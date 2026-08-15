@@ -1,0 +1,24 @@
+{
+  "button.crack-all": "Đập tất cả",
+  "tooltip.crack-all": "Đập toàn bộ (Shift+Click)",
+  "menu.description.free": "Clint có thể đập vỡ chúng miễn phí cho bạn.\n(Giữ Shift hoặc nhấn 'Đập tất cả' để mở hết)",
+  "menu.description.price": "Clint có thể đập vỡ chúng cho bạn với giá {{price}}g.\n(Giữ Shift hoặc nhấn 'Đập tất cả' để mở hết)",
+  "toast.cracked-summary": "Đã đập {{count}}x {{name}}",
+
+  "config.section.blacksmith": "Đập Địa Thạch ở Thợ Rèn",
+  "config.free-cracking.name": "Đập Miễn Phí",
+  "config.free-cracking.tooltip": "Đập địa thạch, hòm cổ vật, dừa vàng và hộp bí ẩn hoàn toàn miễn phí (0g) tại tiệm Clint.",
+  "config.cracking-price.name": "Giá Đập Tùy Chỉnh",
+  "config.cracking-price.tooltip": "Số vàng cần trả cho mỗi địa thạch khi tắt Đập Miễn Phí.",
+  "config.instant-cracking.name": "Đập Tức Thì",
+  "config.instant-cracking.tooltip": "Bỏ qua hoạt ảnh chờ 2.7 giây để đập địa thạch ngay lập tức.",
+  "config.show-crack-all-button.name": "Hiện Nút 'Đập Tất Cả'",
+  "config.show-crack-all-button.tooltip": "Hiển thị nút 'Đập Tất Cả' chuyên dụng trong menu địa thạch của Clint.",
+  "config.bulk-batch-size.name": "Số Lượng Đập Tối Đa",
+  "config.bulk-batch-size.tooltip": "Số lượng địa thạch tối đa đập trong một lần (999 = toàn bộ).",
+  "config.show-summary-toast.name": "Hiện Thông Báo Tóm Tắt",
+  "config.show-summary-toast.tooltip": "Hiển thị thông báo tổng kết số địa thạch đã đập.",
+  "config.section.farm-machines": "Tùy Chọn Máy Móc Nông Trại",
+  "config.instant-geode-crusher.name": "Máy Nghiền Địa Thạch Tức Thì",
+  "config.instant-geode-crusher.tooltip": "Giúp máy nghiền địa thạch trên nông trại xử lý ngay lập tức."
+}

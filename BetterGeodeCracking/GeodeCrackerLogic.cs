@@ -106,7 +106,7 @@ namespace BetterGeodeCracking
             if (config.ShowSummaryToast && countToCrack > 1)
             {
                 string name = geodeStack.DisplayName;
-                Game1.addHUDMessage(new HUDMessage($"Cracked {countToCrack}x {name}"));
+                Game1.addHUDMessage(new HUDMessage(ModEntry.I18n.Get("toast.cracked-summary", new { count = countToCrack, name = name })));
             }
 
             return result;

@@ -71,12 +71,14 @@ namespace BetterGeodeCracking
 
         private static void UpdateCrackAllButton(GeodeMenu menu)
         {
-            int btnWidth = 140;
+            string label = ModEntry.I18n.Get("button.crack-all");
+            int textWidth = (int)Game1.smallFont.MeasureString(label).X;
+            int btnWidth = Math.Max(140, textWidth + 32);
             int btnHeight = 44;
             int btnX = menu.geodeSpot.bounds.Right - btnWidth - 16;
             int btnY = menu.geodeSpot.bounds.Y + 16;
 
-            if (CrackAllButton == null || CrackAllButton.bounds.X != btnX || CrackAllButton.bounds.Y != btnY)
+            if (CrackAllButton == null || CrackAllButton.bounds.X != btnX || CrackAllButton.bounds.Y != btnY || CrackAllButton.bounds.Width != btnWidth)
             {
                 CrackAllButton = new ClickableComponent(new Rectangle(btnX, btnY, btnWidth, btnHeight), "CrackAll")
                 {
@@ -221,7 +223,7 @@ namespace BetterGeodeCracking
 
             if (isHoveringCrackAll)
             {
-                __instance.hoverText = "Crack Entire Stack (Shift+Click)";
+                __instance.hoverText = ModEntry.I18n.Get("tooltip.crack-all");
                 return;
             }
 
@@ -229,11 +231,11 @@ namespace BetterGeodeCracking
             {
                 if (Config.FreeCracking)
                 {
-                    __instance.descriptionText = "Clint can break these open for you for free.\n(Hold Shift or click 'Crack All' to open stack)";
+                    __instance.descriptionText = ModEntry.I18n.Get("menu.description.free");
                 }
                 else if (Config.CrackingPrice != 25)
                 {
-                    __instance.descriptionText = $"Clint can break these open for you for {Config.CrackingPrice}g.\n(Hold Shift or click 'Crack All' to open stack)";
+                    __instance.descriptionText = ModEntry.I18n.Get("menu.description.price", new { price = Config.CrackingPrice });
                 }
                 else
                 {
@@ -281,7 +283,7 @@ namespace BetterGeodeCracking
             );
 
             // Draw Button Label
-            string label = "Crack All";
+            string label = ModEntry.I18n.Get("button.crack-all");
             Vector2 textSize = Game1.smallFont.MeasureString(label);
             Vector2 textPos = new Vector2(
                 CrackAllButton.bounds.X + (CrackAllButton.bounds.Width - textSize.X) / 2f,
