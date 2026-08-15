@@ -13,6 +13,7 @@ A suite of high-performance, modular quality-of-life and progression enhancement
 | [**ExtendedDesertFestival**](./ExtendedDesertFestival) | `1.1.0` | Expands the Calico Desert Festival across all seasons. | Enables Desert Festival in Summer, Fall, and Winter (15th–17th), preserves Calico Eggs between festivals. |
 | [**ExtendedStackable**](./ExtendedStackable) | `1.0.0` | Stack size overhaul for normally unstackable items. | Stacks fishing tackle, 1.6 trinkets, rings, furniture, boots, clothing, and hats up to 999. |
 | [**BetterGeodeCracking**](./BetterGeodeCracking) | `1.0.0` | Bulk and instant geode/trove cracking without fees. | Free 0g geode cracking at Clint's, Shift+Click / button bulk stack cracking, instant opening, GMCM menu. |
+| [**BetterTrinket**](./BetterTrinket) | `1.0.0` | Smart trinket reforging overhaul, bad-luck protection, and stat tooltips. | "Never downgrade" reforge guarantee, bad-luck pity counter, stat range tooltips, configurable Iridium Bar cost, GMCM menu. |
 
 ---
 
@@ -28,7 +29,8 @@ A suite of high-performance, modular quality-of-life and progression enhancement
        ├── BetterProduct/
        ├── ExtendedDesertFestival/
        ├── ExtendedStackable/
-       └── BetterGeodeCracking/
+       ├── BetterGeodeCracking/
+       └── BetterTrinket/
    ```
 4. Run the game using **StardewModdingAPI.exe**.
 
@@ -42,7 +44,7 @@ All mods in this collection feature native integration with [Generic Mod Config 
 
 ## 🛠️ Development & Building
 
-All mods are built targeting **.NET 10.0** and the **Stardew Valley 1.6+** SMAPI environment.
+All mods are built targeting **.NET 6.0 / .NET 10.0** and the **Stardew Valley 1.6+** SMAPI environment.
 
 ### Build All Mods
 Run the following command from the root folder:
@@ -52,6 +54,7 @@ dotnet build BetterProduct/BetterProduct.csproj
 dotnet build ExtendedDesertFestival/ExtendedDesertFestival.csproj
 dotnet build ExtendedStackable/ExtendedStackable.csproj
 dotnet build BetterGeodeCracking/BetterGeodeCracking.csproj
+dotnet build BetterTrinket/BetterTrinket.csproj
 ```
 
 ---

@@ -1,0 +1,10 @@
+{
+  "Name": "BetterTrinket",
+  "Author": "feiluvnana",
+  "Version": "1.0.0",
+  "Description": "Overhauls Stardew Valley 1.6 trinket mechanics with smart reforge protections, pity progression, stat range tooltips, and custom anvil costs.",
+  "UniqueID": "feiluvnana.BetterTrinket",
+  "EntryDll": "BetterTrinket.dll",
+  "MinimumApiVersion": "4.0.0",
+  "UpdateKeys": []
+}

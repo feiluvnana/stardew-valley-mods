@@ -21,6 +21,12 @@
   - **Pickle Multiplier (`PickleMultiplier: 2.5x`):** Improves preserves jar margins.
   - **Aged Roe & Caviar Scaling (`AgedRoeMultiplier: 2.5x`, `CaviarPrice: 750g`):** Makes fish pond roe production and sturgeon caviar lucrative.
 
+- **🍄 Enhanced Dehydrator Mechanics:**
+  - **Mixed-Quality Input Support:** Combines items of different star qualities (e.g. 2 Normal + 2 Silver + 1 Gold) into the 5-item batch with zero waste.
+  - **Smart Inventory Auto-Pull:** Interacting with $<5$ items in hand automatically pulls remaining matching items from other inventory stacks.
+  - **Weighted Output Quality:** Produces Silver, Gold, or Iridium dried goods matching the weighted average quality of the input batch.
+  - **Custom Speed & Recipe Expansion:** Configurable speed multiplier and options to dry edible vegetables and flowers.
+
 ---
 
 ## ⚙️ Configuration (`config.json`)
@@ -41,7 +47,13 @@
   "PickleMultiplier": 2.5,
   "EnableRoeBuff": true,
   "AgedRoeMultiplier": 2.5,
-  "CaviarPrice": 750
+  "CaviarPrice": 750,
+  "EnableDehydratorBalancing": true,
+  "AllowMixedQualityDehydrating": true,
+  "EnableDriedQualityScaling": true,
+  "DehydratorSpeedMultiplier": 1.0,
+  "AllowVegetableDehydrating": true,
+  "AllowFlowerDehydrating": false
 }
 ```
 
