@@ -55,7 +55,6 @@ namespace BetterSkullCavernChest
             new("(O)74", LootCategory.Legendary, 1, 3, 25.0, c => c.EnableLegendaryCategory && c.EnablePrismaticShard),
             new("(O)279", LootCategory.Legendary, 1, 2, 20.0, c => c.EnableLegendaryCategory && c.EnableMagicRockCandy),
             new("(O)GoldenAnimalCracker", LootCategory.Legendary, 1, 2, 20.0, c => c.EnableLegendaryCategory && c.EnableGoldenAnimalCracker),
-            new("(O)PurpleBook", LootCategory.Legendary, 1, 1, 15.0, c => c.EnableLegendaryCategory && c.EnableBooks, false), // Book of Stars
             new("(O)896", LootCategory.Legendary, 1, 1, 15.0, c => c.EnableLegendaryCategory && c.EnableGalaxySoul, false),  // Galaxy Soul
             new("(O)StardropTea", LootCategory.Legendary, 1, 2, 15.0, c => c.EnableLegendaryCategory && c.EnableStardropTea),
             new("(O)PrizeTicket", LootCategory.Legendary, 2, 5, 15.0, c => c.EnableLegendaryCategory && c.EnablePrizeTicket),
@@ -72,11 +71,6 @@ namespace BetterSkullCavernChest
             new("(O)805", LootCategory.Agriculture, 10, 25, 15.0, c => c.EnableAgricultureCategory && c.EnableFertilizers),     // Tree Fertilizer
             new("(O)915", LootCategory.Agriculture, 1, 2, 12.0, c => c.EnableAgricultureCategory && c.EnableSprinklers),        // Pressure Nozzle
             new("(O)913", LootCategory.Agriculture, 1, 2, 12.0, c => c.EnableAgricultureCategory && c.EnableSprinklers),        // Enricher
-            new("(O)SkillBook_0", LootCategory.Agriculture, 1, 1, 10.0, c => c.EnableAgricultureCategory && c.EnableBooks, false), // Almanac
-            new("(O)Book_AnimalCatalogue", LootCategory.Agriculture, 1, 1, 8.0, c => c.EnableAgricultureCategory && c.EnableBooks, false),
-            new("(O)Book_Grass", LootCategory.Agriculture, 1, 1, 8.0, c => c.EnableAgricultureCategory && c.EnableBooks, false), // Ol' Slitherlegs
-            new("(O)Book_PriceCatalogue", LootCategory.Agriculture, 1, 1, 8.0, c => c.EnableAgricultureCategory && c.EnableBooks, false),
-            new("(O)Book_QueenOfSauce", LootCategory.Agriculture, 1, 1, 8.0, c => c.EnableAgricultureCategory && c.EnableBooks, false),
 
             // =========================================================================
             // === 3. MINING CATEGORY (15% Category Weight)                          ===
@@ -89,9 +83,6 @@ namespace BetterSkullCavernChest
             new("(O)848", LootCategory.Mining, 5, 20, 20.0, c => c.EnableMiningCategory),                                // Cinder Shard
             new("(O)70", LootCategory.Mining, 3, 8, 20.0, c => c.EnableMiningCategory),                                  // Jade (Staircases)
             new("(O)72", LootCategory.Mining, 3, 8, 18.0, c => c.EnableMiningCategory),                                  // Diamond
-            new("(O)SkillBook_3", LootCategory.Mining, 1, 1, 10.0, c => c.EnableMiningCategory && c.EnableBooks, false), // Mining Monthly
-            new("(O)Book_Bombs", LootCategory.Mining, 1, 1, 8.0, c => c.EnableMiningCategory && c.EnableBooks, false),   // Dwarvish Safety Manual
-            new("(O)Book_Diamonds", LootCategory.Mining, 1, 1, 8.0, c => c.EnableMiningCategory && c.EnableBooks, false),// The Diamond Hunter
 
             // =========================================================================
             // === 4. FISHING CATEGORY (15% Category Weight)                         ===
@@ -100,9 +91,6 @@ namespace BetterSkullCavernChest
             new("(O)DeluxeBait", LootCategory.Fishing, 20, 50, 22.0, c => c.EnableFishingCategory && c.EnableFishingTackle),
             new("(O)694", LootCategory.Fishing, 1, 3, 18.0, c => c.EnableFishingCategory && c.EnableFishingTackle),  // Trap Bobber
             new("(O)856", LootCategory.Fishing, 1, 2, 16.0, c => c.EnableFishingCategory && c.EnableFishingTackle),  // Curiosity Lure
-            new("(O)SkillBook_1", LootCategory.Fishing, 1, 1, 10.0, c => c.EnableFishingCategory && c.EnableBooks, false), // Bait & Bobber
-            new("(O)Book_Crabbing", LootCategory.Fishing, 1, 1, 8.0, c => c.EnableFishingCategory && c.EnableBooks, false), // Art O' Crabbing
-            new("(O)Book_Roe", LootCategory.Fishing, 1, 1, 8.0, c => c.EnableFishingCategory && c.EnableBooks, false),      // Jewels of the Sea
 
             // =========================================================================
             // === 5. COMBAT CATEGORY (15% Category Weight)                          ===
@@ -114,12 +102,6 @@ namespace BetterSkullCavernChest
             new("(O)879", LootCategory.Combat, 2, 5, 18.0, c => c.EnableCombatCategory),                                // Monster Musk
             new("(O)857", LootCategory.Combat, 1, 1, 15.0, c => c.EnableCombatCategory && c.EnableSlimeEggs, false),    // Tiger Slime Egg
             new("(O)439", LootCategory.Combat, 1, 1, 15.0, c => c.EnableCombatCategory && c.EnableSlimeEggs, false),    // Purple Slime Egg
-            new("(O)SkillBook_4", LootCategory.Combat, 1, 1, 10.0, c => c.EnableCombatCategory && c.EnableBooks, false), // Combat Quarterly
-            new("(O)Book_Void", LootCategory.Combat, 1, 1, 8.0, c => c.EnableCombatCategory && c.EnableBooks, false),   // Monster Compendium
-            new("(O)Book_Defense", LootCategory.Combat, 1, 1, 8.0, c => c.EnableCombatCategory && c.EnableBooks, false),// Jack Be Nimble
-            new("(O)Book_Speed", LootCategory.Combat, 1, 1, 8.0, c => c.EnableCombatCategory && c.EnableBooks, false),  // Way of the Wind pt. 1
-            new("(O)Book_Speed2", LootCategory.Combat, 1, 1, 6.0, c => c.EnableCombatCategory && c.EnableBooks, false), // Way of the Wind pt. 2
-            new("(O)Book_Marlon", LootCategory.Combat, 1, 1, 8.0, c => c.EnableCombatCategory && c.EnableBooks, false), // Mapping Cave Systems
 
             // =========================================================================
             // === 6. FORAGING CATEGORY (15% Category Weight)                        ===
@@ -128,12 +110,6 @@ namespace BetterSkullCavernChest
             new("(O)791", LootCategory.Foraging, 2, 6, 22.0, c => c.EnableForagingCategory),                            // Golden Coconut
             new("(O)261", LootCategory.Foraging, 3, 8, 20.0, c => c.EnableForagingCategory && c.EnableWarpTotems),     // Warp Totem: Desert
             new("(O)688", LootCategory.Foraging, 3, 8, 20.0, c => c.EnableForagingCategory && c.EnableWarpTotems),     // Warp Totem: Farm
-            new("(O)SkillBook_2", LootCategory.Foraging, 1, 1, 10.0, c => c.EnableForagingCategory && c.EnableBooks, false), // Woodcutter's Weekly
-            new("(O)Book_Woodcutting", LootCategory.Foraging, 1, 1, 8.0, c => c.EnableForagingCategory && c.EnableBooks, false), // Woody's Secret
-            new("(O)Book_WildSeeds", LootCategory.Foraging, 1, 1, 8.0, c => c.EnableForagingCategory && c.EnableBooks, false),   // Ways of the Wild
-            new("(O)Book_Friendship", LootCategory.Foraging, 1, 1, 8.0, c => c.EnableForagingCategory && c.EnableBooks, false),  // Friendship 101
-            new("(O)Book_Horse", LootCategory.Foraging, 1, 1, 8.0, c => c.EnableForagingCategory && c.EnableBooks, false),       // Horse: The Book
-            new("(O)Book_Trash", LootCategory.Foraging, 1, 1, 8.0, c => c.EnableForagingCategory && c.EnableBooks, false),       // The Alleyway Buffet
 
             // =========================================================================
             // === 7. LOOTBOXES CATEGORY (15% Category Weight)                       ===
@@ -144,8 +120,6 @@ namespace BetterSkullCavernChest
             new("(O)GoldenMysteryBox", LootCategory.Lootboxes, 2, 5, 22.0, c => c.EnableLootboxCategory && c.EnableMysteryBoxes),
             new("(O)CalicoEgg", LootCategory.Lootboxes, 15, 50, 22.0, c => c.EnableLootboxCategory && c.EnableCalicoEggs),
             new("(O)TreasureTotem", LootCategory.Lootboxes, 1, 3, 18.0, c => c.EnableLootboxCategory),
-            new("(O)Book_Mystery", LootCategory.Lootboxes, 1, 1, 10.0, c => c.EnableLootboxCategory && c.EnableBooks, false),   // Book of Mysteries
-            new("(O)Book_Artifact", LootCategory.Lootboxes, 1, 1, 10.0, c => c.EnableLootboxCategory && c.EnableBooks, false), // Treasure Appraisal Guide
         };
 
         public static List<Item> GenerateRewards(ModConfig config, Random random, bool isSpecialChest = false)

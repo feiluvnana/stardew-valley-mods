@@ -62,7 +62,6 @@ namespace BetterSkullCavernChest
         public bool EnableGalaxySoul { get; set; } = true;
         public bool EnablePrizeTicket { get; set; } = true;
         public bool EnableStardropTea { get; set; } = true;
-        public bool EnableBooks { get; set; } = true;
         public bool EnableFertilizers { get; set; } = true;
         public bool EnableSprinklers { get; set; } = true;
         public bool EnableRareSeeds { get; set; } = true;

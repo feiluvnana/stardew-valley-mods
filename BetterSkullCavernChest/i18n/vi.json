@@ -94,8 +94,6 @@
   "config.enable-lootbox-category.tooltip": "Bật hoặc tắt toàn bộ Hộp kỳ bí & Rương cổ vật.",
 
   "config.section.item-toggles": "Bật / Tắt Từng Loại Vật Phẩm",
-  "config.enable-books.name": "Bật Sách Kỹ Năng (Đủ 24 Cuốn)",
-  "config.enable-books.tooltip": "Cho phép Sách Kỹ Năng & Sách Sức Mạnh xuất hiện trong rương.",
   "config.enable-fertilizers.name": "Bật Phân Bón & Phụ Kiện Tưới",
   "config.enable-fertilizers.tooltip": "Cho phép Siêu phân bón tăng tốc, Phân bón cao cấp, Vòi tăng áp và Bộ bón phân tự động xuất hiện.",
   "config.enable-radioactive-items.name": "Bật Quặng & Thỏi Phóng Xạ",

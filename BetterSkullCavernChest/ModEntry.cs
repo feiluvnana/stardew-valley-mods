@@ -565,13 +565,6 @@ namespace BetterSkullCavernChest
             configMenu.AddSectionTitle(mod: ModManifest, text: () => I18n.Get("config.section.item-toggles"));
             configMenu.AddBoolOption(
                 mod: ModManifest,
-                name: () => I18n.Get("config.enable-books.name"),
-                tooltip: () => I18n.Get("config.enable-books.tooltip"),
-                getValue: () => Config.EnableBooks,
-                setValue: value => Config.EnableBooks = value
-            );
-            configMenu.AddBoolOption(
-                mod: ModManifest,
                 name: () => I18n.Get("config.enable-fertilizers.name"),
                 tooltip: () => I18n.Get("config.enable-fertilizers.tooltip"),
                 getValue: () => Config.EnableFertilizers,

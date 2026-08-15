@@ -6,14 +6,14 @@
 
 ## ✨ Features
 
-### 🌟 1. 7 Usage-Based Gameplay Categories (76 Validated Items, 0 Machines)
-- 🌟 **Legendary:** Prismatic Shard, Magic Rock Candy, Golden Animal Cracker, Book of Stars, Galaxy Soul, Stardrop Tea, Prize Ticket.
-- 🌾 **Agriculture:** Hyper Speed-Gro, Deluxe Fertilizer, Deluxe Retaining Soil, Tree Fertilizer, Iridium Sprinklers, Pressure Nozzles, Enrichers, Rare Seeds, Ancient Seeds, Agricultural Books.
-- ⛏️ **Mining:** Radioactive Ore & Bar, Iridium Ore & Bar, Coal (bulk 25–75), Cinder Shards, Mega Bombs, Bombs, Jade (Staircase trading), Diamond, Mining Books.
-- 🎣 **Fishing:** Trap Bobber, Curiosity Lure, Deluxe Bait, Challenge Bait, Magnet, Caviar, Squid Ink, Fishing Books.
-- ⚔️ **Combat:** Tiger, Purple & Blue Slime Eggs, Dragon Teeth, Fairy Dust, Monster Musk, Life Elixir, Triple Shot Espresso, Combat Books.
-- 🌲 **Foraging:** Mystic Tree Seed, Golden Coconut, Desert & Farm Warp Totems, Foraging Books.
-- 🎁 **Lootboxes & Troves:** Omni Geodes, Mystery Boxes, Artifact Troves, Golden Mystery Boxes, Calico Eggs (15–50), Treasure Totems, Book of Mysteries, Treasure Appraisal Guide.
+### 🌟 1. 7 Usage-Based Gameplay Categories (44 Validated Items, 0 Machines, 0 Books)
+- 🌟 **Legendary:** Prismatic Shard, Magic Rock Candy, Golden Animal Cracker, Galaxy Soul, Stardrop Tea, Prize Ticket.
+- 🌾 **Agriculture:** Hyper Speed-Gro, Deluxe Fertilizer, Deluxe Retaining Soil, Tree Fertilizer, Iridium Sprinklers, Pressure Nozzles, Enrichers, Rare Seeds, Starfruit Seeds.
+- ⛏️ **Mining:** Radioactive Ore & Bar, Iridium Ore & Bar, Cinder Shards, Mega Bombs, Jade (Staircase trading), Diamond.
+- 🎣 **Fishing:** Trap Bobber, Curiosity Lure, Deluxe Bait, Challenge Bait.
+- ⚔️ **Combat:** Tiger & Purple Slime Eggs, Dragon Teeth, Fairy Dust, Monster Musk, Life Elixir, Triple Shot Espresso.
+- 🌲 **Foraging:** Mystic Tree Seed, Golden Coconut, Desert & Farm Warp Totems.
+- 🎁 **Lootboxes & Troves:** Omni Geodes, Mystery Boxes, Artifact Troves, Golden Mystery Boxes, Calico Eggs (15–50), Treasure Totems.
 
 ---
 
@@ -32,92 +32,59 @@
 
 ### 🛡️ 3. Zero Junk / Invalid Item Protection
 - Fully compatible with Stardew Valley 1.6 item IDs.
-- Validated item references for books (`(O)SkillBook_0` to `(O)SkillBook_4`, `(O)Book_Bombs`, `(O)Book_Diamonds`, etc.).
-- Protects single-count items (Books, Slime Eggs, Galaxy Souls) from illegal multi-stack duplication.
+- Protects single-count items (Slime Eggs, Galaxy Souls) from illegal multi-stack duplication.
 - Strips decorative cosmetic junk (hats, shirts, floor dividers).
 
 ---
 
 ## 📊 Complete Drop Rate & Probability Table (Regular Chests)
 
-| Category | Item Name | Qualified ID | Base Stack | Item Weight | Category Share | Per-Roll Chance | Per-Chest Chance |
-| :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: |
-| **Legendary (10%)** | **Prismatic Shard** | `(O)74` | 1 – 3 | 25.0 | 20.00% | **2.000%** | **4.08%** |
-| | **Magic Rock Candy** | `(O)279` | 1 – 2 | 20.0 | 16.00% | **1.600%** | **3.29%** |
-| | **Golden Animal Cracker** | `(O)GoldenAnimalCracker` | 1 – 2 | 20.0 | 16.00% | **1.600%** | **3.31%** |
-| | **Book of Stars** | `(O)PurpleBook` | 1 | 15.0 | 12.00% | **1.200%** | **2.50%** |
-| | **Galaxy Soul** | `(O)896` | 1 | 15.0 | 12.00% | **1.200%** | **2.50%** |
-| | **Stardrop Tea** | `(O)StardropTea` | 1 – 2 | 15.0 | 12.00% | **1.200%** | **2.48%** |
-| | **Prize Ticket** | `(O)PrizeTicket` | 2 – 5 | 15.0 | 12.00% | **1.200%** | **2.48%** |
-| **Agriculture (15%)** | **Hyper Speed-Gro** | `(O)918` | 10 – 30 | 20.0 | 10.36% | **1.554%** | **3.28%** |
-| | **Deluxe Fertilizer** | `(O)919` | 10 – 30 | 20.0 | 10.36% | **1.554%** | **3.24%** |
-| | **Rare Seed** | `(O)347` | 2 – 6 | 20.0 | 10.36% | **1.554%** | **3.20%** |
-| | **Deluxe Retaining Soil** | `(O)920` | 10 – 30 | 18.0 | 9.33% | **1.399%** | **2.85%** |
-| | **Iridium Sprinkler** | `(O)645` | 1 – 3 | 18.0 | 9.33% | **1.399%** | **2.88%** |
-| | **Ancient Seeds** | `(O)499` | 1 – 3 | 16.0 | 8.29% | **1.244%** | **2.59%** |
-| | **Tree Fertilizer** | `(O)805` | 10 – 25 | 15.0 | 7.77% | **1.166%** | **2.42%** |
-| | **Pressure Nozzle** | `(O)915` | 1 – 2 | 12.0 | 6.22% | **0.933%** | **1.95%** |
-| | **Enricher** | `(O)913` | 1 – 2 | 12.0 | 6.22% | **0.933%** | **1.95%** |
-| | **Stardew Valley Almanac** | `(O)SkillBook_0` | 1 | 10.0 | 5.18% | **0.777%** | **1.65%** |
-| | **Animal Catalogue** | `(O)Book_AnimalCatalogue` | 1 | 8.0 | 4.15% | **0.622%** | **1.31%** |
-| | **Ol' Slitherlegs** | `(O)Book_Grass` | 1 | 8.0 | 4.15% | **0.622%** | **1.30%** |
-| | **Price Catalogue** | `(O)Book_PriceCatalogue` | 1 | 8.0 | 4.15% | **0.622%** | **1.31%** |
-| | **Queen of Sauce Cookbook**| `(O)Book_QueenOfSauce` | 1 | 8.0 | 4.15% | **0.622%** | **1.29%** |
-| **Mining (15%)** | **Iridium Ore** | `(O)386` | 10 – 30 | 25.0 | 10.50% | **1.576%** | **3.29%** |
-| | **Mega Bomb** | `(O)288` | 5 – 20 | 25.0 | 10.50% | **1.576%** | **3.28%** |
-| | **Radioactive Ore** | `(O)909` | 5 – 20 | 22.0 | 9.24% | **1.387%** | **2.84%** |
-| | **Iridium Bar** | `(O)337` | 5 – 15 | 22.0 | 9.24% | **1.387%** | **2.93%** |
-| | **Radioactive Bar** | `(O)910` | 3 – 8 | 20.0 | 8.40% | **1.261%** | **2.59%** |
-| | **Cinder Shard** | `(O)848` | 5 – 20 | 20.0 | 8.40% | **1.261%** | **2.62%** |
-| | **Coal** | `(O)382` | 25 – 75 | 20.0 | 8.40% | **1.261%** | **2.64%** |
-| | **Bomb** | `(O)287` | 10 – 30 | 20.0 | 8.40% | **1.261%** | **2.59%** |
-| | **Jade** | `(O)70` | 3 – 8 | 20.0 | 8.40% | **1.261%** | **2.63%** |
-| | **Diamond** | `(O)72` | 3 – 8 | 18.0 | 7.56% | **1.134%** | **2.37%** |
-| | **Mining Monthly** | `(O)SkillBook_3` | 1 | 10.0 | 4.20% | **0.630%** | **1.32%** |
-| | **Dwarvish Safety Manual** | `(O)Book_Bombs` | 1 | 8.0 | 3.36% | **0.504%** | **1.06%** |
-| | **The Diamond Hunter** | `(O)Book_Diamonds` | 1 | 8.0 | 3.36% | **0.504%** | **1.05%** |
-| **Fishing (15%)** | **Challenge Bait** | `(O)ChallengeBait` | 15 – 45 | 22.0 | 14.10% | **2.115%** | **4.37%** |
-| | **Deluxe Bait** | `(O)DeluxeBait` | 20 – 50 | 22.0 | 14.10% | **2.115%** | **4.32%** |
-| | **Magnet** | `(O)703` | 15 – 40 | 18.0 | 11.54% | **1.731%** | **3.62%** |
-| | **Caviar** | `(O)445` | 2 – 5 | 18.0 | 11.54% | **1.731%** | **3.57%** |
-| | **Trap Bobber** | `(O)694` | 1 – 3 | 18.0 | 11.54% | **1.731%** | **3.56%** |
-| | **Curiosity Lure** | `(O)856` | 1 – 2 | 16.0 | 10.26% | **1.538%** | **3.17%** |
-| | **Squid Ink** | `(O)814` | 3 – 8 | 16.0 | 10.26% | **1.538%** | **3.21%** |
-| | **Bait and Bobber** | `(O)SkillBook_1` | 1 | 10.0 | 6.41% | **0.962%** | **2.01%** |
-| | **The Art O' Crabbing** | `(O)Book_Crabbing` | 1 | 8.0 | 5.13% | **0.769%** | **1.60%** |
-| | **Jewels of the Sea** | `(O)Book_Roe` | 1 | 8.0 | 5.13% | **0.769%** | **1.59%** |
-| **Combat (15%)** | **Life Elixir** | `(O)773` | 3 – 6 | 22.0 | 11.28% | **1.692%** | **3.54%** |
-| | **Triple Shot Espresso** | `(O)253` | 3 – 8 | 22.0 | 11.28% | **1.692%** | **3.51%** |
-| | **Dragon Tooth** | `(O)852` | 2 – 5 | 20.0 | 10.26% | **1.538%** | **3.22%** |
-| | **Fairy Dust** | `(O)872` | 2 – 5 | 20.0 | 10.26% | **1.538%** | **3.17%** |
-| | **Monster Musk** | `(O)879` | 2 – 5 | 18.0 | 9.23% | **1.385%** | **2.92%** |
-| | **Tiger Slime Egg** | `(O)857` | 1 | 15.0 | 7.69% | **1.154%** | **2.40%** |
-| | **Purple Slime Egg** | `(O)439` | 1 | 15.0 | 7.69% | **1.154%** | **2.41%** |
-| | **Blue Slime Egg** | `(O)413` | 1 | 15.0 | 7.69% | **1.154%** | **2.40%** |
-| | **Combat Quarterly** | `(O)SkillBook_4` | 1 | 10.0 | 5.13% | **0.769%** | **1.63%** |
-| | **Monster Compendium** | `(O)Book_Void` | 1 | 8.0 | 4.10% | **0.615%** | **1.30%** |
-| | **Jack Be Nimble** | `(O)Book_Defense` | 1 | 8.0 | 4.10% | **0.615%** | **1.31%** |
-| | **Way of the Wind pt. 1** | `(O)Book_Speed` | 1 | 8.0 | 4.10% | **0.615%** | **1.28%** |
-| | **Way of the Wind pt. 2** | `(O)Book_Speed2` | 1 | 6.0 | 3.08% | **0.462%** | **0.96%** |
-| | **Mapping Cave Systems** | `(O)Book_Marlon` | 1 | 8.0 | 4.10% | **0.615%** | **1.30%** |
-| **Foraging (15%)** | **Mystic Tree Seed** | `(O)MysticTreeSeed` | 2 – 6 | 22.0 | 16.42% | **2.463%** | **5.06%** |
-| | **Golden Coconut** | `(O)791` | 2 – 6 | 22.0 | 16.42% | **2.463%** | **5.17%** |
-| | **Warp Totem: Desert** | `(O)261` | 3 – 8 | 20.0 | 14.93% | **2.239%** | **4.65%** |
-| | **Warp Totem: Farm** | `(O)688` | 3 – 8 | 20.0 | 14.93% | **2.239%** | **4.62%** |
-| | **Woodcutter's Weekly** | `(O)SkillBook_2` | 1 | 10.0 | 7.46% | **1.119%** | **2.33%** |
-| | **Woody's Secret** | `(O)Book_Woodcutting` | 1 | 8.0 | 5.97% | **0.896%** | **1.86%** |
-| | **Ways of the Wild** | `(O)Book_WildSeeds` | 1 | 8.0 | 5.97% | **0.896%** | **1.86%** |
-| | **Friendship 101** | `(O)Book_Friendship` | 1 | 8.0 | 5.97% | **0.896%** | **1.90%** |
-| | **Horse: The Book** | `(O)Book_Horse` | 1 | 8.0 | 5.97% | **0.896%** | **1.87%** |
-| | **The Alleyway Buffet** | `(O)Book_Trash` | 1 | 8.0 | 5.97% | **0.896%** | **1.89%** |
-| **Lootboxes (15%)** | **Omni Geode** | `(O)749` | 10 – 30 | 28.0 | 17.50% | **2.625%** | **5.39%** |
-| | **Mystery Box** | `(O)MysteryBox` | 3 – 10 | 25.0 | 15.62% | **2.344%** | **4.84%** |
-| | **Artifact Trove** | `(O)275` | 3 – 10 | 25.0 | 15.62% | **2.344%** | **4.84%** |
-| | **Golden Mystery Box** | `(O)GoldenMysteryBox` | 2 – 5 | 22.0 | 13.75% | **2.062%** | **4.28%** |
-| | **Calico Egg** | `(O)CalicoEgg` | 15 – 50 | 22.0 | 13.75% | **2.062%** | **4.29%** |
-| | **Treasure Totem** | `(O)TreasureTotem` | 1 – 3 | 18.0 | 11.25% | **1.688%** | **3.52%** |
-| | **Book of Mysteries** | `(O)Book_Mystery` | 1 | 10.0 | 6.25% | **0.938%** | **1.97%** |
-| | **Treasure Appraisal Guide**| `(O)Book_Artifact` | 1 | 10.0 | 6.25% | **0.938%** | **1.96%** |
+| Category | Item Name | Qualified ID | Base Stack | Item Weight | Category Share | Per-Roll Chance |
+| :--- | :--- | :--- | :---: | :---: | :---: | :---: |
+| **Legendary (10%)** | **Prismatic Shard** | `(O)74` | 1 – 3 | 25.0 | 22.73% | **2.273%** |
+| | **Magic Rock Candy** | `(O)279` | 1 – 2 | 20.0 | 18.18% | **1.818%** |
+| | **Golden Animal Cracker** | `(O)GoldenAnimalCracker` | 1 – 2 | 20.0 | 18.18% | **1.818%** |
+| | **Galaxy Soul** | `(O)896` | 1 | 15.0 | 13.64% | **1.364%** |
+| | **Stardrop Tea** | `(O)StardropTea` | 1 – 2 | 15.0 | 13.64% | **1.364%** |
+| | **Prize Ticket** | `(O)PrizeTicket` | 2 – 5 | 15.0 | 13.64% | **1.364%** |
+| **Agriculture (15%)** | **Hyper Speed-Gro** | `(O)918` | 10 – 30 | 20.0 | 13.07% | **1.961%** |
+| | **Deluxe Fertilizer** | `(O)919` | 10 – 30 | 20.0 | 13.07% | **1.961%** |
+| | **Rare Seed** | `(O)347` | 2 – 6 | 20.0 | 13.07% | **1.961%** |
+| | **Starfruit Seeds** | `(O)486` | 5 – 20 | 18.0 | 11.76% | **1.765%** |
+| | **Deluxe Retaining Soil** | `(O)920` | 10 – 30 | 18.0 | 11.76% | **1.765%** |
+| | **Iridium Sprinkler** | `(O)645` | 1 – 3 | 18.0 | 11.76% | **1.765%** |
+| | **Tree Fertilizer** | `(O)805` | 10 – 25 | 15.0 | 9.80% | **1.471%** |
+| | **Pressure Nozzle** | `(O)915` | 1 – 2 | 12.0 | 7.84% | **1.176%** |
+| | **Enricher** | `(O)913` | 1 – 2 | 12.0 | 7.84% | **1.176%** |
+| **Mining (15%)** | **Iridium Ore** | `(O)386` | 10 – 30 | 25.0 | 14.53% | **2.180%** |
+| | **Mega Bomb** | `(O)288` | 5 – 20 | 25.0 | 14.53% | **2.180%** |
+| | **Radioactive Ore** | `(O)909` | 5 – 20 | 22.0 | 12.79% | **1.919%** |
+| | **Iridium Bar** | `(O)337` | 5 – 15 | 22.0 | 12.79% | **1.919%** |
+| | **Radioactive Bar** | `(O)910` | 3 – 8 | 20.0 | 11.63% | **1.744%** |
+| | **Cinder Shard** | `(O)848` | 5 – 20 | 20.0 | 11.63% | **1.744%** |
+| | **Jade** | `(O)70` | 3 – 8 | 20.0 | 11.63% | **1.744%** |
+| | **Diamond** | `(O)72` | 3 – 8 | 18.0 | 10.47% | **1.570%** |
+| **Fishing (15%)** | **Challenge Bait** | `(O)ChallengeBait` | 15 – 45 | 22.0 | 28.21% | **4.231%** |
+| | **Deluxe Bait** | `(O)DeluxeBait` | 20 – 50 | 22.0 | 28.21% | **4.231%** |
+| | **Trap Bobber** | `(O)694` | 1 – 3 | 18.0 | 23.08% | **3.462%** |
+| | **Curiosity Lure** | `(O)856` | 1 – 2 | 16.0 | 20.51% | **3.077%** |
+| **Combat (15%)** | **Life Elixir** | `(O)773` | 3 – 6 | 22.0 | 16.67% | **2.500%** |
+| | **Triple Shot Espresso** | `(O)253` | 3 – 8 | 22.0 | 16.67% | **2.500%** |
+| | **Dragon Tooth** | `(O)852` | 2 – 5 | 20.0 | 15.15% | **2.273%** |
+| | **Fairy Dust** | `(O)872` | 2 – 5 | 20.0 | 15.15% | **2.273%** |
+| | **Monster Musk** | `(O)879` | 2 – 5 | 18.0 | 13.64% | **2.045%** |
+| | **Tiger Slime Egg** | `(O)857` | 1 | 15.0 | 11.36% | **1.705%** |
+| | **Purple Slime Egg** | `(O)439` | 1 | 15.0 | 11.36% | **1.705%** |
+| **Foraging (15%)** | **Mystic Tree Seed** | `(O)MysticTreeSeed` | 2 – 6 | 22.0 | 26.19% | **3.929%** |
+| | **Golden Coconut** | `(O)791` | 2 – 6 | 22.0 | 26.19% | **3.929%** |
+| | **Warp Totem: Desert** | `(O)261` | 3 – 8 | 20.0 | 23.81% | **3.571%** |
+| | **Warp Totem: Farm** | `(O)688` | 3 – 8 | 20.0 | 23.81% | **3.571%** |
+| **Lootboxes (15%)** | **Omni Geode** | `(O)749` | 10 – 30 | 28.0 | 20.00% | **3.000%** |
+| | **Mystery Box** | `(O)MysteryBox` | 3 – 10 | 25.0 | 17.86% | **2.679%** |
+| | **Artifact Trove** | `(O)275` | 3 – 10 | 25.0 | 17.86% | **2.679%** |
+| | **Golden Mystery Box** | `(O)GoldenMysteryBox` | 2 – 5 | 22.0 | 15.71% | **2.357%** |
+| | **Calico Egg** | `(O)CalicoEgg` | 15 – 50 | 22.0 | 15.71% | **2.357%** |
+| | **Treasure Totem** | `(O)TreasureTotem` | 1 – 3 | 18.0 | 12.86% | **1.929%** |
 
 ---
 
@@ -172,7 +139,6 @@
   "EnableGalaxySoul": true,
   "EnablePrizeTicket": true,
   "EnableStardropTea": true,
-  "EnableBooks": true,
   "EnableFertilizers": true,
   "EnableSprinklers": true,
   "EnableRareSeeds": true,

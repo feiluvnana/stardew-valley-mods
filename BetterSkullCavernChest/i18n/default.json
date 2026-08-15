@@ -94,8 +94,6 @@
   "config.enable-lootbox-category.tooltip": "Enable or disable all Lootboxes & Troves.",
 
   "config.section.item-toggles": "Item Feature Toggles",
-  "config.enable-books.name": "Enable Books (All 24 Books)",
-  "config.enable-books.tooltip": "Allow Skill & Power Books to appear in chests.",
   "config.enable-fertilizers.name": "Enable Fertilizers & Attachments",
   "config.enable-fertilizers.tooltip": "Allow Hyper Speed-Gro, Deluxe Fertilizers, Pressure Nozzles, and Enrichers to appear.",
   "config.enable-radioactive-items.name": "Enable Radioactive Ore & Bars",
