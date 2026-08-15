@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using HarmonyLib;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI;
@@ -110,7 +111,6 @@ namespace BetterForge
                 return false;
             }
 
-            // Consume 1 Prismatic Shard
             who.Items.ReduceId("(O)74", 1);
 
             return AscendTrinketDirect(trinket, who);
@@ -126,10 +126,8 @@ namespace BetterForge
                 return false;
             }
 
-            // Mark as Ascended
             trinket.modData[AscensionKey] = "true";
 
-            // Clear cached tooltip so description updates immediately
             TrinketReforgeLogic.ResetCachedDescription(trinket, who);
 
             who.currentLocation?.playSound("yoba");
@@ -185,7 +183,47 @@ namespace BetterForge
 
         // --- In-Combat Ascension Effects ---
 
-        // 1. Frog Egg: 35% chance to immediately reset tongue / fullness cooldown
+        // 1. Frog Egg: Drop monster loot & 35% chance to immediately reset fullness
+        public static Monster? GetFrogAttachedMonster(HungryFrogCompanion frog, GameLocation location)
+        {
+            var netRef = AccessTools.Field(typeof(HungryFrogCompanion), "attachedMonsterField")?.GetValue(frog) as StardewValley.Network.NetNPCRef;
+            return netRef?.Get(location) as Monster;
+        }
+
+        public static void TriggerFrogLootDrop(Monster monster, Farmer? who)
+        {
+            if (monster == null || who?.currentLocation == null) return;
+
+            var extraDrops = monster.getExtraDropItems();
+            if (extraDrops != null)
+            {
+                foreach (var item in extraDrops)
+                {
+                    if (item != null)
+                    {
+                        Game1.createItemDebris(item, monster.Position, Game1.random.Next(4), who.currentLocation);
+                    }
+                }
+            }
+
+            if (monster.objectsToDrop.Count > 0)
+            {
+                for (int i = 0; i < monster.objectsToDrop.Count; i++)
+                {
+                    string dropId = monster.objectsToDrop[i];
+                    if (!string.IsNullOrEmpty(dropId))
+                    {
+                        Item dropItem = ItemRegistry.Create(dropId);
+                        if (dropItem != null)
+                        {
+                            Game1.createItemDebris(dropItem, monster.Position, Game1.random.Next(4), who.currentLocation);
+                        }
+                    }
+                }
+            }
+            who.currentLocation.playSound("coin");
+        }
+
         public static void TriggerFrogCooldownReset(HungryFrogCompanion frog, Farmer who)
         {
             if (frog == null || who == null) return;
@@ -204,10 +242,8 @@ namespace BetterForge
         {
             if (who?.currentLocation == null) return;
 
-            // Apply +1 Defense to owner
             ApplyFairyDefenseBuff(who);
 
-            // Heal nearby co-op farmhands and grant +1 Defense to them too
             foreach (var farmer in who.currentLocation.farmers)
             {
                 if (farmer != null && farmer != who && Vector2.Distance(who.Tile, farmer.Tile) <= 6f)
@@ -238,14 +274,13 @@ namespace BetterForge
             farmer.applyBuff(defenseBuff);
         }
 
-        // 3. Parrot Egg: 25% chance to drop extra monster loot
+        // 3. Parrot Egg: 25% chance to drop extra monster loot on defeat
         public static void TriggerParrotBonusLoot(Monster monster, Farmer who)
         {
             if (monster == null || who?.currentLocation == null) return;
 
             if (Game1.random.NextDouble() < 0.25)
             {
-                // Spawn bonus monster loot
                 var extraDrops = monster.getExtraDropItems();
                 if (extraDrops != null && extraDrops.Count > 0)
                 {
@@ -265,11 +300,9 @@ namespace BetterForge
         {
             if (who == null || monster == null || baseDamage <= 0) return;
 
-            // Grant +25% bonus crit damage
             int bonusCritDmg = Math.Max(2, (int)(baseDamage * 0.25f));
-            monster.takeDamage(bonusCritDmg, 0, 0, false, 1.0, who);
+            monster.takeDamage(bonusCritDmg, 0, 0, false, 1.0, "hitEnemy");
 
-            // Apply +3 Attack buff alongside speed
             var attackBuff = new Buff(
                 id: SpurAttackBuffId,
                 displayName: ModEntry.I18n.Get("buff.spur-attack.name"),
@@ -285,18 +318,18 @@ namespace BetterForge
             who.applyBuff(attackBuff);
         }
 
-        // 5. Magic Quiver: Execute monsters below 15% HP or <= 25 HP
+        // 5. Magic Quiver: Execute monsters below 15% HP or <= 30 HP
         public static bool TriggerQuiverExecute(Monster monster, Farmer who, GameLocation location)
         {
             if (monster == null || who == null || location == null) return false;
 
             if (monster.Health > 0)
             {
-                bool isLowHp = monster.Health <= (int)(monster.MaxHealth * 0.15f) || monster.Health <= 25;
+                bool isLowHp = monster.Health <= (int)(monster.MaxHealth * 0.15f) || monster.Health <= 30;
                 if (isLowHp)
                 {
                     int fatalDamage = monster.Health + 50;
-                    monster.takeDamage(fatalDamage, 0, 0, false, 1.0, who);
+                    monster.takeDamage(fatalDamage, 0, 0, false, 1.0, "hitEnemy");
                     location.playSound("shadowDie");
                     location.playSound("crit");
                     Game1.createRadialDebris(location, 12, (int)monster.Position.X + 32, (int)monster.Position.Y + 32, 8, false);
@@ -312,11 +345,10 @@ namespace BetterForge
             if (monster == null || who?.currentLocation == null) return;
 
             int bonusDamage = 35;
-            monster.takeDamage(bonusDamage, 0, 0, false, 1.0, who);
+            monster.takeDamage(bonusDamage, 0, 0, false, 1.0, "hitEnemy");
             who.currentLocation.playSound("glassBreak");
             who.currentLocation.playSound("freeze");
 
-            // Frost wave: slow/freeze nearby monsters in a 5-tile radius for 2 seconds
             Vector2 centerTile = monster.Tile;
             foreach (var character in who.currentLocation.characters)
             {
@@ -337,7 +369,7 @@ namespace BetterForge
             if (attacker == null || victim == null || incomingDamage <= 0) return;
 
             int reflectDamage = Math.Max(1, incomingDamage / 2);
-            attacker.takeDamage(reflectDamage, 0, 0, false, 1.0, victim);
+            attacker.takeDamage(reflectDamage, 0, 0, false, 1.0, "hitEnemy");
             victim.currentLocation?.playSound("hitEnemy");
         }
 
