@@ -26,81 +26,7 @@ namespace BetterMap
                    (idx == 464);
         }
 
-        /// <summary>Applies map modifications to Island_S (Island South / Beach).</summary>
-        public static void PatchIslandSouth(Map map, ModConfig config, IMonitor monitor)
-        {
-            try
-            {
-                var buildings = map.GetLayer("Buildings");
-                var front = map.GetLayer("Front");
-                var alwaysFront = map.GetLayer("AlwaysFront");
-                var back = map.GetLayer("Back");
-                var tsIsland = map.GetTileSheet("untitled tile sheet"); // island_tilesheet_1
-
-                if (config.RemoveBeachFarmWreck)
-                {
-                    // 1. Remove the passage wreckage and obstacles (x: 0..3, y: 11..16)
-                    for (int x = 0; x <= 3; x++)
-                    {
-                        for (int y = 11; y <= 16; y++)
-                        {
-                            if (buildings?.Tiles[x, y] != null)
-                            {
-                                buildings.Tiles[x, y]?.Properties.Clear();
-                                buildings.Tiles[x, y] = null;
-                            }
-
-                            if (front?.Tiles[x, y] != null)
-                            {
-                                front.Tiles[x, y] = null;
-                            }
-
-                            if (alwaysFront?.Tiles[x, y] != null)
-                            {
-                                alwaysFront.Tiles[x, y] = null;
-                            }
-
-                            if (back != null && tsIsland != null)
-                            {
-                                back.Tiles[x, y] = new StaticTile(back, tsIsland, BlendMode.Alpha, 72);
-                            }
-                        }
-                    }
-
-                    // 2. Remove any miscellaneous driftwood logs on Island South
-                    for (int y = 0; y < map.Layers[0].LayerHeight; y++)
-                    {
-                        for (int x = 0; x < map.Layers[0].LayerWidth; x++)
-                        {
-                            var bTile = buildings?.Tiles[x, y];
-                            if (bTile != null && bTile.TileSheet.ImageSource.Contains("island_tilesheet_1") && IsDriftwoodTile(bTile.TileIndex))
-                            {
-                                buildings?.Tiles[x, y]?.Properties.Clear();
-                                if (buildings != null) buildings.Tiles[x, y] = null;
-                                if (back != null && back.Tiles[x, y] == null && tsIsland != null)
-                                {
-                                    back.Tiles[x, y] = new StaticTile(back, tsIsland, BlendMode.Alpha, 72);
-                                }
-                            }
-
-                            var fTile = front?.Tiles[x, y];
-                            if (fTile != null && fTile.TileSheet.ImageSource.Contains("island_tilesheet_1") && IsDriftwoodTile(fTile.TileIndex))
-                            {
-                                if (front != null) front.Tiles[x, y] = null;
-                            }
-                        }
-                    }
-
-                    monitor.Log("Successfully patched Island_S: Removed beach wreckage and driftwood logs.", LogLevel.Trace);
-                }
-            }
-            catch (Exception ex)
-            {
-                monitor.Log($"Error patching Island_S: {ex.Message}", LogLevel.Error);
-            }
-        }
-
-        /// <summary>Applies map modifications to Island_W (Island West / Farm).</summary>
+        /// <summary>Applies map modifications to Island_W (Island West / Ginger Island Farm).</summary>
         public static void PatchIslandWest(Map map, ModConfig config, IMonitor monitor)
         {
             try
@@ -151,42 +77,10 @@ namespace BetterMap
                             }
                         }
                     }
-                    monitor.Log($"Successfully patched Island_W: Removed {driftwoodCount} driftwood barrier tiles.", LogLevel.Trace);
+                    monitor.Log($"Successfully patched Island_W: Removed {driftwoodCount} driftwood fence/log tiles.", LogLevel.Trace);
                 }
 
-                // 2. Remove beach-farm passage wreckage on the east border of Island West (x: 101..106, y: 41..46)
-                if (config.RemoveBeachFarmWreck)
-                {
-                    for (int x = 101; x <= 106; x++)
-                    {
-                        for (int y = 41; y <= 46; y++)
-                        {
-                            if (buildings?.Tiles[x, y] != null)
-                            {
-                                buildings.Tiles[x, y]?.Properties.Clear();
-                                buildings.Tiles[x, y] = null;
-                            }
-
-                            if (front?.Tiles[x, y] != null)
-                            {
-                                front.Tiles[x, y] = null;
-                            }
-
-                            if (alwaysFront?.Tiles[x, y] != null)
-                            {
-                                alwaysFront.Tiles[x, y] = null;
-                            }
-
-                            if (back != null && tsOutdoors != null)
-                            {
-                                back.Tiles[x, y] = new StaticTile(back, tsOutdoors, BlendMode.Alpha, 201);
-                            }
-                        }
-                    }
-                    monitor.Log("Successfully patched Island_W: Removed east border transition obstacles.", LogLevel.Trace);
-                }
-
-                // 3. Remove southern beach shipwreck (x: 57..78, y: 88..98)
+                // 2. Optional: Remove southern beach shipwreck (x: 57..78, y: 88..98)
                 if (config.RemoveIslandWestShipwreck)
                 {
                     for (int x = 57; x <= 78; x++)

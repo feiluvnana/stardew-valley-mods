@@ -7,8 +7,7 @@ A high-performance map enhancement and quality-of-life mod for **Stardew Valley 
 ## ✨ Features
 
 - **🪵 Remove Farm Driftwood Fence & Logs**: Completely removes the long horizontal driftwood fence and bleached log piles across Ginger Island Farm (Island West) that separate the upper grassy path from the farmable fields, creating a wide, seamless open farm.
-- **🏖️ Remove Beach-Farm Passage Wreckage**: Clears the half-sunken wreck, clutter, and obstacles located along the passage between Island South (the dock beach) and Island West (the island farm), creating a wide, unobstructed walkway.
-- **🚢 Remove Island West Shipwreck**: Cleans up the giant broken pirate shipwreck on the southern beach of Island West, seamlessly replacing it with clean, walkable beach sand and shoreline.
+- **🚢 Remove Island West Beach Shipwreck**: Cleans up the giant broken pirate shipwreck on the southern beach of Island West, seamlessly replacing it with clean, walkable beach sand and shoreline.
 - **⚙️ Full GMCM Support**: In-game configuration menu support with real-time map cache updating when settings change.
 - **🌐 Localization**: Full English and Vietnamese support.
 
@@ -19,7 +18,6 @@ A high-performance map enhancement and quality-of-life mod for **Stardew Valley 
 | Setting | Default | Description |
 | :--- | :---: | :--- |
 | `RemoveFarmDriftwoodBarrier` | `true` | Removes the driftwood fence and bleached log piles across the Ginger Island Farm. |
-| `RemoveBeachFarmWreck` | `true` | Removes the wreckage and obstacles along the pathway between Island South and Island West. |
 | `RemoveIslandWestShipwreck` | `true` | Removes the giant pirate shipwreck at the southern beach of Island West. |
 
 ---

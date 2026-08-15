@@ -23,15 +23,7 @@ namespace BetterMap
 
         private void OnAssetRequested(object? sender, AssetRequestedEventArgs e)
         {
-            if (e.NameWithoutLocale.IsEquivalentTo("Maps/Island_S"))
-            {
-                e.Edit(asset =>
-                {
-                    var editor = asset.AsMap();
-                    MapPatcher.PatchIslandSouth(editor.Data, Config, Monitor);
-                });
-            }
-            else if (e.NameWithoutLocale.IsEquivalentTo("Maps/Island_W"))
+            if (e.NameWithoutLocale.IsEquivalentTo("Maps/Island_W"))
             {
                 e.Edit(asset =>
                 {
@@ -67,7 +59,7 @@ namespace BetterMap
                 }
             );
 
-            // Section: Ginger Island
+            // Section: Ginger Island Farm
             configMenu.AddSectionTitle(
                 mod: ModManifest,
                 text: () => Helper.Translation.Get("gmcm.section.ginger_island.title"),
@@ -84,14 +76,6 @@ namespace BetterMap
 
             configMenu.AddBoolOption(
                 mod: ModManifest,
-                getValue: () => Config.RemoveBeachFarmWreck,
-                setValue: value => Config.RemoveBeachFarmWreck = value,
-                name: () => Helper.Translation.Get("gmcm.remove_beach_farm_wreck.name"),
-                tooltip: () => Helper.Translation.Get("gmcm.remove_beach_farm_wreck.tooltip")
-            );
-
-            configMenu.AddBoolOption(
-                mod: ModManifest,
                 getValue: () => Config.RemoveIslandWestShipwreck,
                 setValue: value => Config.RemoveIslandWestShipwreck = value,
                 name: () => Helper.Translation.Get("gmcm.remove_island_west_shipwreck.name"),
@@ -101,7 +85,6 @@ namespace BetterMap
 
         private void ReloadMaps()
         {
-            Helper.GameContent.InvalidateCache("Maps/Island_S");
             Helper.GameContent.InvalidateCache("Maps/Island_W");
             Monitor.Log("BetterMap: Invalidated map cache and reloaded maps.", LogLevel.Debug);
         }

@@ -182,7 +182,9 @@ namespace BetterTrinket
                 // Execute smart reforge
                 TrinketReforgeLogic.ProcessReforge(trinket, who, Config);
 
-                who.currentLocation.playSound("anvil");
+                who.currentLocation.playSound("metal_tap");
+                DelayedAction.playSoundAfterDelay("metal_tap", 250);
+                DelayedAction.playSoundAfterDelay("metal_tap", 500);
 
                 // Spawn sparkle animation
                 who.currentLocation.TemporarySprites.Add(new TemporaryAnimatedSprite(

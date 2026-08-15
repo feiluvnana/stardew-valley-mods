@@ -1,10 +1,8 @@
 {
-  "gmcm.section.ginger_island.title": "Tùy chỉnh bản đồ Đảo Gừng",
-  "gmcm.section.ginger_island.description": "Cấu hình dọn dẹp và xóa chướng ngại vật trên Đảo Gừng.",
+  "gmcm.section.ginger_island.title": "Tùy chỉnh Nông trại Đảo Gừng",
+  "gmcm.section.ginger_island.description": "Cấu hình dọn dẹp và xóa chướng ngại vật trên Nông trại Đảo Gừng.",
   "gmcm.remove_farm_driftwood_barrier.name": "Xóa hàng rào gỗ mục & đống gỗ Nông trại",
   "gmcm.remove_farm_driftwood_barrier.tooltip": "Xóa hàng rào gỗ mục ngang và các đống gỗ chắn giữa lối đi phía trên và khu vực trồng trọt trên Nông trại Đảo Gừng (Đảo Tây).",
-  "gmcm.remove_beach_farm_wreck.name": "Xóa xác tàu giữa Bãi biển và Nông trại",
-  "gmcm.remove_beach_farm_wreck.tooltip": "Xóa các mảnh vỡ, xác tàu và chướng ngại vật trên đường đi giữa Đảo Nam (bãi biển) và Đảo Tây (nông trại) để có lối đi rộng rãi, sạch đẹp.",
   "gmcm.remove_island_west_shipwreck.name": "Xóa xác tàu đắm Đảo Tây",
   "gmcm.remove_island_west_shipwreck.tooltip": "Xóa xác tàu cướp biển khổng lồ bị đắm ở bãi biển phía nam Đảo Tây và thay thế bằng bãi cát sạch sẽ."
 }
