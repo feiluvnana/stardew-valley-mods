@@ -6,15 +6,15 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v6.0": {
-      "BetterTrinket/1.0.0": {
+      "BetterForge/1.0.0": {
         "runtime": {
-          "BetterTrinket.dll": {}
+          "BetterForge.dll": {}
         }
       }
     }
   },
   "libraries": {
-    "BetterTrinket/1.0.0": {
+    "BetterForge/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

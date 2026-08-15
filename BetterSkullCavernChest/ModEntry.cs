@@ -194,7 +194,7 @@ namespace BetterSkullCavernChest
                 getValue: () => Config.MaxRolls,
                 setValue: value => Config.MaxRolls = value,
                 min: 1,
-                max: 7
+                max: 6
             );
             configMenu.AddNumberOption(
                 mod: ModManifest,
@@ -204,7 +204,7 @@ namespace BetterSkullCavernChest
                 setValue: value => Config.Roll2Chance = value,
                 min: 0.0f,
                 max: 1.0f,
-                interval: 0.05f
+                interval: 0.01f
             );
             configMenu.AddNumberOption(
                 mod: ModManifest,
@@ -214,7 +214,7 @@ namespace BetterSkullCavernChest
                 setValue: value => Config.Roll3Chance = value,
                 min: 0.0f,
                 max: 1.0f,
-                interval: 0.05f
+                interval: 0.01f
             );
             configMenu.AddNumberOption(
                 mod: ModManifest,
@@ -224,7 +224,7 @@ namespace BetterSkullCavernChest
                 setValue: value => Config.Roll4Chance = value,
                 min: 0.0f,
                 max: 1.0f,
-                interval: 0.05f
+                interval: 0.01f
             );
             configMenu.AddNumberOption(
                 mod: ModManifest,
@@ -234,7 +234,7 @@ namespace BetterSkullCavernChest
                 setValue: value => Config.Roll5Chance = value,
                 min: 0.0f,
                 max: 1.0f,
-                interval: 0.05f
+                interval: 0.01f
             );
             configMenu.AddNumberOption(
                 mod: ModManifest,
@@ -244,17 +244,7 @@ namespace BetterSkullCavernChest
                 setValue: value => Config.Roll6Chance = value,
                 min: 0.0f,
                 max: 1.0f,
-                interval: 0.05f
-            );
-            configMenu.AddNumberOption(
-                mod: ModManifest,
-                name: () => I18n.Get("config.roll-7-chance.name"),
-                tooltip: () => I18n.Get("config.roll-7-chance.tooltip"),
-                getValue: () => Config.Roll7Chance,
-                setValue: value => Config.Roll7Chance = value,
-                min: 0.0f,
-                max: 1.0f,
-                interval: 0.05f
+                interval: 0.01f
             );
 
             // Stack Multipliers Section (Regular Chests)
@@ -323,7 +313,7 @@ namespace BetterSkullCavernChest
                 getValue: () => Config.Floor100MaxRolls,
                 setValue: value => Config.Floor100MaxRolls = value,
                 min: 1,
-                max: 10
+                max: 12
             );
             configMenu.AddNumberOption(
                 mod: ModManifest,
@@ -333,7 +323,7 @@ namespace BetterSkullCavernChest
                 setValue: value => Config.Floor100Roll2Chance = value,
                 min: 0.0f,
                 max: 1.0f,
-                interval: 0.05f
+                interval: 0.01f
             );
             configMenu.AddNumberOption(
                 mod: ModManifest,
@@ -343,7 +333,7 @@ namespace BetterSkullCavernChest
                 setValue: value => Config.Floor100Roll3Chance = value,
                 min: 0.0f,
                 max: 1.0f,
-                interval: 0.05f
+                interval: 0.01f
             );
             configMenu.AddNumberOption(
                 mod: ModManifest,
@@ -353,7 +343,7 @@ namespace BetterSkullCavernChest
                 setValue: value => Config.Floor100Roll4Chance = value,
                 min: 0.0f,
                 max: 1.0f,
-                interval: 0.05f
+                interval: 0.01f
             );
             configMenu.AddNumberOption(
                 mod: ModManifest,
@@ -363,7 +353,7 @@ namespace BetterSkullCavernChest
                 setValue: value => Config.Floor100Roll5Chance = value,
                 min: 0.0f,
                 max: 1.0f,
-                interval: 0.05f
+                interval: 0.01f
             );
             configMenu.AddNumberOption(
                 mod: ModManifest,
@@ -373,7 +363,7 @@ namespace BetterSkullCavernChest
                 setValue: value => Config.Floor100Roll6Chance = value,
                 min: 0.0f,
                 max: 1.0f,
-                interval: 0.05f
+                interval: 0.01f
             );
             configMenu.AddNumberOption(
                 mod: ModManifest,
@@ -383,7 +373,7 @@ namespace BetterSkullCavernChest
                 setValue: value => Config.Floor100Roll7Chance = value,
                 min: 0.0f,
                 max: 1.0f,
-                interval: 0.05f
+                interval: 0.01f
             );
             configMenu.AddNumberOption(
                 mod: ModManifest,
@@ -393,7 +383,7 @@ namespace BetterSkullCavernChest
                 setValue: value => Config.Floor100Roll8Chance = value,
                 min: 0.0f,
                 max: 1.0f,
-                interval: 0.05f
+                interval: 0.01f
             );
             configMenu.AddNumberOption(
                 mod: ModManifest,
@@ -403,7 +393,7 @@ namespace BetterSkullCavernChest
                 setValue: value => Config.Floor100Roll9Chance = value,
                 min: 0.0f,
                 max: 1.0f,
-                interval: 0.05f
+                interval: 0.01f
             );
             configMenu.AddNumberOption(
                 mod: ModManifest,
@@ -413,7 +403,27 @@ namespace BetterSkullCavernChest
                 setValue: value => Config.Floor100Roll10Chance = value,
                 min: 0.0f,
                 max: 1.0f,
-                interval: 0.05f
+                interval: 0.01f
+            );
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.floor-100-roll-11-chance.name"),
+                tooltip: () => I18n.Get("config.floor-100-roll-11-chance.tooltip"),
+                getValue: () => Config.Floor100Roll11Chance,
+                setValue: value => Config.Floor100Roll11Chance = value,
+                min: 0.0f,
+                max: 1.0f,
+                interval: 0.01f
+            );
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.floor-100-roll-12-chance.name"),
+                tooltip: () => I18n.Get("config.floor-100-roll-12-chance.tooltip"),
+                getValue: () => Config.Floor100Roll12Chance,
+                setValue: value => Config.Floor100Roll12Chance = value,
+                min: 0.0f,
+                max: 1.0f,
+                interval: 0.01f
             );
             configMenu.AddNumberOption(
                 mod: ModManifest,

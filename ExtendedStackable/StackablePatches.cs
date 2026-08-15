@@ -102,6 +102,10 @@ namespace ExtendedStackable
             {
                 resultTrinket.generationSeed.Value = sourceTrinket.generationSeed.Value;
                 resultTrinket.displayNameOverrideTemplate.Value = sourceTrinket.displayNameOverrideTemplate.Value;
+                foreach (var kvp in sourceTrinket.modData.Pairs)
+                {
+                    resultTrinket.modData[kvp.Key] = kvp.Value;
+                }
             }
             else if (__instance is Boots sourceBoots && __result is Boots resultBoots)
             {
@@ -162,8 +166,12 @@ namespace ExtendedStackable
 
             if (Config.EnableTrinketStacking && __instance is Trinket thisTrinket && other is Trinket otherTrinket)
             {
+                bool thisAscended = thisTrinket.modData.ContainsKey("feiluvnana.BetterTrinket/IsAscended");
+                bool otherAscended = otherTrinket.modData.ContainsKey("feiluvnana.BetterTrinket/IsAscended");
+
                 if (thisTrinket.QualifiedItemId == otherTrinket.QualifiedItemId &&
                     thisTrinket.generationSeed.Value == otherTrinket.generationSeed.Value &&
+                    thisAscended == otherAscended &&
                     thisTrinket.displayNameOverrideTemplate.Value == otherTrinket.displayNameOverrideTemplate.Value &&
                     thisTrinket.getDescription() == otherTrinket.getDescription())
                 {

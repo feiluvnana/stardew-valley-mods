@@ -1,0 +1,54 @@
+{
+  "anvil.description": "Dùng để nâng cấp chỉ số Đồ trang sức bằng Thỏi Iridium hoặc Thăng hoa bằng Mảnh Tán Sắc (chỉ mang một loại nguyên liệu trong túi khi tương tác).",
+
+  "config.section.enchanting": "Tùy Chọn Yểm Bùa Vũ Khí & Dụng Cụ",
+  "config.uniform-chances.name": "Tỷ Lệ Yểm Bùa Đồng Đều",
+  "config.uniform-chances.tooltip": "Đảm bảo mọi bùa yểm phù hợp cho vũ khí hoặc dụng cụ đều có tỷ lệ xuất hiện hoàn toàn bằng nhau (như Hào Phóng, Bậc Thầy, Thập Tự Quân, Ma Cà Rồng).",
+  "config.randomize-seed.name": "Ngẫu Nhiên Hóa Hạt Giống",
+  "config.randomize-seed.tooltip": "Sử dụng cơ chế ngẫu nhiên thực sự thay vì chuỗi hạt giống cố định mỗi ngày của game, cho phép bạn tải lại ngày chơi để quay lại bùa mới.",
+
+  "config.section.reforging": "Tùy Chọn Rèn Bùa Trang Sức",
+  "config.prevent-downgrades.name": "Chống Giảm Cấp",
+  "config.prevent-downgrades.tooltip": "Đảm bảo rằng việc rèn tại Đe sẽ không bao giờ làm giảm cấp bậc hoặc chỉ số hiện tại của bùa trang sức.",
+  "config.iridium-cost.name": "Chi Phí Thỏi Iridium",
+  "config.iridium-cost.tooltip": "Số lượng Thỏi Iridium tiêu hao cho mỗi bùa trang sức tại Đe (Mặc định = 3).",
+  "config.show-messages.name": "Hiển Thị Thông Báo HUD",
+  "config.show-messages.tooltip": "Hiển thị biểu ngữ thông báo khi rèn thành công bậc cao hơn hoặc đạt phẩm chất tối đa.",
+
+  "message.cannot-both": "Không thể thực hiện: Bạn đang có cả Thỏi Iridium và Mảnh Tán Sắc. Hãy chỉ giữ một loại trong túi đồ!",
+  "message.need-trinket-in-hand": "Cầm một Bùa trang sức trên tay và tương tác với Đe để nâng cấp hoặc Thăng hoa.",
+  "message.need-materials": "Bạn cần {{count}} Thỏi Iridium để nâng cấp, hoặc 1 Mảnh Tán Sắc để Thăng hoa bùa trang sức.",
+  "message.need-stack-materials": "Bạn cần {{count}} Thỏi Iridium để nâng cấp, hoặc {{shards}} Mảnh Tán Sắc để Thăng hoa cả chồng {{stack}} bùa trang sức.",
+  "message.need-iridium": "Bạn cần ít nhất {{count}} Thỏi Iridium để nâng cấp bùa trang sức này.",
+  "message.need-stack-iridium": "Bạn cần ít nhất {{count}} Thỏi Iridium để nâng cấp cả chồng {{stack}} bùa trang sức này.",
+  "message.need-prismatic": "Bạn cần 1 Mảnh Tán Sắc để Thăng Hoa bùa trang sức này.",
+  "message.need-stack-prismatic": "Bạn cần ít nhất {{count}} Mảnh Tán Sắc để Thăng hoa cả chồng {{stack}} bùa trang sức này.",
+  "message.already-ascended": "Bùa trang sức này đã được Thăng Hoa Tán Sắc từ trước, không thể thăng hoa lại.",
+  "message.already-max-tier": "Bùa trang sức này đã đạt cấp tối đa, không thể rèn thêm.",
+
+  "tooltip.perfect-roll": "✦ ĐÃ ĐẠT PHẨM CHẤT TỐI ĐA ✦",
+  "tooltip.ascended-badge": "THĂNG HOA:",
+  "tooltip.ascended-base-luck": "✦ [Cơ Bản] +0.5 May Mắn khi trang bị.",
+
+  "hud.reforge-perfect": "✦ Nâng Cấp Hoàn Hảo! {{item}} của bạn đã đạt chỉ số tối đa! ✦",
+  "hud.reforge-upgrade": "Đã nâng cấp {{item}} lên Bậc {{tier}}/{{maxTier}}!",
+  "hud.reforge-fail": "Rèn không cải thiện {{item}} (Đã bảo vệ chỉ số).",
+  "hud.reforge-no-change": "Rèn lại nhận được chỉ số tương đương cho {{item}}.",
+  "hud.reforge-downgrade": "Rèn lại nhận được chỉ số thấp hơn cho {{item}}.",
+  "hud.ascension-success": "Thăng Hoa Tán Sắc hoàn tất cho {{item}}!",
+
+  "buff.ascension-luck.name": "Thăng Hoa Tán Sắc",
+  "buff.ascension-luck.desc": "+{{luck}} May Mắn từ các bùa trang sức đã thăng hoa.",
+  "buff.fairy-defense.name": "Phước Lành Tiên Tử",
+  "buff.fairy-defense.desc": "+1 Phòng Ngự nhận được từ nhịp hồi phục của tiên tử.",
+  "buff.spur-attack.name": "Cựa Thép Cuồng Nộ",
+  "buff.spur-attack.desc": "+3 Sát Thương Tấn Công khi kích hoạt tăng tốc chí mạng.",
+
+  "ascension.frogegg.desc": "Khi ếch nuốt quái vật, toàn bộ vật phẩm rơi vẫn xuất hiện đầy đủ, và có 35% tỷ lệ lập tức làm mới hồi chiêu nuốt mồi.",
+  "ascension.fairybox.desc": "Nhịp hồi máu của tiên tử hồi phục cho cả đồng minh xung quanh, đồng thời ban thêm hiệu ứng +1 Phòng Ngự (+1 Defense) trong 15 giây.",
+  "ascension.parrotegg.desc": "Nhân đôi số lượng & tỷ lệ rơi tiền vàng, đồng thời tăng thêm 25% tỷ lệ nhận thêm chiến lợi phẩm khi tiêu diệt quái vật.",
+  "ascension.goldenspur.desc": "Tăng +25% sát thương chí mạng; đồng thời hiệu ứng tăng tốc khi đánh chí mạng cộng thêm +3 Sát Thương Tấn Công (+3 Attack).",
+  "ascension.magicquiver.desc": "Mũi tên ma thuật bắn xuyên qua toàn bộ quái vật trên đường bay, và lập tức kết liễu những quái vật có lượng máu dưới 15%.",
+  "ascension.icerod.desc": "Tấn công quái vật đang bị đóng băng gây thêm +35 sát thương vỡ băng, đồng thời phát ra luồng sóng băng làm chậm/đóng băng quái vật xung quanh.",
+  "ascension.basiliskpaw.desc": "Phản lại 50% sát thương nhận vào lên kẻ địch, và các đòn đánh có 20% tỷ lệ hút máu (hồi 3–8 Máu) khi tấn công quái vật."
+}

@@ -1,0 +1,7 @@
+{
+  "UniformEnchantmentChances": true,
+  "RandomizeEnchantmentSeed": true,
+  "PreventDowngrades": true,
+  "IridiumBarCost": 3,
+  "ShowReforgeSuccessMessage": true
+}

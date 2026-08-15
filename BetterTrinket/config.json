@@ -1,8 +1,0 @@
-{
-  "PreventDowngrades": true,
-  "EnablePitySystem": true,
-  "RollsForGuaranteedUpgrade": 3,
-  "IridiumBarCost": 3,
-  "ShowStatRangesInTooltips": true,
-  "ShowReforgeSuccessMessage": true
-}

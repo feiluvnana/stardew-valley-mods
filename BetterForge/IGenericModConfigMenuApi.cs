@@ -1,7 +1,7 @@
 using System;
 using StardewModdingAPI;
 
-namespace BetterTrinket
+namespace BetterForge
 {
     public interface IGenericModConfigMenuApi
     {

@@ -22,9 +22,9 @@
 | Feature | 📦 Regular Treasure Chests | 🏆 Floor 100 Special Chest (Floor 100/200/300) |
 | :--- | :---: | :---: |
 | **Category Selection Rates** | **Equal Weight (~14.285% each)** across all 7 categories | **Equal Weight (~14.285% each)** across all 7 categories |
-| **Max Rolls per Chest** | **7 Rolls** | **10 Rolls** |
-| **Decaying Roll Success Rates** | R1: 100%<br>R2: 90%<br>R3: 70%<br>R4: 55%<br>R5: 30%<br>R6: 15%<br>R7: 5% | R1: 100%<br>R2: 95%<br>R3: 90%<br>R4: 85%<br>R5: 70%<br>R6: 55%<br>R7: 45%<br>R8: 25%<br>R9: 15%<br>R10: 10% |
-| **Empirical Average Items** | **~3.00 items** / chest | **~4.50 items** / chest (up to 10 items!) |
+| **Max Rolls per Chest** | **6 Rolls** | **12 Rolls** |
+| **Decaying Roll Success Rates** | R1: 100%<br>R2: 90%<br>R3: 70%<br>R4: 55%<br>R5: 30%<br>R6: 15% | R1: 100%<br>R2: 98%<br>R3: 96%<br>R4: 92%<br>R5: 88%<br>R6: 80%<br>R7: 70%<br>R8: 58%<br>R9: 46%<br>R10: 32%<br>R11: 20%<br>R12: 10% |
+| **Empirical Average Items** | **~3.00 items** / chest | **~6.00 items** / chest (2x normal chest, up to 12 items!) |
 | **Critical Stack Multipliers** | 2x: 20%<br>3x: 10%<br>4x: 5%<br>*(Total Crit: **35%**)* | **2x: 30%**<br>**3x: 15%**<br>**4x (Quadruple): 10%**<br>**5x (Quintuple Mega Jackpot): 5%**<br>*(Total Crit: **60%**)* |
 | **Repeatable Runs Protection** | Built-in | Guaranteed chest spawn on repeat visits |
 
@@ -104,29 +104,30 @@
 {
   "EnableCustomRewards": true,
   "ExcludeCosmetics": true,
-  "MaxRolls": 7,
+  "MaxRolls": 6,
   "Roll2Chance": 0.9,
   "Roll3Chance": 0.7,
   "Roll4Chance": 0.55,
   "Roll5Chance": 0.3,
   "Roll6Chance": 0.15,
-  "Roll7Chance": 0.05,
   "DoubleStackChance": 0.2,
   "TripleStackChance": 0.1,
   "QuadrupleStackChance": 0.05,
   "QuintupleStackChance": 0.0,
   "EnableFloor100Buff": true,
   "Floor100AllCategoriesEqual": true,
-  "Floor100MaxRolls": 10,
-  "Floor100Roll2Chance": 0.95,
-  "Floor100Roll3Chance": 0.9,
-  "Floor100Roll4Chance": 0.85,
-  "Floor100Roll5Chance": 0.7,
-  "Floor100Roll6Chance": 0.55,
-  "Floor100Roll7Chance": 0.45,
-  "Floor100Roll8Chance": 0.25,
-  "Floor100Roll9Chance": 0.15,
-  "Floor100Roll10Chance": 0.1,
+  "Floor100MaxRolls": 12,
+  "Floor100Roll2Chance": 0.98,
+  "Floor100Roll3Chance": 0.96,
+  "Floor100Roll4Chance": 0.92,
+  "Floor100Roll5Chance": 0.88,
+  "Floor100Roll6Chance": 0.8,
+  "Floor100Roll7Chance": 0.7,
+  "Floor100Roll8Chance": 0.58,
+  "Floor100Roll9Chance": 0.46,
+  "Floor100Roll10Chance": 0.32,
+  "Floor100Roll11Chance": 0.2,
+  "Floor100Roll12Chance": 0.1,
   "Floor100DoubleStackChance": 0.3,
   "Floor100TripleStackChance": 0.15,
   "Floor100QuadrupleStackChance": 0.1,
