@@ -1,41 +1,44 @@
 # 💎 BetterSkullCavernChest
 
-**BetterSkullCavernChest** transforms Skull Cavern treasure room chests from static, repetitive drops into a dynamic **7 Usage-Based Gameplay Categories** loot engine with **Decaying Multi-Rolls** and **Critical Jackpot Stack Multipliers**.
+**BetterSkullCavernChest** transforms Skull Cavern treasure room chests from static, repetitive drops into a dynamic **7 Usage-Based Gameplay Categories** loot engine with **Decaying Multi-Rolls**, **Critical Jackpot Stack Multipliers**, and a dedicated **Supercharged Floor 100 Special Chest System**.
 
 ---
 
 ## ✨ Features
 
-- **7 Usage-Based Gameplay Categories (76 Validated Items, 0 Machines):**
-  - 🌟 **Legendary (10% Category Weight):** Prismatic Shard, Magic Rock Candy, Golden Animal Cracker, Book of Stars, Galaxy Soul, Stardrop Tea, Prize Ticket.
-  - 🌾 **Agriculture (15% Category Weight):** Hyper Speed-Gro, Deluxe Fertilizer, Deluxe Retaining Soil, Tree Fertilizer, Iridium Sprinklers, Pressure Nozzles, Enrichers, Rare Seeds, Ancient Seeds, Agricultural Books.
-  - ⛏️ **Mining (15% Category Weight):** Radioactive Ore & Bar, Iridium Ore & Bar, Coal (bulk 25–75), Cinder Shards, Mega Bombs, Bombs, Jade (Staircase trading), Diamond, Mining Books.
-  - 🎣 **Fishing (15% Category Weight):** Trap Bobber, Curiosity Lure, Deluxe Bait, Challenge Bait, Magnet, Caviar, Squid Ink, Fishing Books.
-  - ⚔️ **Combat (15% Category Weight):** Tiger, Purple & Blue Slime Eggs, Dragon Teeth, Fairy Dust, Monster Musk, Life Elixir, Triple Shot Espresso, Combat Books.
-  - 🌲 **Foraging (15% Category Weight):** Mystic Tree Seed, Golden Coconut, Desert & Farm Warp Totems, Foraging Books.
-  - 🎁 **Lootboxes & Troves (15% Category Weight):** Omni Geodes, Mystery Boxes, Artifact Troves, Golden Mystery Boxes, Calico Eggs (15–50), Treasure Totems, Book of Mysteries, Treasure Appraisal Guide.
-
-- **Decaying Multi-Roll System (Max 5 Rolls per Chest):**
-  Chests roll sequentially with diminishing probabilities:
-  - **Roll #1:** 100% Guaranteed
-  - **Roll #2:** 70% Chance
-  - **Roll #3:** 45% Chance
-  - **Roll #4:** 25% Chance
-  - **Roll #5:** 10% Chance
-  *(Empirical Average: **2.10 items per chest**)*
-
-- **Critical Stack Multipliers:**
-  On eligible stackable items:
-  - **Double Stack (2x):** 15% Chance
-  - **Triple Stack (3x Jackpot):** 5% Chance
-  *(Single-count books and special items are protected from duplication)*
-
-- **Zero Junk / Invalid Item Protection:**
-  Fully compatible with Stardew Valley 1.6 item IDs. Replaces error IDs with correct qualified IDs (`(O)SkillBook_3`, `(O)SkillBook_4`, `(O)Book_Bombs`, `(O)Book_Diamonds`, etc.) and filters out decorative cosmetic junk.
+### 🌟 1. 7 Usage-Based Gameplay Categories (76 Validated Items, 0 Machines)
+- 🌟 **Legendary:** Prismatic Shard, Magic Rock Candy, Golden Animal Cracker, Book of Stars, Galaxy Soul, Stardrop Tea, Prize Ticket.
+- 🌾 **Agriculture:** Hyper Speed-Gro, Deluxe Fertilizer, Deluxe Retaining Soil, Tree Fertilizer, Iridium Sprinklers, Pressure Nozzles, Enrichers, Rare Seeds, Ancient Seeds, Agricultural Books.
+- ⛏️ **Mining:** Radioactive Ore & Bar, Iridium Ore & Bar, Coal (bulk 25–75), Cinder Shards, Mega Bombs, Bombs, Jade (Staircase trading), Diamond, Mining Books.
+- 🎣 **Fishing:** Trap Bobber, Curiosity Lure, Deluxe Bait, Challenge Bait, Magnet, Caviar, Squid Ink, Fishing Books.
+- ⚔️ **Combat:** Tiger, Purple & Blue Slime Eggs, Dragon Teeth, Fairy Dust, Monster Musk, Life Elixir, Triple Shot Espresso, Combat Books.
+- 🌲 **Foraging:** Mystic Tree Seed, Golden Coconut, Desert & Farm Warp Totems, Foraging Books.
+- 🎁 **Lootboxes & Troves:** Omni Geodes, Mystery Boxes, Artifact Troves, Golden Mystery Boxes, Calico Eggs (15–50), Treasure Totems, Book of Mysteries, Treasure Appraisal Guide.
 
 ---
 
-## 📊 Complete Drop Rate & Probability Table
+### 📦 2. Regular Treasure Chests vs 🏆 Floor 100 Special Chests
+
+| Feature | 📦 Regular Treasure Chests | 🏆 Floor 100 Special Chest (Floor 100/200/300) |
+| :--- | :---: | :---: |
+| **Legendary Category Share** | **10.0%** (Others: 15.0% each) | **Equal Weight (~14.285% each)** — Legendary is rolled just as often as other categories! |
+| **Max Rolls per Chest** | **5 Rolls** | **7 Rolls** |
+| **Decaying Roll Success Rates** | R1: 100%<br>R2: 70%<br>R3: 45%<br>R4: 25%<br>R5: 10% | R1: 100%<br>R2: 85%<br>R3: 70%<br>R4: 55%<br>R5: 40%<br>R6: 25%<br>R7: 15% |
+| **Empirical Average Items** | **~2.10 items** / chest | **~2.95 items** / chest (up to 7 items!) |
+| **Critical Stack Multipliers** | 2x: 15%<br>3x: 5%<br>*(Total Crit: 20%)* | **2x: 25%**<br>**3x: 15%**<br>**4x (Quadruple): 10%**<br>**5x (Quintuple Mega Jackpot): 5%**<br>*(Total Crit: **55%**)* |
+| **Repeatable Runs Protection** | Built-in | Guaranteed chest spawn on repeat visits |
+
+---
+
+### 🛡️ 3. Zero Junk / Invalid Item Protection
+- Fully compatible with Stardew Valley 1.6 item IDs.
+- Validated item references for books (`(O)SkillBook_0` to `(O)SkillBook_4`, `(O)Book_Bombs`, `(O)Book_Diamonds`, etc.).
+- Protects single-count items (Books, Slime Eggs, Galaxy Souls) from illegal multi-stack duplication.
+- Strips decorative cosmetic junk (hats, shirts, floor dividers).
+
+---
+
+## 📊 Complete Drop Rate & Probability Table (Regular Chests)
 
 | Category | Item Name | Qualified ID | Base Stack | Item Weight | Category Share | Per-Roll Chance | Per-Chest Chance |
 | :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: |
@@ -131,6 +134,21 @@
   "Roll5Chance": 0.1,
   "DoubleStackChance": 0.15,
   "TripleStackChance": 0.05,
+  "QuadrupleStackChance": 0.0,
+  "QuintupleStackChance": 0.0,
+  "EnableFloor100Buff": true,
+  "Floor100AllCategoriesEqual": true,
+  "Floor100MaxRolls": 7,
+  "Floor100Roll2Chance": 0.85,
+  "Floor100Roll3Chance": 0.7,
+  "Floor100Roll4Chance": 0.55,
+  "Floor100Roll5Chance": 0.4,
+  "Floor100Roll6Chance": 0.25,
+  "Floor100Roll7Chance": 0.15,
+  "Floor100DoubleStackChance": 0.25,
+  "Floor100TripleStackChance": 0.15,
+  "Floor100QuadrupleStackChance": 0.1,
+  "Floor100QuintupleStackChance": 0.05,
   "LegendaryWeight": 10.0,
   "AgricultureWeight": 15.0,
   "MiningWeight": 15.0,

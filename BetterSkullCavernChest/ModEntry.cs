@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using HarmonyLib;
+using Microsoft.Xna.Framework;
 using Netcode;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
@@ -56,19 +58,70 @@ namespace BetterSkullCavernChest
 
         public static void MineShaft_addLevelChests_Postfix(MineShaft? __instance)
         {
-            if (__instance == null || NetIsTreasureRoomRef == null || !NetIsTreasureRoomRef(__instance).Value || __instance.mineLevel <= 120)
+            if (__instance == null || __instance.mineLevel <= 120)
+                return;
+
+            bool isTreasureRoom = NetIsTreasureRoomRef != null && NetIsTreasureRoomRef(__instance).Value;
+            bool isForcedSpecialChest = __instance.mineLevel == 220 || __instance.mineLevel == 320 || __instance.mineLevel == 420;
+
+            if (!isTreasureRoom && !isForcedSpecialChest)
                 return;
 
             if (__instance.Objects == null)
                 return;
 
+            // Ensure special chest exists on repeatable runs for Floor 100/200/300 even if marked consumed by vanilla
+            if (isForcedSpecialChest)
+            {
+                Vector2 vector = new Vector2(9f, 9f);
+                if (__instance.mineLevel == 320)
+                    vector.X += 1f;
+
+                if (!__instance.overlayObjects.ContainsKey(vector) && !__instance.Objects.ContainsKey(vector))
+                {
+                    Chest chest = new Chest(new List<Item>(), vector);
+                    chest.SetBigCraftableSpriteIndex(344);
+                    __instance.overlayObjects[vector] = chest;
+                }
+
+                if (__instance.mineLevel == 320 || __instance.mineLevel == 420)
+                {
+                    Vector2 secVector = vector + new Vector2(-2f, 0f);
+                    if (!__instance.overlayObjects.ContainsKey(secVector) && !__instance.Objects.ContainsKey(secVector))
+                    {
+                        Chest secChest = new Chest(new List<Item>(), secVector)
+                        {
+                            Tint = new Color(255, 210, 200)
+                        };
+                        secChest.SetBigCraftableSpriteIndex(344);
+                        __instance.overlayObjects[secVector] = secChest;
+                    }
+                }
+
+                if (__instance.mineLevel == 420)
+                {
+                    Vector2 tertVector = vector + new Vector2(2f, 0f);
+                    if (!__instance.overlayObjects.ContainsKey(tertVector) && !__instance.Objects.ContainsKey(tertVector))
+                    {
+                        Chest tertChest = new Chest(new List<Item>(), tertVector)
+                        {
+                            Tint = new Color(216, 255, 240)
+                        };
+                        tertChest.SetBigCraftableSpriteIndex(344);
+                        __instance.overlayObjects[tertVector] = tertChest;
+                    }
+                }
+            }
+
             foreach (var obj in __instance.Objects.Values)
             {
                 if (obj is Chest chest)
                 {
+                    bool isSpecial = isForcedSpecialChest || (chest.giftbox.Value == false && chest.bigCraftableSpriteIndex.Value == 344);
+
                     if (Config.EnableCustomRewards)
                     {
-                        var rewards = RewardGenerator.GenerateRewards(Config, Game1.random);
+                        var rewards = RewardGenerator.GenerateRewards(Config, Game1.random, isSpecialChest: isSpecial);
                         if (rewards.Count > 0)
                         {
                             chest.Items.Clear();
@@ -90,7 +143,7 @@ namespace BetterSkullCavernChest
 
                         if (chest.Items.Count == 0)
                         {
-                            var fallback = RewardGenerator.GenerateRewards(Config, Game1.random);
+                            var fallback = RewardGenerator.GenerateRewards(Config, Game1.random, isSpecialChest: isSpecial);
                             foreach (var item in fallback)
                             {
                                 chest.Items.Add(item);
@@ -130,12 +183,12 @@ namespace BetterSkullCavernChest
                 setValue: value => Config.ExcludeCosmetics = value
             );
 
-            // Decaying Multi-Roll Section
-            configMenu.AddSectionTitle(mod: ModManifest, text: () => "Decaying Multi-Rolls");
+            // Decaying Multi-Roll Section (Regular Chests)
+            configMenu.AddSectionTitle(mod: ModManifest, text: () => "Decaying Multi-Rolls (Regular Chests)");
             configMenu.AddNumberOption(
                 mod: ModManifest,
                 name: () => "Max Rolls Per Chest",
-                tooltip: () => "Maximum number of item rolls a chest can attempt (1 to 5).",
+                tooltip: () => "Maximum number of item rolls a regular chest can attempt (1 to 5).",
                 getValue: () => Config.MaxRolls,
                 setValue: value => Config.MaxRolls = value,
                 min: 1,
@@ -182,8 +235,8 @@ namespace BetterSkullCavernChest
                 interval: 0.05f
             );
 
-            // Stack Multipliers Section
-            configMenu.AddSectionTitle(mod: ModManifest, text: () => "Jackpot Stack Multipliers");
+            // Stack Multipliers Section (Regular Chests)
+            configMenu.AddSectionTitle(mod: ModManifest, text: () => "Jackpot Stack Multipliers (Regular Chests)");
             configMenu.AddNumberOption(
                 mod: ModManifest,
                 name: () => "Double Stack Chance (2x)",
@@ -200,6 +253,152 @@ namespace BetterSkullCavernChest
                 tooltip: () => "Chance (0.0 to 1.0) for a rolled item stack to be tripled.",
                 getValue: () => Config.TripleStackChance,
                 setValue: value => Config.TripleStackChance = value,
+                min: 0.0f,
+                max: 1.0f,
+                interval: 0.01f
+            );
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => "Quadruple Stack Chance (4x)",
+                tooltip: () => "Chance (0.0 to 1.0) for a rolled item stack in regular chests to be quadrupled (4x).",
+                getValue: () => Config.QuadrupleStackChance,
+                setValue: value => Config.QuadrupleStackChance = value,
+                min: 0.0f,
+                max: 1.0f,
+                interval: 0.01f
+            );
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => "Quintuple Stack Chance (5x)",
+                tooltip: () => "Chance (0.0 to 1.0) for a rolled item stack in regular chests to be quintupled (5x).",
+                getValue: () => Config.QuintupleStackChance,
+                setValue: value => Config.QuintupleStackChance = value,
+                min: 0.0f,
+                max: 1.0f,
+                interval: 0.01f
+            );
+
+            // Floor 100 Special Chest Buff Section
+            configMenu.AddSectionTitle(mod: ModManifest, text: () => "Floor 100 Special Chest Buffs");
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => "Enable Floor 100 Buff",
+                tooltip: () => "Enable the dedicated enhanced loot table and roll system on Floor 100 (and special forced chest levels).",
+                getValue: () => Config.EnableFloor100Buff,
+                setValue: value => Config.EnableFloor100Buff = value
+            );
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => "All Categories Equal (Floor 100)",
+                tooltip: () => "When enabled, all 7 active categories have equal probability (~14.28% each), giving Legendary items the same rate as others.",
+                getValue: () => Config.Floor100AllCategoriesEqual,
+                setValue: value => Config.Floor100AllCategoriesEqual = value
+            );
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => "Floor 100 Max Rolls",
+                tooltip: () => "Maximum number of item rolls for Floor 100 special chests (1 to 10).",
+                getValue: () => Config.Floor100MaxRolls,
+                setValue: value => Config.Floor100MaxRolls = value,
+                min: 1,
+                max: 10
+            );
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => "Floor 100 Roll #2 Chance",
+                tooltip: () => "Probability (0.0 to 1.0) to roll a 2nd item on Floor 100.",
+                getValue: () => Config.Floor100Roll2Chance,
+                setValue: value => Config.Floor100Roll2Chance = value,
+                min: 0.0f,
+                max: 1.0f,
+                interval: 0.05f
+            );
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => "Floor 100 Roll #3 Chance",
+                tooltip: () => "Probability (0.0 to 1.0) to roll a 3rd item on Floor 100.",
+                getValue: () => Config.Floor100Roll3Chance,
+                setValue: value => Config.Floor100Roll3Chance = value,
+                min: 0.0f,
+                max: 1.0f,
+                interval: 0.05f
+            );
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => "Floor 100 Roll #4 Chance",
+                tooltip: () => "Probability (0.0 to 1.0) to roll a 4th item on Floor 100.",
+                getValue: () => Config.Floor100Roll4Chance,
+                setValue: value => Config.Floor100Roll4Chance = value,
+                min: 0.0f,
+                max: 1.0f,
+                interval: 0.05f
+            );
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => "Floor 100 Roll #5 Chance",
+                tooltip: () => "Probability (0.0 to 1.0) to roll a 5th item on Floor 100.",
+                getValue: () => Config.Floor100Roll5Chance,
+                setValue: value => Config.Floor100Roll5Chance = value,
+                min: 0.0f,
+                max: 1.0f,
+                interval: 0.05f
+            );
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => "Floor 100 Roll #6 Chance",
+                tooltip: () => "Probability (0.0 to 1.0) to roll a 6th item on Floor 100.",
+                getValue: () => Config.Floor100Roll6Chance,
+                setValue: value => Config.Floor100Roll6Chance = value,
+                min: 0.0f,
+                max: 1.0f,
+                interval: 0.05f
+            );
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => "Floor 100 Roll #7 Chance",
+                tooltip: () => "Probability (0.0 to 1.0) to roll a 7th item on Floor 100.",
+                getValue: () => Config.Floor100Roll7Chance,
+                setValue: value => Config.Floor100Roll7Chance = value,
+                min: 0.0f,
+                max: 1.0f,
+                interval: 0.05f
+            );
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => "Floor 100 Double Stack (2x)",
+                tooltip: () => "Chance (0.0 to 1.0) for an item stack on Floor 100 to be doubled.",
+                getValue: () => Config.Floor100DoubleStackChance,
+                setValue: value => Config.Floor100DoubleStackChance = value,
+                min: 0.0f,
+                max: 1.0f,
+                interval: 0.01f
+            );
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => "Floor 100 Triple Stack (3x)",
+                tooltip: () => "Chance (0.0 to 1.0) for an item stack on Floor 100 to be tripled.",
+                getValue: () => Config.Floor100TripleStackChance,
+                setValue: value => Config.Floor100TripleStackChance = value,
+                min: 0.0f,
+                max: 1.0f,
+                interval: 0.01f
+            );
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => "Floor 100 Quadruple Stack (4x)",
+                tooltip: () => "Chance (0.0 to 1.0) for an item stack on Floor 100 to be quadrupled (4x).",
+                getValue: () => Config.Floor100QuadrupleStackChance,
+                setValue: value => Config.Floor100QuadrupleStackChance = value,
+                min: 0.0f,
+                max: 1.0f,
+                interval: 0.01f
+            );
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => "Floor 100 Quintuple Stack (5x)",
+                tooltip: () => "Chance (0.0 to 1.0) for an item stack on Floor 100 to be quintupled (5x Mega Jackpot).",
+                getValue: () => Config.Floor100QuintupleStackChance,
+                setValue: value => Config.Floor100QuintupleStackChance = value,
                 min: 0.0f,
                 max: 1.0f,
                 interval: 0.01f

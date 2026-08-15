@@ -13,9 +13,26 @@ namespace BetterSkullCavernChest
         public float Roll4Chance { get; set; } = 0.25f;
         public float Roll5Chance { get; set; } = 0.10f;
 
-        // Stack Multipliers (Jackpot critical procs on stackable items)
+        // Stack Multipliers (Jackpot critical procs on stackable items - Regular Chests)
         public float DoubleStackChance { get; set; } = 0.15f;
         public float TripleStackChance { get; set; } = 0.05f;
+        public float QuadrupleStackChance { get; set; } = 0.0f;
+        public float QuintupleStackChance { get; set; } = 0.0f;
+
+        // Floor 100 Special Chest Buff Settings
+        public bool EnableFloor100Buff { get; set; } = true;
+        public bool Floor100AllCategoriesEqual { get; set; } = true;
+        public int Floor100MaxRolls { get; set; } = 7;
+        public float Floor100Roll2Chance { get; set; } = 0.85f;
+        public float Floor100Roll3Chance { get; set; } = 0.70f;
+        public float Floor100Roll4Chance { get; set; } = 0.55f;
+        public float Floor100Roll5Chance { get; set; } = 0.40f;
+        public float Floor100Roll6Chance { get; set; } = 0.25f;
+        public float Floor100Roll7Chance { get; set; } = 0.15f;
+        public float Floor100DoubleStackChance { get; set; } = 0.25f;
+        public float Floor100TripleStackChance { get; set; } = 0.15f;
+        public float Floor100QuadrupleStackChance { get; set; } = 0.10f;
+        public float Floor100QuintupleStackChance { get; set; } = 0.05f;
 
         // Category Weights (Target: 10% Legendary, 15% each for other 6 categories)
         public double LegendaryWeight { get; set; } = 10.0;

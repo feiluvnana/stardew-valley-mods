@@ -8,7 +8,7 @@ A suite of high-performance, modular quality-of-life and progression enhancement
 
 | Mod | Version | Description | Key Features |
 | :--- | :---: | :--- | :--- |
-| [**BetterSkullCavernChest**](./BetterSkullCavernChest) | `1.0.0` | Complete overhaul of Skull Cavern treasure room loot mechanics. | 7 usage categories, 76 items, decaying multi-rolls (max 5), 2x/3x jackpot multipliers, GMCM menu. |
+| [**BetterSkullCavernChest**](./BetterSkullCavernChest) | `1.1.0` | Complete overhaul of Skull Cavern treasure room loot mechanics. | 7 usage categories, Floor 100 special chest buffs (equal category shares, 7 decaying rolls, 2x-5x stack multipliers), GMCM menu. |
 | [**BetterProduct**](./BetterProduct) | `1.0.0` | Comprehensive artisan and cooking value / buff rebalancer. | Cooking profit margins, honey-type flower mead preservation, juice/pickle/roe/caviar buffs, energy & buff duration scaling. |
 | [**ExtendedDesertFestival**](./ExtendedDesertFestival) | `1.1.0` | Expands the Calico Desert Festival across all seasons. | Enables Desert Festival in Summer, Fall, and Winter (15th–17th), preserves Calico Eggs between festivals. |
 | [**ExtendedStackable**](./ExtendedStackable) | `1.0.0` | Stack size overhaul for normally unstackable items. | Stacks fishing tackle, 1.6 trinkets, rings, furniture, boots, clothing, and hats up to 999. |

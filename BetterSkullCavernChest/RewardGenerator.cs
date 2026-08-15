@@ -154,9 +154,10 @@ namespace BetterSkullCavernChest
             new("(O)Book_Artifact", LootCategory.Lootboxes, 1, 1, 10.0, c => c.EnableLootboxCategory && c.EnableBooks, false), // Treasure Appraisal Guide
         };
 
-        public static List<Item> GenerateRewards(ModConfig config, Random random)
+        public static List<Item> GenerateRewards(ModConfig config, Random random, bool isSpecialChest = false)
         {
             var results = new List<Item>();
+            bool applySpecialBuff = isSpecialChest && config.EnableFloor100Buff;
 
             // Organize eligible items into category buckets
             var categoryPools = new Dictionary<LootCategory, (List<RewardEntry> Entries, double TotalWeight)>();
@@ -176,22 +177,32 @@ namespace BetterSkullCavernChest
                 }
             }
 
+            // Determine category weights (equal weights if floor 100 buff with AllCategoriesEqual enabled)
+            bool equalCategories = applySpecialBuff && config.Floor100AllCategoriesEqual;
+            double legWeight = equalCategories ? 15.0 : config.LegendaryWeight;
+            double agrWeight = equalCategories ? 15.0 : config.AgricultureWeight;
+            double minWeight = equalCategories ? 15.0 : config.MiningWeight;
+            double fisWeight = equalCategories ? 15.0 : config.FishingWeight;
+            double comWeight = equalCategories ? 15.0 : config.CombatWeight;
+            double forWeight = equalCategories ? 15.0 : config.ForagingWeight;
+            double looWeight = equalCategories ? 15.0 : config.LootboxWeight;
+
             // Build active category list
             var activeCategories = new List<(LootCategory Category, double Weight)>();
-            if (categoryPools[LootCategory.Legendary].Entries.Count > 0 && config.LegendaryWeight > 0)
-                activeCategories.Add((LootCategory.Legendary, config.LegendaryWeight));
-            if (categoryPools[LootCategory.Agriculture].Entries.Count > 0 && config.AgricultureWeight > 0)
-                activeCategories.Add((LootCategory.Agriculture, config.AgricultureWeight));
-            if (categoryPools[LootCategory.Mining].Entries.Count > 0 && config.MiningWeight > 0)
-                activeCategories.Add((LootCategory.Mining, config.MiningWeight));
-            if (categoryPools[LootCategory.Fishing].Entries.Count > 0 && config.FishingWeight > 0)
-                activeCategories.Add((LootCategory.Fishing, config.FishingWeight));
-            if (categoryPools[LootCategory.Combat].Entries.Count > 0 && config.CombatWeight > 0)
-                activeCategories.Add((LootCategory.Combat, config.CombatWeight));
-            if (categoryPools[LootCategory.Foraging].Entries.Count > 0 && config.ForagingWeight > 0)
-                activeCategories.Add((LootCategory.Foraging, config.ForagingWeight));
-            if (categoryPools[LootCategory.Lootboxes].Entries.Count > 0 && config.LootboxWeight > 0)
-                activeCategories.Add((LootCategory.Lootboxes, config.LootboxWeight));
+            if (categoryPools[LootCategory.Legendary].Entries.Count > 0 && legWeight > 0)
+                activeCategories.Add((LootCategory.Legendary, legWeight));
+            if (categoryPools[LootCategory.Agriculture].Entries.Count > 0 && agrWeight > 0)
+                activeCategories.Add((LootCategory.Agriculture, agrWeight));
+            if (categoryPools[LootCategory.Mining].Entries.Count > 0 && minWeight > 0)
+                activeCategories.Add((LootCategory.Mining, minWeight));
+            if (categoryPools[LootCategory.Fishing].Entries.Count > 0 && fisWeight > 0)
+                activeCategories.Add((LootCategory.Fishing, fisWeight));
+            if (categoryPools[LootCategory.Combat].Entries.Count > 0 && comWeight > 0)
+                activeCategories.Add((LootCategory.Combat, comWeight));
+            if (categoryPools[LootCategory.Foraging].Entries.Count > 0 && forWeight > 0)
+                activeCategories.Add((LootCategory.Foraging, forWeight));
+            if (categoryPools[LootCategory.Lootboxes].Entries.Count > 0 && looWeight > 0)
+                activeCategories.Add((LootCategory.Lootboxes, looWeight));
 
             double totalCatWeight = 0;
             foreach (var c in activeCategories)
@@ -201,9 +212,13 @@ namespace BetterSkullCavernChest
                 return results;
 
             // Determine number of rolls using diminishing probabilities
+            int maxRolls = applySpecialBuff ? config.Floor100MaxRolls : config.MaxRolls;
+            float[] decayChances = applySpecialBuff
+                ? new[] { 1.0f, config.Floor100Roll2Chance, config.Floor100Roll3Chance, config.Floor100Roll4Chance, config.Floor100Roll5Chance, config.Floor100Roll6Chance, config.Floor100Roll7Chance }
+                : new[] { 1.0f, config.Roll2Chance, config.Roll3Chance, config.Roll4Chance, config.Roll5Chance };
+
             int rolls = 1; // 1st roll is 100% guaranteed
-            float[] decayChances = new[] { 1.0f, config.Roll2Chance, config.Roll3Chance, config.Roll4Chance, config.Roll5Chance };
-            for (int r = 1; r < config.MaxRolls; r++)
+            for (int r = 1; r < maxRolls; r++)
             {
                 if (r < decayChances.Length && random.NextDouble() < decayChances[r])
                 {
@@ -214,6 +229,12 @@ namespace BetterSkullCavernChest
                     break;
                 }
             }
+
+            // Stack multiplier rates
+            float x5Chance = applySpecialBuff ? config.Floor100QuintupleStackChance : config.QuintupleStackChance;
+            float x4Chance = applySpecialBuff ? config.Floor100QuadrupleStackChance : config.QuadrupleStackChance;
+            float x3Chance = applySpecialBuff ? config.Floor100TripleStackChance : config.TripleStackChance;
+            float x2Chance = applySpecialBuff ? config.Floor100DoubleStackChance : config.DoubleStackChance;
 
             // Roll each item
             for (int i = 0; i < rolls; i++)
@@ -262,11 +283,19 @@ namespace BetterSkullCavernChest
                 if (selectedItem.AllowMultiplier)
                 {
                     double multRoll = random.NextDouble();
-                    if (multRoll < config.TripleStackChance)
+                    if (multRoll < x5Chance)
+                    {
+                        stack *= 5;
+                    }
+                    else if (multRoll < x5Chance + x4Chance)
+                    {
+                        stack *= 4;
+                    }
+                    else if (multRoll < x5Chance + x4Chance + x3Chance)
                     {
                         stack *= 3;
                     }
-                    else if (multRoll < config.TripleStackChance + config.DoubleStackChance)
+                    else if (multRoll < x5Chance + x4Chance + x3Chance + x2Chance)
                     {
                         stack *= 2;
                     }
