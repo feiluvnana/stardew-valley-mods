@@ -122,7 +122,7 @@ namespace BetterMap
             }
         }
 
-        /// <summary>Applies 3x1 exit widening and cleans upper surrounding wood moldings for IslandFarmHouse.</summary>
+        /// <summary>Applies seamless 3x1 exit widening to IslandFarmHouse, perfectly flush with the living room bottom wall.</summary>
         public static void PatchIslandFarmHouse(Map map, ModConfig config, IMonitor monitor)
         {
             try
@@ -135,57 +135,49 @@ namespace BetterMap
                 var tsIndoor = map.GetTileSheet("indoor");
                 var tsIsland = map.GetTileSheet("untitled tile sheet");
 
-                if (buildings != null && front != null && tsIndoor != null)
+                if (buildings != null && front != null && back != null && tsIndoor != null && tsIsland != null)
                 {
-                    // Row above doorway (y=15): remove wood moldings from x=13, 14, 15 and place at outer edges x=12, 16
-                    front.Tiles[12, 15] = new StaticTile(front, tsIndoor, BlendMode.Alpha, 162);
-                    front.Tiles[13, 15] = null;
+                    // Row 15:
+                    // Left dividing wall continues straight down column 12
+                    buildings.Tiles[12, 15] = new StaticTile(buildings, tsIndoor, BlendMode.Alpha, 64);
+                    front.Tiles[12, 15] = null;
+
+                    // Wood molding turning into door on the left at x=13
+                    front.Tiles[13, 15] = new StaticTile(front, tsIndoor, BlendMode.Alpha, 162);
                     front.Tiles[14, 15] = null;
                     front.Tiles[15, 15] = null;
+                    // Wood corner molding above right doorframe at x=16
                     front.Tiles[16, 15] = new StaticTile(front, tsIndoor, BlendMode.Alpha, 163);
 
-                    // Row at doorway top (y=16):
+                    // Row 16 (Doorway row, flush with living room bottom wall):
+                    // Left doorframe base at x=12
                     buildings.Tiles[12, 16] = new StaticTile(buildings, tsIndoor, BlendMode.Alpha, 64);
-                    front.Tiles[12, 16] = new StaticTile(front, tsIndoor, BlendMode.Alpha, 64);
+                    front.Tiles[12, 16] = new StaticTile(front, tsIndoor, BlendMode.Alpha, 96);
+
+                    // 3-wide doorway mats at x=13, 14, 15
+                    for (int x = 13; x <= 15; x++)
+                    {
+                        back.Tiles[x, 16] = new StaticTile(back, tsIsland, BlendMode.Alpha, 181);
+                        buildings.Tiles[x, 16] = null;
+                        front.Tiles[x, 16] = new StaticTile(front, tsIndoor, BlendMode.Alpha, 165);
+                    }
+
+                    // Right doorframe base at x=16 (seamlessly connects to living room bottom wall at x=17..28)
                     buildings.Tiles[16, 16] = new StaticTile(buildings, tsIndoor, BlendMode.Alpha, 68);
-                    front.Tiles[16, 16] = new StaticTile(front, tsIndoor, BlendMode.Alpha, 68);
+                    front.Tiles[16, 16] = new StaticTile(front, tsIndoor, BlendMode.Alpha, 130);
 
-                    buildings.Tiles[13, 16] = null;
-                    front.Tiles[13, 16] = null;
-                    buildings.Tiles[14, 16] = null;
-                    front.Tiles[14, 16] = null;
-                    buildings.Tiles[15, 16] = null;
-                    front.Tiles[15, 16] = null;
+                    // Row 17 (Void row below all walls & doorway):
+                    for (int x = 12; x <= 16; x++)
+                    {
+                        back.Tiles[x, 17] = null;
+                        buildings.Tiles[x, 17] = new StaticTile(buildings, tsIndoor, BlendMode.Alpha, 0);
+                        front.Tiles[x, 17] = null;
+                    }
 
-                    // Row at doorway bottom (y=17):
-                    buildings.Tiles[12, 17] = new StaticTile(buildings, tsIndoor, BlendMode.Alpha, 64);
-                    front.Tiles[12, 17] = new StaticTile(front, tsIndoor, BlendMode.Alpha, 96);
-                    buildings.Tiles[16, 17] = new StaticTile(buildings, tsIndoor, BlendMode.Alpha, 68);
-                    front.Tiles[16, 17] = new StaticTile(front, tsIndoor, BlendMode.Alpha, 130);
-
-                    buildings.Tiles[13, 17] = null;
-                    buildings.Tiles[14, 17] = null;
-                    buildings.Tiles[15, 17] = null;
-
-                    front.Tiles[13, 17] = new StaticTile(front, tsIndoor, BlendMode.Alpha, 165);
-                    front.Tiles[14, 17] = new StaticTile(front, tsIndoor, BlendMode.Alpha, 165);
-                    front.Tiles[15, 17] = new StaticTile(front, tsIndoor, BlendMode.Alpha, 165);
+                    // Map Warps: allow exit from row 16 or walking down through row 17/18
+                    map.Properties["Warp"] = "13 17 IslandWest 77 40 14 17 IslandWest 77 40 15 17 IslandWest 77 40 13 18 IslandWest 77 40 14 18 IslandWest 77 40 15 18 IslandWest 77 40";
+                    monitor.Log("Successfully patched IslandFarmHouse: Applied seamless 3x1 exit doorway flush with bottom wall.", LogLevel.Trace);
                 }
-
-                // Ensure Back floor tiles on x=13..15 at y=16..17
-                if (back != null && tsIsland != null)
-                {
-                    back.Tiles[13, 16] = new StaticTile(back, tsIsland, BlendMode.Alpha, 181);
-                    back.Tiles[14, 16] = new StaticTile(back, tsIsland, BlendMode.Alpha, 181);
-                    back.Tiles[15, 16] = new StaticTile(back, tsIsland, BlendMode.Alpha, 181);
-                    back.Tiles[13, 17] = new StaticTile(back, tsIsland, BlendMode.Alpha, 181);
-                    back.Tiles[14, 17] = new StaticTile(back, tsIsland, BlendMode.Alpha, 181);
-                    back.Tiles[15, 17] = new StaticTile(back, tsIsland, BlendMode.Alpha, 181);
-                }
-
-                // Update Map Warp property to 3x1
-                map.Properties["Warp"] = "13 18 IslandWest 77 40 14 18 IslandWest 77 40 15 18 IslandWest 77 40";
-                monitor.Log("Successfully patched IslandFarmHouse: Widened exit doorway to 3x1 and cleaned upper wood molding.", LogLevel.Trace);
             }
             catch (Exception ex)
             {
@@ -206,7 +198,7 @@ namespace BetterMap
 
                 if (buildings != null && front != null && tsIndoor != null)
                 {
-                    // Row above doorway (y=10): remove wood moldings from x=2, 3, 4 and move to x=1, 5
+                    // Row above doorway (y=10): wood corner moldings at x=1 and x=5
                     front.Tiles[1, 10] = new StaticTile(front, tsIndoor, BlendMode.Alpha, 162);
                     front.Tiles[2, 10] = null;
                     front.Tiles[3, 10] = null;
@@ -229,7 +221,7 @@ namespace BetterMap
                 }
 
                 map.Properties["Warp"] = "2 12 Farm 64 15 3 12 Farm 64 15 4 12 Farm 64 15";
-                monitor.Log("Successfully patched FarmHouse: Widened exit doorway to 3x1 and cleaned upper wood molding.", LogLevel.Trace);
+                monitor.Log("Successfully patched FarmHouse: Widened exit doorway to 3x1.", LogLevel.Trace);
             }
             catch (Exception ex)
             {
@@ -250,7 +242,7 @@ namespace BetterMap
 
                 if (buildings != null && front != null && tsIndoor != null)
                 {
-                    // Row above doorway (y=10): remove wood moldings from x=8, 9, 10 and move to x=7, 11
+                    // Row above doorway (y=10): wood corner moldings at x=7 and x=11
                     front.Tiles[7, 10] = new StaticTile(front, tsIndoor, BlendMode.Alpha, 162);
                     front.Tiles[8, 10] = null;
                     front.Tiles[9, 10] = null;
@@ -273,7 +265,7 @@ namespace BetterMap
                 }
 
                 map.Properties["Warp"] = "8 12 Farm 64 15 9 12 Farm 64 15 10 12 Farm 64 15";
-                monitor.Log("Successfully patched FarmHouse1: Widened exit doorway to 3x1 and cleaned upper wood molding.", LogLevel.Trace);
+                monitor.Log("Successfully patched FarmHouse1: Widened exit doorway to 3x1.", LogLevel.Trace);
             }
             catch (Exception ex)
             {
@@ -294,7 +286,7 @@ namespace BetterMap
 
                 if (buildings != null && front != null && tsIndoor != null)
                 {
-                    // Row above doorway (y=29): remove wood moldings from x=26, 27, 28 and move to x=25, 29
+                    // Row above doorway (y=29): wood corner moldings at x=25 and x=29
                     front.Tiles[25, 29] = new StaticTile(front, tsIndoor, BlendMode.Alpha, 162);
                     front.Tiles[26, 29] = null;
                     front.Tiles[27, 29] = null;
@@ -317,7 +309,7 @@ namespace BetterMap
                 }
 
                 map.Properties["Warp"] = "26 31 Farm 64 15 27 31 Farm 64 15 28 31 Farm 64 15";
-                monitor.Log("Successfully patched FarmHouse2: Widened exit doorway to 3x1 and cleaned upper wood molding.", LogLevel.Trace);
+                monitor.Log("Successfully patched FarmHouse2: Widened exit doorway to 3x1.", LogLevel.Trace);
             }
             catch (Exception ex)
             {
