@@ -153,7 +153,8 @@ namespace BetterTrinket
                             flicker: false,
                             flipped: false
                         ));
-                        __result = true;
+                        who.ignoreItemConsumptionThisFrame = true;
+                        __result = false;
                         return false;
                     }
                 }
@@ -195,7 +196,8 @@ namespace BetterTrinket
                     flipped: false
                 ));
 
-                __result = true;
+                who.ignoreItemConsumptionThisFrame = true;
+                __result = false;
                 return false;
             }
 

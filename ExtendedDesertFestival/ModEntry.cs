@@ -5,6 +5,7 @@ using HarmonyLib;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
+using StardewValley.GameData;
 
 namespace ExtendedDesertFestival
 {
@@ -22,8 +23,6 @@ namespace ExtendedDesertFestival
         public static IMonitor ModMonitor { get; private set; } = null!;
         public static ITranslationHelper I18n { get; private set; } = null!;
 
-        private static readonly Dictionary<long, List<Item>> StashedEggs = new();
-
         public override void Entry(IModHelper helper)
         {
             Config = helper.ReadConfig<ModConfig>();
@@ -33,29 +32,31 @@ namespace ExtendedDesertFestival
             var harmony = new Harmony(ModManifest.UniqueID);
             try
             {
-                // Patch Utility.isFestivalDay(int dayOfMonth, Season season)
-                MethodInfo isFestivalDayMethod = AccessTools.Method(typeof(Utility), nameof(Utility.isFestivalDay), new[] { typeof(int), typeof(Season) });
-                if (isFestivalDayMethod != null)
+                // Patch Utility.TryGetPassiveFestivalDataForDay
+                MethodInfo tryGetPassiveMethod = AccessTools.Method(
+                    typeof(Utility),
+                    nameof(Utility.TryGetPassiveFestivalDataForDay),
+                    new[] { typeof(int), typeof(Season), typeof(string), typeof(string).MakeByRefType(), typeof(PassiveFestivalData).MakeByRefType(), typeof(bool) }
+                );
+
+                if (tryGetPassiveMethod != null)
                 {
                     harmony.Patch(
-                        original: isFestivalDayMethod,
-                        postfix: new HarmonyMethod(typeof(ModEntry), nameof(Utility_isFestivalDay_Postfix))
+                        original: tryGetPassiveMethod,
+                        postfix: new HarmonyMethod(typeof(ModEntry), nameof(Utility_TryGetPassiveFestivalDataForDay_Postfix))
                     );
+                    Monitor.Log("Hooked Utility.TryGetPassiveFestivalDataForDay successfully.", LogLevel.Trace);
                 }
 
                 // Patch DesertFestival.CleanupFestival
-                Type desertFestivalType = AccessTools.TypeByName("StardewValley.DesertFestival");
-                if (desertFestivalType != null)
+                MethodInfo cleanupMethod = AccessTools.Method(typeof(StardewValley.Locations.DesertFestival), "CleanupFestival");
+                if (cleanupMethod != null)
                 {
-                    MethodInfo cleanupMethod = AccessTools.Method(desertFestivalType, "CleanupFestival");
-                    if (cleanupMethod != null)
-                    {
-                        harmony.Patch(
-                            original: cleanupMethod,
-                            prefix: new HarmonyMethod(typeof(ModEntry), nameof(DesertFestival_CleanupFestival_Prefix)),
-                            postfix: new HarmonyMethod(typeof(ModEntry), nameof(DesertFestival_CleanupFestival_Postfix))
-                        );
-                    }
+                    harmony.Patch(
+                        original: cleanupMethod,
+                        postfix: new HarmonyMethod(typeof(ModEntry), nameof(DesertFestival_CleanupFestival_Postfix))
+                    );
+                    Monitor.Log("Hooked DesertFestival.CleanupFestival successfully.", LogLevel.Trace);
                 }
 
                 Monitor.Log("Harmony patches for ExtendedDesertFestival applied successfully.", LogLevel.Trace);
@@ -65,86 +66,92 @@ namespace ExtendedDesertFestival
                 Monitor.Log($"Failed to apply ExtendedDesertFestival harmony patches: {ex}", LogLevel.Error);
             }
 
+            helper.Events.Content.AssetRequested += OnAssetRequested;
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
+            helper.Events.GameLoop.DayStarted += OnDayStarted;
+            helper.Events.GameLoop.DayEnding += OnDayEnding;
         }
 
-        public static void Utility_isFestivalDay_Postfix(int dayOfMonth, Season season, ref bool __result)
+        public static bool IsSeasonEnabled(Season season)
         {
-            if (__result)
-                return;
-
-            if (dayOfMonth >= Config.FestivalStartDay && dayOfMonth <= Config.FestivalEndDay)
+            return season switch
             {
-                if (Config.EnableSummer && season == Season.Summer)
-                {
-                    __result = true;
-                }
-                else if (Config.EnableFall && season == Season.Fall)
-                {
-                    __result = true;
-                }
-                else if (Config.EnableWinter && season == Season.Winter)
-                {
-                    __result = true;
-                }
-            }
+                Season.Spring => true,
+                Season.Summer => Config.EnableSummer,
+                Season.Fall => Config.EnableFall,
+                Season.Winter => Config.EnableWinter,
+                _ => false
+            };
         }
 
-        public static void DesertFestival_CleanupFestival_Prefix()
+        public static bool IsDesertFestivalDay(int dayOfMonth, Season season)
         {
-            if (!Config.KeepEggs)
-                return;
+            return dayOfMonth >= Config.FestivalStartDay
+                && dayOfMonth <= Config.FestivalEndDay
+                && IsSeasonEnabled(season);
+        }
 
-            StashedEggs.Clear();
-            try
+        private void OnAssetRequested(object? sender, AssetRequestedEventArgs e)
+        {
+            if (e.NameWithoutLocale.IsEquivalentTo("Data/PassiveFestivals"))
             {
-                foreach (Farmer farmer in Game1.getAllFarmers())
+                e.Edit(asset =>
                 {
-                    if (farmer?.Items == null) continue;
-                    var eggs = new List<Item>();
-                    for (int i = 0; i < farmer.Items.Count; i++)
+                    var data = asset.AsDictionary<string, PassiveFestivalData>().Data;
+                    if (data.TryGetValue("DesertFestival", out var festival))
                     {
-                        Item? item = farmer.Items[i];
-                        if (item != null && (item.ItemId == "CalicoEgg" || item.QualifiedItemId == "(O)CalicoEgg"))
+                        festival.StartDay = Config.FestivalStartDay;
+                        festival.EndDay = Config.FestivalEndDay;
+
+                        if (IsSeasonEnabled(Game1.season))
                         {
-                            Item clone = ItemRegistry.Create(item.QualifiedItemId, item.Stack);
-                            eggs.Add(clone);
+                            festival.Season = Game1.season;
                         }
                     }
-                    if (eggs.Count > 0)
-                    {
-                        StashedEggs[farmer.UniqueMultiplayerID] = eggs;
-                    }
-                }
+                });
             }
-            catch (Exception ex)
+        }
+
+        private void OnDayStarted(object? sender, DayStartedEventArgs e)
+        {
+            if (Config.KeepEggs && Game1.player?.team?.itemsToRemoveOvernight != null)
             {
-                ModMonitor.Log($"Error stashing Calico Eggs during festival cleanup: {ex}", LogLevel.Warn);
+                Game1.player.team.itemsToRemoveOvernight.Remove("CalicoEgg");
+                Game1.player.team.itemsToRemoveOvernight.Remove("(O)CalicoEgg");
+            }
+
+            // Ensure festival asset reflects current season
+            Helper.GameContent.InvalidateCache("Data/PassiveFestivals");
+        }
+
+        private void OnDayEnding(object? sender, DayEndingEventArgs e)
+        {
+            if (Config.KeepEggs && Game1.player?.team?.itemsToRemoveOvernight != null)
+            {
+                Game1.player.team.itemsToRemoveOvernight.Remove("CalicoEgg");
+                Game1.player.team.itemsToRemoveOvernight.Remove("(O)CalicoEgg");
+            }
+        }
+
+        public static void Utility_TryGetPassiveFestivalDataForDay_Postfix(int dayOfMonth, Season season, string locationContextId, ref string id, ref PassiveFestivalData data, ref bool __result)
+        {
+            if (IsDesertFestivalDay(dayOfMonth, season))
+            {
+                if (Utility.TryGetPassiveFestivalData("DesertFestival", out var dfData))
+                {
+                    id = "DesertFestival";
+                    data = dfData;
+                    __result = true;
+                }
             }
         }
 
         public static void DesertFestival_CleanupFestival_Postfix()
         {
-            if (!Config.KeepEggs || StashedEggs.Count == 0)
-                return;
-
-            try
+            if (Config.KeepEggs && Game1.player?.team?.itemsToRemoveOvernight != null)
             {
-                foreach (Farmer farmer in Game1.getAllFarmers())
-                {
-                    if (farmer != null && StashedEggs.TryGetValue(farmer.UniqueMultiplayerID, out var eggs))
-                    {
-                        foreach (var egg in eggs)
-                        {
-                            farmer.addItemToInventory(egg);
-                        }
-                    }
-                }
-                StashedEggs.Clear();
-            }
-            catch (Exception ex)
-            {
-                ModMonitor.Log($"Error restoring Calico Eggs after festival cleanup: {ex}", LogLevel.Warn);
+                Game1.player.team.itemsToRemoveOvernight.Remove("CalicoEgg");
+                Game1.player.team.itemsToRemoveOvernight.Remove("(O)CalicoEgg");
             }
         }
 
@@ -156,8 +163,16 @@ namespace ExtendedDesertFestival
 
             configMenu.Register(
                 mod: ModManifest,
-                reset: () => Config = new ModConfig(),
-                save: () => Helper.WriteConfig(Config)
+                reset: () =>
+                {
+                    Config = new ModConfig();
+                    Helper.GameContent.InvalidateCache("Data/PassiveFestivals");
+                },
+                save: () =>
+                {
+                    Helper.WriteConfig(Config);
+                    Helper.GameContent.InvalidateCache("Data/PassiveFestivals");
+                }
             );
 
             configMenu.AddSectionTitle(
@@ -170,7 +185,11 @@ namespace ExtendedDesertFestival
                 name: () => I18n.Get("config.start-day.name"),
                 tooltip: () => I18n.Get("config.start-day.tooltip"),
                 getValue: () => Config.FestivalStartDay,
-                setValue: value => Config.FestivalStartDay = value,
+                setValue: value =>
+                {
+                    Config.FestivalStartDay = value;
+                    Helper.GameContent.InvalidateCache("Data/PassiveFestivals");
+                },
                 min: 1,
                 max: 28
             );
@@ -180,7 +199,11 @@ namespace ExtendedDesertFestival
                 name: () => I18n.Get("config.end-day.name"),
                 tooltip: () => I18n.Get("config.end-day.tooltip"),
                 getValue: () => Config.FestivalEndDay,
-                setValue: value => Config.FestivalEndDay = value,
+                setValue: value =>
+                {
+                    Config.FestivalEndDay = value;
+                    Helper.GameContent.InvalidateCache("Data/PassiveFestivals");
+                },
                 min: 1,
                 max: 28
             );
@@ -190,7 +213,11 @@ namespace ExtendedDesertFestival
                 name: () => I18n.Get("config.enable-summer.name"),
                 tooltip: () => I18n.Get("config.enable-summer.tooltip"),
                 getValue: () => Config.EnableSummer,
-                setValue: value => Config.EnableSummer = value
+                setValue: value =>
+                {
+                    Config.EnableSummer = value;
+                    Helper.GameContent.InvalidateCache("Data/PassiveFestivals");
+                }
             );
 
             configMenu.AddBoolOption(
@@ -198,7 +225,11 @@ namespace ExtendedDesertFestival
                 name: () => I18n.Get("config.enable-fall.name"),
                 tooltip: () => I18n.Get("config.enable-fall.tooltip"),
                 getValue: () => Config.EnableFall,
-                setValue: value => Config.EnableFall = value
+                setValue: value =>
+                {
+                    Config.EnableFall = value;
+                    Helper.GameContent.InvalidateCache("Data/PassiveFestivals");
+                }
             );
 
             configMenu.AddBoolOption(
@@ -206,7 +237,11 @@ namespace ExtendedDesertFestival
                 name: () => I18n.Get("config.enable-winter.name"),
                 tooltip: () => I18n.Get("config.enable-winter.tooltip"),
                 getValue: () => Config.EnableWinter,
-                setValue: value => Config.EnableWinter = value
+                setValue: value =>
+                {
+                    Config.EnableWinter = value;
+                    Helper.GameContent.InvalidateCache("Data/PassiveFestivals");
+                }
             );
 
             configMenu.AddBoolOption(

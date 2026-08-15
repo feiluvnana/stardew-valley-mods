@@ -1,0 +1,9 @@
+{
+  "Name": "BetterMap",
+  "Author": "feiluvnana",
+  "Version": "1.0.0",
+  "Description": "Enhances Stardew Valley maps by clearing unwanted wrecks, obstacles, and expanding pathways for a cleaner, more accessible world.",
+  "UniqueID": "feiluvnana.BetterMap",
+  "MinimumApiVersion": "4.0.0",
+  "EntryDll": "BetterMap.dll"
+}

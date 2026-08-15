@@ -184,38 +184,52 @@ namespace BetterProduct
 
             // Create output object
             StardewValley.Object outputObj;
+            int inputPrice = (dropInItem is StardewValley.Object dropObj) ? dropObj.Price : dropInItem.salePrice();
+
             if (dropInItem.QualifiedItemId == "(O)398" || dropInItem.ItemId == "398")
             {
                 outputObj = ItemRegistry.Create<StardewValley.Object>("(O)Raisins");
+                outputObj.Price = 600;
             }
             else if (IsMushroom(dropInItem))
             {
                 outputObj = ItemRegistry.Create<StardewValley.Object>("(O)DriedMushrooms");
                 outputObj.preservedParentSheetIndex.Value = dropInItem.ItemId;
-                outputObj.preserve.Value = StardewValley.Object.PreserveType.DriedFruit;
+                outputObj.preserve.Value = StardewValley.Object.PreserveType.DriedMushroom;
+                outputObj.Price = (int)(inputPrice * 7.5f + 25);
             }
             else
             {
                 outputObj = ItemRegistry.Create<StardewValley.Object>("(O)DriedFruit");
                 outputObj.preservedParentSheetIndex.Value = dropInItem.ItemId;
                 outputObj.preserve.Value = StardewValley.Object.PreserveType.DriedFruit;
+                outputObj.Price = (int)(inputPrice * 7.5f + 25);
+            }
+
+            // Copy color if applicable
+            var itemColor = (dropInItem is StardewValley.Objects.ColoredObject colObj)
+                ? new Microsoft.Xna.Framework.Color?(colObj.color.Value)
+                : ItemContextTagManager.GetColorFromTags(dropInItem);
+            if (itemColor.HasValue && StardewValley.Objects.ColoredObject.TrySetColor(outputObj, itemColor.Value, out var coloredOutput) && coloredOutput is StardewValley.Object coloredObj)
+            {
+                outputObj = coloredObj;
             }
 
             outputObj.Quality = outputQuality;
             __instance.heldObject.Value = outputObj;
 
-            // Set processing time
+            // Set processing time (Dehydrator does NOT use showNextIndex)
+            __instance.showNextIndex.Value = false;
             if (Config.DehydratorSpeedMultiplier <= 0f)
             {
                 __instance.MinutesUntilReady = 0;
                 __instance.readyForHarvest.Value = true;
-                __instance.showNextIndex.Value = true;
             }
             else
             {
                 int baseMinutes = 1750;
                 __instance.MinutesUntilReady = Math.Max(1, (int)(baseMinutes / Config.DehydratorSpeedMultiplier));
-                __instance.showNextIndex.Value = true;
+                __instance.readyForHarvest.Value = false;
             }
 
             // Audio visual feedback
