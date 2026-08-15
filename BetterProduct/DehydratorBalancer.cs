@@ -119,6 +119,16 @@ namespace BetterProduct
                 return false;
             }
 
+            // Capture ingredient metadata before consuming stacks
+            string ingredientId = dropInItem.ItemId;
+            string ingredientQualifiedId = dropInItem.QualifiedItemId;
+            string ingredientName = dropInItem.Name;
+            bool isMushroom = IsMushroom(dropInItem);
+            int inputPrice = (dropInItem is StardewValley.Object dropObj) ? dropObj.Price : dropInItem.salePrice();
+            var ingredientColor = (dropInItem is StardewValley.Objects.ColoredObject colObj)
+                ? new Microsoft.Xna.Framework.Color?(colObj.color.Value)
+                : (StardewValley.Menus.TailoringMenu.GetDyeColor(dropInItem) ?? ItemContextTagManager.GetColorFromTags(dropInItem));
+
             // Consume 5 items across inventory stacks and record individual qualities
             List<int> inputQualities = new List<int>();
             int remainingToConsume = 5;
@@ -143,7 +153,7 @@ namespace BetterProduct
                 for (int i = 0; i < who.Items.Count && remainingToConsume > 0; i++)
                 {
                     var item = who.Items[i];
-                    if (item != null && item != dropInItem && item.QualifiedItemId == dropInItem.QualifiedItemId)
+                    if (item != null && item != dropInItem && item.QualifiedItemId == ingredientQualifiedId)
                     {
                         int take = Math.Min(item.Stack, remainingToConsume);
                         for (int k = 0; k < take; k++)
@@ -184,34 +194,34 @@ namespace BetterProduct
 
             // Create output object
             StardewValley.Object outputObj;
-            int inputPrice = (dropInItem is StardewValley.Object dropObj) ? dropObj.Price : dropInItem.salePrice();
 
-            if (dropInItem.QualifiedItemId == "(O)398" || dropInItem.ItemId == "398")
+            if (ingredientQualifiedId == "(O)398" || ingredientId == "398")
             {
                 outputObj = ItemRegistry.Create<StardewValley.Object>("(O)Raisins");
                 outputObj.Price = 600;
             }
-            else if (IsMushroom(dropInItem))
+            else if (isMushroom)
             {
-                outputObj = ItemRegistry.Create<StardewValley.Object>("(O)DriedMushrooms");
-                outputObj.preservedParentSheetIndex.Value = dropInItem.ItemId;
-                outputObj.preserve.Value = StardewValley.Object.PreserveType.DriedMushroom;
-                outputObj.Price = (int)(inputPrice * 7.5f + 25);
+                var color = ingredientColor ?? Microsoft.Xna.Framework.Color.Orange;
+                var coloredObj = new StardewValley.Objects.ColoredObject("DriedMushrooms", 1, color)
+                {
+                    Name = StardewValley.BellsAndWhistles.Lexicon.makePlural("Dried " + ingredientName),
+                    Price = (int)(inputPrice * 7.5f + 25)
+                };
+                coloredObj.preserve.Value = StardewValley.Object.PreserveType.DriedMushroom;
+                coloredObj.preservedParentSheetIndex.Value = ingredientId;
+                outputObj = coloredObj;
             }
             else
             {
-                outputObj = ItemRegistry.Create<StardewValley.Object>("(O)DriedFruit");
-                outputObj.preservedParentSheetIndex.Value = dropInItem.ItemId;
-                outputObj.preserve.Value = StardewValley.Object.PreserveType.DriedFruit;
-                outputObj.Price = (int)(inputPrice * 7.5f + 25);
-            }
-
-            // Copy color if applicable
-            var itemColor = (dropInItem is StardewValley.Objects.ColoredObject colObj)
-                ? new Microsoft.Xna.Framework.Color?(colObj.color.Value)
-                : ItemContextTagManager.GetColorFromTags(dropInItem);
-            if (itemColor.HasValue && StardewValley.Objects.ColoredObject.TrySetColor(outputObj, itemColor.Value, out var coloredOutput) && coloredOutput is StardewValley.Object coloredObj)
-            {
+                var color = ingredientColor ?? Microsoft.Xna.Framework.Color.Orange;
+                var coloredObj = new StardewValley.Objects.ColoredObject("DriedFruit", 1, color)
+                {
+                    Name = StardewValley.BellsAndWhistles.Lexicon.makePlural("Dried " + ingredientName),
+                    Price = (int)(inputPrice * 7.5f + 25)
+                };
+                coloredObj.preserve.Value = StardewValley.Object.PreserveType.DriedFruit;
+                coloredObj.preservedParentSheetIndex.Value = ingredientId;
                 outputObj = coloredObj;
             }
 
