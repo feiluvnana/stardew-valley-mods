@@ -7,7 +7,7 @@
 
   "config.section.decaying-rolls": "Decaying Multi-Rolls (Regular Chests)",
   "config.max-rolls.name": "Max Rolls Per Chest",
-  "config.max-rolls.tooltip": "Maximum number of item rolls a regular chest can attempt (1 to 5).",
+  "config.max-rolls.tooltip": "Maximum number of item rolls a regular chest can attempt (1 to 7).",
   "config.roll-2-chance.name": "Roll #2 Chance",
   "config.roll-2-chance.tooltip": "Probability (0.0 to 1.0) to successfully roll a 2nd item.",
   "config.roll-3-chance.name": "Roll #3 Chance",
@@ -16,6 +16,10 @@
   "config.roll-4-chance.tooltip": "Probability (0.0 to 1.0) to successfully roll a 4th item.",
   "config.roll-5-chance.name": "Roll #5 Chance",
   "config.roll-5-chance.tooltip": "Probability (0.0 to 1.0) to successfully roll a 5th item.",
+  "config.roll-6-chance.name": "Roll #6 Chance",
+  "config.roll-6-chance.tooltip": "Probability (0.0 to 1.0) to successfully roll a 6th item.",
+  "config.roll-7-chance.name": "Roll #7 Chance",
+  "config.roll-7-chance.tooltip": "Probability (0.0 to 1.0) to successfully roll a 7th item.",
 
   "config.section.stack-multipliers": "Jackpot Stack Multipliers (Regular Chests)",
   "config.double-stack-chance.name": "Double Stack Chance (2x)",

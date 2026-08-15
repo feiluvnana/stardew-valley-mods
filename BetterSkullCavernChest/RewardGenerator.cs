@@ -52,84 +52,84 @@ namespace BetterSkullCavernChest
             // =========================================================================
             // === 1. LEGENDARY CATEGORY (10% Category Weight)                       ===
             // =========================================================================
-            new("(O)74", LootCategory.Legendary, 1, 3, 25.0, c => c.EnableLegendaryCategory && c.EnablePrismaticShard),
-            new("(O)279", LootCategory.Legendary, 1, 2, 20.0, c => c.EnableLegendaryCategory && c.EnableMagicRockCandy),
-            new("(O)GoldenAnimalCracker", LootCategory.Legendary, 1, 1, 20.0, c => c.EnableLegendaryCategory && c.EnableGoldenAnimalCracker, false),
+            new("(O)74", LootCategory.Legendary, 1, 4, 25.0, c => c.EnableLegendaryCategory && c.EnablePrismaticShard),
+            new("(O)279", LootCategory.Legendary, 1, 3, 20.0, c => c.EnableLegendaryCategory && c.EnableMagicRockCandy),
+            new("(O)GoldenAnimalCracker", LootCategory.Legendary, 1, 2, 20.0, c => c.EnableLegendaryCategory && c.EnableGoldenAnimalCracker, false),
             new("(BC)272", LootCategory.Legendary, 1, 1, 20.0, c => c.EnableLegendaryCategory && c.EnableAutoPetter, false), // Auto-Petter
-            new("(O)896", LootCategory.Legendary, 1, 1, 15.0, c => c.EnableLegendaryCategory && c.EnableGalaxySoul, false),  // Galaxy Soul
-            new("(O)StardropTea", LootCategory.Legendary, 1, 2, 15.0, c => c.EnableLegendaryCategory && c.EnableStardropTea),
-            new("(O)PrizeTicket", LootCategory.Legendary, 2, 5, 15.0, c => c.EnableLegendaryCategory && c.EnablePrizeTicket),
+            new("(O)896", LootCategory.Legendary, 1, 2, 15.0, c => c.EnableLegendaryCategory && c.EnableGalaxySoul, false),  // Galaxy Soul
+            new("(O)StardropTea", LootCategory.Legendary, 2, 4, 15.0, c => c.EnableLegendaryCategory && c.EnableStardropTea),
+            new("(O)PrizeTicket", LootCategory.Legendary, 3, 8, 15.0, c => c.EnableLegendaryCategory && c.EnablePrizeTicket),
 
             // =========================================================================
             // === 2. AGRICULTURE CATEGORY (15% Category Weight)                     ===
             // =========================================================================
-            new("(O)918", LootCategory.Agriculture, 10, 30, 20.0, c => c.EnableAgricultureCategory && c.EnableFertilizers),     // Hyper Speed-Gro
-            new("(O)919", LootCategory.Agriculture, 10, 30, 20.0, c => c.EnableAgricultureCategory && c.EnableFertilizers),     // Deluxe Fertilizer
-            new("(O)347", LootCategory.Agriculture, 2, 6, 20.0, c => c.EnableAgricultureCategory && c.EnableRareSeeds),         // Rare Seed
-            new("(O)486", LootCategory.Agriculture, 5, 20, 18.0, c => c.EnableAgricultureCategory && c.EnableRareSeeds),        // Starfruit Seeds
-            new("(O)920", LootCategory.Agriculture, 10, 30, 18.0, c => c.EnableAgricultureCategory && c.EnableFertilizers),     // Deluxe Retaining Soil
-            new("(O)645", LootCategory.Agriculture, 1, 3, 18.0, c => c.EnableAgricultureCategory && c.EnableSprinklers),        // Iridium Sprinkler
-            new("(O)805", LootCategory.Agriculture, 10, 25, 15.0, c => c.EnableAgricultureCategory && c.EnableFertilizers),     // Tree Fertilizer
-            new("(O)915", LootCategory.Agriculture, 1, 2, 12.0, c => c.EnableAgricultureCategory && c.EnableSprinklers),        // Pressure Nozzle
-            new("(O)913", LootCategory.Agriculture, 1, 2, 12.0, c => c.EnableAgricultureCategory && c.EnableSprinklers),        // Enricher
+            new("(O)918", LootCategory.Agriculture, 15, 35, 20.0, c => c.EnableAgricultureCategory && c.EnableFertilizers),     // Hyper Speed-Gro
+            new("(O)919", LootCategory.Agriculture, 15, 35, 20.0, c => c.EnableAgricultureCategory && c.EnableFertilizers),     // Deluxe Fertilizer
+            new("(O)347", LootCategory.Agriculture, 4, 10, 20.0, c => c.EnableAgricultureCategory && c.EnableRareSeeds),         // Rare Seed
+            new("(O)486", LootCategory.Agriculture, 10, 25, 18.0, c => c.EnableAgricultureCategory && c.EnableRareSeeds),        // Starfruit Seeds
+            new("(O)920", LootCategory.Agriculture, 15, 35, 18.0, c => c.EnableAgricultureCategory && c.EnableFertilizers),     // Deluxe Retaining Soil
+            new("(O)645", LootCategory.Agriculture, 2, 5, 18.0, c => c.EnableAgricultureCategory && c.EnableSprinklers),        // Iridium Sprinkler
+            new("(O)805", LootCategory.Agriculture, 15, 30, 15.0, c => c.EnableAgricultureCategory && c.EnableFertilizers),     // Tree Fertilizer
+            new("(O)915", LootCategory.Agriculture, 2, 4, 12.0, c => c.EnableAgricultureCategory && c.EnableSprinklers),        // Pressure Nozzle
+            new("(O)913", LootCategory.Agriculture, 2, 4, 12.0, c => c.EnableAgricultureCategory && c.EnableSprinklers),        // Enricher
 
             // =========================================================================
             // === 3. MINING CATEGORY (15% Category Weight)                          ===
             // =========================================================================
-            new("(O)386", LootCategory.Mining, 10, 30, 25.0, c => c.EnableMiningCategory && c.EnableIridiumItems),       // Iridium Ore
-            new("(O)288", LootCategory.Mining, 5, 20, 25.0, c => c.EnableMiningCategory && c.EnableBombs),               // Mega Bomb
-            new("(O)909", LootCategory.Mining, 5, 20, 22.0, c => c.EnableMiningCategory && c.EnableRadioactiveItems && (!c.GatekeepRadioactiveItems || IsRadioactiveUnlocked())),    // Radioactive Ore
-            new("(O)337", LootCategory.Mining, 5, 15, 22.0, c => c.EnableMiningCategory && c.EnableIridiumItems),       // Iridium Bar
-            new("(O)910", LootCategory.Mining, 3, 8, 20.0, c => c.EnableMiningCategory && c.EnableRadioactiveItems && (!c.GatekeepRadioactiveItems || IsRadioactiveUnlocked())),     // Radioactive Bar
-            new("(O)848", LootCategory.Mining, 5, 20, 20.0, c => c.EnableMiningCategory),                                // Cinder Shard
-            new("(O)70", LootCategory.Mining, 3, 8, 20.0, c => c.EnableMiningCategory),                                  // Jade (Staircases)
-            new("(O)72", LootCategory.Mining, 3, 8, 18.0, c => c.EnableMiningCategory),                                  // Diamond
+            new("(O)386", LootCategory.Mining, 15, 35, 25.0, c => c.EnableMiningCategory && c.EnableIridiumItems),       // Iridium Ore
+            new("(O)288", LootCategory.Mining, 10, 25, 25.0, c => c.EnableMiningCategory && c.EnableBombs),               // Mega Bomb
+            new("(O)909", LootCategory.Mining, 10, 25, 22.0, c => c.EnableMiningCategory && c.EnableRadioactiveItems && (!c.GatekeepRadioactiveItems || IsRadioactiveUnlocked())),    // Radioactive Ore
+            new("(O)337", LootCategory.Mining, 5, 20, 22.0, c => c.EnableMiningCategory && c.EnableIridiumItems),       // Iridium Bar
+            new("(O)910", LootCategory.Mining, 4, 10, 20.0, c => c.EnableMiningCategory && c.EnableRadioactiveItems && (!c.GatekeepRadioactiveItems || IsRadioactiveUnlocked())),     // Radioactive Bar
+            new("(O)848", LootCategory.Mining, 10, 25, 20.0, c => c.EnableMiningCategory),                                // Cinder Shard
+            new("(O)70", LootCategory.Mining, 5, 12, 20.0, c => c.EnableMiningCategory),                                  // Jade (Staircases)
+            new("(O)72", LootCategory.Mining, 5, 12, 18.0, c => c.EnableMiningCategory),                                  // Diamond
 
             // =========================================================================
             // === 4. FISHING CATEGORY (15% Category Weight)                         ===
             // =========================================================================
-            new("(O)ChallengeBait", LootCategory.Fishing, 15, 45, 22.0, c => c.EnableFishingCategory && c.EnableFishingTackle),
-            new("(O)DeluxeBait", LootCategory.Fishing, 20, 50, 22.0, c => c.EnableFishingCategory && c.EnableFishingTackle),
-            new("(O)908", LootCategory.Fishing, 10, 30, 20.0, c => c.EnableFishingCategory && c.EnableFishingTackle),  // Magic Bait
-            new("(O)694", LootCategory.Fishing, 1, 3, 18.0, c => c.EnableFishingCategory && c.EnableFishingTackle),  // Trap Bobber
-            new("(O)856", LootCategory.Fishing, 1, 2, 16.0, c => c.EnableFishingCategory && c.EnableFishingTackle),  // Curiosity Lure
-            new("(O)SeaJelly", LootCategory.Fishing, 1, 3, 16.0, c => c.EnableFishingCategory),                      // Sea Jelly
-            new("(O)RiverJelly", LootCategory.Fishing, 1, 3, 16.0, c => c.EnableFishingCategory),                    // River Jelly
-            new("(O)CaveJelly", LootCategory.Fishing, 1, 3, 16.0, c => c.EnableFishingCategory),                     // Cave Jelly
-            new("(O)265", LootCategory.Fishing, 2, 5, 15.0, c => c.EnableFishingCategory),                            // Seafoam Pudding
-            new("(O)242", LootCategory.Fishing, 3, 6, 15.0, c => c.EnableFishingCategory),                            // Dish O' The Sea
+            new("(O)ChallengeBait", LootCategory.Fishing, 20, 50, 22.0, c => c.EnableFishingCategory && c.EnableFishingTackle),
+            new("(O)DeluxeBait", LootCategory.Fishing, 25, 60, 22.0, c => c.EnableFishingCategory && c.EnableFishingTackle),
+            new("(O)908", LootCategory.Fishing, 15, 35, 20.0, c => c.EnableFishingCategory && c.EnableFishingTackle),  // Magic Bait
+            new("(O)694", LootCategory.Fishing, 2, 5, 18.0, c => c.EnableFishingCategory && c.EnableFishingTackle),  // Trap Bobber
+            new("(O)856", LootCategory.Fishing, 2, 4, 16.0, c => c.EnableFishingCategory && c.EnableFishingTackle),  // Curiosity Lure
+            new("(O)SeaJelly", LootCategory.Fishing, 2, 5, 16.0, c => c.EnableFishingCategory),                      // Sea Jelly
+            new("(O)RiverJelly", LootCategory.Fishing, 2, 5, 16.0, c => c.EnableFishingCategory),                    // River Jelly
+            new("(O)CaveJelly", LootCategory.Fishing, 2, 5, 16.0, c => c.EnableFishingCategory),                     // Cave Jelly
+            new("(O)265", LootCategory.Fishing, 3, 8, 15.0, c => c.EnableFishingCategory),                            // Seafoam Pudding
+            new("(O)242", LootCategory.Fishing, 4, 10, 15.0, c => c.EnableFishingCategory),                            // Dish O' The Sea
 
             // =========================================================================
             // === 5. COMBAT CATEGORY (15% Category Weight)                          ===
             // =========================================================================
-            new("(O)773", LootCategory.Combat, 3, 6, 22.0, c => c.EnableCombatCategory && c.EnableCombatConsumables),   // Life Elixir
-            new("(O)253", LootCategory.Combat, 3, 8, 22.0, c => c.EnableCombatCategory && c.EnableCombatConsumables),   // Triple Shot Espresso
-            new("(O)852", LootCategory.Combat, 2, 5, 20.0, c => c.EnableCombatCategory),                                // Dragon Tooth
-            new("(O)872", LootCategory.Combat, 2, 5, 20.0, c => c.EnableCombatCategory),                                // Fairy Dust
-            new("(O)879", LootCategory.Combat, 2, 5, 18.0, c => c.EnableCombatCategory),                                // Monster Musk
-            new("(O)857", LootCategory.Combat, 1, 1, 15.0, c => c.EnableCombatCategory && c.EnableSlimeEggs, false),    // Tiger Slime Egg
-            new("(O)439", LootCategory.Combat, 1, 1, 15.0, c => c.EnableCombatCategory && c.EnableSlimeEggs, false),    // Purple Slime Egg
+            new("(O)773", LootCategory.Combat, 5, 12, 22.0, c => c.EnableCombatCategory && c.EnableCombatConsumables),   // Life Elixir
+            new("(O)253", LootCategory.Combat, 5, 15, 22.0, c => c.EnableCombatCategory && c.EnableCombatConsumables),   // Triple Shot Espresso
+            new("(O)852", LootCategory.Combat, 3, 8, 20.0, c => c.EnableCombatCategory),                                // Dragon Tooth
+            new("(O)872", LootCategory.Combat, 3, 8, 20.0, c => c.EnableCombatCategory),                                // Fairy Dust
+            new("(O)879", LootCategory.Combat, 3, 8, 18.0, c => c.EnableCombatCategory),                                // Monster Musk
+            new("(O)857", LootCategory.Combat, 1, 2, 15.0, c => c.EnableCombatCategory && c.EnableSlimeEggs, false),    // Tiger Slime Egg
+            new("(O)439", LootCategory.Combat, 1, 2, 15.0, c => c.EnableCombatCategory && c.EnableSlimeEggs, false),    // Purple Slime Egg
 
             // =========================================================================
             // === 6. FORAGING CATEGORY (15% Category Weight)                        ===
             // =========================================================================
-            new("(O)709", LootCategory.Foraging, 20, 50, 22.0, c => c.EnableForagingCategory),                        // Hardwood
-            new("(O)MysticTreeSeed", LootCategory.Foraging, 2, 6, 22.0, c => c.EnableForagingCategory),                  // Mystic Tree Seed
-            new("(O)791", LootCategory.Foraging, 2, 6, 22.0, c => c.EnableForagingCategory),                            // Golden Coconut
-            new("(O)851", LootCategory.Foraging, 3, 8, 20.0, c => c.EnableForagingCategory),                            // Magma Cap
-            new("(O)422", LootCategory.Foraging, 5, 15, 20.0, c => c.EnableForagingCategory),                           // Purple Mushroom
-            new("(O)261", LootCategory.Foraging, 3, 8, 20.0, c => c.EnableForagingCategory && c.EnableWarpTotems),     // Warp Totem: Desert
-            new("(O)688", LootCategory.Foraging, 3, 8, 20.0, c => c.EnableForagingCategory && c.EnableWarpTotems),     // Warp Totem: Farm
+            new("(O)709", LootCategory.Foraging, 25, 60, 22.0, c => c.EnableForagingCategory),                        // Hardwood
+            new("(O)MysticTreeSeed", LootCategory.Foraging, 4, 10, 22.0, c => c.EnableForagingCategory),                  // Mystic Tree Seed
+            new("(O)791", LootCategory.Foraging, 4, 10, 22.0, c => c.EnableForagingCategory),                            // Golden Coconut
+            new("(O)851", LootCategory.Foraging, 5, 12, 20.0, c => c.EnableForagingCategory),                            // Magma Cap
+            new("(O)422", LootCategory.Foraging, 8, 20, 20.0, c => c.EnableForagingCategory),                           // Purple Mushroom
+            new("(O)261", LootCategory.Foraging, 5, 12, 20.0, c => c.EnableForagingCategory && c.EnableWarpTotems),     // Warp Totem: Desert
+            new("(O)688", LootCategory.Foraging, 5, 12, 20.0, c => c.EnableForagingCategory && c.EnableWarpTotems),     // Warp Totem: Farm
 
             // =========================================================================
             // === 7. LOOTBOXES CATEGORY (15% Category Weight)                       ===
             // =========================================================================
-            new("(O)749", LootCategory.Lootboxes, 10, 30, 28.0, c => c.EnableLootboxCategory && c.EnableOmniGeodes),    // Omni Geode
-            new("(O)MysteryBox", LootCategory.Lootboxes, 3, 10, 25.0, c => c.EnableLootboxCategory && c.EnableMysteryBoxes),
-            new("(O)275", LootCategory.Lootboxes, 3, 10, 25.0, c => c.EnableLootboxCategory && c.EnableArtifactTroves), // Artifact Trove
-            new("(O)GoldenMysteryBox", LootCategory.Lootboxes, 2, 5, 22.0, c => c.EnableLootboxCategory && c.EnableMysteryBoxes),
-            new("(O)CalicoEgg", LootCategory.Lootboxes, 15, 50, 22.0, c => c.EnableLootboxCategory && c.EnableCalicoEggs),
-            new("(O)TreasureTotem", LootCategory.Lootboxes, 1, 3, 18.0, c => c.EnableLootboxCategory),
+            new("(O)749", LootCategory.Lootboxes, 15, 35, 28.0, c => c.EnableLootboxCategory && c.EnableOmniGeodes),    // Omni Geode
+            new("(O)MysteryBox", LootCategory.Lootboxes, 5, 15, 25.0, c => c.EnableLootboxCategory && c.EnableMysteryBoxes),
+            new("(O)275", LootCategory.Lootboxes, 5, 15, 25.0, c => c.EnableLootboxCategory && c.EnableArtifactTroves), // Artifact Trove
+            new("(O)GoldenMysteryBox", LootCategory.Lootboxes, 3, 8, 22.0, c => c.EnableLootboxCategory && c.EnableMysteryBoxes),
+            new("(O)CalicoEgg", LootCategory.Lootboxes, 20, 60, 22.0, c => c.EnableLootboxCategory && c.EnableCalicoEggs),
+            new("(O)TreasureTotem", LootCategory.Lootboxes, 2, 5, 18.0, c => c.EnableLootboxCategory),
         };
 
         public static List<Item> GenerateRewards(ModConfig config, Random random, bool isSpecialChest = false)
@@ -193,7 +193,7 @@ namespace BetterSkullCavernChest
             int maxRolls = applySpecialBuff ? config.Floor100MaxRolls : config.MaxRolls;
             float[] decayChances = applySpecialBuff
                 ? new[] { 1.0f, config.Floor100Roll2Chance, config.Floor100Roll3Chance, config.Floor100Roll4Chance, config.Floor100Roll5Chance, config.Floor100Roll6Chance, config.Floor100Roll7Chance, config.Floor100Roll8Chance, config.Floor100Roll9Chance, config.Floor100Roll10Chance }
-                : new[] { 1.0f, config.Roll2Chance, config.Roll3Chance, config.Roll4Chance, config.Roll5Chance };
+                : new[] { 1.0f, config.Roll2Chance, config.Roll3Chance, config.Roll4Chance, config.Roll5Chance, config.Roll6Chance, config.Roll7Chance };
 
             int rolls = 1; // 1st roll is 100% guaranteed
             for (int r = 1; r < maxRolls; r++)

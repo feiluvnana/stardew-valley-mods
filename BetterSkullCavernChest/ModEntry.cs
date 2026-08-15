@@ -194,7 +194,7 @@ namespace BetterSkullCavernChest
                 getValue: () => Config.MaxRolls,
                 setValue: value => Config.MaxRolls = value,
                 min: 1,
-                max: 5
+                max: 7
             );
             configMenu.AddNumberOption(
                 mod: ModManifest,
@@ -232,6 +232,26 @@ namespace BetterSkullCavernChest
                 tooltip: () => I18n.Get("config.roll-5-chance.tooltip"),
                 getValue: () => Config.Roll5Chance,
                 setValue: value => Config.Roll5Chance = value,
+                min: 0.0f,
+                max: 1.0f,
+                interval: 0.05f
+            );
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.roll-6-chance.name"),
+                tooltip: () => I18n.Get("config.roll-6-chance.tooltip"),
+                getValue: () => Config.Roll6Chance,
+                setValue: value => Config.Roll6Chance = value,
+                min: 0.0f,
+                max: 1.0f,
+                interval: 0.05f
+            );
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.roll-7-chance.name"),
+                tooltip: () => I18n.Get("config.roll-7-chance.tooltip"),
+                getValue: () => Config.Roll7Chance,
+                setValue: value => Config.Roll7Chance = value,
                 min: 0.0f,
                 max: 1.0f,
                 interval: 0.05f
