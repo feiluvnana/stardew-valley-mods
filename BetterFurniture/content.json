@@ -32,6 +32,48 @@
       "FromFile": "assets/princess_grand_rug.png"
     },
     {
+      "Action": "Load",
+      "Target": "Mods/feiluvnana.BetterFurniture/PrincessRococoMirror",
+      "FromFile": "assets/princess_rococo_mirror.png"
+    },
+    {
+      "Action": "Load",
+      "Target": "Mods/feiluvnana.BetterFurniture/PrincessBedCanopy",
+      "FromFile": "assets/princess_bed_canopy.png"
+    },
+    {
+      "Action": "Load",
+      "Target": "Mods/feiluvnana.BetterFurniture/TeakDiningTable",
+      "FromFile": "assets/teak_dining_table.png"
+    },
+    {
+      "Action": "Load",
+      "Target": "Mods/feiluvnana.BetterFurniture/TeakDiningBench",
+      "FromFile": "assets/teak_dining_bench.png"
+    },
+
+    {
+      "Action": "EditImage",
+      "Target": "Maps/farmhouse_tiles",
+      "FromFile": "assets/white_kitchen_tiles.png",
+      "PatchMode": "Overlay"
+    },
+    {
+      "Action": "EditImage",
+      "Target": "Maps/walls_and_floors",
+      "FromFile": "assets/princess_wallpaper.png",
+      "FromArea": { "X": 0, "Y": 0, "Width": 16, "Height": 48 },
+      "ToArea": { "X": 176, "Y": 0, "Width": 16, "Height": 48 }
+    },
+    {
+      "Action": "EditImage",
+      "Target": "Maps/walls_and_floors",
+      "FromFile": "assets/warm_cream_wallpaper.png",
+      "FromArea": { "X": 0, "Y": 0, "Width": 16, "Height": 48 },
+      "ToArea": { "X": 176, "Y": 192, "Width": 16, "Height": 48 }
+    },
+
+    {
       "Action": "EditData",
       "Target": "Data/Furniture",
       "Entries": {
@@ -40,7 +82,11 @@
         "feiluvnana.BetterFurniture.PrincessWallMolding": "Princess Wall Molding/painting/2 2/2 2/1/1500/-1/Princess Wall Molding/0/Mods\\feiluvnana.BetterFurniture\\PrincessWallMolding/true",
         "feiluvnana.BetterFurniture.PrincessWallSconce": "Princess Wall Sconce/lamp/1 2/1 1/1/1000/-1/Princess Wall Sconce/0/Mods\\feiluvnana.BetterFurniture\\PrincessWallSconce/true",
         "feiluvnana.BetterFurniture.PrincessNightstand": "Princess Nightstand/lamp/1 2/1 1/1/2000/-1/Princess Nightstand/0/Mods\\feiluvnana.BetterFurniture\\PrincessNightstand/true",
-        "feiluvnana.BetterFurniture.PrincessGrandRug": "Princess Grand Rug/rug/4 3/4 3/2/3000/-1/Princess Grand Rug/0/Mods\\feiluvnana.BetterFurniture\\PrincessGrandRug/true"
+        "feiluvnana.BetterFurniture.PrincessGrandRug": "Princess Grand Rug/rug/4 3/4 3/2/3000/-1/Princess Grand Rug/0/Mods\\feiluvnana.BetterFurniture\\PrincessGrandRug/true",
+        "feiluvnana.BetterFurniture.PrincessRococoMirror": "Princess Rococo Mirror/painting/2 2/2 2/1/2500/-1/Princess Rococo Mirror/0/Mods\\feiluvnana.BetterFurniture\\PrincessRococoMirror/true",
+        "feiluvnana.BetterFurniture.PrincessBedCanopy": "Princess Bed Canopy/painting/4 3/4 3/1/3500/-1/Princess Bed Canopy/0/Mods\\feiluvnana.BetterFurniture\\PrincessBedCanopy/true",
+        "feiluvnana.BetterFurniture.TeakDiningTable": "Teak Dining Table/table/3 2/3 2/1/3500/-1/Teak Dining Table/0/Mods\\feiluvnana.BetterFurniture\\TeakDiningTable/true",
+        "feiluvnana.BetterFurniture.TeakDiningBench": "Teak Dining Bench/bench/3 2/3 1/1/2000/-1/Teak Dining Bench/0/Mods\\feiluvnana.BetterFurniture\\TeakDiningBench/true"
       }
     }
   ]
