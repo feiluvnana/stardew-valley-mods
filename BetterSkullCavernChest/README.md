@@ -22,9 +22,9 @@
 | Feature | 📦 Regular Treasure Chests | 🏆 Floor 100 Special Chest (Floor 100/200/300) |
 | :--- | :---: | :---: |
 | **Legendary Category Share** | **10.0%** (Others: 15.0% each) | **Equal Weight (~14.285% each)** — Legendary is rolled just as often as other categories! |
-| **Max Rolls per Chest** | **5 Rolls** | **7 Rolls** |
-| **Decaying Roll Success Rates** | R1: 100%<br>R2: 70%<br>R3: 45%<br>R4: 25%<br>R5: 10% | R1: 100%<br>R2: 85%<br>R3: 70%<br>R4: 55%<br>R5: 40%<br>R6: 25%<br>R7: 15% |
-| **Empirical Average Items** | **~2.10 items** / chest | **~2.95 items** / chest (up to 7 items!) |
+| **Max Rolls per Chest** | **5 Rolls** | **10 Rolls** |
+| **Decaying Roll Success Rates** | R1: 100%<br>R2: 70%<br>R3: 45%<br>R4: 25%<br>R5: 10% | R1: 100%<br>R2: 85%<br>R3: 70%<br>R4: 55%<br>R5: 40%<br>R6: 25%<br>R7: 15%<br>R8: 10%<br>R9: 5%<br>R10: 2% |
+| **Empirical Average Items** | **~2.10 items** / chest | **~2.96 items** / chest (up to 10 items!) |
 | **Critical Stack Multipliers** | 2x: 15%<br>3x: 5%<br>*(Total Crit: 20%)* | **2x: 25%**<br>**3x: 15%**<br>**4x (Quadruple): 10%**<br>**5x (Quintuple Mega Jackpot): 5%**<br>*(Total Crit: **55%**)* |
 | **Repeatable Runs Protection** | Built-in | Guaranteed chest spawn on repeat visits |
 
@@ -138,13 +138,16 @@
   "QuintupleStackChance": 0.0,
   "EnableFloor100Buff": true,
   "Floor100AllCategoriesEqual": true,
-  "Floor100MaxRolls": 7,
+  "Floor100MaxRolls": 10,
   "Floor100Roll2Chance": 0.85,
   "Floor100Roll3Chance": 0.7,
   "Floor100Roll4Chance": 0.55,
   "Floor100Roll5Chance": 0.4,
   "Floor100Roll6Chance": 0.25,
   "Floor100Roll7Chance": 0.15,
+  "Floor100Roll8Chance": 0.1,
+  "Floor100Roll9Chance": 0.05,
+  "Floor100Roll10Chance": 0.02,
   "Floor100DoubleStackChance": 0.25,
   "Floor100TripleStackChance": 0.15,
   "Floor100QuadrupleStackChance": 0.1,

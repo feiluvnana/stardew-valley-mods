@@ -208,7 +208,7 @@ namespace BetterSkullCavernChest
             // Determine number of rolls using diminishing probabilities
             int maxRolls = applySpecialBuff ? config.Floor100MaxRolls : config.MaxRolls;
             float[] decayChances = applySpecialBuff
-                ? new[] { 1.0f, config.Floor100Roll2Chance, config.Floor100Roll3Chance, config.Floor100Roll4Chance, config.Floor100Roll5Chance, config.Floor100Roll6Chance, config.Floor100Roll7Chance }
+                ? new[] { 1.0f, config.Floor100Roll2Chance, config.Floor100Roll3Chance, config.Floor100Roll4Chance, config.Floor100Roll5Chance, config.Floor100Roll6Chance, config.Floor100Roll7Chance, config.Floor100Roll8Chance, config.Floor100Roll9Chance, config.Floor100Roll10Chance }
                 : new[] { 1.0f, config.Roll2Chance, config.Roll3Chance, config.Roll4Chance, config.Roll5Chance };
 
             int rolls = 1; // 1st roll is 100% guaranteed

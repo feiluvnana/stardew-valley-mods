@@ -365,6 +365,36 @@ namespace BetterSkullCavernChest
             );
             configMenu.AddNumberOption(
                 mod: ModManifest,
+                name: () => "Floor 100 Roll #8 Chance",
+                tooltip: () => "Probability (0.0 to 1.0) to roll an 8th item on Floor 100.",
+                getValue: () => Config.Floor100Roll8Chance,
+                setValue: value => Config.Floor100Roll8Chance = value,
+                min: 0.0f,
+                max: 1.0f,
+                interval: 0.05f
+            );
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => "Floor 100 Roll #9 Chance",
+                tooltip: () => "Probability (0.0 to 1.0) to roll a 9th item on Floor 100.",
+                getValue: () => Config.Floor100Roll9Chance,
+                setValue: value => Config.Floor100Roll9Chance = value,
+                min: 0.0f,
+                max: 1.0f,
+                interval: 0.05f
+            );
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => "Floor 100 Roll #10 Chance",
+                tooltip: () => "Probability (0.0 to 1.0) to roll a 10th item on Floor 100.",
+                getValue: () => Config.Floor100Roll10Chance,
+                setValue: value => Config.Floor100Roll10Chance = value,
+                min: 0.0f,
+                max: 1.0f,
+                interval: 0.05f
+            );
+            configMenu.AddNumberOption(
+                mod: ModManifest,
                 name: () => "Floor 100 Double Stack (2x)",
                 tooltip: () => "Chance (0.0 to 1.0) for an item stack on Floor 100 to be doubled.",
                 getValue: () => Config.Floor100DoubleStackChance,

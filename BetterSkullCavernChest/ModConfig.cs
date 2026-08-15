@@ -22,13 +22,16 @@ namespace BetterSkullCavernChest
         // Floor 100 Special Chest Buff Settings
         public bool EnableFloor100Buff { get; set; } = true;
         public bool Floor100AllCategoriesEqual { get; set; } = true;
-        public int Floor100MaxRolls { get; set; } = 7;
+        public int Floor100MaxRolls { get; set; } = 10;
         public float Floor100Roll2Chance { get; set; } = 0.85f;
         public float Floor100Roll3Chance { get; set; } = 0.70f;
         public float Floor100Roll4Chance { get; set; } = 0.55f;
         public float Floor100Roll5Chance { get; set; } = 0.40f;
         public float Floor100Roll6Chance { get; set; } = 0.25f;
         public float Floor100Roll7Chance { get; set; } = 0.15f;
+        public float Floor100Roll8Chance { get; set; } = 0.10f;
+        public float Floor100Roll9Chance { get; set; } = 0.05f;
+        public float Floor100Roll10Chance { get; set; } = 0.02f;
         public float Floor100DoubleStackChance { get; set; } = 0.25f;
         public float Floor100TripleStackChance { get; set; } = 0.15f;
         public float Floor100QuadrupleStackChance { get; set; } = 0.10f;
