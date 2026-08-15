@@ -1,0 +1,9 @@
+{
+  "MaxStackSize": 999,
+  "EnableTackleStacking": true,
+  "EnableTrinketStacking": true,
+  "EnableFurnitureStacking": true,
+  "EnableRingStacking": true,
+  "EnableClothingAndHatStacking": true,
+  "EnableBootsStacking": true
+}

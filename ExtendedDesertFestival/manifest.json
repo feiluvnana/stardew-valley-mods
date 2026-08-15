@@ -1,0 +1,9 @@
+{
+  "Name": "Extended Desert Festival",
+  "Author": "feiluvnana",
+  "Version": "1.1.0",
+  "Description": "Extends the Desert Festival to Summer, Fall, and Winter (Days 22-24).",
+  "UniqueID": "feiluvnana.ExtendedDesertFestival",
+  "MinimumApiVersion": "4.0.0",
+  "EntryDll": "ExtendedDesertFestival.dll"
+}

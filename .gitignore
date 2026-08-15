@@ -1,0 +1,22 @@
+# Build artifacts
+**/bin/
+**/obj/
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# IDE Directories
+.vs/
+.idea/
+.vscode/
+
+# Logs and temp files
+*.log
+*.tmp
+
+# Release zip packages created by build tasks (optional, can be kept if desired, but good to ignore build zips)
+*.zip

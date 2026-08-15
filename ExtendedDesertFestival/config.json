@@ -1,0 +1,6 @@
+{
+  "EnableSummer": true,
+  "EnableFall": true,
+  "EnableWinter": true,
+  "KeepEggs": true
+}
