@@ -318,14 +318,14 @@ namespace BetterForge
             who.applyBuff(attackBuff);
         }
 
-        // 5. Magic Quiver: Execute monsters below 15% HP or <= 30 HP
+        // 5. Magic Quiver: Execute monsters below 20% HP or <= 40 HP
         public static bool TriggerQuiverExecute(Monster monster, Farmer who, GameLocation location)
         {
             if (monster == null || who == null || location == null) return false;
 
             if (monster.Health > 0)
             {
-                bool isLowHp = monster.Health <= (int)(monster.MaxHealth * 0.15f) || monster.Health <= 30;
+                bool isLowHp = monster.Health <= (int)(monster.MaxHealth * 0.20f) || monster.Health <= 40;
                 if (isLowHp)
                 {
                     int fatalDamage = monster.Health + 50;

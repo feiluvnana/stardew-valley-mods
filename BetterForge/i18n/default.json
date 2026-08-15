@@ -49,7 +49,7 @@
   "ascension.fairybox.desc": "Fairy heal pulses restore health to nearby allies and grant +1 Defense for 15 seconds.",
   "ascension.parrotegg.desc": "Doubles gold coin drops and grants a +25% chance for bonus monster loot drops upon defeat.",
   "ascension.goldenspur.desc": "Grants +25% Critical Damage, and critical strike speed boost also provides +3 Attack damage.",
-  "ascension.magicquiver.desc": "Spectral arrows pierce through all enemies and instantly execute monsters below 15% HP.",
+  "ascension.magicquiver.desc": "Spectral arrows pierce through all enemies and instantly execute monsters below 20% HP.",
   "ascension.icerod.desc": "Striking frozen enemies deals +35 Ice Shatter damage and emits a frost wave that slows/freezes nearby enemies.",
   "ascension.basiliskpaw.desc": "Reflects 50% incoming damage back to attackers, and attacks have a 20% chance to lifesteal (heal 3–8 HP)."
 }
