@@ -1,0 +1,161 @@
+using System;
+using System.Collections.Generic;
+using Microsoft.Xna.Framework;
+using StardewValley;
+using StardewValley.Objects;
+
+namespace BetterGeodeCracking
+{
+    public class GeodeBatchResult
+    {
+        public int CountCracked { get; set; }
+        public List<Item> Treasures { get; set; } = new();
+    }
+
+    public static class GeodeCrackerLogic
+    {
+        /// <summary>
+        /// Cracks a batch of geodes from a stack, generating treasures faithfully according to vanilla 1.6 mechanics.
+        /// </summary>
+        public static GeodeBatchResult ProcessBatch(Farmer who, Item geodeStack, int requestedCount, ModConfig config)
+        {
+            var result = new GeodeBatchResult();
+            if (geodeStack == null || !Utility.IsGeode(geodeStack) || requestedCount <= 0)
+                return result;
+
+            int available = geodeStack.Stack;
+            int countToCrack = Math.Min(available, requestedCount);
+
+            int pricePerGeode = config.FreeCracking ? 0 : Math.Max(0, config.CrackingPrice);
+            if (pricePerGeode > 0)
+            {
+                int affordable = who.Money / pricePerGeode;
+                countToCrack = Math.Min(countToCrack, affordable);
+            }
+
+            if (countToCrack <= 0)
+                return result;
+
+            var rawTreasures = new List<Item>();
+            string qualifiedItemId = geodeStack.QualifiedItemId;
+            bool isMysteryBox = qualifiedItemId == "(O)MysteryBox" || qualifiedItemId == "(O)GoldenMysteryBox";
+            bool isGoldenCoconut = qualifiedItemId == "(O)791";
+            bool isArtifactTrove = qualifiedItemId == "(O)275";
+
+            for (int i = 0; i < countToCrack; i++)
+            {
+                Item? treasure = null;
+
+                if (isGoldenCoconut && !Game1.netWorldState.Value.GoldenCoconutCracked)
+                {
+                    Game1.netWorldState.Value.GoldenCoconutCracked = true;
+                    treasure = ItemRegistry.Create("(O)73");
+                }
+                else
+                {
+                    if (isMysteryBox)
+                    {
+                        Game1.stats.Increment("MysteryBoxesOpened");
+                    }
+                    else
+                    {
+                        Game1.stats.GeodesCracked++;
+                    }
+
+                    treasure = Utility.getTreasureFromGeode(geodeStack);
+
+                    if (!isArtifactTrove && !(treasure is StardewValley.Object { Type: "Minerals" }) && treasure is StardewValley.Object { Type: "Arch" } && !who.hasOrWillReceiveMail("artifactFound"))
+                    {
+                        treasure = ItemRegistry.Create("(O)390", 5);
+                    }
+                }
+
+                if (treasure != null)
+                {
+                    rawTreasures.Add(treasure);
+                }
+            }
+
+            // Consolidate identical items into stacks
+            var consolidatedTreasures = ConsolidateTreasures(rawTreasures);
+
+            // Add consolidated treasures into player inventory or drop safely as debris
+            foreach (var item in consolidatedTreasures)
+            {
+                Item? leftover = who.addItemToInventory(item);
+                if (leftover != null && leftover.Stack > 0)
+                {
+                    Game1.createItemDebris(leftover, new Vector2(who.StandingPixel.X, who.StandingPixel.Y), -1, who.currentLocation);
+                }
+            }
+
+            // Deduct price if not free
+            int totalCost = pricePerGeode * countToCrack;
+            if (totalCost > 0)
+            {
+                who.Money = Math.Max(0, who.Money - totalCost);
+            }
+
+            // Play audio cues
+            PlayCrackingSoundEffects(isMysteryBox || isArtifactTrove);
+
+            result.CountCracked = countToCrack;
+            result.Treasures = consolidatedTreasures;
+
+            // Optional HUD notification
+            if (config.ShowSummaryToast)
+            {
+                string name = geodeStack.DisplayName;
+                Game1.addHUDMessage(new HUDMessage($"Cracked {countToCrack}x {name}!", HUDMessage.achievement_type));
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Consolidates duplicate items into single stacks where possible.
+        /// </summary>
+        public static List<Item> ConsolidateTreasures(List<Item> items)
+        {
+            var consolidated = new List<Item>();
+            foreach (var item in items)
+            {
+                if (item == null) continue;
+
+                bool merged = false;
+                if (item.maximumStackSize() > 1)
+                {
+                    foreach (var existing in consolidated)
+                    {
+                        if (existing.canStackWith(item))
+                        {
+                            existing.Stack += item.Stack;
+                            merged = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!merged)
+                {
+                    consolidated.Add(item);
+                }
+            }
+            return consolidated;
+        }
+
+        private static void PlayCrackingSoundEffects(bool woodWhack)
+        {
+            Game1.playSound("hammer");
+            if (woodWhack)
+            {
+                Game1.playSound("woodWhack");
+            }
+            else
+            {
+                Game1.playSound("stoneCrack");
+            }
+            Game1.playSound("discoverMineral");
+        }
+    }
+}

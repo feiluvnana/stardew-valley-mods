@@ -12,6 +12,7 @@ A suite of high-performance, modular quality-of-life and progression enhancement
 | [**BetterProduct**](./BetterProduct) | `1.0.0` | Comprehensive artisan and cooking value / buff rebalancer. | Cooking profit margins, honey-type flower mead preservation, juice/pickle/roe/caviar buffs, energy & buff duration scaling. |
 | [**ExtendedDesertFestival**](./ExtendedDesertFestival) | `1.1.0` | Expands the Calico Desert Festival across all seasons. | Enables Desert Festival in Summer, Fall, and Winter (15th–17th), preserves Calico Eggs between festivals. |
 | [**ExtendedStackable**](./ExtendedStackable) | `1.0.0` | Stack size overhaul for normally unstackable items. | Stacks fishing tackle, 1.6 trinkets, rings, furniture, boots, clothing, and hats up to 999. |
+| [**BetterGeodeCracking**](./BetterGeodeCracking) | `1.0.0` | Bulk and instant geode/trove cracking without fees. | Free 0g geode cracking at Clint's, Shift+Click / button bulk stack cracking, instant opening, GMCM menu. |
 
 ---
 
@@ -26,7 +27,8 @@ A suite of high-performance, modular quality-of-life and progression enhancement
        ├── BetterSkullCavernChest/
        ├── BetterProduct/
        ├── ExtendedDesertFestival/
-       └── ExtendedStackable/
+       ├── ExtendedStackable/
+       └── BetterGeodeCracking/
    ```
 4. Run the game using **StardewModdingAPI.exe**.
 
@@ -49,6 +51,7 @@ dotnet build BetterSkullCavernChest/BetterSkullCavernChest.csproj
 dotnet build BetterProduct/BetterProduct.csproj
 dotnet build ExtendedDesertFestival/ExtendedDesertFestival.csproj
 dotnet build ExtendedStackable/ExtendedStackable.csproj
+dotnet build BetterGeodeCracking/BetterGeodeCracking.csproj
 ```
 
 ---
