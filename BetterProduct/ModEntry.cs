@@ -9,11 +9,13 @@ namespace BetterProduct
     {
         public static ModConfig Config { get; private set; } = null!;
         public static IMonitor ModMonitor { get; private set; } = null!;
+        public static ITranslationHelper I18n { get; private set; } = null!;
 
         public override void Entry(IModHelper helper)
         {
             Config = helper.ReadConfig<ModConfig>();
             ModMonitor = Monitor;
+            I18n = helper.Translation;
 
             CookingBalancer.Initialize(Config, Monitor);
             ArtisanBalancer.Initialize(Config, Monitor);
@@ -45,18 +47,23 @@ namespace BetterProduct
             );
 
             // Cooking Options
+            configMenu.AddSectionTitle(
+                mod: ModManifest,
+                text: () => I18n.Get("config.section.cooking")
+            );
+
             configMenu.AddBoolOption(
                 mod: ModManifest,
-                name: () => "Cooking Balance",
-                tooltip: () => "Ensure cooking dishes always sell for at least the configured profit margin over raw ingredients.",
+                name: () => I18n.Get("config.cooking-balancing.name"),
+                tooltip: () => I18n.Get("config.cooking-balancing.tooltip"),
                 getValue: () => Config.EnableCookingBalancing,
                 setValue: value => Config.EnableCookingBalancing = value
             );
 
             configMenu.AddNumberOption(
                 mod: ModManifest,
-                name: () => "Cooking Margin",
-                tooltip: () => "Profit multiplier over raw ingredients (e.g. 1.25 = 125%).",
+                name: () => I18n.Get("config.cooking-margin.name"),
+                tooltip: () => I18n.Get("config.cooking-margin.tooltip"),
                 getValue: () => Config.CookingProfitMargin,
                 setValue: value => Config.CookingProfitMargin = value,
                 min: 1.0f,
@@ -66,16 +73,16 @@ namespace BetterProduct
 
             configMenu.AddBoolOption(
                 mod: ModManifest,
-                name: () => "Energy Buff",
-                tooltip: () => "Multiply energy/health restored by cooked dishes.",
+                name: () => I18n.Get("config.energy-buff.name"),
+                tooltip: () => I18n.Get("config.energy-buff.tooltip"),
                 getValue: () => Config.EnableEnergyBuff,
                 setValue: value => Config.EnableEnergyBuff = value
             );
 
             configMenu.AddNumberOption(
                 mod: ModManifest,
-                name: () => "Energy Multiplier",
-                tooltip: () => "Energy/Health multiplier for cooked food.",
+                name: () => I18n.Get("config.energy-multiplier.name"),
+                tooltip: () => I18n.Get("config.energy-multiplier.tooltip"),
                 getValue: () => Config.EnergyMultiplier,
                 setValue: value => Config.EnergyMultiplier = value,
                 min: 1.0f,
@@ -85,16 +92,16 @@ namespace BetterProduct
 
             configMenu.AddBoolOption(
                 mod: ModManifest,
-                name: () => "Buff Duration Boost",
-                tooltip: () => "Boost the duration of food buffs.",
+                name: () => I18n.Get("config.buff-duration-boost.name"),
+                tooltip: () => I18n.Get("config.buff-duration-boost.tooltip"),
                 getValue: () => Config.EnableBuffDurationBoost,
                 setValue: value => Config.EnableBuffDurationBoost = value
             );
 
             configMenu.AddNumberOption(
                 mod: ModManifest,
-                name: () => "Buff Duration Multiplier",
-                tooltip: () => "Multiplier for food buff durations.",
+                name: () => I18n.Get("config.buff-duration-multiplier.name"),
+                tooltip: () => I18n.Get("config.buff-duration-multiplier.tooltip"),
                 getValue: () => Config.BuffDurationMultiplier,
                 setValue: value => Config.BuffDurationMultiplier = value,
                 min: 1.0f,
@@ -103,18 +110,23 @@ namespace BetterProduct
             );
 
             // Artisan Options
+            configMenu.AddSectionTitle(
+                mod: ModManifest,
+                text: () => I18n.Get("config.section.artisan")
+            );
+
             configMenu.AddBoolOption(
                 mod: ModManifest,
-                name: () => "Mead Flavor & Value Fix",
-                tooltip: () => "Mead scales price based on the input honey flower type.",
+                name: () => I18n.Get("config.mead-fix.name"),
+                tooltip: () => I18n.Get("config.mead-fix.tooltip"),
                 getValue: () => Config.EnableMeadFix,
                 setValue: value => Config.EnableMeadFix = value
             );
 
             configMenu.AddNumberOption(
                 mod: ModManifest,
-                name: () => "Mead Multiplier",
-                tooltip: () => "Multiplier applied to honey price when turned into mead.",
+                name: () => I18n.Get("config.mead-multiplier.name"),
+                tooltip: () => I18n.Get("config.mead-multiplier.tooltip"),
                 getValue: () => Config.MeadMultiplier,
                 setValue: value => Config.MeadMultiplier = value,
                 min: 1.0f,
@@ -124,16 +136,16 @@ namespace BetterProduct
 
             configMenu.AddBoolOption(
                 mod: ModManifest,
-                name: () => "Juice Buff",
-                tooltip: () => "Buff juice price multiplier.",
+                name: () => I18n.Get("config.juice-buff.name"),
+                tooltip: () => I18n.Get("config.juice-buff.tooltip"),
                 getValue: () => Config.EnableJuiceBuff,
                 setValue: value => Config.EnableJuiceBuff = value
             );
 
             configMenu.AddNumberOption(
                 mod: ModManifest,
-                name: () => "Juice Multiplier",
-                tooltip: () => "Base vegetable multiplier for Juice.",
+                name: () => I18n.Get("config.juice-multiplier.name"),
+                tooltip: () => I18n.Get("config.juice-multiplier.tooltip"),
                 getValue: () => Config.JuiceMultiplier,
                 setValue: value => Config.JuiceMultiplier = value,
                 min: 2.25f,
@@ -143,16 +155,16 @@ namespace BetterProduct
 
             configMenu.AddBoolOption(
                 mod: ModManifest,
-                name: () => "Pickle Buff",
-                tooltip: () => "Buff pickle price multiplier.",
+                name: () => I18n.Get("config.pickle-buff.name"),
+                tooltip: () => I18n.Get("config.pickle-buff.tooltip"),
                 getValue: () => Config.EnablePickleBuff,
                 setValue: value => Config.EnablePickleBuff = value
             );
 
             configMenu.AddNumberOption(
                 mod: ModManifest,
-                name: () => "Pickle Multiplier",
-                tooltip: () => "Base multiplier for Pickles.",
+                name: () => I18n.Get("config.pickle-multiplier.name"),
+                tooltip: () => I18n.Get("config.pickle-multiplier.tooltip"),
                 getValue: () => Config.PickleMultiplier,
                 setValue: value => Config.PickleMultiplier = value,
                 min: 2.0f,
@@ -162,16 +174,16 @@ namespace BetterProduct
 
             configMenu.AddBoolOption(
                 mod: ModManifest,
-                name: () => "Aged Roe Buff",
-                tooltip: () => "Buff aged roe price multiplier.",
+                name: () => I18n.Get("config.roe-buff.name"),
+                tooltip: () => I18n.Get("config.roe-buff.tooltip"),
                 getValue: () => Config.EnableRoeBuff,
                 setValue: value => Config.EnableRoeBuff = value
             );
 
             configMenu.AddNumberOption(
                 mod: ModManifest,
-                name: () => "Aged Roe Multiplier",
-                tooltip: () => "Base multiplier for Aged Roe.",
+                name: () => I18n.Get("config.aged-roe-multiplier.name"),
+                tooltip: () => I18n.Get("config.aged-roe-multiplier.tooltip"),
                 getValue: () => Config.AgedRoeMultiplier,
                 setValue: value => Config.AgedRoeMultiplier = value,
                 min: 2.0f,
@@ -181,8 +193,8 @@ namespace BetterProduct
 
             configMenu.AddNumberOption(
                 mod: ModManifest,
-                name: () => "Caviar Price",
-                tooltip: () => "Base selling price for Caviar.",
+                name: () => I18n.Get("config.caviar-price.name"),
+                tooltip: () => I18n.Get("config.caviar-price.tooltip"),
                 getValue: () => Config.CaviarPrice,
                 setValue: value => Config.CaviarPrice = value,
                 min: 500,

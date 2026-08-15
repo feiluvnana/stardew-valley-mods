@@ -10,6 +10,7 @@ namespace ExtendedDesertFestival
     public interface IGenericModConfigMenuApi
     {
         void Register(IManifest mod, Action reset, Action save, bool titleScreenOnly = false);
+        void AddSectionTitle(IManifest mod, Func<string> text, Func<string>? tooltip = null);
         void AddBoolOption(IManifest mod, Func<bool> getValue, Action<bool> setValue, Func<string> name, Func<string>? tooltip = null, string? fieldId = null);
     }
 
@@ -17,11 +18,13 @@ namespace ExtendedDesertFestival
     {
         public static ModConfig Config { get; private set; } = null!;
         public static IMonitor ModMonitor { get; private set; } = null!;
+        public static ITranslationHelper I18n { get; private set; } = null!;
 
         public override void Entry(IModHelper helper)
         {
             Config = helper.ReadConfig<ModConfig>();
             ModMonitor = Monitor;
+            I18n = helper.Translation;
 
             var harmony = new Harmony(ModManifest.UniqueID);
             try
@@ -101,34 +104,39 @@ namespace ExtendedDesertFestival
                 save: () => Helper.WriteConfig(Config)
             );
 
+            configMenu.AddSectionTitle(
+                mod: ModManifest,
+                text: () => I18n.Get("config.section.festivals")
+            );
+
             configMenu.AddBoolOption(
                 mod: ModManifest,
-                name: () => "Enable Summer Festival",
-                tooltip: () => "Extend Desert Festival to Summer 22-24.",
+                name: () => I18n.Get("config.enable-summer.name"),
+                tooltip: () => I18n.Get("config.enable-summer.tooltip"),
                 getValue: () => Config.EnableSummer,
                 setValue: value => Config.EnableSummer = value
             );
 
             configMenu.AddBoolOption(
                 mod: ModManifest,
-                name: () => "Enable Fall Festival",
-                tooltip: () => "Extend Desert Festival to Fall 22-24.",
+                name: () => I18n.Get("config.enable-fall.name"),
+                tooltip: () => I18n.Get("config.enable-fall.tooltip"),
                 getValue: () => Config.EnableFall,
                 setValue: value => Config.EnableFall = value
             );
 
             configMenu.AddBoolOption(
                 mod: ModManifest,
-                name: () => "Enable Winter Festival",
-                tooltip: () => "Extend Desert Festival to Winter 22-24.",
+                name: () => I18n.Get("config.enable-winter.name"),
+                tooltip: () => I18n.Get("config.enable-winter.tooltip"),
                 getValue: () => Config.EnableWinter,
                 setValue: value => Config.EnableWinter = value
             );
 
             configMenu.AddBoolOption(
                 mod: ModManifest,
-                name: () => "Keep Calico Eggs",
-                tooltip: () => "Keep Calico Eggs in inventory between festival seasons.",
+                name: () => I18n.Get("config.keep-eggs.name"),
+                tooltip: () => I18n.Get("config.keep-eggs.tooltip"),
                 getValue: () => Config.KeepEggs,
                 setValue: value => Config.KeepEggs = value
             );

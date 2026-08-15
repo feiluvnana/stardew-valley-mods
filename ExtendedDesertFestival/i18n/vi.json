@@ -1,0 +1,11 @@
+{
+  "config.section.festivals": "Tùy Chọn Lễ Hội Sa Mạc Mở Rộng",
+  "config.enable-summer.name": "Mở Lễ Hội Mùa Hè",
+  "config.enable-summer.tooltip": "Mở rộng Lễ Hội Sa Mạc sang Mùa Hè từ ngày 22 đến 24.",
+  "config.enable-fall.name": "Mở Lễ Hội Mùa Thu",
+  "config.enable-fall.tooltip": "Mở rộng Lễ Hội Sa Mạc sang Mùa Thu từ ngày 22 đến 24.",
+  "config.enable-winter.name": "Mở Lễ Hội Mùa Đông",
+  "config.enable-winter.tooltip": "Mở rộng Lễ Hội Sa Mạc sang Mùa Đông từ ngày 22 đến 24.",
+  "config.keep-eggs.name": "Giữ Lại Trứng Calico",
+  "config.keep-eggs.tooltip": "Giữ lại Trứng Calico trong hành trang giữa các mùa lễ hội thay vì bị xóa."
+}

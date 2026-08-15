@@ -239,7 +239,7 @@ namespace BetterGeodeCracking
                 }
                 else
                 {
-                    __instance.descriptionText = "Clint can break these open for you for 25g.\n(Hold Shift or click 'Crack All' to open stack)";
+                    __instance.descriptionText = ModEntry.I18n.Get("menu.description.price", new { price = 25 });
                 }
             }
         }
