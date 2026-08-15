@@ -4,5 +4,9 @@
   "gmcm.remove_farm_driftwood_barrier.name": "Remove Farm Driftwood Fence & Logs",
   "gmcm.remove_farm_driftwood_barrier.tooltip": "Removes the long horizontal driftwood fence and bleached log piles separating the upper path and the farmable field on Ginger Island Farm (Island West).",
   "gmcm.remove_island_west_shipwreck.name": "Remove Island West Beach Shipwreck",
-  "gmcm.remove_island_west_shipwreck.tooltip": "Removes the giant broken pirate shipwreck on the southern beach of Island West and replaces it with clean sandy beach."
+  "gmcm.remove_island_west_shipwreck.tooltip": "Removes the giant broken pirate shipwreck on the southern beach of Island West and replaces it with clean sandy beach.",
+  "gmcm.section.farmhouse.title": "Farmhouse Customization",
+  "gmcm.section.farmhouse.description": "Configure farmhouse entrance and doorway enhancements.",
+  "gmcm.widen_house_exit.name": "3x1 Farmhouse Exit Doorway",
+  "gmcm.widen_house_exit.tooltip": "Widens the farmhouse exit doorway to 3 tiles wide across all Farmhouse upgrade levels and the Ginger Island Farmhouse, allowing easy 3x1 exit without being funneled into a single tile."
 }

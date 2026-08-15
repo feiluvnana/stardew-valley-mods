@@ -170,7 +170,7 @@ namespace BetterTrinket
 
                 if (!who.Items.ContainsId("(O)337", requiredBars))
                 {
-                    Game1.showRedMessage(ModEntry.I18n.Get("message.need-iridium", new { count = requiredBars }));
+                    Game1.addHUDMessage(new HUDMessage(ModEntry.I18n.Get("message.need-iridium", new { count = requiredBars }), 2));
                     who.currentLocation.playSound("cancel");
                     __result = false;
                     return false;

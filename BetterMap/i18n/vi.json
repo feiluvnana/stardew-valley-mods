@@ -4,5 +4,9 @@
   "gmcm.remove_farm_driftwood_barrier.name": "Xóa hàng rào gỗ mục & đống gỗ Nông trại",
   "gmcm.remove_farm_driftwood_barrier.tooltip": "Xóa hàng rào gỗ mục ngang và các đống gỗ chắn giữa lối đi phía trên và khu vực trồng trọt trên Nông trại Đảo Gừng (Đảo Tây).",
   "gmcm.remove_island_west_shipwreck.name": "Xóa xác tàu đắm Đảo Tây",
-  "gmcm.remove_island_west_shipwreck.tooltip": "Xóa xác tàu cướp biển khổng lồ bị đắm ở bãi biển phía nam Đảo Tây và thay thế bằng bãi cát sạch sẽ."
+  "gmcm.remove_island_west_shipwreck.tooltip": "Xóa xác tàu cướp biển khổng lồ bị đắm ở bãi biển phía nam Đảo Tây và thay thế bằng bãi cát sạch sẽ.",
+  "gmcm.section.farmhouse.title": "Tùy chỉnh Nhà ở",
+  "gmcm.section.farmhouse.description": "Cấu hình mở rộng cửa ra vào nhà ở.",
+  "gmcm.widen_house_exit.name": "Cửa ra vào nhà ở rộng 3x1",
+  "gmcm.widen_house_exit.tooltip": "Mở rộng cửa ra vào nhà ở thành 3 ô ngang cho tất cả các cấp độ Nhà chính và Nhà Đảo Gừng, giúp ra khỏi nhà dễ dàng và thoải mái."
 }

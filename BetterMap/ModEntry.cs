@@ -31,6 +31,38 @@ namespace BetterMap
                     MapPatcher.PatchIslandWest(editor.Data, Config, Monitor);
                 });
             }
+            else if (e.NameWithoutLocale.IsEquivalentTo("Maps/IslandFarmHouse"))
+            {
+                e.Edit(asset =>
+                {
+                    var editor = asset.AsMap();
+                    MapPatcher.PatchIslandFarmHouse(editor.Data, Config, Monitor);
+                });
+            }
+            else if (e.NameWithoutLocale.IsEquivalentTo("Maps/FarmHouse"))
+            {
+                e.Edit(asset =>
+                {
+                    var editor = asset.AsMap();
+                    MapPatcher.PatchFarmHouse(editor.Data, Config, Monitor);
+                });
+            }
+            else if (e.NameWithoutLocale.IsEquivalentTo("Maps/FarmHouse1") || e.NameWithoutLocale.IsEquivalentTo("Maps/FarmHouse1_marriage"))
+            {
+                e.Edit(asset =>
+                {
+                    var editor = asset.AsMap();
+                    MapPatcher.PatchFarmHouse1(editor.Data, Config, Monitor);
+                });
+            }
+            else if (e.NameWithoutLocale.IsEquivalentTo("Maps/FarmHouse2") || e.NameWithoutLocale.IsEquivalentTo("Maps/FarmHouse2_marriage"))
+            {
+                e.Edit(asset =>
+                {
+                    var editor = asset.AsMap();
+                    MapPatcher.PatchFarmHouse2(editor.Data, Config, Monitor);
+                });
+            }
         }
 
         private void OnGameLaunched(object? sender, GameLaunchedEventArgs e)
@@ -81,11 +113,32 @@ namespace BetterMap
                 name: () => Helper.Translation.Get("gmcm.remove_island_west_shipwreck.name"),
                 tooltip: () => Helper.Translation.Get("gmcm.remove_island_west_shipwreck.tooltip")
             );
+
+            // Section: Farmhouse Doorways
+            configMenu.AddSectionTitle(
+                mod: ModManifest,
+                text: () => Helper.Translation.Get("gmcm.section.farmhouse.title"),
+                tooltip: () => Helper.Translation.Get("gmcm.section.farmhouse.description")
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                getValue: () => Config.WidenHouseExit,
+                setValue: value => Config.WidenHouseExit = value,
+                name: () => Helper.Translation.Get("gmcm.widen_house_exit.name"),
+                tooltip: () => Helper.Translation.Get("gmcm.widen_house_exit.tooltip")
+            );
         }
 
         private void ReloadMaps()
         {
             Helper.GameContent.InvalidateCache("Maps/Island_W");
+            Helper.GameContent.InvalidateCache("Maps/IslandFarmHouse");
+            Helper.GameContent.InvalidateCache("Maps/FarmHouse");
+            Helper.GameContent.InvalidateCache("Maps/FarmHouse1");
+            Helper.GameContent.InvalidateCache("Maps/FarmHouse1_marriage");
+            Helper.GameContent.InvalidateCache("Maps/FarmHouse2");
+            Helper.GameContent.InvalidateCache("Maps/FarmHouse2_marriage");
             Monitor.Log("BetterMap: Invalidated map cache and reloaded maps.", LogLevel.Debug);
         }
     }

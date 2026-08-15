@@ -121,5 +121,173 @@ namespace BetterMap
                 monitor.Log($"Error patching Island_W: {ex.Message}", LogLevel.Error);
             }
         }
+
+        /// <summary>Applies 3x1 exit widening to IslandFarmHouse.</summary>
+        public static void PatchIslandFarmHouse(Map map, ModConfig config, IMonitor monitor)
+        {
+            try
+            {
+                if (!config.WidenHouseExit) return;
+
+                var buildings = map.GetLayer("Buildings");
+                var front = map.GetLayer("Front");
+                var back = map.GetLayer("Back");
+                var tsIndoor = map.GetTileSheet("indoor");
+                var tsIsland = map.GetTileSheet("untitled tile sheet");
+
+                // Widen door opening from x=14 to x=13..15
+                if (buildings != null && front != null && tsIndoor != null)
+                {
+                    // Move door frames outward at y=16
+                    buildings.Tiles[12, 16] = new StaticTile(buildings, tsIndoor, BlendMode.Alpha, 64);
+                    front.Tiles[12, 16] = new StaticTile(front, tsIndoor, BlendMode.Alpha, 64);
+                    buildings.Tiles[16, 16] = new StaticTile(buildings, tsIndoor, BlendMode.Alpha, 68);
+                    front.Tiles[16, 16] = new StaticTile(front, tsIndoor, BlendMode.Alpha, 68);
+
+                    buildings.Tiles[13, 16] = null;
+                    front.Tiles[13, 16] = null;
+                    buildings.Tiles[15, 16] = null;
+                    front.Tiles[15, 16] = null;
+
+                    // Move door frames outward at y=17
+                    buildings.Tiles[12, 17] = new StaticTile(buildings, tsIndoor, BlendMode.Alpha, 64);
+                    front.Tiles[12, 17] = new StaticTile(front, tsIndoor, BlendMode.Alpha, 96);
+                    buildings.Tiles[16, 17] = new StaticTile(buildings, tsIndoor, BlendMode.Alpha, 68);
+                    front.Tiles[16, 17] = new StaticTile(front, tsIndoor, BlendMode.Alpha, 130);
+
+                    buildings.Tiles[13, 17] = null;
+                    buildings.Tiles[15, 17] = null;
+
+                    // Add doormat front shadows
+                    front.Tiles[13, 17] = new StaticTile(front, tsIndoor, BlendMode.Alpha, 165);
+                    front.Tiles[15, 17] = new StaticTile(front, tsIndoor, BlendMode.Alpha, 165);
+                }
+
+                // Ensure Back floor tiles on x=13..15 at y=16..17
+                if (back != null && tsIsland != null)
+                {
+                    back.Tiles[13, 16] = new StaticTile(back, tsIsland, BlendMode.Alpha, 181);
+                    back.Tiles[15, 16] = new StaticTile(back, tsIsland, BlendMode.Alpha, 181);
+                    back.Tiles[13, 17] = new StaticTile(back, tsIsland, BlendMode.Alpha, 181);
+                    back.Tiles[15, 17] = new StaticTile(back, tsIsland, BlendMode.Alpha, 181);
+                }
+
+                // Update Map Warp property to 3x1
+                map.Properties["Warp"] = "13 18 IslandWest 77 40 14 18 IslandWest 77 40 15 18 IslandWest 77 40";
+                monitor.Log("Successfully patched IslandFarmHouse: Widened exit doorway to 3x1.", LogLevel.Trace);
+            }
+            catch (Exception ex)
+            {
+                monitor.Log($"Error patching IslandFarmHouse: {ex.Message}", LogLevel.Error);
+            }
+        }
+
+        /// <summary>Applies 3x1 exit widening to FarmHouse (Starter Farmhouse).</summary>
+        public static void PatchFarmHouse(Map map, ModConfig config, IMonitor monitor)
+        {
+            try
+            {
+                if (!config.WidenHouseExit) return;
+
+                var buildings = map.GetLayer("Buildings");
+                var front = map.GetLayer("Front");
+                var tsIndoor = map.GetTileSheet("indoor");
+
+                // Center is x=3, doorway widened to x=2..4
+                if (buildings != null && front != null && tsIndoor != null)
+                {
+                    // Move door frames to x=1 and x=5 at y=11
+                    buildings.Tiles[1, 11] = new StaticTile(buildings, tsIndoor, BlendMode.Alpha, 64);
+                    front.Tiles[1, 11] = new StaticTile(front, tsIndoor, BlendMode.Alpha, 96);
+                    buildings.Tiles[5, 11] = new StaticTile(buildings, tsIndoor, BlendMode.Alpha, 68);
+                    front.Tiles[5, 11] = new StaticTile(front, tsIndoor, BlendMode.Alpha, 130);
+
+                    buildings.Tiles[2, 11] = null;
+                    buildings.Tiles[4, 11] = null;
+
+                    front.Tiles[2, 11] = new StaticTile(front, tsIndoor, BlendMode.Alpha, 165);
+                    front.Tiles[4, 11] = new StaticTile(front, tsIndoor, BlendMode.Alpha, 165);
+                }
+
+                map.Properties["Warp"] = "2 12 Farm 64 15 3 12 Farm 64 15 4 12 Farm 64 15";
+                monitor.Log("Successfully patched FarmHouse: Widened exit doorway to 3x1.", LogLevel.Trace);
+            }
+            catch (Exception ex)
+            {
+                monitor.Log($"Error patching FarmHouse: {ex.Message}", LogLevel.Error);
+            }
+        }
+
+        /// <summary>Applies 3x1 exit widening to FarmHouse1 (Level 1 Farmhouse).</summary>
+        public static void PatchFarmHouse1(Map map, ModConfig config, IMonitor monitor)
+        {
+            try
+            {
+                if (!config.WidenHouseExit) return;
+
+                var buildings = map.GetLayer("Buildings");
+                var front = map.GetLayer("Front");
+                var tsIndoor = map.GetTileSheet("indoor");
+
+                // Center is x=9, doorway widened to x=8..10
+                if (buildings != null && front != null && tsIndoor != null)
+                {
+                    // Move door frames to x=7 and x=11 at y=11
+                    buildings.Tiles[7, 11] = new StaticTile(buildings, tsIndoor, BlendMode.Alpha, 64);
+                    front.Tiles[7, 11] = new StaticTile(front, tsIndoor, BlendMode.Alpha, 96);
+                    buildings.Tiles[11, 11] = new StaticTile(buildings, tsIndoor, BlendMode.Alpha, 68);
+                    front.Tiles[11, 11] = new StaticTile(front, tsIndoor, BlendMode.Alpha, 130);
+
+                    buildings.Tiles[8, 11] = null;
+                    buildings.Tiles[10, 11] = null;
+
+                    front.Tiles[8, 11] = new StaticTile(front, tsIndoor, BlendMode.Alpha, 165);
+                    front.Tiles[10, 11] = new StaticTile(front, tsIndoor, BlendMode.Alpha, 165);
+                }
+
+                map.Properties["Warp"] = "8 12 Farm 64 15 9 12 Farm 64 15 10 12 Farm 64 15";
+                monitor.Log("Successfully patched FarmHouse1: Widened exit doorway to 3x1.", LogLevel.Trace);
+            }
+            catch (Exception ex)
+            {
+                monitor.Log($"Error patching FarmHouse1: {ex.Message}", LogLevel.Error);
+            }
+        }
+
+        /// <summary>Applies 3x1 exit widening to FarmHouse2 (Level 2 Farmhouse).</summary>
+        public static void PatchFarmHouse2(Map map, ModConfig config, IMonitor monitor)
+        {
+            try
+            {
+                if (!config.WidenHouseExit) return;
+
+                var buildings = map.GetLayer("Buildings");
+                var front = map.GetLayer("Front");
+                var tsIndoor = map.GetTileSheet("indoor");
+
+                // Center is x=27, doorway widened to x=26..28
+                if (buildings != null && front != null && tsIndoor != null)
+                {
+                    // Move door frames to x=25 and x=29 at y=30
+                    buildings.Tiles[25, 30] = new StaticTile(buildings, tsIndoor, BlendMode.Alpha, 64);
+                    front.Tiles[25, 30] = new StaticTile(front, tsIndoor, BlendMode.Alpha, 96);
+                    buildings.Tiles[29, 30] = new StaticTile(buildings, tsIndoor, BlendMode.Alpha, 68);
+                    front.Tiles[29, 30] = new StaticTile(front, tsIndoor, BlendMode.Alpha, 130);
+
+                    buildings.Tiles[26, 30] = null;
+                    buildings.Tiles[28, 30] = null;
+
+                    front.Tiles[26, 30] = new StaticTile(front, tsIndoor, BlendMode.Alpha, 165);
+                    front.Tiles[28, 30] = new StaticTile(front, tsIndoor, BlendMode.Alpha, 165);
+                }
+
+                map.Properties["Warp"] = "26 31 Farm 64 15 27 31 Farm 64 15 28 31 Farm 64 15";
+                monitor.Log("Successfully patched FarmHouse2: Widened exit doorway to 3x1.", LogLevel.Trace);
+            }
+            catch (Exception ex)
+            {
+                monitor.Log($"Error patching FarmHouse2: {ex.Message}", LogLevel.Error);
+            }
+        }
     }
 }

@@ -67,14 +67,14 @@ namespace BetterTrinket
 
             if (IsAscended(trinket))
             {
-                Game1.showRedMessage(ModEntry.I18n.Get("message.already-ascended"));
+                Game1.addHUDMessage(new HUDMessage(ModEntry.I18n.Get("message.already-ascended"), 2));
                 who.currentLocation.playSound("cancel");
                 return false;
             }
 
             if (!who.Items.ContainsId("(O)74", 1)) // Prismatic Shard
             {
-                Game1.showRedMessage(ModEntry.I18n.Get("message.need-prismatic"));
+                Game1.addHUDMessage(new HUDMessage(ModEntry.I18n.Get("message.need-prismatic"), 2));
                 who.currentLocation.playSound("cancel");
                 return false;
             }
@@ -114,7 +114,8 @@ namespace BetterTrinket
             who.currentLocation.playSound("reward");
 
             Game1.addHUDMessage(new HUDMessage(
-                ModEntry.I18n.Get("hud.ascension-success", new { item = trinket.DisplayName })
+                ModEntry.I18n.Get("hud.ascension-success", new { item = trinket.DisplayName }),
+                1
             ));
 
             return true;

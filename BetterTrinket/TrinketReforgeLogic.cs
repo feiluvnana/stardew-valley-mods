@@ -223,59 +223,59 @@ namespace BetterTrinket
             count++;
 
             bool isPity = config.EnablePitySystem && (count >= config.RollsForGuaranteedUpgrade);
-            float targetMinScore = 0f;
-
-            if (isPity)
-            {
-                // Force an upgrade or top tier
-                targetMinScore = Math.Min(1.0f, currentEval.Score + 0.2f);
-            }
-            else if (config.PreventDowngrades)
-            {
-                targetMinScore = currentEval.Score;
-            }
-
-            int bestSeed = currentSeed;
-            float bestScore = currentEval.Score;
-            bool foundImprovement = false;
-
             Random rng = Game1.random;
 
-            // Search candidate seeds
-            for (int i = 0; i < 500; i++)
+            int newSeed = currentSeed;
+            if (isPity)
             {
-                int candidateSeed = rng.Next();
-                var candidateEval = Evaluate(trinket.ItemId, candidateSeed);
-
-                if (candidateEval.Score > bestScore)
+                // Pity guaranteed upgrade: search for a candidate that improves upon current score
+                for (int i = 0; i < 100; i++)
                 {
-                    bestScore = candidateEval.Score;
-                    bestSeed = candidateSeed;
-                    foundImprovement = true;
-
-                    if (candidateEval.IsMaxRoll)
+                    int candidateSeed = rng.Next();
+                    var candidateEval = Evaluate(trinket.ItemId, candidateSeed);
+                    if (candidateEval.Score > currentEval.Score)
+                    {
+                        newSeed = candidateSeed;
                         break;
+                    }
                 }
-                else if (!foundImprovement && candidateEval.Score >= targetMinScore)
+                // If already at max or no higher found, roll a random seed
+                if (newSeed == currentSeed)
                 {
-                    bestScore = candidateEval.Score;
-                    bestSeed = candidateSeed;
-                    foundImprovement = true;
+                    newSeed = rng.Next();
+                }
+            }
+            else
+            {
+                // Standard single roll
+                newSeed = rng.Next();
+            }
+
+            var newEval = Evaluate(trinket.ItemId, newSeed);
+            int finalSeed = newSeed;
+
+            // Downgrade protection
+            if (config.PreventDowngrades && !isPity)
+            {
+                if (newEval.Score < currentEval.Score)
+                {
+                    // Keep existing stats
+                    finalSeed = currentSeed;
                 }
             }
 
-            // Apply selected seed and re-roll stats natively
-            trinket.RerollStats(bestSeed);
+            // Apply seed and update native stats & cache
+            trinket.RerollStats(finalSeed);
             ResetCachedDescription(trinket, who);
 
-            var finalEval = Evaluate(trinket.ItemId, bestSeed);
+            var finalEval = Evaluate(trinket.ItemId, finalSeed);
 
-            if (finalEval.IsMaxRoll)
+            if (finalEval.IsMaxRoll && (finalSeed != currentSeed || !currentEval.IsMaxRoll))
             {
                 count = 0; // Reset pity counter on max roll
                 if (config.ShowReforgeSuccessMessage)
                 {
-                    Game1.addHUDMessage(new HUDMessage(ModEntry.I18n.Get("hud.reforge-perfect", new { item = trinket.DisplayName })));
+                    Game1.addHUDMessage(new HUDMessage(ModEntry.I18n.Get("hud.reforge-perfect", new { item = trinket.DisplayName }), 1));
                     who.currentLocation.playSound("yoba");
                 }
             }
@@ -284,14 +284,38 @@ namespace BetterTrinket
                 count = 0; // Reset pity counter on improvement
                 if (config.ShowReforgeSuccessMessage)
                 {
-                    Game1.addHUDMessage(new HUDMessage(ModEntry.I18n.Get("hud.reforge-upgrade", new { item = trinket.DisplayName, tier = finalEval.Tier, maxTier = finalEval.MaxTier })));
+                    Game1.addHUDMessage(new HUDMessage(ModEntry.I18n.Get("hud.reforge-upgrade", new { item = trinket.DisplayName, tier = finalEval.Tier, maxTier = finalEval.MaxTier }), 1));
+                }
+            }
+            else if (finalSeed == currentSeed && config.PreventDowngrades)
+            {
+                // Did not improve but protected from downgrade
+                if (config.ShowReforgeSuccessMessage)
+                {
+                    Game1.addHUDMessage(new HUDMessage(ModEntry.I18n.Get("hud.reforge-fail", new { item = trinket.DisplayName }), 2));
+                }
+            }
+            else if (finalEval.Score < currentEval.Score)
+            {
+                // Downgraded (PreventDowngrades is off)
+                if (config.ShowReforgeSuccessMessage)
+                {
+                    Game1.addHUDMessage(new HUDMessage(ModEntry.I18n.Get("hud.reforge-downgrade", new { item = trinket.DisplayName }), 2));
+                }
+            }
+            else
+            {
+                // Similar stats rolled
+                if (config.ShowReforgeSuccessMessage)
+                {
+                    Game1.addHUDMessage(new HUDMessage(ModEntry.I18n.Get("hud.reforge-no-change", new { item = trinket.DisplayName }), 2));
                 }
             }
 
             // Save updated reforge count
             trinket.modData[ReforgeCountKey] = count.ToString();
 
-            return bestSeed;
+            return finalSeed;
         }
     }
 }

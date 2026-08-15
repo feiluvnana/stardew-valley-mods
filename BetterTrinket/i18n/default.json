@@ -24,6 +24,9 @@
 
   "hud.reforge-perfect": "✦ Perfect Reforge! Your {{item}} reached maximum stats! ✦",
   "hud.reforge-upgrade": "Upgraded {{item}} to Tier {{tier}}/{{maxTier}}!",
+  "hud.reforge-fail": "Reforge did not improve {{item}} (Stats Protected).",
+  "hud.reforge-no-change": "Reforge rolled similar stats for {{item}}.",
+  "hud.reforge-downgrade": "Reforge rolled lower stats for {{item}}.",
   "hud.ascension-success": "🌈 Prismatic Ascension Complete for {{item}}! 🌈",
 
   "ascension.frogegg.desc": "Swallowing monsters drops all of their normal loot and rewards.",
