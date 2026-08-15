@@ -66,9 +66,9 @@ namespace BetterSkullCavernChest
             new("(O)918", LootCategory.Agriculture, 10, 30, 20.0, c => c.EnableAgricultureCategory && c.EnableFertilizers),     // Hyper Speed-Gro
             new("(O)919", LootCategory.Agriculture, 10, 30, 20.0, c => c.EnableAgricultureCategory && c.EnableFertilizers),     // Deluxe Fertilizer
             new("(O)347", LootCategory.Agriculture, 2, 6, 20.0, c => c.EnableAgricultureCategory && c.EnableRareSeeds),         // Rare Seed
+            new("(O)486", LootCategory.Agriculture, 5, 20, 18.0, c => c.EnableAgricultureCategory && c.EnableRareSeeds),        // Starfruit Seeds
             new("(O)920", LootCategory.Agriculture, 10, 30, 18.0, c => c.EnableAgricultureCategory && c.EnableFertilizers),     // Deluxe Retaining Soil
             new("(O)645", LootCategory.Agriculture, 1, 3, 18.0, c => c.EnableAgricultureCategory && c.EnableSprinklers),        // Iridium Sprinkler
-            new("(O)499", LootCategory.Agriculture, 1, 3, 16.0, c => c.EnableAgricultureCategory && c.EnableRareSeeds),         // Ancient Seeds
             new("(O)805", LootCategory.Agriculture, 10, 25, 15.0, c => c.EnableAgricultureCategory && c.EnableFertilizers),     // Tree Fertilizer
             new("(O)915", LootCategory.Agriculture, 1, 2, 12.0, c => c.EnableAgricultureCategory && c.EnableSprinklers),        // Pressure Nozzle
             new("(O)913", LootCategory.Agriculture, 1, 2, 12.0, c => c.EnableAgricultureCategory && c.EnableSprinklers),        // Enricher
@@ -87,8 +87,6 @@ namespace BetterSkullCavernChest
             new("(O)337", LootCategory.Mining, 5, 15, 22.0, c => c.EnableMiningCategory && c.EnableIridiumItems),       // Iridium Bar
             new("(O)910", LootCategory.Mining, 3, 8, 20.0, c => c.EnableMiningCategory && c.EnableRadioactiveItems),     // Radioactive Bar
             new("(O)848", LootCategory.Mining, 5, 20, 20.0, c => c.EnableMiningCategory),                                // Cinder Shard
-            new("(O)382", LootCategory.Mining, 25, 75, 20.0, c => c.EnableMiningCategory),                               // Coal
-            new("(O)287", LootCategory.Mining, 10, 30, 20.0, c => c.EnableMiningCategory && c.EnableBombs),              // Bomb
             new("(O)70", LootCategory.Mining, 3, 8, 20.0, c => c.EnableMiningCategory),                                  // Jade (Staircases)
             new("(O)72", LootCategory.Mining, 3, 8, 18.0, c => c.EnableMiningCategory),                                  // Diamond
             new("(O)SkillBook_3", LootCategory.Mining, 1, 1, 10.0, c => c.EnableMiningCategory && c.EnableBooks, false), // Mining Monthly
@@ -100,11 +98,8 @@ namespace BetterSkullCavernChest
             // =========================================================================
             new("(O)ChallengeBait", LootCategory.Fishing, 15, 45, 22.0, c => c.EnableFishingCategory && c.EnableFishingTackle),
             new("(O)DeluxeBait", LootCategory.Fishing, 20, 50, 22.0, c => c.EnableFishingCategory && c.EnableFishingTackle),
-            new("(O)703", LootCategory.Fishing, 15, 40, 18.0, c => c.EnableFishingCategory && c.EnableFishingTackle), // Magnet
-            new("(O)445", LootCategory.Fishing, 2, 5, 18.0, c => c.EnableFishingCategory),                            // Caviar
             new("(O)694", LootCategory.Fishing, 1, 3, 18.0, c => c.EnableFishingCategory && c.EnableFishingTackle),  // Trap Bobber
             new("(O)856", LootCategory.Fishing, 1, 2, 16.0, c => c.EnableFishingCategory && c.EnableFishingTackle),  // Curiosity Lure
-            new("(O)814", LootCategory.Fishing, 3, 8, 16.0, c => c.EnableFishingCategory),                            // Squid Ink
             new("(O)SkillBook_1", LootCategory.Fishing, 1, 1, 10.0, c => c.EnableFishingCategory && c.EnableBooks, false), // Bait & Bobber
             new("(O)Book_Crabbing", LootCategory.Fishing, 1, 1, 8.0, c => c.EnableFishingCategory && c.EnableBooks, false), // Art O' Crabbing
             new("(O)Book_Roe", LootCategory.Fishing, 1, 1, 8.0, c => c.EnableFishingCategory && c.EnableBooks, false),      // Jewels of the Sea
@@ -119,7 +114,6 @@ namespace BetterSkullCavernChest
             new("(O)879", LootCategory.Combat, 2, 5, 18.0, c => c.EnableCombatCategory),                                // Monster Musk
             new("(O)857", LootCategory.Combat, 1, 1, 15.0, c => c.EnableCombatCategory && c.EnableSlimeEggs, false),    // Tiger Slime Egg
             new("(O)439", LootCategory.Combat, 1, 1, 15.0, c => c.EnableCombatCategory && c.EnableSlimeEggs, false),    // Purple Slime Egg
-            new("(O)413", LootCategory.Combat, 1, 1, 15.0, c => c.EnableCombatCategory && c.EnableSlimeEggs, false),    // Blue Slime Egg
             new("(O)SkillBook_4", LootCategory.Combat, 1, 1, 10.0, c => c.EnableCombatCategory && c.EnableBooks, false), // Combat Quarterly
             new("(O)Book_Void", LootCategory.Combat, 1, 1, 8.0, c => c.EnableCombatCategory && c.EnableBooks, false),   // Monster Compendium
             new("(O)Book_Defense", LootCategory.Combat, 1, 1, 8.0, c => c.EnableCombatCategory && c.EnableBooks, false),// Jack Be Nimble
