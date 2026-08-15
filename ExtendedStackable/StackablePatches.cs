@@ -40,6 +40,15 @@ namespace ExtendedStackable
                 PatchCanStackWith(harmony, typeof(Furniture));
                 PatchCanStackWith(harmony, typeof(Trinket));
 
+                // Patch getOne
+                PatchGetOne(harmony, typeof(StardewValley.Object));
+                PatchGetOne(harmony, typeof(Ring));
+                PatchGetOne(harmony, typeof(Clothing));
+                PatchGetOne(harmony, typeof(Hat));
+                PatchGetOne(harmony, typeof(Boots));
+                PatchGetOne(harmony, typeof(Furniture));
+                PatchGetOne(harmony, typeof(Trinket));
+
                 Monitor.Log("Harmony patches for ExtendedStackable applied successfully.", LogLevel.Trace);
             }
             catch (Exception ex)
@@ -69,6 +78,43 @@ namespace ExtendedStackable
                     original: method,
                     postfix: new HarmonyMethod(typeof(StackablePatches), nameof(Item_canStackWith_Postfix))
                 );
+            }
+        }
+
+        private static void PatchGetOne(Harmony harmony, Type type)
+        {
+            var method = type.GetMethod(nameof(Item.getOne), BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+            if (method != null && !method.IsAbstract)
+            {
+                harmony.Patch(
+                    original: method,
+                    postfix: new HarmonyMethod(typeof(StackablePatches), nameof(Item_getOne_Postfix))
+                );
+            }
+        }
+
+        public static void Item_getOne_Postfix(Item __instance, ref Item __result)
+        {
+            if (__instance == null || __result == null)
+                return;
+
+            if (__instance is Trinket sourceTrinket && __result is Trinket resultTrinket)
+            {
+                resultTrinket.generationSeed.Value = sourceTrinket.generationSeed.Value;
+                resultTrinket.displayNameOverrideTemplate.Value = sourceTrinket.displayNameOverrideTemplate.Value;
+            }
+            else if (__instance is Boots sourceBoots && __result is Boots resultBoots)
+            {
+                resultBoots.appliedBootSheetIndex.Value = sourceBoots.appliedBootSheetIndex.Value;
+                resultBoots.defenseBonus.Value = sourceBoots.defenseBonus.Value;
+                resultBoots.immunityBonus.Value = sourceBoots.immunityBonus.Value;
+            }
+            else if (__instance is StardewValley.Object sourceObj && __result is StardewValley.Object resultObj)
+            {
+                if (sourceObj.Category == StardewValley.Object.tackleCategory)
+                {
+                    resultObj.uses.Value = sourceObj.uses.Value;
+                }
             }
         }
 

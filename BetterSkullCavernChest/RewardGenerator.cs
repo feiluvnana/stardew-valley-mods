@@ -54,7 +54,8 @@ namespace BetterSkullCavernChest
             // =========================================================================
             new("(O)74", LootCategory.Legendary, 1, 3, 25.0, c => c.EnableLegendaryCategory && c.EnablePrismaticShard),
             new("(O)279", LootCategory.Legendary, 1, 2, 20.0, c => c.EnableLegendaryCategory && c.EnableMagicRockCandy),
-            new("(O)GoldenAnimalCracker", LootCategory.Legendary, 1, 2, 20.0, c => c.EnableLegendaryCategory && c.EnableGoldenAnimalCracker),
+            new("(O)GoldenAnimalCracker", LootCategory.Legendary, 1, 1, 20.0, c => c.EnableLegendaryCategory && c.EnableGoldenAnimalCracker, false),
+            new("(BC)272", LootCategory.Legendary, 1, 1, 20.0, c => c.EnableLegendaryCategory && c.EnableAutoPetter, false), // Auto-Petter
             new("(O)896", LootCategory.Legendary, 1, 1, 15.0, c => c.EnableLegendaryCategory && c.EnableGalaxySoul, false),  // Galaxy Soul
             new("(O)StardropTea", LootCategory.Legendary, 1, 2, 15.0, c => c.EnableLegendaryCategory && c.EnableStardropTea),
             new("(O)PrizeTicket", LootCategory.Legendary, 2, 5, 15.0, c => c.EnableLegendaryCategory && c.EnablePrizeTicket),
@@ -77,9 +78,9 @@ namespace BetterSkullCavernChest
             // =========================================================================
             new("(O)386", LootCategory.Mining, 10, 30, 25.0, c => c.EnableMiningCategory && c.EnableIridiumItems),       // Iridium Ore
             new("(O)288", LootCategory.Mining, 5, 20, 25.0, c => c.EnableMiningCategory && c.EnableBombs),               // Mega Bomb
-            new("(O)909", LootCategory.Mining, 5, 20, 22.0, c => c.EnableMiningCategory && c.EnableRadioactiveItems),    // Radioactive Ore
+            new("(O)909", LootCategory.Mining, 5, 20, 22.0, c => c.EnableMiningCategory && c.EnableRadioactiveItems && (!c.GatekeepRadioactiveItems || IsRadioactiveUnlocked())),    // Radioactive Ore
             new("(O)337", LootCategory.Mining, 5, 15, 22.0, c => c.EnableMiningCategory && c.EnableIridiumItems),       // Iridium Bar
-            new("(O)910", LootCategory.Mining, 3, 8, 20.0, c => c.EnableMiningCategory && c.EnableRadioactiveItems),     // Radioactive Bar
+            new("(O)910", LootCategory.Mining, 3, 8, 20.0, c => c.EnableMiningCategory && c.EnableRadioactiveItems && (!c.GatekeepRadioactiveItems || IsRadioactiveUnlocked())),     // Radioactive Bar
             new("(O)848", LootCategory.Mining, 5, 20, 20.0, c => c.EnableMiningCategory),                                // Cinder Shard
             new("(O)70", LootCategory.Mining, 3, 8, 20.0, c => c.EnableMiningCategory),                                  // Jade (Staircases)
             new("(O)72", LootCategory.Mining, 3, 8, 18.0, c => c.EnableMiningCategory),                                  // Diamond
@@ -287,6 +288,24 @@ namespace BetterSkullCavernChest
             }
 
             return results;
+        }
+
+        public static bool IsRadioactiveUnlocked()
+        {
+            if (Game1.netWorldState?.Value != null && Game1.netWorldState.Value.GoldenWalnuts >= 100)
+                return true;
+
+            if (Game1.player != null)
+            {
+                if (Game1.player.hasOrWillReceiveMail("QiNutDoor") ||
+                    (Game1.player.team != null && Game1.player.team.SpecialOrderRuleActive("MineConditionsLocked")) ||
+                    Game1.player.stats.Get("WalnutsCollected") >= 100)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public static bool IsCosmeticItem(Item item)

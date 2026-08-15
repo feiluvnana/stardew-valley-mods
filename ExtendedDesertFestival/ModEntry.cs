@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
 using StardewModdingAPI;
@@ -12,6 +13,7 @@ namespace ExtendedDesertFestival
         void Register(IManifest mod, Action reset, Action save, bool titleScreenOnly = false);
         void AddSectionTitle(IManifest mod, Func<string> text, Func<string>? tooltip = null);
         void AddBoolOption(IManifest mod, Func<bool> getValue, Action<bool> setValue, Func<string> name, Func<string>? tooltip = null, string? fieldId = null);
+        void AddNumberOption(IManifest mod, Func<int> getValue, Action<int> setValue, Func<string> name, Func<string>? tooltip = null, int? min = null, int? max = null, int? interval = null, Func<int, string>? formatValue = null, string? fieldId = null);
     }
 
     public class ModEntry : Mod
@@ -19,6 +21,8 @@ namespace ExtendedDesertFestival
         public static ModConfig Config { get; private set; } = null!;
         public static IMonitor ModMonitor { get; private set; } = null!;
         public static ITranslationHelper I18n { get; private set; } = null!;
+
+        private static readonly Dictionary<long, List<Item>> StashedEggs = new();
 
         public override void Entry(IModHelper helper)
         {
@@ -48,7 +52,8 @@ namespace ExtendedDesertFestival
                     {
                         harmony.Patch(
                             original: cleanupMethod,
-                            prefix: new HarmonyMethod(typeof(ModEntry), nameof(DesertFestival_CleanupFestival_Prefix))
+                            prefix: new HarmonyMethod(typeof(ModEntry), nameof(DesertFestival_CleanupFestival_Prefix)),
+                            postfix: new HarmonyMethod(typeof(ModEntry), nameof(DesertFestival_CleanupFestival_Postfix))
                         );
                     }
                 }
@@ -68,7 +73,7 @@ namespace ExtendedDesertFestival
             if (__result)
                 return;
 
-            if (day >= 22 && day <= 24)
+            if (day >= Config.FestivalStartDay && day <= Config.FestivalEndDay)
             {
                 if (Config.EnableSummer && season == Season.Summer)
                 {
@@ -85,11 +90,62 @@ namespace ExtendedDesertFestival
             }
         }
 
-        public static bool DesertFestival_CleanupFestival_Prefix()
+        public static void DesertFestival_CleanupFestival_Prefix()
         {
-            // If KeepEggs is true, we allow standard cleanup except player inventory egg clearing
-            // Or return true to proceed with cleanup
-            return true;
+            if (!Config.KeepEggs)
+                return;
+
+            StashedEggs.Clear();
+            try
+            {
+                foreach (Farmer farmer in Game1.getAllFarmers())
+                {
+                    if (farmer?.Items == null) continue;
+                    var eggs = new List<Item>();
+                    for (int i = 0; i < farmer.Items.Count; i++)
+                    {
+                        Item? item = farmer.Items[i];
+                        if (item != null && (item.ItemId == "CalicoEgg" || item.QualifiedItemId == "(O)CalicoEgg"))
+                        {
+                            Item clone = ItemRegistry.Create(item.QualifiedItemId, item.Stack);
+                            eggs.Add(clone);
+                        }
+                    }
+                    if (eggs.Count > 0)
+                    {
+                        StashedEggs[farmer.UniqueMultiplayerID] = eggs;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ModMonitor.Log($"Error stashing Calico Eggs during festival cleanup: {ex}", LogLevel.Warn);
+            }
+        }
+
+        public static void DesertFestival_CleanupFestival_Postfix()
+        {
+            if (!Config.KeepEggs || StashedEggs.Count == 0)
+                return;
+
+            try
+            {
+                foreach (Farmer farmer in Game1.getAllFarmers())
+                {
+                    if (farmer != null && StashedEggs.TryGetValue(farmer.UniqueMultiplayerID, out var eggs))
+                    {
+                        foreach (var egg in eggs)
+                        {
+                            farmer.addItemToInventory(egg);
+                        }
+                    }
+                }
+                StashedEggs.Clear();
+            }
+            catch (Exception ex)
+            {
+                ModMonitor.Log($"Error restoring Calico Eggs after festival cleanup: {ex}", LogLevel.Warn);
+            }
         }
 
         private void OnGameLaunched(object? sender, GameLaunchedEventArgs e)
@@ -107,6 +163,26 @@ namespace ExtendedDesertFestival
             configMenu.AddSectionTitle(
                 mod: ModManifest,
                 text: () => I18n.Get("config.section.festivals")
+            );
+
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.start-day.name"),
+                tooltip: () => I18n.Get("config.start-day.tooltip"),
+                getValue: () => Config.FestivalStartDay,
+                setValue: value => Config.FestivalStartDay = value,
+                min: 1,
+                max: 28
+            );
+
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.end-day.name"),
+                tooltip: () => I18n.Get("config.end-day.tooltip"),
+                getValue: () => Config.FestivalEndDay,
+                setValue: value => Config.FestivalEndDay = value,
+                min: 1,
+                max: 28
             );
 
             configMenu.AddBoolOption(

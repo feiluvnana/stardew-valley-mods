@@ -299,12 +299,13 @@ namespace BetterGeodeCracking
 
         public static void Object_performObjectDropInAction_Postfix(StardewValley.Object __instance, Item dropInItem, bool probe, Farmer who, bool __result)
         {
-            if (!probe && __result && __instance.QualifiedItemId == "(BC)182") // Geode Crusher
+            if (!probe && __result && (__instance.QualifiedItemId == "(BC)182" || __instance.ItemId == "182")) // Geode Crusher
             {
                 if (Config.InstantGeodeCrusher)
                 {
                     __instance.MinutesUntilReady = 0;
                     __instance.readyForHarvest.Value = true;
+                    __instance.showNextIndex.Value = true;
                 }
             }
         }

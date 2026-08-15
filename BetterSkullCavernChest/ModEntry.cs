@@ -572,10 +572,24 @@ namespace BetterSkullCavernChest
             );
             configMenu.AddBoolOption(
                 mod: ModManifest,
+                name: () => I18n.Get("config.enable-auto-petter.name"),
+                tooltip: () => I18n.Get("config.enable-auto-petter.tooltip"),
+                getValue: () => Config.EnableAutoPetter,
+                setValue: value => Config.EnableAutoPetter = value
+            );
+            configMenu.AddBoolOption(
+                mod: ModManifest,
                 name: () => I18n.Get("config.enable-radioactive-items.name"),
                 tooltip: () => I18n.Get("config.enable-radioactive-items.tooltip"),
                 getValue: () => Config.EnableRadioactiveItems,
                 setValue: value => Config.EnableRadioactiveItems = value
+            );
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.gatekeep-radioactive-items.name"),
+                tooltip: () => I18n.Get("config.gatekeep-radioactive-items.tooltip"),
+                getValue: () => Config.GatekeepRadioactiveItems,
+                setValue: value => Config.GatekeepRadioactiveItems = value
             );
             configMenu.AddBoolOption(
                 mod: ModManifest,

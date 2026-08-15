@@ -57,9 +57,13 @@ namespace BetterProduct
             {
                 if (!string.IsNullOrEmpty(__instance.preservedParentSheetIndex.Value) && __instance.preservedParentSheetIndex.Value != "-1")
                 {
-                    if (ItemRegistry.Create(__instance.preservedParentSheetIndex.Value) is StardewValley.Object honeyObj)
+                    if (ItemRegistry.Create(__instance.preservedParentSheetIndex.Value) is StardewValley.Object flowerObj)
                     {
-                        int honeyBasePrice = honeyObj.Price;
+                        // Flower Honey in vanilla is worth (100 + 2 * flower.Price)
+                        int honeyBasePrice = (flowerObj.ItemId == "340" || flowerObj.QualifiedItemId == "(O)340")
+                            ? flowerObj.Price
+                            : 100 + flowerObj.Price * 2;
+
                         int meadPrice = (int)Math.Round(honeyBasePrice * Config.MeadMultiplier);
                         __result = Math.Max(__result, meadPrice);
                     }

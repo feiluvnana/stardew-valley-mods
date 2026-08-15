@@ -2,5 +2,7 @@
   "EnableSummer": true,
   "EnableFall": true,
   "EnableWinter": true,
-  "KeepEggs": true
+  "KeepEggs": true,
+  "FestivalStartDay": 22,
+  "FestivalEndDay": 24
 }

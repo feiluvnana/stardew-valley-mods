@@ -59,6 +59,7 @@ namespace BetterSkullCavernChest
         public bool EnablePrismaticShard { get; set; } = true;
         public bool EnableMagicRockCandy { get; set; } = true;
         public bool EnableGoldenAnimalCracker { get; set; } = true;
+        public bool EnableAutoPetter { get; set; } = true;
         public bool EnableGalaxySoul { get; set; } = true;
         public bool EnablePrizeTicket { get; set; } = true;
         public bool EnableStardropTea { get; set; } = true;
@@ -66,6 +67,7 @@ namespace BetterSkullCavernChest
         public bool EnableSprinklers { get; set; } = true;
         public bool EnableRareSeeds { get; set; } = true;
         public bool EnableRadioactiveItems { get; set; } = true;
+        public bool GatekeepRadioactiveItems { get; set; } = true;
         public bool EnableIridiumItems { get; set; } = true;
         public bool EnableBombs { get; set; } = true;
         public bool EnableFishingTackle { get; set; } = true;

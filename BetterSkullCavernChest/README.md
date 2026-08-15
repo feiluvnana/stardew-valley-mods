@@ -6,10 +6,10 @@
 
 ## ✨ Features
 
-### 🌟 1. 7 Usage-Based Gameplay Categories (53 Validated Items, 0 Machines, 0 Books)
-- 🌟 **Legendary:** Prismatic Shard, Magic Rock Candy, Golden Animal Cracker, Galaxy Soul, Stardrop Tea, Prize Ticket.
+### 🌟 1. 7 Usage-Based Gameplay Categories (54 Validated Items)
+- 🌟 **Legendary:** Prismatic Shard, Magic Rock Candy, Golden Animal Cracker, Auto-Petter, Galaxy Soul, Stardrop Tea, Prize Ticket.
 - 🌾 **Agriculture:** Hyper Speed-Gro, Deluxe Fertilizer, Deluxe Retaining Soil, Tree Fertilizer, Iridium Sprinklers, Pressure Nozzles, Enrichers, Rare Seeds, Starfruit Seeds.
-- ⛏️ **Mining:** Radioactive Ore & Bar, Iridium Ore & Bar, Cinder Shards, Mega Bombs, Jade (Staircase trading), Diamond.
+- ⛏️ **Mining:** Radioactive Ore & Bar (Qi room gated), Iridium Ore & Bar, Cinder Shards, Mega Bombs, Jade (Staircase trading), Diamond.
 - 🎣 **Fishing:** Magic Bait, Trap Bobber, Curiosity Lure, Deluxe Bait, Challenge Bait, Sea Jelly, River Jelly, Cave Jelly, Seafoam Pudding, Dish O' The Sea.
 - ⚔️ **Combat:** Tiger & Purple Slime Eggs, Dragon Teeth, Fairy Dust, Monster Musk, Life Elixir, Triple Shot Espresso.
 - 🌲 **Foraging:** Hardwood, Mystic Tree Seed, Golden Coconut, Magma Cap, Purple Mushroom, Desert & Farm Warp Totems.
@@ -32,7 +32,7 @@
 
 ### 🛡️ 3. Zero Junk / Invalid Item Protection
 - Fully compatible with Stardew Valley 1.6 item IDs.
-- Protects single-count items (Slime Eggs, Galaxy Souls) from illegal multi-stack duplication.
+- Protects single-count items (Auto-Petter, Slime Eggs, Galaxy Souls, Golden Animal Crackers) from illegal multi-stack duplication.
 - Strips decorative cosmetic junk (hats, shirts, floor dividers).
 
 ---
@@ -41,12 +41,13 @@
 
 | Category | Item Name | Qualified ID | Base Stack | Item Weight | Category Share | Per-Roll Chance |
 | :--- | :--- | :--- | :---: | :---: | :---: | :---: |
-| **Legendary (~14.285%)** | **Prismatic Shard** | `(O)74` | 1 – 3 | 25.0 | 22.73% | **3.247%** |
-| | **Magic Rock Candy** | `(O)279` | 1 – 2 | 20.0 | 18.18% | **2.597%** |
-| | **Golden Animal Cracker** | `(O)GoldenAnimalCracker` | 1 – 2 | 20.0 | 18.18% | **2.597%** |
-| | **Galaxy Soul** | `(O)896` | 1 | 15.0 | 13.64% | **1.948%** |
-| | **Stardrop Tea** | `(O)StardropTea` | 1 – 2 | 15.0 | 13.64% | **1.948%** |
-| | **Prize Ticket** | `(O)PrizeTicket` | 2 – 5 | 15.0 | 13.64% | **1.948%** |
+| **Legendary (~14.285%)** | **Prismatic Shard** | `(O)74` | 1 – 3 | 25.0 | 19.23% | **2.747%** |
+| | **Magic Rock Candy** | `(O)279` | 1 – 2 | 20.0 | 15.38% | **2.198%** |
+| | **Golden Animal Cracker** | `(O)GoldenAnimalCracker` | 1 | 20.0 | 15.38% | **2.198%** |
+| | **Auto-Petter** | `(BC)272` | 1 | 20.0 | 15.38% | **2.198%** |
+| | **Galaxy Soul** | `(O)896` | 1 | 15.0 | 11.54% | **1.648%** |
+| | **Stardrop Tea** | `(O)StardropTea` | 1 – 2 | 15.0 | 11.54% | **1.648%** |
+| | **Prize Ticket** | `(O)PrizeTicket` | 2 – 5 | 15.0 | 11.54% | **1.648%** |
 | **Agriculture (~14.285%)**| **Hyper Speed-Gro** | `(O)918` | 10 – 30 | 20.0 | 13.07% | **1.867%** |
 | | **Deluxe Fertilizer** | `(O)919` | 10 – 30 | 20.0 | 13.07% | **1.867%** |
 | | **Rare Seed** | `(O)347` | 2 – 6 | 20.0 | 13.07% | **1.867%** |

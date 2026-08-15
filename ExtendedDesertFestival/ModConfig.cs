@@ -6,5 +6,7 @@ namespace ExtendedDesertFestival
         public bool EnableFall { get; set; } = true;
         public bool EnableWinter { get; set; } = true;
         public bool KeepEggs { get; set; } = true;
+        public int FestivalStartDay { get; set; } = 22;
+        public int FestivalEndDay { get; set; } = 24;
     }
 }
