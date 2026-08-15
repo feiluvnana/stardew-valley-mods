@@ -79,6 +79,13 @@ namespace BetterGeodeCracking
             // Consolidate identical items into stacks
             var consolidatedTreasures = ConsolidateTreasures(rawTreasures);
 
+            // Deduct geode stack first so inventory slot is freed up if fully consumed
+            geodeStack.Stack -= countToCrack;
+            if (geodeStack.Stack <= 0)
+            {
+                who.removeItemFromInventory(geodeStack);
+            }
+
             // Add consolidated treasures into player inventory or drop safely as debris
             foreach (var item in consolidatedTreasures)
             {
