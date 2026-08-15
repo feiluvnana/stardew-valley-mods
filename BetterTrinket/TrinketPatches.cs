@@ -121,7 +121,6 @@ namespace BetterTrinket
             Item dropInItem,
             bool probe,
             Farmer who,
-            bool destroyItem,
             ref bool __result)
         {
             if (__instance == null || !IsAnvil(__instance) || who == null)

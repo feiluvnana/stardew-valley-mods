@@ -68,12 +68,12 @@ namespace ExtendedDesertFestival
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
         }
 
-        public static void Utility_isFestivalDay_Postfix(int day, Season season, ref bool __result)
+        public static void Utility_isFestivalDay_Postfix(int dayOfMonth, Season season, ref bool __result)
         {
             if (__result)
                 return;
 
-            if (day >= Config.FestivalStartDay && day <= Config.FestivalEndDay)
+            if (dayOfMonth >= Config.FestivalStartDay && dayOfMonth <= Config.FestivalEndDay)
             {
                 if (Config.EnableSummer && season == Season.Summer)
                 {

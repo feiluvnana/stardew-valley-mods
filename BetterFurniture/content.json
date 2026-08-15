@@ -1,0 +1,17 @@
+{
+  "Format": "2.4.0",
+  "Changes": [
+    {
+      "Action": "Load",
+      "Target": "Mods/feiluvnana.BetterFurniture/Texture",
+      "FromFile": "assets/king_bed.png"
+    },
+    {
+      "Action": "EditData",
+      "Target": "Data/Furniture",
+      "Entries": {
+        "feiluvnana.BetterFurniture.KingBed": "King Bed/bed double/4 4/4 3/1/10000/-1/King Size Bed/0/Mods\\feiluvnana.BetterFurniture\\Texture/true"
+      }
+    }
+  ]
+}

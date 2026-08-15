@@ -82,7 +82,6 @@ namespace BetterProduct
             Item dropInItem,
             bool probe,
             Farmer who,
-            bool destroyItem,
             ref bool __result)
         {
             if (!Config.EnableDehydratorBalancing || !IsDehydrator(__instance) || dropInItem == null || who == null)
