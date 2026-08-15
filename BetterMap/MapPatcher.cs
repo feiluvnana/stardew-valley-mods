@@ -166,16 +166,26 @@ namespace BetterMap
                     buildings.Tiles[16, 16] = new StaticTile(buildings, tsIndoor, BlendMode.Alpha, 68);
                     front.Tiles[16, 16] = new StaticTile(front, tsIndoor, BlendMode.Alpha, 130);
 
-                    // Row 17 (Void row below all walls & doorway):
-                    for (int x = 12; x <= 16; x++)
+                    // Row 17 (Exit pathway row below walls & doorway):
+                    // Left and right void below doorframes
+                    back.Tiles[12, 17] = null;
+                    buildings.Tiles[12, 17] = new StaticTile(buildings, tsIndoor, BlendMode.Alpha, 0);
+                    front.Tiles[12, 17] = null;
+
+                    back.Tiles[16, 17] = null;
+                    buildings.Tiles[16, 17] = new StaticTile(buildings, tsIndoor, BlendMode.Alpha, 0);
+                    front.Tiles[16, 17] = null;
+
+                    // 3-wide exit pathway across x=13..15
+                    for (int x = 13; x <= 15; x++)
                     {
-                        back.Tiles[x, 17] = null;
-                        buildings.Tiles[x, 17] = new StaticTile(buildings, tsIndoor, BlendMode.Alpha, 0);
+                        back.Tiles[x, 17] = new StaticTile(back, tsIsland, BlendMode.Alpha, 181);
+                        buildings.Tiles[x, 17] = null;
                         front.Tiles[x, 17] = null;
                     }
 
-                    // Map Warps: allow exit from row 16 or walking down through row 17/18
-                    map.Properties["Warp"] = "13 17 IslandWest 77 40 14 17 IslandWest 77 40 15 17 IslandWest 77 40 13 18 IslandWest 77 40 14 18 IslandWest 77 40 15 18 IslandWest 77 40";
+                    // Map Warps: allow exit by stepping down onto row 18
+                    map.Properties["Warp"] = "13 18 IslandWest 77 40 14 18 IslandWest 77 40 15 18 IslandWest 77 40";
                     monitor.Log("Successfully patched IslandFarmHouse: Applied seamless 3x1 exit doorway flush with bottom wall.", LogLevel.Trace);
                 }
             }
@@ -282,9 +292,10 @@ namespace BetterMap
 
                 var buildings = map.GetLayer("Buildings");
                 var front = map.GetLayer("Front");
+                var back = map.GetLayer("Back");
                 var tsIndoor = map.GetTileSheet("indoor");
 
-                if (buildings != null && front != null && tsIndoor != null)
+                if (buildings != null && front != null && back != null && tsIndoor != null)
                 {
                     // Row above doorway (y=29): wood corner moldings at x=25 and x=29
                     front.Tiles[25, 29] = new StaticTile(front, tsIndoor, BlendMode.Alpha, 162);
@@ -306,6 +317,24 @@ namespace BetterMap
                     front.Tiles[26, 30] = new StaticTile(front, tsIndoor, BlendMode.Alpha, 165);
                     front.Tiles[27, 30] = new StaticTile(front, tsIndoor, BlendMode.Alpha, 165);
                     front.Tiles[28, 30] = new StaticTile(front, tsIndoor, BlendMode.Alpha, 165);
+
+                    // Row at exit step (y=31):
+                    // Left vertical dividing wall continues down at x=25
+                    buildings.Tiles[25, 31] = new StaticTile(buildings, tsIndoor, BlendMode.Alpha, 68);
+                    front.Tiles[25, 31] = new StaticTile(front, tsIndoor, BlendMode.Alpha, 68);
+
+                    // Clear any void blocker tiles at x=26, 27, 28 so player can exit across full 3-tile width
+                    for (int x = 26; x <= 28; x++)
+                    {
+                        back.Tiles[x, 31] = null;
+                        buildings.Tiles[x, 31] = null;
+                        front.Tiles[x, 31] = null;
+                    }
+
+                    // Void below right door jamb base at (29, 31)
+                    back.Tiles[29, 31] = null;
+                    buildings.Tiles[29, 31] = new StaticTile(buildings, tsIndoor, BlendMode.Alpha, 0);
+                    front.Tiles[29, 31] = new StaticTile(front, tsIndoor, BlendMode.Alpha, 0);
                 }
 
                 map.Properties["Warp"] = "26 31 Farm 64 15 27 31 Farm 64 15 28 31 Farm 64 15";
