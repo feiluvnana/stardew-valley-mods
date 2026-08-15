@@ -76,6 +76,14 @@ namespace BetterMap
 
             configMenu.AddBoolOption(
                 mod: ModManifest,
+                getValue: () => Config.RemoveFarmDriftwoodBarrier,
+                setValue: value => Config.RemoveFarmDriftwoodBarrier = value,
+                name: () => Helper.Translation.Get("gmcm.remove_farm_driftwood_barrier.name"),
+                tooltip: () => Helper.Translation.Get("gmcm.remove_farm_driftwood_barrier.tooltip")
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
                 getValue: () => Config.RemoveBeachFarmWreck,
                 setValue: value => Config.RemoveBeachFarmWreck = value,
                 name: () => Helper.Translation.Get("gmcm.remove_beach_farm_wreck.name"),
@@ -95,7 +103,7 @@ namespace BetterMap
         {
             Helper.GameContent.InvalidateCache("Maps/Island_S");
             Helper.GameContent.InvalidateCache("Maps/Island_W");
-            Monitor.Log("BetterMap: Invalided map cache and reloaded maps.", LogLevel.Debug);
+            Monitor.Log("BetterMap: Invalidated map cache and reloaded maps.", LogLevel.Debug);
         }
     }
 }

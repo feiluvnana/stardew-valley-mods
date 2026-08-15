@@ -105,7 +105,10 @@ namespace BetterTrinket
                     bestSeed = candSeed;
                 }
             }
-            trinket.generationSeed.Value = bestSeed;
+
+            // Apply stats and clear cached tooltip
+            trinket.RerollStats(bestSeed);
+            TrinketReforgeLogic.ResetCachedDescription(trinket, who);
 
             who.currentLocation.playSound("yoba");
             who.currentLocation.playSound("reward");

@@ -1,6 +1,8 @@
 {
   "gmcm.section.ginger_island.title": "Ginger Island Map Customization",
   "gmcm.section.ginger_island.description": "Configure map cleanup and obstacle removal for Ginger Island.",
+  "gmcm.remove_farm_driftwood_barrier.name": "Remove Farm Driftwood Fence & Logs",
+  "gmcm.remove_farm_driftwood_barrier.tooltip": "Removes the long horizontal driftwood fence and bleached log piles separating the upper path and the farmable field on Ginger Island Farm (Island West).",
   "gmcm.remove_beach_farm_wreck.name": "Remove Beach-Farm Passage Wreck",
   "gmcm.remove_beach_farm_wreck.tooltip": "Removes the wreckage, debris, and obstacle tiles along the pathway between Island South (beach) and Island West (farm) for a wide, clean transit.",
   "gmcm.remove_island_west_shipwreck.name": "Remove Island West Shipwreck",

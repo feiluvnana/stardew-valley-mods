@@ -1,5 +1,7 @@
 using System;
+using HarmonyLib;
 using StardewValley;
+using StardewValley.Extensions;
 using StardewValley.Objects.Trinkets;
 
 namespace BetterTrinket
@@ -18,105 +20,168 @@ namespace BetterTrinket
     {
         public const string ReforgeCountKey = "feiluvnana.BetterTrinket/ReforgeCount";
 
+        public static void ResetCachedDescription(Trinket trinket, Farmer? who)
+        {
+            if (trinket == null) return;
+
+            AccessTools.Field(typeof(Trinket), "_description")?.SetValue(trinket, null);
+            AccessTools.Field(typeof(Trinket), "displayNameOverride")?.SetValue(trinket, null);
+            AccessTools.Field(typeof(StardewValley.Object), "displayName")?.SetValue(trinket, null);
+
+            if (who != null && who.trinketItems.Contains(trinket))
+            {
+                trinket.Unapply(who);
+                trinket.Apply(who);
+            }
+        }
+
         public static TrinketEvaluation Evaluate(string itemId, int seed)
         {
             var eval = new TrinketEvaluation();
             Random r = Utility.CreateRandom(seed);
 
-            string cleanId = itemId.Replace("(TR)", "").Trim();
+            string cleanId = itemId.Replace("(TR)", "").Trim().ToLowerInvariant();
 
             switch (cleanId)
             {
-                case "FairyBox":
+                case "fairybox":
                 {
                     eval.MaxTier = 5;
-                    float roll = (float)r.NextDouble();
-                    if (roll < 0.03f) eval.Tier = 5;
-                    else if (roll < 0.12f) eval.Tier = 4;
-                    else if (roll < 0.30f) eval.Tier = 3;
-                    else if (roll < 0.60f) eval.Tier = 2;
-                    else eval.Tier = 1;
+                    int num = 1;
+                    if (r.NextBool(0.45)) num = 2;
+                    else if (r.NextBool(0.25)) num = 3;
+                    else if (r.NextBool(0.125)) num = 4;
+                    else if (r.NextBool(0.0675)) num = 5;
 
-                    eval.Score = (eval.Tier - 1) / 4.0f;
-                    eval.IsMaxRoll = eval.Tier == 5;
-                    float interval = 10.0f - eval.Tier * 1.2f;
-                    eval.Summary = $"Level {eval.Tier}/5 (Heal Pulse: {interval:0.0}s)";
+                    eval.Tier = num;
+                    eval.Score = (num - 1) / 4.0f;
+                    eval.IsMaxRoll = (num == 5);
+                    float interval = (5000 - num * 300) / 1000f;
+                    float power = 0.7f + num * 0.1f;
+                    eval.Summary = $"Level {num}/5 (Heal Pulse: {interval:0.0}s, Power: {power:0.0}x)";
                     break;
                 }
 
-                case "MagicQuiver":
+                case "magicquiver":
                 {
                     eval.MaxTier = 5;
-                    int delay = r.Next(54, 97); // 54 to 96 frames (0.9s to 1.6s)
-                    int minDmg = r.Next(20, 31);
-                    int maxDmg = r.Next(35, 46);
+                    int minDmg, maxDmg;
+                    float delay;
+                    string style = "Normal";
 
-                    float delayScore = 1.0f - ((delay - 54) / 42.0f);
-                    float dmgScore = ((minDmg - 20) / 10.0f + (maxDmg - 35) / 10.0f) / 2.0f;
-                    eval.Score = Math.Clamp(delayScore * 0.6f + dmgScore * 0.4f, 0f, 1f);
+                    if (r.NextBool(0.04))
+                    {
+                        style = "Perfect";
+                        minDmg = 30;
+                        maxDmg = 35;
+                        delay = 900f;
+                    }
+                    else if (r.NextBool(0.1))
+                    {
+                        if (r.NextBool(0.5))
+                        {
+                            style = "Rapid";
+                            minDmg = r.Next(10, 15) - 2;
+                            maxDmg = minDmg + 5;
+                            delay = 600 + r.Next(11) * 10;
+                        }
+                        else
+                        {
+                            style = "Heavy";
+                            minDmg = r.Next(25, 41) - 2;
+                            maxDmg = minDmg + 5;
+                            delay = 1500 + r.Next(6) * 100;
+                        }
+                    }
+                    else
+                    {
+                        minDmg = r.Next(15, 31) - 2;
+                        maxDmg = minDmg + 5;
+                        delay = 1100 + r.Next(11) * 100;
+                    }
 
-                    eval.Tier = 1 + (int)Math.Round(eval.Score * 4.0f);
-                    eval.IsMaxRoll = delay <= 56 && maxDmg >= 44;
-                    eval.Summary = $"Cooldown: {delay / 60.0f:0.00}s [0.90s-1.60s] | Dmg: {minDmg}-{maxDmg}";
+                    float avgDmg = (minDmg + maxDmg) / 2.0f;
+                    float dps = avgDmg / (delay / 1000f);
+                    eval.Score = Math.Clamp((dps - 10f) / 26f, 0f, 1f);
+                    eval.Tier = style switch
+                    {
+                        "Perfect" => 5,
+                        "Heavy" => 4,
+                        "Rapid" => 4,
+                        _ => Math.Clamp(1 + (int)Math.Round(eval.Score * 3.0f), 1, 5)
+                    };
+                    eval.IsMaxRoll = (style == "Perfect");
+                    eval.Summary = $"{style} | Cooldown: {delay / 1000f:0.00}s | Dmg: {minDmg}-{maxDmg}";
                     break;
                 }
 
-                case "IceRod":
+                case "icerod":
                 {
                     eval.MaxTier = 5;
-                    int delay = r.Next(180, 301); // 3.0s to 5.0s
-                    int duration = r.Next(180, 301); // 3.0s to 5.0s
+                    float delay = r.Next(3000, 5001);
+                    int freeze = r.Next(2000, 4001);
+                    bool isPerfect = false;
 
-                    float delayScore = 1.0f - ((delay - 180) / 120.0f);
-                    float durScore = (duration - 180) / 120.0f;
-                    eval.Score = Math.Clamp(delayScore * 0.5f + durScore * 0.5f, 0f, 1f);
+                    if (r.NextDouble() < 0.05)
+                    {
+                        isPerfect = true;
+                        delay = 3000f;
+                        freeze = 4000;
+                    }
 
-                    eval.Tier = 1 + (int)Math.Round(eval.Score * 4.0f);
-                    eval.IsMaxRoll = delay <= 190 && duration >= 290;
-                    eval.Summary = $"Delay: {delay / 60.0f:0.0}s [3.0s-5.0s] | Freeze: {duration / 60.0f:0.0}s [3.0s-5.0s]";
+                    float delayScore = 1.0f - ((delay - 3000f) / 2000f);
+                    float freezeScore = (freeze - 2000) / 2000f;
+                    eval.Score = isPerfect ? 1.0f : Math.Clamp(delayScore * 0.5f + freezeScore * 0.5f, 0f, 0.95f);
+                    eval.Tier = isPerfect ? 5 : Math.Clamp(1 + (int)Math.Round(eval.Score * 3.5f), 1, 5);
+                    eval.IsMaxRoll = isPerfect;
+                    eval.Summary = $"Delay: {delay / 1000f:0.0}s | Freeze: {freeze / 1000f:0.0}s{(isPerfect ? " (Perfect)" : "")}";
                     break;
                 }
 
-                case "GoldenSpur":
+                case "goldenspur":
+                case "iridiumspur":
                 {
                     eval.MaxTier = 5;
                     int duration = r.Next(5, 11); // 5 to 10 seconds
                     eval.Score = (duration - 5) / 5.0f;
-                    eval.Tier = duration - 5 + 1; // 1 to 6 mapped to 1..5
-                    if (eval.Tier > 5) eval.Tier = 5;
-                    eval.IsMaxRoll = duration >= 10;
-                    eval.Summary = $"Speed Duration: {duration}s [5s-10s]";
+                    eval.Tier = Math.Clamp(duration - 5 + 1, 1, 5);
+                    eval.IsMaxRoll = (duration == 10);
+                    eval.Summary = $"Crit Speed Boost: {duration}s [5s-10s]";
                     break;
                 }
 
-                case "ParrotEgg":
+                case "parrotegg":
                 {
                     eval.MaxTier = 4;
-                    int level = r.Next(1, 5); // 1 to 4
+                    int maxLevel = Math.Min(4, (int)(1 + (Game1.player?.totalMoneyEarned ?? 0) / 750000));
+                    int stat = r.Next(0, Math.Max(1, maxLevel));
+                    int level = stat + 1;
                     eval.Tier = level;
                     eval.Score = (level - 1) / 3.0f;
-                    eval.IsMaxRoll = level == 4;
-                    eval.Summary = $"Level {level}/4 ({level * 10}% Coin Chance)";
+                    eval.IsMaxRoll = (level == 4);
+                    eval.Summary = $"Level {level}/4 ({level * 10}% Gold Coin Drop Chance)";
                     break;
                 }
 
-                case "FrogEgg":
+                case "frogegg":
                 {
-                    eval.MaxTier = 6;
-                    int variant = r.Next(0, 6); // 0=Green, 1=Yellow, 2=Red, 3=Blue, 4=Void, 5=Prismatic
-                    eval.Tier = variant + 1;
-                    eval.Score = variant / 5.0f;
-                    eval.IsMaxRoll = variant == 5;
+                    eval.MaxTier = 7;
+                    int variant = 0;
+                    if (r.NextBool(0.2)) variant = 0;
+                    else if (r.NextBool(0.8)) variant = r.Next(3);
+                    else if (r.NextBool(0.8)) variant = r.Next(3) + 3;
+                    else variant = r.Next(2) + 6;
 
-                    string[] variantNames = { "Green", "Yellow", "Red", "Blue", "Void", "Prismatic" };
+                    string[] variantNames = { "Green", "Yellow", "Red", "Blue", "Void", "Poison", "Prismatic", "Prismatic" };
                     string name = variant >= 0 && variant < variantNames.Length ? variantNames[variant] : "Green";
-                    int level = Math.Min(5, variant + 1);
-                    float cd = 12.0f - level * 1.0f;
-                    eval.Summary = $"{name} Frog (Lvl {level}: {cd:0.0}s CD, {2.5f + level * 0.5f:0.0} Reach)";
+                    eval.Tier = Math.Clamp(variant + 1, 1, 7);
+                    eval.Score = variant / 6.0f;
+                    eval.IsMaxRoll = (variant >= 6);
+                    eval.Summary = $"{name} Frog Variant";
                     break;
                 }
 
-                case "BasiliskPaw":
+                case "basiliskpaw":
                 {
                     eval.MaxTier = 1;
                     eval.Tier = 1;
@@ -199,8 +264,9 @@ namespace BetterTrinket
                 }
             }
 
-            // Apply selected seed
-            trinket.generationSeed.Value = bestSeed;
+            // Apply selected seed and re-roll stats natively
+            trinket.RerollStats(bestSeed);
+            ResetCachedDescription(trinket, who);
 
             var finalEval = Evaluate(trinket.ItemId, bestSeed);
 
