@@ -20,24 +20,17 @@
   "tooltip.pity-counter": "Tiến trình bảo hiểm: {{count}}/{{max}} (Nâng cấp sau {{remaining}} lần rèn)",
   "tooltip.pity-guaranteed": "Tiến trình bảo hiểm: {{count}}/{{max}} ★ (CHẮC CHẮN NÂNG CẤP LẦN TIẾP THEO)",
   "tooltip.perfect-roll": "✦ ĐÃ ĐẠT CẤP ĐỘ HOÀN HẢO TỐI ĐA ✦",
-  "tooltip.ascended-badge": "🌈 THĂNG HOA: {{name}}",
+  "tooltip.ascended-badge": "🌈 THĂNG HOA",
 
   "hud.reforge-perfect": "✦ Rèn Hoàn Hảo! {{item}} của bạn đã đạt chỉ số tối đa! ✦",
   "hud.reforge-upgrade": "Đã nâng cấp {{item}} lên Bậc {{tier}}/{{maxTier}}!",
-  "hud.ascension-success": "🌈 Thăng Hoa Lăng Kính Hoàn Tất! Đã mở khóa {{skill}} cho {{item}}! 🌈",
+  "hud.ascension-success": "🌈 Thăng Hoa Lăng Kính Hoàn Tất cho {{item}}! 🌈",
 
-  "ascension.frogegg.name": "Bữa Tiệc No Say",
   "ascension.frogegg.desc": "Khi ếch nuốt quái vật, toàn bộ vật phẩm và phần thưởng rơi vẫn xuất hiện đầy đủ.",
-  "ascension.fairybox.name": "Hào Quang Hộ Thể",
   "ascension.fairybox.desc": "Nhịp hồi máu của tiên tử đồng thời hồi phục cho người chơi phụ, thú cưng và ngựa xung quanh.",
-  "ascension.parrotegg.name": "Thợ Săn Kho Báu",
   "ascension.parrotegg.desc": "Nhân đôi số lượng và tỷ lệ rơi tiền vàng khi tiêu diệt quái vật.",
-  "ascension.goldenspur.name": "Cuồng Chiến Thần Tốc",
   "ascension.goldenspur.desc": "Hiệu ứng tăng tốc khi đánh chí mạng đồng thời cộng thêm sát thương tấn công (+Attack).",
-  "ascension.magicquiver.name": "Xuyên Phá Thần Tiễn",
   "ascension.magicquiver.desc": "Mũi tên quang phổ xuyên qua toàn bộ quái vật trên đường bay thay vì dừng lại.",
-  "ascension.icerod.name": "Phá Băng Bạo Kích",
   "ascension.icerod.desc": "Tấn công quái vật đang bị đóng băng gây thêm lượng lớn sát thương vỡ băng.",
-  "ascension.basiliskpaw.name": "Phản Đòn Xà Vương",
   "ascension.basiliskpaw.desc": "Phản lại một phần sát thương nhận vào trực tiếp lên quái vật tấn công."
 }

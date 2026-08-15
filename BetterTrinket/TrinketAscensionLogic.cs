@@ -35,26 +35,26 @@ namespace BetterTrinket
             return false;
         }
 
-        public static (string Name, string Description)? GetAscensionDetails(string itemId)
+        public static string? GetAscensionDescription(string itemId)
         {
             string cleanId = itemId.Replace("(TR)", "").Trim().ToLowerInvariant();
 
             switch (cleanId)
             {
                 case "frogegg":
-                    return (ModEntry.I18n.Get("ascension.frogegg.name"), ModEntry.I18n.Get("ascension.frogegg.desc"));
+                    return ModEntry.I18n.Get("ascension.frogegg.desc");
                 case "fairybox":
-                    return (ModEntry.I18n.Get("ascension.fairybox.name"), ModEntry.I18n.Get("ascension.fairybox.desc"));
+                    return ModEntry.I18n.Get("ascension.fairybox.desc");
                 case "parrotegg":
-                    return (ModEntry.I18n.Get("ascension.parrotegg.name"), ModEntry.I18n.Get("ascension.parrotegg.desc"));
+                    return ModEntry.I18n.Get("ascension.parrotegg.desc");
                 case "goldenspur":
-                    return (ModEntry.I18n.Get("ascension.goldenspur.name"), ModEntry.I18n.Get("ascension.goldenspur.desc"));
+                    return ModEntry.I18n.Get("ascension.goldenspur.desc");
                 case "magicquiver":
-                    return (ModEntry.I18n.Get("ascension.magicquiver.name"), ModEntry.I18n.Get("ascension.magicquiver.desc"));
+                    return ModEntry.I18n.Get("ascension.magicquiver.desc");
                 case "icerod":
-                    return (ModEntry.I18n.Get("ascension.icerod.name"), ModEntry.I18n.Get("ascension.icerod.desc"));
+                    return ModEntry.I18n.Get("ascension.icerod.desc");
                 case "basiliskpaw":
-                    return (ModEntry.I18n.Get("ascension.basiliskpaw.name"), ModEntry.I18n.Get("ascension.basiliskpaw.desc"));
+                    return ModEntry.I18n.Get("ascension.basiliskpaw.desc");
                 default:
                     return null;
             }
@@ -107,14 +107,11 @@ namespace BetterTrinket
             }
             trinket.generationSeed.Value = bestSeed;
 
-            var details = GetAscensionDetails(trinket.ItemId);
-            string skillName = details?.Name ?? "Ascension Power";
-
             who.currentLocation.playSound("yoba");
             who.currentLocation.playSound("reward");
 
             Game1.addHUDMessage(new HUDMessage(
-                ModEntry.I18n.Get("hud.ascension-success", new { skill = skillName, item = trinket.DisplayName })
+                ModEntry.I18n.Get("hud.ascension-success", new { item = trinket.DisplayName })
             ));
 
             return true;

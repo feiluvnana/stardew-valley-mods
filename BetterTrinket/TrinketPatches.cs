@@ -246,11 +246,11 @@ namespace BetterTrinket
                 // Ascension Display
                 if (TrinketAscensionLogic.IsAscended(__instance))
                 {
-                    var details = TrinketAscensionLogic.GetAscensionDetails(__instance.ItemId);
-                    if (details.HasValue)
+                    string? desc = TrinketAscensionLogic.GetAscensionDescription(__instance.ItemId);
+                    if (!string.IsNullOrEmpty(desc))
                     {
-                        extra += $"\n\n{ModEntry.I18n.Get("tooltip.ascended-badge", new { name = details.Value.Name })}";
-                        extra += $"\n• {details.Value.Description}";
+                        extra += $"\n\n{ModEntry.I18n.Get("tooltip.ascended-badge")}";
+                        extra += $"\n• {desc}";
                     }
                 }
 

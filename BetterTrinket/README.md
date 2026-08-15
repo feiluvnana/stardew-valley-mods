@@ -19,14 +19,14 @@
   Configure the number of Iridium Bars required per roll (`IridiumBarCost: 3`, range 1–10) via Generic Mod Config Menu.
 
 - **🌈 1-Time Prismatic Ascension (1 Prismatic Shard at Anvil):**
-  Permanently ascend any trinket to unlock its unique signature skill:
-  - **🐸 Frog Egg:** *Full Harvest Feast / Bữa Tiệc No Say* — Swallowing monsters drops all of their normal loot and rewards.
-  - **🧚 Fairy Box:** *Sanctuary Bloom / Hào Quang Hộ Thể* — Heal pulses also restore health to nearby allies, farmhands, horses, and pets.
-  - **🦜 Parrot Egg:** *Treasure Hunter / Thợ Săn Kho Báu* — Doubles the amount and drop frequency of gold coins from monsters.
-  - **⚡ Golden Spur:** *Battle Frenzy / Cuồng Chiến Thần Tốc* — Critical strike speed buff also grants +Attack damage.
-  - **🏹 Magic Quiver:** *Spectral Piercer / Xuyên Phá Thần Tiễn* — Spectral arrows pierce through all enemies in their path.
-  - **❄️ Ice Rod:** *Shatter Strike / Phá Băng Bạo Kích* — Striking frozen enemies shatters the ice for bonus critical damage.
-  - **🛡️ Basilisk Paw:** *Gorgon's Retribution / Phản Đòn Xà Vương* — Reflects a portion of incoming damage back to attackers.
+  Permanently ascend any trinket to unlock its enhanced ascension effect:
+  - **🐸 Frog Egg:** Swallowing monsters drops all of their normal loot and rewards.
+  - **🧚 Fairy Box:** Heal pulses also restore health to nearby allies, farmhands, horses, and pets.
+  - **🦜 Parrot Egg:** Doubles the amount and drop frequency of gold coins from monsters.
+  - **⚡ Golden Spur:** Critical strike speed buff also grants +Attack damage.
+  - **🏹 Magic Quiver:** Spectral arrows pierce through all enemies in their path.
+  - **❄️ Ice Rod:** Striking frozen enemies shatters the ice for bonus critical damage.
+  - **🛡️ Basilisk Paw:** Reflects a portion of incoming damage back to attackers.
 
 - **🌐 Multi-Language Support:**
   Full native localization support for English and Vietnamese (`vi.json`).

@@ -20,24 +20,17 @@
   "tooltip.pity-counter": "Pity Progress: {{count}}/{{max}} (Upgrade in {{remaining}} rolls)",
   "tooltip.pity-guaranteed": "Pity Progress: {{count}}/{{max}} ★ (GUARANTEED UPGRADE NEXT ROLL)",
   "tooltip.perfect-roll": "✦ MAXIMUM TIER REACHED ✦",
-  "tooltip.ascended-badge": "🌈 ASCENDED: {{name}}",
+  "tooltip.ascended-badge": "🌈 ASCENDED",
 
   "hud.reforge-perfect": "✦ Perfect Reforge! Your {{item}} reached maximum stats! ✦",
   "hud.reforge-upgrade": "Upgraded {{item}} to Tier {{tier}}/{{maxTier}}!",
-  "hud.ascension-success": "🌈 Prismatic Ascension Complete! Unlocked {{skill}} on your {{item}}! 🌈",
+  "hud.ascension-success": "🌈 Prismatic Ascension Complete for {{item}}! 🌈",
 
-  "ascension.frogegg.name": "Full Harvest Feast",
   "ascension.frogegg.desc": "Swallowing monsters drops all of their normal loot and rewards.",
-  "ascension.fairybox.name": "Sanctuary Bloom",
   "ascension.fairybox.desc": "Fairy heal pulses also restore health to nearby allies, farmhands, horses, and pets.",
-  "ascension.parrotegg.name": "Treasure Hunter",
   "ascension.parrotegg.desc": "Doubles the amount and drop frequency of gold coins from defeated monsters.",
-  "ascension.goldenspur.name": "Battle Frenzy",
   "ascension.goldenspur.desc": "Critical strike speed buff also grants +Attack damage.",
-  "ascension.magicquiver.name": "Spectral Piercer",
   "ascension.magicquiver.desc": "Spectral arrows pierce through all enemies in their path.",
-  "ascension.icerod.name": "Shatter Strike",
   "ascension.icerod.desc": "Striking frozen enemies shatters the ice for bonus critical damage.",
-  "ascension.basiliskpaw.name": "Gorgon's Retribution",
   "ascension.basiliskpaw.desc": "Reflects a portion of incoming damage directly back to attackers."
 }
