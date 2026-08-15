@@ -171,11 +171,42 @@ namespace BetterGeodeCracking
                             return false; // Handled!
                         }
                     }
-                    else if (Config.FreeCracking && !isBulk && !Config.InstantCracking)
+                    else if (!isBulk && !Config.InstantCracking)
                     {
-                        // Vanilla non-instant single crack with free price
-                        __instance.startGeodeCrack();
-                        return false;
+                        // Single crack with Clint's animation
+                        if (__instance.geodeAnimationTimer <= 0 && __instance.heldItem != null)
+                        {
+                            int freeSpots = Game1.player.freeSpotsInInventory();
+                            if (freeSpots > 1 || (freeSpots == 1 && __instance.heldItem.Stack == 1))
+                            {
+                                if (__instance.heldItem.QualifiedItemId == "(O)791" && !Game1.netWorldState.Value.GoldenCoconutCracked)
+                                {
+                                    __instance.waitingForServerResponse = true;
+                                    Game1.player.team.goldenCoconutMutex.RequestLock(delegate
+                                    {
+                                        __instance.waitingForServerResponse = false;
+                                        __instance.geodeTreasureOverride = ItemRegistry.Create("(O)73");
+                                        __instance.startGeodeCrack();
+                                    }, delegate
+                                    {
+                                        __instance.waitingForServerResponse = false;
+                                        __instance.startGeodeCrack();
+                                    });
+                                }
+                                else
+                                {
+                                    __instance.startGeodeCrack();
+                                }
+                                return false;
+                            }
+                            else
+                            {
+                                __instance.descriptionText = Game1.content.LoadString("Strings\\UI:GeodeMenu_InventoryFull");
+                                __instance.wiggleWordsTimer = 500;
+                                __instance.alertTimer = 1500;
+                                return false;
+                            }
+                        }
                     }
                 }
             }

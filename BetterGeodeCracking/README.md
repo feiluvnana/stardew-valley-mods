@@ -7,10 +7,11 @@ A lightweight, high-performance quality-of-life mod for **Stardew Valley 1.6+** 
 ## 🌟 Key Features
 
 - **🆓 Free Cracking (0g Cost)**: Clint no longer charges 25g to crack geodes, troves, golden coconuts, or mystery boxes.
-- **⚡ Instant & Bulk Cracking**:
+- **⚡ Bulk Cracking & Free Processing**:
+  - **Click on Anvil**: Cracks 1 geode with Clint's hammering animation (100% free of charge).
   - **Shift + Click** on the anvil with any geode stack to instantly crack the whole stack.
   - **"Crack All" UI Button**: An in-menu button for one-click stack processing on mouse and controllers.
-  - Skips the slow 2.7-second single-geode animation.
+  - Optional **Instant Cracking** toggle in GMCM if you want to skip Clint's single-geode hammering animation as well.
 - **📦 Supports All Geode Items**:
   - Regular Geodes, Frozen Geodes, Magma Geodes, Omni Geodes
   - Artifact Troves
@@ -27,8 +28,8 @@ A lightweight, high-performance quality-of-life mod for **Stardew Valley 1.6+** 
 
 1. Visit Clint at the Blacksmith shop and select **"Process Geodes"**.
 2. Pick up a stack of geodes, troves, coconuts, or mystery boxes:
-   - **Click on Anvil**: Cracks 1 geode instantly.
-   - **Shift + Click on Anvil** or **Click "Crack All"**: Cracks the entire stack at once!
+   - **Click on Anvil**: Cracks 1 geode with Clint's animation for 0g.
+   - **Shift + Click on Anvil** or **Click "Crack All"**: Cracks the entire stack instantly!
 3. Enjoy your consolidated rewards!
 
 ---
@@ -39,7 +40,7 @@ A lightweight, high-performance quality-of-life mod for **Stardew Valley 1.6+** 
 | :--- | :---: | :--- |
 | `FreeCracking` | `true` | When enabled, cracking geodes costs 0g. |
 | `CustomCrackingPrice` | `0` | Price per geode if FreeCracking is turned off (0–100g). |
-| `InstantCracking` | `true` | Instantly cracks geodes without the 2.7s animation delay. |
+| `InstantCracking` | `false` | When enabled, skips Clint's animation for single cracks as well. |
 | `ShowCrackAllButton` | `true` | Displays the "Crack All" button in the Geode Menu. |
 | `BulkBatchSize` | `999` | Maximum quantity cracked in a single bulk action. |
 | `ShowSummaryToast` | `true` | Shows a HUD popup summarizing cracked geodes. |

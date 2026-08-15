@@ -1,0 +1,10 @@
+{
+  "FreeCracking": true,
+  "CrackingPrice": 0,
+  "InstantCracking": true,
+  "BulkBatchSize": 999,
+  "ShowCrackAllButton": true,
+  "ShowSummaryToast": true,
+  "InstantGeodeCrusher": false,
+  "GeodeCrusherRequiresCoal": true
+}

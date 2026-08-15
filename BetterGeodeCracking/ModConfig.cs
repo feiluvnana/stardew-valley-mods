@@ -8,8 +8,8 @@ namespace BetterGeodeCracking
         /// <summary>Custom price per geode if FreeCracking is false.</summary>
         public int CrackingPrice { get; set; } = 0;
 
-        /// <summary>Whether geode cracking is instantaneous (skips the 2.7-second animation).</summary>
-        public bool InstantCracking { get; set; } = true;
+        /// <summary>Whether geode cracking is instantaneous (skips Clint's hammering animation). Defaults to false so Clint's animation is on.</summary>
+        public bool InstantCracking { get; set; } = false;
 
         /// <summary>Maximum number of geodes to crack in a single bulk action (999 = full stack).</summary>
         public int BulkBatchSize { get; set; } = 999;

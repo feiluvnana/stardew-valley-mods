@@ -102,11 +102,11 @@ namespace BetterGeodeCracking
             result.CountCracked = countToCrack;
             result.Treasures = consolidatedTreasures;
 
-            // Optional HUD notification
-            if (config.ShowSummaryToast)
+            // Optional HUD notification for bulk actions
+            if (config.ShowSummaryToast && countToCrack > 1)
             {
                 string name = geodeStack.DisplayName;
-                Game1.addHUDMessage(new HUDMessage($"Cracked {countToCrack}x {name}!", HUDMessage.achievement_type));
+                Game1.addHUDMessage(new HUDMessage($"Cracked {countToCrack}x {name}"));
             }
 
             return result;
