@@ -2,28 +2,6 @@
   "Format": "2.4.0",
   "Changes": [
     {
-      "Action": "EditImage",
-      "Target": "Maps/walls_and_floors",
-      "FromFile": "assets/pastel_cream_wallpaper.png",
-      "ToArea": {
-        "X": 0,
-        "Y": 0,
-        "Width": 16,
-        "Height": 48
-      }
-    },
-    {
-      "Action": "EditImage",
-      "Target": "Maps/walls_and_floors",
-      "FromFile": "assets/pastel_pink_wallpaper.png",
-      "ToArea": {
-        "X": 16,
-        "Y": 0,
-        "Width": 16,
-        "Height": 48
-      }
-    },
-    {
       "Action": "Load",
       "Target": "Mods/feiluvnana.BetterFurniture/PrincessDoubleBed",
       "FromFile": "assets/princess_double_bed.png"
