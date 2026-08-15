@@ -69,6 +69,17 @@ namespace BetterForge
                     Monitor.Log("Hooked Trinket.getDescription successfully.", LogLevel.Trace);
                 }
 
+                // Patch Trinket.loadDisplayName for Maxed + Ascended "Perfect" name
+                var loadDisplayNameMethod = AccessTools.Method(typeof(Trinket), "loadDisplayName");
+                if (loadDisplayNameMethod != null)
+                {
+                    harmony.Patch(
+                        original: loadDisplayNameMethod,
+                        postfix: new HarmonyMethod(typeof(TrinketPatches), nameof(Trinket_loadDisplayName_Postfix))
+                    );
+                    Monitor.Log("Hooked Trinket.loadDisplayName successfully.", LogLevel.Trace);
+                }
+
                 // Patch Trinket.OnDamageMonster (called directly by GameLocation.damageMonster on every hit!)
                 var onDamageMonsterMethod = AccessTools.Method(
                     typeof(Trinket),
@@ -398,6 +409,39 @@ namespace BetterForge
             catch (Exception ex)
             {
                 Monitor.Log($"Error formatting trinket tooltip: {ex}", LogLevel.Trace);
+            }
+        }
+
+        public static void Trinket_loadDisplayName_Postfix(Trinket __instance, ref string __result)
+        {
+            if (__instance == null || string.IsNullOrEmpty(__result))
+                return;
+
+            try
+            {
+                // When trinket is both Maxed (Max Tier / Perfect Stats) AND Ascended, add "Perfect" prefix/suffix
+                if (TrinketAscensionLogic.IsAscended(__instance))
+                {
+                    var eval = TrinketReforgeLogic.Evaluate(__instance.ItemId, __instance.generationSeed.Value);
+                    if (eval.IsMaxRoll)
+                    {
+                        string baseName = __result;
+                        if (baseName.StartsWith("Perfect ", StringComparison.OrdinalIgnoreCase))
+                        {
+                            baseName = baseName.Substring(8).Trim();
+                        }
+                        if (baseName.EndsWith(" Hoàn Hảo", StringComparison.OrdinalIgnoreCase))
+                        {
+                            baseName = baseName.Substring(0, baseName.Length - 9).Trim();
+                        }
+
+                        __result = ModEntry.I18n.Get("trinket.perfect-name-format", new { name = baseName });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Monitor.Log($"Error formatting trinket display name: {ex}", LogLevel.Trace);
             }
         }
 

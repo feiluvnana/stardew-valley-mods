@@ -29,6 +29,7 @@
   "tooltip.perfect-roll": "✦ MAXIMUM TIER REACHED ✦",
   "tooltip.ascended-badge": "ASCENSION:",
   "tooltip.ascended-base-luck": "✦ [Base] +0.5 Luck while equipped.",
+  "trinket.perfect-name-format": "Perfect {{name}}",
 
   "hud.reforge-perfect": "✦ Perfect Upgrade! Your {{item}} reached maximum stats! ✦",
   "hud.reforge-upgrade": "Upgraded {{item}} to Tier {{tier}}/{{maxTier}}!",

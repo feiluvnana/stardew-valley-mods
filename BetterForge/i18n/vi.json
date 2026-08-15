@@ -29,6 +29,7 @@
   "tooltip.perfect-roll": "✦ ĐÃ ĐẠT PHẨM CHẤT TỐI ĐA ✦",
   "tooltip.ascended-badge": "THĂNG HOA:",
   "tooltip.ascended-base-luck": "✦ [Cơ Bản] +0.5 May Mắn khi trang bị.",
+  "trinket.perfect-name-format": "{{name}} Hoàn Hảo",
 
   "hud.reforge-perfect": "✦ Nâng Cấp Hoàn Hảo! {{item}} của bạn đã đạt chỉ số tối đa! ✦",
   "hud.reforge-upgrade": "Đã nâng cấp {{item}} lên Bậc {{tier}}/{{maxTier}}!",
