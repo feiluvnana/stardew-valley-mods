@@ -15,7 +15,7 @@ namespace BetterSkullCavernChest
 
         // Stack Multipliers (Jackpot critical procs on stackable items - Regular Chests)
         public float DoubleStackChance { get; set; } = 0.15f;
-        public float TripleStackChance { get; set; } = 0.05f;
+        public float TripleStackChance { get; set; } = 0.10f;
         public float QuadrupleStackChance { get; set; } = 0.0f;
         public float QuintupleStackChance { get; set; } = 0.0f;
 
@@ -37,8 +37,8 @@ namespace BetterSkullCavernChest
         public float Floor100QuadrupleStackChance { get; set; } = 0.10f;
         public float Floor100QuintupleStackChance { get; set; } = 0.05f;
 
-        // Category Weights (Target: 10% Legendary, 15% each for other 6 categories)
-        public double LegendaryWeight { get; set; } = 10.0;
+        // Category Weights (Equal 15.0 each, ~14.285% chance per category across all 7 categories)
+        public double LegendaryWeight { get; set; } = 15.0;
         public double AgricultureWeight { get; set; } = 15.0;
         public double MiningWeight { get; set; } = 15.0;
         public double FishingWeight { get; set; } = 15.0;

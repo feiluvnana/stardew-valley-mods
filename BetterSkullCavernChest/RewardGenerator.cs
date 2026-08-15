@@ -89,8 +89,14 @@ namespace BetterSkullCavernChest
             // =========================================================================
             new("(O)ChallengeBait", LootCategory.Fishing, 15, 45, 22.0, c => c.EnableFishingCategory && c.EnableFishingTackle),
             new("(O)DeluxeBait", LootCategory.Fishing, 20, 50, 22.0, c => c.EnableFishingCategory && c.EnableFishingTackle),
+            new("(O)908", LootCategory.Fishing, 10, 30, 20.0, c => c.EnableFishingCategory && c.EnableFishingTackle),  // Magic Bait
             new("(O)694", LootCategory.Fishing, 1, 3, 18.0, c => c.EnableFishingCategory && c.EnableFishingTackle),  // Trap Bobber
             new("(O)856", LootCategory.Fishing, 1, 2, 16.0, c => c.EnableFishingCategory && c.EnableFishingTackle),  // Curiosity Lure
+            new("(O)SeaJelly", LootCategory.Fishing, 1, 3, 16.0, c => c.EnableFishingCategory),                      // Sea Jelly
+            new("(O)RiverJelly", LootCategory.Fishing, 1, 3, 16.0, c => c.EnableFishingCategory),                    // River Jelly
+            new("(O)CaveJelly", LootCategory.Fishing, 1, 3, 16.0, c => c.EnableFishingCategory),                     // Cave Jelly
+            new("(O)265", LootCategory.Fishing, 2, 5, 15.0, c => c.EnableFishingCategory),                            // Seafoam Pudding
+            new("(O)242", LootCategory.Fishing, 3, 6, 15.0, c => c.EnableFishingCategory),                            // Dish O' The Sea
 
             // =========================================================================
             // === 5. COMBAT CATEGORY (15% Category Weight)                          ===
@@ -106,8 +112,11 @@ namespace BetterSkullCavernChest
             // =========================================================================
             // === 6. FORAGING CATEGORY (15% Category Weight)                        ===
             // =========================================================================
+            new("(O)709", LootCategory.Foraging, 20, 50, 22.0, c => c.EnableForagingCategory),                        // Hardwood
             new("(O)MysticTreeSeed", LootCategory.Foraging, 2, 6, 22.0, c => c.EnableForagingCategory),                  // Mystic Tree Seed
             new("(O)791", LootCategory.Foraging, 2, 6, 22.0, c => c.EnableForagingCategory),                            // Golden Coconut
+            new("(O)851", LootCategory.Foraging, 3, 8, 20.0, c => c.EnableForagingCategory),                            // Magma Cap
+            new("(O)422", LootCategory.Foraging, 5, 15, 20.0, c => c.EnableForagingCategory),                           // Purple Mushroom
             new("(O)261", LootCategory.Foraging, 3, 8, 20.0, c => c.EnableForagingCategory && c.EnableWarpTotems),     // Warp Totem: Desert
             new("(O)688", LootCategory.Foraging, 3, 8, 20.0, c => c.EnableForagingCategory && c.EnableWarpTotems),     // Warp Totem: Farm
 
