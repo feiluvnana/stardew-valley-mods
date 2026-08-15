@@ -8,8 +8,8 @@
     },
     {
       "Action": "Load",
-      "Target": "Mods/feiluvnana.BetterFurniture/PrincessChildBed",
-      "FromFile": "assets/princess_child_bed.png"
+      "Target": "Mods/feiluvnana.BetterFurniture/PrincessPastelWindow",
+      "FromFile": "assets/princess_pastel_window.png"
     },
     {
       "Action": "Load",
@@ -18,17 +18,41 @@
     },
     {
       "Action": "Load",
+      "Target": "Mods/feiluvnana.BetterFurniture/PrincessWallSconce",
+      "FromFile": "assets/princess_wall_sconce.png"
+    },
+    {
+      "Action": "Load",
       "Target": "Mods/feiluvnana.BetterFurniture/PrincessNightstand",
       "FromFile": "assets/princess_nightstand.png"
+    },
+    {
+      "Action": "Load",
+      "Target": "Mods/feiluvnana.BetterFurniture/PrincessGrandRug",
+      "FromFile": "assets/princess_grand_rug.png"
+    },
+    {
+      "Action": "Load",
+      "Target": "Mods/feiluvnana.BetterFurniture/PrincessRoyalSofa",
+      "FromFile": "assets/princess_royal_sofa.png"
+    },
+    {
+      "Action": "Load",
+      "Target": "Mods/feiluvnana.BetterFurniture/PrincessTeaTable",
+      "FromFile": "assets/princess_tea_table.png"
     },
     {
       "Action": "EditData",
       "Target": "Data/Furniture",
       "Entries": {
         "feiluvnana.BetterFurniture.PrincessDoubleBed": "Princess Double Bed/bed double/4 4/4 3/1/10000/-1/Princess Double Bed/0/Mods\\feiluvnana.BetterFurniture\\PrincessDoubleBed/true",
-        "feiluvnana.BetterFurniture.PrincessChildBed": "Princess Child Bed/bed child/2 4/2 3/1/5000/-1/Princess Child Bed/0/Mods\\feiluvnana.BetterFurniture\\PrincessChildBed/true",
+        "feiluvnana.BetterFurniture.PrincessPastelWindow": "Princess Pastel Window/window/2 3/2 3/1/2000/-1/Princess Pastel Window/0/Mods\\feiluvnana.BetterFurniture\\PrincessPastelWindow/true",
         "feiluvnana.BetterFurniture.PrincessWallMolding": "Princess Wall Molding/painting/2 2/2 2/1/1500/-1/Princess Wall Molding/0/Mods\\feiluvnana.BetterFurniture\\PrincessWallMolding/true",
-        "feiluvnana.BetterFurniture.PrincessNightstand": "Princess Nightstand/lamp/1 2/1 1/1/2000/-1/Princess Nightstand/0/Mods\\feiluvnana.BetterFurniture\\PrincessNightstand/true"
+        "feiluvnana.BetterFurniture.PrincessWallSconce": "Princess Wall Sconce/lamp/1 2/1 1/1/1000/-1/Princess Wall Sconce/0/Mods\\feiluvnana.BetterFurniture\\PrincessWallSconce/true",
+        "feiluvnana.BetterFurniture.PrincessNightstand": "Princess Nightstand/lamp/1 2/1 1/1/2000/-1/Princess Nightstand/0/Mods\\feiluvnana.BetterFurniture\\PrincessNightstand/true",
+        "feiluvnana.BetterFurniture.PrincessGrandRug": "Princess Grand Rug/rug/4 3/4 3/2/3000/-1/Princess Grand Rug/0/Mods\\feiluvnana.BetterFurniture\\PrincessGrandRug/true",
+        "feiluvnana.BetterFurniture.PrincessRoyalSofa": "Princess Royal Sofa/couch/3 2/3 1/1/4000/-1/Princess Royal Sofa/0/Mods\\feiluvnana.BetterFurniture\\PrincessRoyalSofa/true",
+        "feiluvnana.BetterFurniture.PrincessTeaTable": "Princess Tea Table/table/2 2/2 2/1/2500/-1/Princess Tea Table/0/Mods\\feiluvnana.BetterFurniture\\PrincessTeaTable/true"
       }
     }
   ]
