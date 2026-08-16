@@ -6,5 +6,5 @@
   "ShowCrackAllButton": true,
   "ShowSummaryToast": true,
   "InstantGeodeCrusher": true,
-  "GeodeCrusherRequiresCoal": true
+  "GeodeCrusherRequiresCoal": false
 }

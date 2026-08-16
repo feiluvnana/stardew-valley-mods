@@ -20,5 +20,7 @@
   "config.show-summary-toast.tooltip": "Displays a HUD notification summarizing cracked geodes.",
   "config.section.farm-machines": "Farm Machine Options",
   "config.instant-geode-crusher.name": "Instant Geode Crusher",
-  "config.instant-geode-crusher.tooltip": "Makes Geode Crusher machines on the farm process geodes immediately."
+  "config.instant-geode-crusher.tooltip": "Makes Geode Crusher machines on the farm process geodes immediately.",
+  "config.geode-crusher-requires-coal.name": "Geode Crusher Requires Coal",
+  "config.geode-crusher-requires-coal.tooltip": "Whether Geode Crusher machines require 1 Coal to operate."
 }

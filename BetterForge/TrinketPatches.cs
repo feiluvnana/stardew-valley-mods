@@ -24,9 +24,9 @@ namespace BetterForge
 
         public static void Apply(Harmony harmony)
         {
+            // 1. Patch Anvil check for action (right-click / activate)
             try
             {
-                // Patch Anvil check for action (right-click / activate)
                 var checkForActionMethod = AccessTools.Method(
                     typeof(StardewValley.Object),
                     nameof(StardewValley.Object.checkForAction),
@@ -41,8 +41,15 @@ namespace BetterForge
                     );
                     Monitor.Log("Hooked Object.checkForAction for Anvil successfully.", LogLevel.Trace);
                 }
+            }
+            catch (Exception ex)
+            {
+                Monitor.Log($"Error patching Object.checkForAction: {ex}", LogLevel.Error);
+            }
 
-                // Patch Anvil drop-in action
+            // 2. Patch Anvil drop-in action
+            try
+            {
                 var dropInMethod = AccessTools.Method(
                     typeof(StardewValley.Object),
                     nameof(StardewValley.Object.performObjectDropInAction),
@@ -57,8 +64,15 @@ namespace BetterForge
                     );
                     Monitor.Log("Hooked Object.performObjectDropInAction for Anvil successfully.", LogLevel.Trace);
                 }
+            }
+            catch (Exception ex)
+            {
+                Monitor.Log($"Error patching Object.performObjectDropInAction: {ex}", LogLevel.Error);
+            }
 
-                // Patch Trinket.getDescription
+            // 3. Patch Trinket.getDescription
+            try
+            {
                 var descMethod = AccessTools.Method(typeof(Trinket), nameof(Trinket.getDescription));
                 if (descMethod != null)
                 {
@@ -68,8 +82,15 @@ namespace BetterForge
                     );
                     Monitor.Log("Hooked Trinket.getDescription successfully.", LogLevel.Trace);
                 }
+            }
+            catch (Exception ex)
+            {
+                Monitor.Log($"Error patching Trinket.getDescription: {ex}", LogLevel.Error);
+            }
 
-                // Patch Trinket.loadDisplayName for Maxed + Ascended "Perfect" name
+            // 4. Patch Trinket.loadDisplayName for Maxed + Ascended "Perfect" name
+            try
+            {
                 var loadDisplayNameMethod = AccessTools.Method(typeof(Trinket), "loadDisplayName");
                 if (loadDisplayNameMethod != null)
                 {
@@ -79,8 +100,15 @@ namespace BetterForge
                     );
                     Monitor.Log("Hooked Trinket.loadDisplayName successfully.", LogLevel.Trace);
                 }
+            }
+            catch (Exception ex)
+            {
+                Monitor.Log($"Error patching Trinket.loadDisplayName: {ex}", LogLevel.Error);
+            }
 
-                // Patch Trinket.OnDamageMonster (called directly by GameLocation.damageMonster on every hit!)
+            // 5. Patch Trinket.OnDamageMonster (called on weapon/tool hits)
+            try
+            {
                 var onDamageMonsterMethod = AccessTools.Method(
                     typeof(Trinket),
                     nameof(Trinket.OnDamageMonster),
@@ -95,8 +123,15 @@ namespace BetterForge
                     );
                     Monitor.Log("Hooked Trinket.OnDamageMonster successfully.", LogLevel.Trace);
                 }
+            }
+            catch (Exception ex)
+            {
+                Monitor.Log($"Error patching Trinket.OnDamageMonster: {ex}", LogLevel.Error);
+            }
 
-                // Patch Farmer.takeDamage for Basilisk Reflection
+            // 6. Patch Farmer.takeDamage for Basilisk Reflection
+            try
+            {
                 var farmerDamageMethod = AccessTools.Method(
                     typeof(Farmer),
                     nameof(Farmer.takeDamage),
@@ -107,44 +142,125 @@ namespace BetterForge
                 {
                     harmony.Patch(
                         original: farmerDamageMethod,
+                        prefix: new HarmonyMethod(typeof(TrinketPatches), nameof(Farmer_takeDamage_Prefix)),
                         postfix: new HarmonyMethod(typeof(TrinketPatches), nameof(Farmer_takeDamage_Postfix))
                     );
                     Monitor.Log("Hooked Farmer.takeDamage for Damage Reflection successfully.", LogLevel.Trace);
                 }
+            }
+            catch (Exception ex)
+            {
+                Monitor.Log($"Error patching Farmer.takeDamage: {ex}", LogLevel.Error);
+            }
 
-                // Patch Projectile collision for Magic Quiver Pierce & Execution
-                var projectileCollisionMethod = AccessTools.Method(
-                    typeof(BasicProjectile),
-                    nameof(BasicProjectile.behaviorOnCollisionWithMonster),
-                    new[] { typeof(NPC), typeof(GameLocation) }
+            // 7. Patch MagicQuiverTrinketEffect.Update for Arrow Infinite Piercing
+            try
+            {
+                var quiverUpdateMethod = AccessTools.Method(
+                    typeof(MagicQuiverTrinketEffect),
+                    nameof(MagicQuiverTrinketEffect.Update),
+                    new[] { typeof(Farmer), typeof(GameTime), typeof(GameLocation) }
                 );
 
-                if (projectileCollisionMethod != null)
+                if (quiverUpdateMethod != null)
                 {
                     harmony.Patch(
-                        original: projectileCollisionMethod,
-                        postfix: new HarmonyMethod(typeof(TrinketPatches), nameof(BasicProjectile_behaviorOnCollisionWithMonster_Postfix))
+                        original: quiverUpdateMethod,
+                        postfix: new HarmonyMethod(typeof(TrinketPatches), nameof(MagicQuiverTrinketEffect_Update_Postfix))
                     );
-                    Monitor.Log("Hooked BasicProjectile for Magic Quiver Piercing & Execute successfully.", LogLevel.Trace);
+                    Monitor.Log("Hooked MagicQuiverTrinketEffect.Update successfully.", LogLevel.Trace);
                 }
+            }
+            catch (Exception ex)
+            {
+                Monitor.Log($"Error patching MagicQuiverTrinketEffect.Update: {ex}", LogLevel.Error);
+            }
 
-                // Patch HungryFrogCompanion.Update for Loot Drop and Cooldown Reset
-                var frogUpdateMethod = AccessTools.Method(
-                    typeof(HungryFrogCompanion),
-                    nameof(HungryFrogCompanion.Update),
+            // 8. Patch IceOrbTrinketEffect.Update for Ice Orb Multi-Target Collision
+            try
+            {
+                var iceOrbUpdateMethod = AccessTools.Method(
+                    typeof(IceOrbTrinketEffect),
+                    nameof(IceOrbTrinketEffect.Update),
+                    new[] { typeof(Farmer), typeof(GameTime), typeof(GameLocation) }
+                );
+
+                if (iceOrbUpdateMethod != null)
+                {
+                    harmony.Patch(
+                        original: iceOrbUpdateMethod,
+                        postfix: new HarmonyMethod(typeof(TrinketPatches), nameof(IceOrbTrinketEffect_Update_Postfix))
+                    );
+                    Monitor.Log("Hooked IceOrbTrinketEffect.Update successfully.", LogLevel.Trace);
+                }
+            }
+            catch (Exception ex)
+            {
+                Monitor.Log($"Error patching IceOrbTrinketEffect.Update: {ex}", LogLevel.Error);
+            }
+
+            // 8. Patch Projectile.update for Magic Quiver Pierce & Execution
+            try
+            {
+                var projectileUpdateMethod = AccessTools.Method(
+                    typeof(Projectile),
+                    nameof(Projectile.update),
                     new[] { typeof(GameTime), typeof(GameLocation) }
                 );
 
-                if (frogUpdateMethod != null)
+                if (projectileUpdateMethod != null)
                 {
                     harmony.Patch(
-                        original: frogUpdateMethod,
-                        prefix: new HarmonyMethod(typeof(TrinketPatches), nameof(HungryFrogCompanion_Update_Prefix))
+                        original: projectileUpdateMethod,
+                        postfix: new HarmonyMethod(typeof(TrinketPatches), nameof(Projectile_update_Postfix))
                     );
-                    Monitor.Log("Hooked HungryFrogCompanion.Update successfully.", LogLevel.Trace);
+                    Monitor.Log("Hooked Projectile.update for Magic Quiver Piercing & Execute successfully.", LogLevel.Trace);
+                }
+            }
+            catch (Exception ex)
+            {
+                Monitor.Log($"Error patching Projectile.update: {ex}", LogLevel.Error);
+            }
+
+            // 9. Patch HungryFrogCompanion for Loot Drop and Cooldown Reset
+            try
+            {
+                var tongueReachedMethod = AccessTools.Method(
+                    typeof(HungryFrogCompanion),
+                    nameof(HungryFrogCompanion.tongueReachedMonster),
+                    new[] { typeof(Monster) }
+                );
+                if (tongueReachedMethod != null)
+                {
+                    harmony.Patch(
+                        original: tongueReachedMethod,
+                        postfix: new HarmonyMethod(typeof(TrinketPatches), nameof(HungryFrogCompanion_tongueReachedMonster_Postfix))
+                    );
+                    Monitor.Log("Hooked HungryFrogCompanion.tongueReachedMonster successfully.", LogLevel.Trace);
                 }
 
-                // Patch FairyBoxTrinketEffect.Update for Ally Heal & +1 Defense Blessing
+                var fullnessTimerMethod = AccessTools.Method(
+                    typeof(HungryFrogCompanion),
+                    "triggerFullnessTimer"
+                );
+                if (fullnessTimerMethod != null)
+                {
+                    harmony.Patch(
+                        original: fullnessTimerMethod,
+                        prefix: new HarmonyMethod(typeof(TrinketPatches), nameof(HungryFrogCompanion_triggerFullnessTimer_Prefix)),
+                        postfix: new HarmonyMethod(typeof(TrinketPatches), nameof(HungryFrogCompanion_triggerFullnessTimer_Postfix))
+                    );
+                    Monitor.Log("Hooked HungryFrogCompanion.triggerFullnessTimer successfully.", LogLevel.Trace);
+                }
+            }
+            catch (Exception ex)
+            {
+                Monitor.Log($"Error patching HungryFrogCompanion: {ex}", LogLevel.Error);
+            }
+
+            // 10. Patch FairyBoxTrinketEffect.Update for Ally Heal & +1 Defense Blessing
+            try
+            {
                 var fairyUpdateMethod = AccessTools.Method(
                     typeof(FairyBoxTrinketEffect),
                     nameof(FairyBoxTrinketEffect.Update),
@@ -160,8 +276,15 @@ namespace BetterForge
                     );
                     Monitor.Log("Hooked FairyBoxTrinketEffect.Update successfully.", LogLevel.Trace);
                 }
+            }
+            catch (Exception ex)
+            {
+                Monitor.Log($"Error patching FairyBoxTrinketEffect.Update: {ex}", LogLevel.Error);
+            }
 
-                // Patch Item.canStackWith to protect Ascension and Stats
+            // 11. Patch Item.canStackWith to protect Ascension and Stats
+            try
+            {
                 var canStackMethod = AccessTools.Method(
                     typeof(Item),
                     nameof(Item.canStackWith),
@@ -176,8 +299,15 @@ namespace BetterForge
                     );
                     Monitor.Log("Hooked Item.canStackWith successfully.", LogLevel.Trace);
                 }
+            }
+            catch (Exception ex)
+            {
+                Monitor.Log($"Error patching Item.canStackWith: {ex}", LogLevel.Error);
+            }
 
-                // Patch Item.getOne to preserve Ascension and ModData
+            // 12. Patch Item.getOne to preserve Ascension and ModData
+            try
+            {
                 var getOneMethod = AccessTools.Method(
                     typeof(Item),
                     nameof(Item.getOne)
@@ -194,7 +324,33 @@ namespace BetterForge
             }
             catch (Exception ex)
             {
-                Monitor.Log($"Failed to apply TrinketPatches: {ex}", LogLevel.Error);
+                Monitor.Log($"Error patching Item.getOne: {ex}", LogLevel.Error);
+            }
+
+            // 13. Patch GameLocation.damageMonster for Spur +10% Crit Chance
+            try
+            {
+                var damageMonsterMethod = AccessTools.Method(
+                    typeof(GameLocation),
+                    nameof(GameLocation.damageMonster),
+                    new[] {
+                        typeof(Rectangle), typeof(int), typeof(int), typeof(bool), typeof(float),
+                        typeof(int), typeof(float), typeof(float), typeof(bool), typeof(Farmer), typeof(bool)
+                    }
+                );
+
+                if (damageMonsterMethod != null)
+                {
+                    harmony.Patch(
+                        original: damageMonsterMethod,
+                        prefix: new HarmonyMethod(typeof(TrinketPatches), nameof(GameLocation_damageMonster_Prefix))
+                    );
+                    Monitor.Log("Hooked GameLocation.damageMonster for Spur Crit Chance successfully.", LogLevel.Trace);
+                }
+            }
+            catch (Exception ex)
+            {
+                Monitor.Log($"Error patching GameLocation.damageMonster: {ex}", LogLevel.Error);
             }
         }
 
@@ -395,12 +551,16 @@ namespace BetterForge
 
                     if (!string.IsNullOrEmpty(desc))
                     {
-                        if (!__result.Contains(desc))
+                        if (!__result.Contains(badge) && !__result.Contains(desc))
                         {
-                            __result += $"\n\n{badge}\n{baseLuck}\n✦ {desc}";
+                            string wrappedDesc = Game1.smallFont != null
+                                ? Game1.parseText("✦ " + desc, Game1.smallFont, 320)
+                                : "✦ " + desc;
+
+                            __result += $"\n\n{badge}\n{baseLuck}\n{wrappedDesc}";
                         }
                     }
-                    else if (!__result.Contains(baseLuck))
+                    else if (!__result.Contains(badge) && !__result.Contains(baseLuck))
                     {
                         __result += $"\n\n{badge}\n{baseLuck}";
                     }
@@ -445,122 +605,241 @@ namespace BetterForge
             }
         }
 
-        // Hooked directly from Trinket.OnDamageMonster (called on every weapon/tool hit against monsters)
+        // Patch GameLocation.damageMonster to grant +10% Crit Chance for Ascended Spur
+        public static void GameLocation_damageMonster_Prefix(Farmer who, ref float critChance)
+        {
+            if (who != null && (TrinketAscensionLogic.HasAscendedTrinket(who, "spur") || TrinketAscensionLogic.HasAscendedTrinket(who, "goldenspur") || TrinketAscensionLogic.HasAscendedTrinket(who, "iridiumspur") || TrinketAscensionLogic.HasAscendedTrinket(who, "iridium")))
+            {
+                critChance += 0.10f; // +10% Critical Strike Chance
+            }
+        }
+
+        // Hooked directly from Trinket.OnDamageMonster (called on weapon/tool hits)
         public static void Trinket_OnDamageMonster_Postfix(Trinket __instance, Farmer farmer, Monster monster, int damageAmount, bool isBomb, bool isCriticalHit)
         {
             if (farmer == null || monster == null || damageAmount <= 0) return;
 
-            // 1. Golden Spur: Crit Damage & Attack Buff
-            if (isCriticalHit && (TrinketAscensionLogic.HasAscendedTrinket(farmer, "GoldenSpur") || TrinketAscensionLogic.HasAscendedTrinket(farmer, "spur")))
+            // 1. Golden / Iridium Spur: Crit Damage & Attack Buff
+            if (isCriticalHit && (TrinketAscensionLogic.HasAscendedTrinket(farmer, "spur") || TrinketAscensionLogic.HasAscendedTrinket(farmer, "golden") || TrinketAscensionLogic.HasAscendedTrinket(farmer, "iridium")))
             {
                 TrinketAscensionLogic.TriggerGoldenSpurCritBonus(farmer, monster, damageAmount);
             }
 
             // 2. Ice Rod: Shatter Strike & Frost Slow Wave on Frozen Monsters
-            if (monster.stunTime.Value > 0 && (TrinketAscensionLogic.HasAscendedTrinket(farmer, "IceRod") || TrinketAscensionLogic.HasAscendedTrinket(farmer, "ice")))
+            if (monster.stunTime.Value > 50 && (TrinketAscensionLogic.HasAscendedTrinket(farmer, "ice") || TrinketAscensionLogic.HasAscendedTrinket(farmer, "rod")))
             {
                 TrinketAscensionLogic.TriggerIceShatterAndSlowNearby(monster, farmer);
             }
 
             // 3. Basilisk Paw: 20% Lifesteal on Hit
-            if (TrinketAscensionLogic.HasAscendedTrinket(farmer, "BasiliskPaw") || TrinketAscensionLogic.HasAscendedTrinket(farmer, "basilisk"))
+            if (TrinketAscensionLogic.HasAscendedTrinket(farmer, "basilisk") || TrinketAscensionLogic.HasAscendedTrinket(farmer, "paw"))
             {
                 TrinketAscensionLogic.TriggerBasiliskLifesteal(farmer, damageAmount);
             }
 
-            // 4. Parrot Egg: 25% Chance for Extra Loot Drop on Monster Kill
+            // 4. Parrot Egg: 2x Gold Coins & 35% Chance for Extra Loot Drop
             if (monster.Health <= 0 || monster.Health <= damageAmount)
             {
-                if (TrinketAscensionLogic.HasAscendedTrinket(farmer, "ParrotEgg") || TrinketAscensionLogic.HasAscendedTrinket(farmer, "parrot"))
+                if (TrinketAscensionLogic.HasAscendedTrinket(farmer, "parrot"))
                 {
+                    monster.objectsToDrop.Add("GoldCoin");
+                    monster.objectsToDrop.Add("GoldCoin");
                     TrinketAscensionLogic.TriggerParrotBonusLoot(monster, farmer);
                 }
             }
         }
 
-        public static void Farmer_takeDamage_Postfix(Farmer __instance, int damage, bool fromBomb, Monster damager, int __result)
+        // Hooked from Farmer.takeDamage (void return type)
+        public static void Farmer_takeDamage_Prefix(Farmer __instance, int damage, bool overrideParry, Monster damager, out bool __state)
         {
-            if (__instance == null || damager == null || damage <= 0) return;
+            __state = __instance != null && damager != null && __instance.CanBeDamaged() && !damager.isInvincible();
+        }
+
+        public static void Farmer_takeDamage_Postfix(Farmer __instance, int damage, bool overrideParry, Monster damager, bool __state)
+        {
+            if (!__state || __instance == null || damager == null || damage <= 0) return;
 
             // Basilisk Paw: Reflect 50% damage back to attacking monster
-            if (TrinketAscensionLogic.HasAscendedTrinket(__instance, "BasiliskPaw") || TrinketAscensionLogic.HasAscendedTrinket(__instance, "basilisk"))
+            if (TrinketAscensionLogic.HasAscendedTrinket(__instance, "basilisk") || TrinketAscensionLogic.HasAscendedTrinket(__instance, "paw"))
             {
                 TrinketAscensionLogic.TriggerDamageReflect(damager, __instance, damage);
             }
         }
 
-        public static void BasicProjectile_behaviorOnCollisionWithMonster_Postfix(BasicProjectile __instance, NPC n, GameLocation location)
+        // Magic Quiver arrow infinite piercing (each enemy damaged at most once per arrow)
+        private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<Projectile, System.Collections.Generic.HashSet<Monster>> _arrowHitMonsters = new();
+        private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<Projectile, System.Collections.Generic.HashSet<Monster>> _iceOrbHitMonsters = new();
+
+        public static void MagicQuiverTrinketEffect_Update_Postfix(MagicQuiverTrinketEffect __instance, Farmer farmer, GameLocation location)
         {
-            if (__instance == null || location == null) return;
+            if (__instance == null || farmer == null || location == null) return;
 
-            Farmer? farmer = __instance.GetPlayerWhoFiredMe(location) ?? Game1.player;
-            if (farmer != null && (TrinketAscensionLogic.HasAscendedTrinket(farmer, "MagicQuiver") || TrinketAscensionLogic.HasAscendedTrinket(farmer, "quiver")))
+            if (TrinketAscensionLogic.HasAscendedTrinket(farmer, "quiver") || TrinketAscensionLogic.HasAscendedTrinket(farmer, "magicquiver"))
             {
-                // Guarantee arrow pierces infinitely through all monsters
-                __instance.piercesLeft.Value = 99999;
-
-                // Execute low-HP monsters below 15% HP or <= 30 HP
-                if (n is Monster monster)
+                foreach (var proj in location.projectiles)
                 {
-                    TrinketAscensionLogic.TriggerQuiverExecute(monster, farmer, location);
+                    if (proj is BasicProjectile bp && bp.projectileID.Value == 14 && bp.theOneWhoFiredMe.Get(location) == farmer)
+                    {
+                        bp.ignoreCharacterCollisions.Value = true;
+                        bp.piercesLeft.Value = 99999;
+                    }
                 }
             }
         }
 
-        public static void HungryFrogCompanion_Update_Prefix(HungryFrogCompanion __instance, GameTime time, GameLocation location)
+        public static void IceOrbTrinketEffect_Update_Postfix(IceOrbTrinketEffect __instance, Farmer farmer, GameLocation location)
+        {
+            if (__instance == null || farmer == null || location == null) return;
+
+            if (TrinketAscensionLogic.HasAscendedTrinket(farmer, "icerod") || TrinketAscensionLogic.HasAscendedTrinket(farmer, "iceorb"))
+            {
+                foreach (var proj in location.projectiles)
+                {
+                    if (proj is DebuffingProjectile dp && dp.debuff.Value == "frozen" && dp.theOneWhoFiredMe.Get(location) == farmer)
+                    {
+                        dp.ignoreCharacterCollisions.Value = true;
+                        dp.piercesLeft.Value = 99999;
+                    }
+                }
+            }
+        }
+
+        public static void Projectile_update_Postfix(Projectile __instance, GameTime time, GameLocation location, ref bool __result)
         {
             if (__instance == null || location == null) return;
 
-            Farmer? owner = __instance.Owner;
-            if (owner == null) return;
-
-            Monster? attached = TrinketAscensionLogic.GetFrogAttachedMonster(__instance, location);
-            if (attached != null)
+            // 1. Magic Quiver Arrow: Multi-target sweeping piercing & execution
+            if (__instance is BasicProjectile bp && bp.projectileID.Value == 14)
             {
-                var tongueReturn = AccessTools.Field(typeof(HungryFrogCompanion), "tongueReturn")?.GetValue(__instance) as Netcode.NetBool;
-                if (tongueReturn?.Value == true)
+                Farmer? farmer = bp.GetPlayerWhoFiredMe(location);
+                if (farmer != null && (TrinketAscensionLogic.HasAscendedTrinket(farmer, "quiver") || TrinketAscensionLogic.HasAscendedTrinket(farmer, "magicquiver")))
                 {
-                    var tonguePos = AccessTools.Field(typeof(HungryFrogCompanion), "tonguePosition")?.GetValue(__instance) as StardewValley.Network.NetPosition;
-                    float dist = tonguePos != null ? Vector2.Distance(__instance.Position, tonguePos.Value) : 0f;
-                    if (dist <= 48f)
+                    bp.ignoreCharacterCollisions.Value = true;
+                    bp.piercesLeft.Value = 99999;
+
+                    Rectangle arrowBounds = bp.getBoundingBox();
+                    var hitList = _arrowHitMonsters.GetOrCreateValue(bp);
+
+                    for (int i = 0; i < location.characters.Count; i++)
                     {
-                        if (TrinketAscensionLogic.HasAscendedTrinket(owner, "FrogEgg") || TrinketAscensionLogic.HasAscendedTrinket(owner, "frog"))
+                        if (location.characters[i] is Monster monster && !monster.IsInvisible && arrowBounds.Intersects(monster.GetBoundingBox()))
                         {
-                            TrinketAscensionLogic.TriggerFrogLootDrop(attached, owner);
-                            TrinketAscensionLogic.TriggerFrogCooldownReset(__instance, owner);
+                            if (hitList.Add(monster))
+                            {
+                                location.damageMonster(monster.GetBoundingBox(), bp.damageToFarmer.Value, bp.damageToFarmer.Value + 1, false, farmer, true);
+                                TrinketAscensionLogic.TriggerQuiverExecute(monster, farmer, location);
+                                location.playSound("hitEnemy");
+                                Game1.createRadialDebris(location, 12, (int)monster.Position.X + 32, (int)monster.Position.Y + 32, 4, false);
+                            }
+                        }
+                    }
+                }
+            }
+
+            // 2. Ice Rod Orb: Multi-target sweeping freeze with expanded hitbox
+            if (__instance is DebuffingProjectile dp && dp.debuff.Value == "frozen")
+            {
+                Farmer? farmer = dp.theOneWhoFiredMe.Get(location) as Farmer;
+                if (farmer != null && (TrinketAscensionLogic.HasAscendedTrinket(farmer, "icerod") || TrinketAscensionLogic.HasAscendedTrinket(farmer, "iceorb")))
+                {
+                    dp.ignoreCharacterCollisions.Value = true;
+                    dp.piercesLeft.Value = 99999;
+
+                    Rectangle orbBounds = dp.getBoundingBox();
+                    orbBounds.Inflate(12, 12);
+                    var hitList = _iceOrbHitMonsters.GetOrCreateValue(dp);
+
+                    for (int i = 0; i < location.characters.Count; i++)
+                    {
+                        if (location.characters[i] is Monster monster && !monster.IsInvisible && !monster.isInvincible() && orbBounds.Intersects(monster.GetBoundingBox()))
+                        {
+                            if (hitList.Add(monster))
+                            {
+                                int freezeDuration = dp.debuffIntensity.Value > 0 ? dp.debuffIntensity.Value : 4000;
+                                monster.stunTime.Value = freezeDuration;
+                                location.playSound("frozen");
+
+                                location.temporarySprites.Add(new TemporaryAnimatedSprite("LooseSprites\\Cursors2", new Rectangle(118, 227, 16, 13), new Vector2(0f, 0f), flipped: false, 0f, Color.White)
+                                {
+                                    layerDepth = (float)(monster.StandingPixel.Y + 2) / 10000f,
+                                    animationLength = 1,
+                                    interval = freezeDuration,
+                                    scale = 4f,
+                                    id = (int)(monster.position.X * 777f + monster.position.Y * 77777f),
+                                    positionFollowsAttachedCharacter = true,
+                                    attachedCharacter = monster
+                                });
+
+                                Game1.createRadialDebris(location, 10, (int)monster.Position.X + 32, (int)monster.Position.Y + 32, 6, false);
+                            }
                         }
                     }
                 }
             }
         }
 
-        private static float _prevFairyTimer = 0f;
-        private static int _prevFairyHealth = 0;
+        // Frog Companion Swallow Loot & Cooldown Reset
+        private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<HungryFrogCompanion, Monster> _frogAttachedMonsters = new();
 
-        public static void FairyBoxTrinketEffect_Update_Prefix(FairyBoxTrinketEffect __instance, Farmer farmer)
+        public static void HungryFrogCompanion_tongueReachedMonster_Postfix(HungryFrogCompanion __instance, Monster m)
         {
-            if (__instance != null && farmer != null)
+            if (__instance != null && m != null)
             {
-                _prevFairyTimer = __instance.HealTimer;
-                _prevFairyHealth = farmer.health;
+                _frogAttachedMonsters.AddOrUpdate(__instance, m);
             }
         }
 
-        public static void FairyBoxTrinketEffect_Update_Postfix(FairyBoxTrinketEffect __instance, Farmer farmer)
+        public static void HungryFrogCompanion_triggerFullnessTimer_Prefix(HungryFrogCompanion __instance)
         {
-            if (__instance == null || farmer == null) return;
+            if (__instance == null) return;
 
-            // Detect if a heal pulse just fired (HealTimer reset or health restored)
-            bool healTriggered = (_prevFairyTimer <= 100f && __instance.HealTimer >= __instance.HealDelay - 150f)
-                              || (farmer.health > _prevFairyHealth && _prevFairyHealth > 0);
-
-            if (healTriggered)
+            Farmer? owner = __instance.Owner;
+            if (owner != null && (TrinketAscensionLogic.HasAscendedTrinket(owner, "frog") || TrinketAscensionLogic.HasAscendedTrinket(owner, "frogegg")))
             {
-                if (TrinketAscensionLogic.HasAscendedTrinket(farmer, "FairyBox") || TrinketAscensionLogic.HasAscendedTrinket(farmer, "fairy"))
+                if (_frogAttachedMonsters.TryGetValue(__instance, out Monster? m) && m != null)
                 {
-                    int healAmount = Math.Max(2, (int)(farmer.maxHealth * 0.05f * __instance.Power));
-                    TrinketAscensionLogic.TriggerFairyAllyHealAndBlessing(farmer, healAmount);
+                    TrinketAscensionLogic.TriggerFrogLootDrop(m, owner);
+                    _frogAttachedMonsters.Remove(__instance);
                 }
+            }
+        }
+
+        public static void HungryFrogCompanion_triggerFullnessTimer_Postfix(HungryFrogCompanion __instance)
+        {
+            if (__instance == null) return;
+
+            Farmer? owner = __instance.Owner;
+            if (owner != null && (TrinketAscensionLogic.HasAscendedTrinket(owner, "frog") || TrinketAscensionLogic.HasAscendedTrinket(owner, "frogegg")))
+            {
+                // 45% chance to immediately reset fullness cooldown
+                if (Game1.random.NextDouble() < 0.45)
+                {
+                    TrinketAscensionLogic.TriggerFrogCooldownReset(__instance, owner);
+                }
+            }
+        }
+
+        // Fairy Box Ally Heal & Defense Blessing
+        public static void FairyBoxTrinketEffect_Update_Prefix(FairyBoxTrinketEffect __instance, Farmer farmer, GameTime time, out bool __state)
+        {
+            __state = false;
+            if (__instance != null && farmer != null && time != null)
+            {
+                if (__instance.HealTimer + (float)time.ElapsedGameTime.TotalMilliseconds >= __instance.HealDelay)
+                {
+                    __state = true;
+                }
+            }
+        }
+
+        public static void FairyBoxTrinketEffect_Update_Postfix(FairyBoxTrinketEffect __instance, Farmer farmer, bool __state)
+        {
+            if (__instance == null || farmer == null || !__state) return;
+
+            if (TrinketAscensionLogic.HasAscendedTrinket(farmer, "fairy") || TrinketAscensionLogic.HasAscendedTrinket(farmer, "fairybox"))
+            {
+                int healAmount = Math.Max(4, (int)(farmer.maxHealth * 0.05f * __instance.Power));
+                TrinketAscensionLogic.TriggerFairyAllyHealAndBlessing(farmer, healAmount);
             }
         }
     }

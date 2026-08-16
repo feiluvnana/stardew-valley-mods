@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
+using StardewValley.GameData.Machines;
 
 namespace BetterGeodeCracking
 {
@@ -18,7 +20,45 @@ namespace BetterGeodeCracking
 
             GeodePatches.Apply(ModManifest.UniqueID, Monitor, Config);
 
+            Helper.Events.Content.AssetRequested += OnAssetRequested;
             Helper.Events.GameLoop.GameLaunched += OnGameLaunched;
+        }
+
+        private void OnAssetRequested(object? sender, AssetRequestedEventArgs e)
+        {
+            if (e.NameWithoutLocale.IsEquivalentTo("Data/Machines"))
+            {
+                e.Edit(asset =>
+                {
+                    var data = asset.AsDictionary<string, MachineData>().Data;
+                    if (data.TryGetValue("(BC)182", out var geodeCrusher))
+                    {
+                        if (Config.InstantGeodeCrusher)
+                        {
+                            if (geodeCrusher.OutputRules != null)
+                            {
+                                foreach (var rule in geodeCrusher.OutputRules)
+                                {
+                                    rule.MinutesUntilReady = 0;
+                                }
+                            }
+                        }
+
+                        if (!Config.GeodeCrusherRequiresCoal)
+                        {
+                            geodeCrusher.AdditionalConsumedItems?.Clear();
+                            geodeCrusher.InvalidCountMessage = null;
+                            if (geodeCrusher.OutputRules != null)
+                            {
+                                foreach (var rule in geodeCrusher.OutputRules)
+                                {
+                                    rule.InvalidCountMessage = null;
+                                }
+                            }
+                        }
+                    }
+                });
+            }
         }
 
         private void OnGameLaunched(object? sender, GameLaunchedEventArgs e)
@@ -29,8 +69,14 @@ namespace BetterGeodeCracking
 
             configMenu.Register(
                 mod: ModManifest,
-                reset: () => Config = new ModConfig(),
-                save: () => Helper.WriteConfig(Config)
+                reset: () => {
+                    Config = new ModConfig();
+                    Helper.GameContent.InvalidateCache("Data/Machines");
+                },
+                save: () => {
+                    Helper.WriteConfig(Config);
+                    Helper.GameContent.InvalidateCache("Data/Machines");
+                }
             );
 
             configMenu.AddSectionTitle(
@@ -102,7 +148,21 @@ namespace BetterGeodeCracking
                 name: () => I18n.Get("config.instant-geode-crusher.name"),
                 tooltip: () => I18n.Get("config.instant-geode-crusher.tooltip"),
                 getValue: () => Config.InstantGeodeCrusher,
-                setValue: value => Config.InstantGeodeCrusher = value
+                setValue: value => {
+                    Config.InstantGeodeCrusher = value;
+                    Helper.GameContent.InvalidateCache("Data/Machines");
+                }
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.geode-crusher-requires-coal.name"),
+                tooltip: () => I18n.Get("config.geode-crusher-requires-coal.tooltip"),
+                getValue: () => Config.GeodeCrusherRequiresCoal,
+                setValue: value => {
+                    Config.GeodeCrusherRequiresCoal = value;
+                    Helper.GameContent.InvalidateCache("Data/Machines");
+                }
             );
         }
     }

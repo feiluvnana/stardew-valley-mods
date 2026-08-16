@@ -24,6 +24,6 @@ namespace BetterGeodeCracking
         public bool InstantGeodeCrusher { get; set; } = true;
 
         /// <summary>Whether Geode Crusher machines require coal.</summary>
-        public bool GeodeCrusherRequiresCoal { get; set; } = true;
+        public bool GeodeCrusherRequiresCoal { get; set; } = false;
     }
 }

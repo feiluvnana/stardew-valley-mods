@@ -12,12 +12,14 @@ namespace BetterForge
         public static ModConfig Config { get; private set; } = null!;
         public static IMonitor ModMonitor { get; private set; } = null!;
         public static ITranslationHelper I18n { get; private set; } = null!;
+        public static IModHelper ModHelper { get; private set; } = null!;
 
         public override void Entry(IModHelper helper)
         {
             Config = helper.ReadConfig<ModConfig>();
             ModMonitor = Monitor;
             I18n = helper.Translation;
+            ModHelper = helper;
 
             TrinketPatches.Initialize(Config, Monitor);
             EnchantmentPatches.Initialize(Config, Monitor);

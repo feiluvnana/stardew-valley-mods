@@ -71,7 +71,7 @@ namespace BetterGeodeCracking
 
                 // Patch Geode Crusher machine if enabled
                 harmony.Patch(
-                    original: AccessTools.Method(typeof(StardewValley.Object), nameof(StardewValley.Object.performObjectDropInAction)),
+                    original: AccessTools.Method(typeof(StardewValley.Object), nameof(StardewValley.Object.performObjectDropInAction), new[] { typeof(Item), typeof(bool), typeof(Farmer), typeof(bool) }),
                     postfix: new HarmonyMethod(typeof(GeodePatches), nameof(Object_performObjectDropInAction_Postfix))
                 );
 
@@ -426,7 +426,7 @@ namespace BetterGeodeCracking
             }
         }
 
-        public static void Object_performObjectDropInAction_Postfix(StardewValley.Object __instance, Item dropInItem, bool probe, Farmer who, bool __result)
+        public static void Object_performObjectDropInAction_Postfix(StardewValley.Object __instance, Item dropInItem, bool probe, Farmer who, bool returnFalseIfItemConsumed, bool __result)
         {
             if (!probe && __result && (__instance.QualifiedItemId == "(BC)182" || __instance.ItemId == "182")) // Geode Crusher
             {

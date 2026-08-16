@@ -39,17 +39,17 @@
   "hud.ascension-success": "Thăng hoa Tán Sắc hoàn tất cho {{item}}!",
 
   "buff.ascension-luck.name": "Thăng Hoa Tán Sắc",
-  "buff.ascension-luck.desc": "+{{luck}} May Mắn từ các đồ trang sức đã thăng hoa.",
+  "buff.ascension-luck.desc": "Nhận được từ các Đồ Trang Sức đã Thăng Hoa.",
   "buff.fairy-defense.name": "Phước Lành Tiên Nữ",
-  "buff.fairy-defense.desc": "+1 Phòng Ngự nhận được từ nhịp hồi phục của tiên nữ.",
+  "buff.fairy-defense.desc": "Nhận được từ nhịp hồi phục của tiên nữ.",
   "buff.spur-attack.name": "Cuồng Nộ Đinh Vàng",
-  "buff.spur-attack.desc": "+3 Sát Thương Tấn Công khi kích hoạt tăng tốc từ đòn chí mạng.",
+  "buff.spur-attack.desc": "Kích hoạt trong lúc tăng tốc từ đòn chí mạng.",
 
-  "ascension.frogegg.desc": "Khi ếch nuốt quái vật, toàn bộ vật phẩm rơi vẫn xuất hiện đầy đủ, và có 35% tỷ lệ lập tức làm mới hồi chiêu nuốt mồi.",
-  "ascension.fairybox.desc": "Nhịp hồi máu của tiên nữ hồi phục cho cả đồng minh xung quanh, đồng thời ban thêm hiệu ứng +1 Phòng Ngự (+1 Defense) trong 15 giây.",
-  "ascension.parrotegg.desc": "Nhân đôi số lượng & tỷ lệ rơi tiền vàng, đồng thời tăng thêm 25% tỷ lệ nhận thêm chiến lợi phẩm khi tiêu diệt quái vật.",
-  "ascension.goldenspur.desc": "Tăng +25% sát thương chí mạng; đồng thời hiệu ứng tăng tốc từ đinh vàng cộng thêm +3 Sát Thương Tấn Công (+3 Attack).",
-  "ascension.magicquiver.desc": "Tên ma thuật bắn xuyên qua toàn bộ quái vật trên đường bay, và lập tức kết liễu những quái vật có lượng máu dưới 20%.",
-  "ascension.icerod.desc": "Tấn công quái vật đang bị đóng băng gây thêm +35 sát thương vỡ băng, đồng thời phát ra luồng sóng băng làm chậm/đóng băng quái vật xung quanh.",
+  "ascension.frogegg.desc": "Khi ếch nuốt quái vật, toàn bộ vật phẩm rơi vẫn xuất hiện đầy đủ, và có 45% tỷ lệ lập tức làm mới hồi chiêu nuốt mồi.",
+  "ascension.fairybox.desc": "Tiên nữ luôn đảm bảo hồi máu ổn định ở mỗi nhịp (kể cả ngoài giao tranh), hồi cho đồng minh xung quanh và ban hiệu ứng +1 Phòng Ngự (+1 Defense) trong 15 giây.",
+  "ascension.parrotegg.desc": "Nhân đôi số lượng & tỷ lệ rơi tiền vàng, đồng thời tăng thêm 35% tỷ lệ nhận thêm chiến lợi phẩm khi tiêu diệt quái vật.",
+  "ascension.goldenspur.desc": "Tăng thêm +10% Tỷ Lệ Chí Mạng (+10% Crit Chance); đồng thời hiệu ứng tăng tốc từ đinh vàng cộng thêm +3 Sát Thương Tấn Công (+3 Attack).",
+  "ascension.magicquiver.desc": "Tên ma thuật bắn xuyên qua toàn bộ quái vật trên đường bay, và lập tức kết liễu những quái vật có lượng máu dưới 15%.",
+  "ascension.icerod.desc": "Tấn công quái vật đang bị đóng băng sẽ phá vỡ lớp băng và kích hoạt vụ nổ băng (gây sát thương bằng 30% Tấn Công và làm chậm quái xung quanh).",
   "ascension.basiliskpaw.desc": "Phản lại 50% sát thương nhận vào lên kẻ địch, và các đòn đánh có 20% tỷ lệ hút máu (hồi 3–8 Máu) khi tấn công quái vật."
 }
