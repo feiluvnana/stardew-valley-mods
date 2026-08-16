@@ -37,7 +37,6 @@ namespace BetterMap
                 var back = map.GetLayer("Back");
 
                 var tsIsland = map.GetTileSheet("untitled tile sheet"); // island_tilesheet_1
-                var tsOutdoors = map.GetTileSheet("untitled tile sheet2"); // summer_outdoorsTileSheet
 
                 // 1. Remove the driftwood barrier fence and log piles across Ginger Island farm
                 if (config.RemoveFarmDriftwoodBarrier)
@@ -78,42 +77,6 @@ namespace BetterMap
                         }
                     }
                     monitor.Log($"Successfully patched Island_W: Removed {driftwoodCount} driftwood fence/log tiles.", LogLevel.Trace);
-                }
-
-                // 2. Optional: Remove southern beach shipwreck (x: 57..78, y: 88..98)
-                if (config.RemoveIslandWestShipwreck)
-                {
-                    for (int x = 57; x <= 78; x++)
-                    {
-                        for (int y = 88; y <= 98; y++)
-                        {
-                            if (buildings?.Tiles[x, y] != null)
-                            {
-                                buildings.Tiles[x, y]?.Properties.Clear();
-                                buildings.Tiles[x, y] = null;
-                            }
-
-                            if (front?.Tiles[x, y] != null)
-                            {
-                                front.Tiles[x, y] = null;
-                            }
-
-                            if (alwaysFront?.Tiles[x, y] != null)
-                            {
-                                alwaysFront.Tiles[x, y] = null;
-                            }
-
-                            if (back != null && tsOutdoors != null)
-                            {
-                                var curTile = back.Tiles[x, y];
-                                if (curTile != null && curTile.TileSheet.ImageSource.Contains("island_tilesheet_1") && curTile.TileIndex >= 1500)
-                                {
-                                    back.Tiles[x, y] = new StaticTile(back, tsOutdoors, BlendMode.Alpha, 201);
-                                }
-                            }
-                        }
-                    }
-                    monitor.Log("Successfully patched Island_W: Removed southern beach shipwreck.", LogLevel.Trace);
                 }
             }
             catch (Exception ex)

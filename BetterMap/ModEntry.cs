@@ -106,14 +106,6 @@ namespace BetterMap
                 tooltip: () => Helper.Translation.Get("gmcm.remove_farm_driftwood_barrier.tooltip")
             );
 
-            configMenu.AddBoolOption(
-                mod: ModManifest,
-                getValue: () => Config.RemoveIslandWestShipwreck,
-                setValue: value => Config.RemoveIslandWestShipwreck = value,
-                name: () => Helper.Translation.Get("gmcm.remove_island_west_shipwreck.name"),
-                tooltip: () => Helper.Translation.Get("gmcm.remove_island_west_shipwreck.tooltip")
-            );
-
             // Section: Farmhouse Doorways
             configMenu.AddSectionTitle(
                 mod: ModManifest,
