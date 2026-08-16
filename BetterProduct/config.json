@@ -13,11 +13,5 @@
   "PickleMultiplier": 2.5,
   "EnableRoeBuff": true,
   "AgedRoeMultiplier": 2.5,
-  "CaviarPrice": 750,
-  "EnableDehydratorBalancing": true,
-  "AllowMixedQualityDehydrating": true,
-  "EnableDriedQualityScaling": true,
-  "DehydratorSpeedMultiplier": 1.0,
-  "AllowVegetableDehydrating": true,
-  "AllowFlowerDehydrating": false
+  "CaviarPrice": 750
 }

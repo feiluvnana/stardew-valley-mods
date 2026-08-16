@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using HarmonyLib;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Netcode;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.ItemTypeDefinitions;
@@ -42,6 +43,11 @@ namespace BetterFurniture
                 original: AccessTools.Method(typeof(Furniture), nameof(Furniture.draw), new[] { typeof(SpriteBatch), typeof(int), typeof(int), typeof(float) }),
                 prefix: new HarmonyMethod(typeof(FurniturePatches), nameof(Draw_Prefix)),
                 postfix: new HarmonyMethod(typeof(FurniturePatches), nameof(Draw_Postfix))
+            );
+
+            harmony.Patch(
+                original: AccessTools.Method(typeof(Furniture), nameof(Furniture.addLights)),
+                postfix: new HarmonyMethod(typeof(FurniturePatches), nameof(AddLights_Postfix))
             );
 
             harmony.Patch(
@@ -94,8 +100,7 @@ namespace BetterFurniture
                 if (__instance == null || __instance.isTemporarilyInvisible)
                     return true;
 
-                if (__instance.ItemId == "feiluvnana.BetterFurniture.PrincessBedCanopy" ||
-                    __instance.ItemId == "feiluvnana.BetterFurniture.PrincessWallMolding")
+                if (__instance.ItemId == "feiluvnana.BetterFurniture.PrincessBedCanopy")
                 {
                     ParsedItemData data = ItemRegistry.GetDataOrErrorItem(__instance.QualifiedItemId);
                     Texture2D texture = data.GetTexture();
@@ -194,6 +199,27 @@ namespace BetterFurniture
             catch (Exception ex)
             {
                 Monitor.Log($"Error in Draw_Postfix: {ex}", LogLevel.Error);
+            }
+        }
+
+        public static void AddLights_Postfix(Furniture __instance)
+        {
+            try
+            {
+                // Vanilla lamp furniture shifts to a second "lit" frame at night via sourceIndexOffset.
+                // The nightstand has no lit frame, so reset the offset to keep its normal sprite visible
+                // (the animated candle flame is drawn separately in Draw_Postfix).
+                if (__instance?.ItemId == "feiluvnana.BetterFurniture.PrincessNightstand")
+                {
+                    if (AccessTools.Field(typeof(Furniture), "sourceIndexOffset")?.GetValue(__instance) is NetInt sourceIndexOffset)
+                    {
+                        sourceIndexOffset.Value = 0;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Monitor.Log($"Error in AddLights_Postfix: {ex}", LogLevel.Error);
             }
         }
 

@@ -31,19 +31,5 @@
   "config.aged-roe-multiplier.name": "Aged Roe Multiplier",
   "config.aged-roe-multiplier.tooltip": "Base multiplier for Aged Roe.",
   "config.caviar-price.name": "Caviar Price",
-  "config.caviar-price.tooltip": "Base selling price for Caviar.",
-
-  "config.section.dehydrator": "Dehydrator Options",
-  "config.dehydrator-balancing.name": "Dehydrator Balancing",
-  "config.dehydrator-balancing.tooltip": "Enable mixed-quality inputs and enhanced dehydrator mechanics.",
-  "config.dehydrator-mixed-quality.name": "Mixed Quality Inputs",
-  "config.dehydrator-mixed-quality.tooltip": "Allow combining items of different star qualities into the 5-item batch.",
-  "config.dehydrator-quality-scaling.name": "Quality Output Scaling",
-  "config.dehydrator-quality-scaling.tooltip": "Produce higher quality dried goods based on the average quality of the input batch.",
-  "config.dehydrator-speed-multiplier.name": "Speed Multiplier",
-  "config.dehydrator-speed-multiplier.tooltip": "Multiplier for processing speed (1.0 = ~29h vanilla, 2.0 = ~14h, 0 = Instant).",
-  "config.dehydrator-allow-vegetables.name": "Allow Vegetables",
-  "config.dehydrator-allow-vegetables.tooltip": "Allow dehydrating edible vegetables into dried goods.",
-  "config.dehydrator-allow-flowers.name": "Allow Flowers",
-  "config.dehydrator-allow-flowers.tooltip": "Allow dehydrating flowers into dried petals."
+  "config.caviar-price.tooltip": "Base selling price for Caviar."
 }

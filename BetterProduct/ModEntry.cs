@@ -20,11 +20,9 @@ namespace BetterProduct
             CookingBalancer.Initialize(Config, Monitor);
             ArtisanBalancer.Initialize(Config, Monitor);
             MeadPatches.Initialize(Config, Monitor);
-            DehydratorBalancer.Initialize(Config, Monitor);
 
             var harmony = new Harmony(ModManifest.UniqueID);
             MeadPatches.Apply(harmony);
-            DehydratorBalancer.Apply(harmony);
 
             helper.Events.Content.AssetRequested += CookingBalancer.OnAssetRequested;
             helper.Events.Content.AssetRequested += ArtisanBalancer.OnAssetRequested;
@@ -202,63 +200,6 @@ namespace BetterProduct
                 min: 500,
                 max: 3000,
                 interval: 50
-            );
-
-            // Dehydrator Options
-            configMenu.AddSectionTitle(
-                mod: ModManifest,
-                text: () => I18n.Get("config.section.dehydrator")
-            );
-
-            configMenu.AddBoolOption(
-                mod: ModManifest,
-                name: () => I18n.Get("config.dehydrator-balancing.name"),
-                tooltip: () => I18n.Get("config.dehydrator-balancing.tooltip"),
-                getValue: () => Config.EnableDehydratorBalancing,
-                setValue: value => Config.EnableDehydratorBalancing = value
-            );
-
-            configMenu.AddBoolOption(
-                mod: ModManifest,
-                name: () => I18n.Get("config.dehydrator-mixed-quality.name"),
-                tooltip: () => I18n.Get("config.dehydrator-mixed-quality.tooltip"),
-                getValue: () => Config.AllowMixedQualityDehydrating,
-                setValue: value => Config.AllowMixedQualityDehydrating = value
-            );
-
-            configMenu.AddBoolOption(
-                mod: ModManifest,
-                name: () => I18n.Get("config.dehydrator-quality-scaling.name"),
-                tooltip: () => I18n.Get("config.dehydrator-quality-scaling.tooltip"),
-                getValue: () => Config.EnableDriedQualityScaling,
-                setValue: value => Config.EnableDriedQualityScaling = value
-            );
-
-            configMenu.AddNumberOption(
-                mod: ModManifest,
-                name: () => I18n.Get("config.dehydrator-speed-multiplier.name"),
-                tooltip: () => I18n.Get("config.dehydrator-speed-multiplier.tooltip"),
-                getValue: () => Config.DehydratorSpeedMultiplier,
-                setValue: value => Config.DehydratorSpeedMultiplier = value,
-                min: 0.0f,
-                max: 10.0f,
-                interval: 0.5f
-            );
-
-            configMenu.AddBoolOption(
-                mod: ModManifest,
-                name: () => I18n.Get("config.dehydrator-allow-vegetables.name"),
-                tooltip: () => I18n.Get("config.dehydrator-allow-vegetables.tooltip"),
-                getValue: () => Config.AllowVegetableDehydrating,
-                setValue: value => Config.AllowVegetableDehydrating = value
-            );
-
-            configMenu.AddBoolOption(
-                mod: ModManifest,
-                name: () => I18n.Get("config.dehydrator-allow-flowers.name"),
-                tooltip: () => I18n.Get("config.dehydrator-allow-flowers.tooltip"),
-                getValue: () => Config.AllowFlowerDehydrating,
-                setValue: value => Config.AllowFlowerDehydrating = value
             );
         }
     }

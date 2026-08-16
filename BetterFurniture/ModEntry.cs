@@ -37,14 +37,11 @@ namespace BetterFurniture
             {
                 ["Mods/feiluvnana.BetterFurniture/PrincessDoubleBed"] = "assets/princess_double_bed.png",
                 ["Mods/feiluvnana.BetterFurniture/PrincessPastelWindow"] = "assets/princess_pastel_window.png",
-                ["Mods/feiluvnana.BetterFurniture/PrincessWallMolding"] = "assets/princess_wall_molding.png",
                 ["Mods/feiluvnana.BetterFurniture/PrincessWallSconce"] = "assets/princess_wall_sconce.png",
                 ["Mods/feiluvnana.BetterFurniture/PrincessNightstand"] = "assets/princess_nightstand.png",
                 ["Mods/feiluvnana.BetterFurniture/PrincessGrandRug"] = "assets/princess_grand_rug.png",
                 ["Mods/feiluvnana.BetterFurniture/PrincessRococoMirror"] = "assets/princess_rococo_mirror.png",
-                ["Mods/feiluvnana.BetterFurniture/PrincessBedCanopy"] = "assets/princess_bed_canopy.png",
-                ["Mods/feiluvnana.BetterFurniture/TeakDiningTable"] = "assets/teak_dining_table.png",
-                ["Mods/feiluvnana.BetterFurniture/TeakDiningBench"] = "assets/teak_dining_bench.png"
+                ["Mods/feiluvnana.BetterFurniture/PrincessBedCanopy"] = "assets/princess_bed_canopy.png"
             };
 
             foreach (var kvp in textures)
@@ -93,14 +90,11 @@ namespace BetterFurniture
 
                     data["feiluvnana.BetterFurniture.PrincessDoubleBed"] = "Princess Double Bed/bed double/4 4/4 4/1/10000/-1/Princess Double Bed/0/Mods\\feiluvnana.BetterFurniture\\PrincessDoubleBed/true";
                     data["feiluvnana.BetterFurniture.PrincessPastelWindow"] = "Princess Pastel Window/window/2 2/2 2/1/2000/-1/Princess Pastel Window/0/Mods\\feiluvnana.BetterFurniture\\PrincessPastelWindow/true";
-                    data["feiluvnana.BetterFurniture.PrincessWallMolding"] = "Princess Wall Molding/painting/2 2/2 2/1/1500/-1/Princess Wall Molding/0/Mods\\feiluvnana.BetterFurniture\\PrincessWallMolding/true";
                     data["feiluvnana.BetterFurniture.PrincessWallSconce"] = "Princess Wall Sconce/painting/1 2/1 2/1/1000/-1/Princess Wall Sconce/0/Mods\\feiluvnana.BetterFurniture\\PrincessWallSconce/true";
                     data["feiluvnana.BetterFurniture.PrincessNightstand"] = "Princess Nightstand/lamp/1 2/1 1/1/2000/-1/Princess Nightstand/0/Mods\\feiluvnana.BetterFurniture\\PrincessNightstand/true";
                     data["feiluvnana.BetterFurniture.PrincessGrandRug"] = "Princess Grand Rug/rug/4 3/4 3/2/3000/-1/Princess Grand Rug/0/Mods\\feiluvnana.BetterFurniture\\PrincessGrandRug/true";
                     data["feiluvnana.BetterFurniture.PrincessRococoMirror"] = "Princess Rococo Mirror/painting/2 2/2 2/1/2500/-1/Princess Rococo Mirror/0/Mods\\feiluvnana.BetterFurniture\\PrincessRococoMirror/true";
                     data["feiluvnana.BetterFurniture.PrincessBedCanopy"] = "Princess Bed Canopy/painting/4 3/4 3/1/3500/-1/Princess Bed Canopy/0/Mods\\feiluvnana.BetterFurniture\\PrincessBedCanopy/true";
-                    data["feiluvnana.BetterFurniture.TeakDiningTable"] = "Teak Dining Table/table/3 2/3 2/1/3500/-1/Teak Dining Table/0/Mods\\feiluvnana.BetterFurniture\\TeakDiningTable/true";
-                    data["feiluvnana.BetterFurniture.TeakDiningBench"] = "Teak Dining Bench/bench/3 2/3 1/1/2000/-1/Teak Dining Bench/0/Mods\\feiluvnana.BetterFurniture\\TeakDiningBench/true";
                 });
             }
         }

@@ -17,13 +17,5 @@ namespace BetterProduct
         public bool EnableRoeBuff { get; set; } = true;
         public float AgedRoeMultiplier { get; set; } = 2.5f;
         public int CaviarPrice { get; set; } = 750;
-
-        // Dehydrator Settings
-        public bool EnableDehydratorBalancing { get; set; } = true;
-        public bool AllowMixedQualityDehydrating { get; set; } = true;
-        public bool EnableDriedQualityScaling { get; set; } = true;
-        public float DehydratorSpeedMultiplier { get; set; } = 1.0f;
-        public bool AllowVegetableDehydrating { get; set; } = true;
-        public bool AllowFlowerDehydrating { get; set; } = false;
     }
 }

@@ -1,60 +1,59 @@
-# 🍯 BetterProduct
+# 🍯 BetterProduct (Stardew Valley 1.6+)
 
-**BetterProduct** rebalances artisan goods and cooked dishes in **Stardew Valley 1.6+**, ensuring that processing high-quality ingredients and cooking complex meals is always profitable and mechanically rewarding.
-
----
-
-## ✨ Features
-
-- **🌸 Honey & Flower Mead Quality Preservation:**
-  In vanilla, processing valuable flower honey into mead loses the flower type and value. **BetterProduct** preserves the underlying flower value and applies a configurable multiplier (`MeadMultiplier: 1.5x`), ensuring that Fairy Rose Mead and rare flower meads remain highly profitable.
-
-- **🍳 Cooking Profit Margins & Value Scaling:**
-  Cooked dishes calculate value based on the total sale price of their constituent raw ingredients plus a configurable profit margin (`CookingProfitMargin: 1.25x` / +25%).
-
-- **⚡ Energy, Health & Buff Duration Boosts:**
-  - **Energy Scaling (`EnergyMultiplier: 1.25x`):** Increases base stamina restoration from cooked foods.
-  - **Buff Duration Scaling (`BuffDurationMultiplier: 1.5x`):** Extends food stat buff timers by +50%, allowing mining/fishing/luck buffs to last significantly longer into the day.
-
-- **🥫 Enhanced Artisan Goods:**
-  - **Juice Multiplier (`JuiceMultiplier: 3.0x`):** Boosts vegetable juices to rival fruit wines.
-  - **Pickle Multiplier (`PickleMultiplier: 2.5x`):** Improves preserves jar margins.
-  - **Aged Roe & Caviar Scaling (`AgedRoeMultiplier: 2.5x`, `CaviarPrice: 750g`):** Makes fish pond roe production and sturgeon caviar lucrative.
-
-- **🍄 Enhanced Dehydrator Mechanics:**
-  - **Mixed-Quality Input Support:** Combines items of different star qualities (e.g. 2 Normal + 2 Silver + 1 Gold) into the 5-item batch with zero waste.
-  - **Smart Inventory Auto-Pull:** Interacting with $<5$ items in hand automatically pulls remaining matching items from other inventory stacks.
-  - **Weighted Output Quality:** Produces Silver, Gold, or Iridium dried goods matching the weighted average quality of the input batch.
-  - **Custom Speed & Recipe Expansion:** Configurable speed multiplier and options to dry edible vegetables and flowers.
+**BetterProduct** rebalances artisan goods, cooked dishes, and preserves in **Stardew Valley 1.6+**, ensuring that processing high-quality ingredients and cooking complex meals is always profitable, viable, and mechanically rewarding.
 
 ---
 
-## ⚙️ Configuration (`config.json`)
+## ✨ Key Features
 
-```json
-{
-  "EnableCookingBalancing": true,
-  "CookingProfitMargin": 1.25,
-  "EnableEnergyBuff": true,
-  "EnergyMultiplier": 1.25,
-  "EnableBuffDurationBoost": true,
-  "BuffDurationMultiplier": 1.5,
-  "EnableMeadFix": true,
-  "MeadMultiplier": 1.5,
-  "EnableJuiceBuff": true,
-  "JuiceMultiplier": 3.0,
-  "EnablePickleBuff": true,
-  "PickleMultiplier": 2.5,
-  "EnableRoeBuff": true,
-  "AgedRoeMultiplier": 2.5,
-  "CaviarPrice": 750,
-  "EnableDehydratorBalancing": true,
-  "AllowMixedQualityDehydrating": true,
-  "EnableDriedQualityScaling": true,
-  "DehydratorSpeedMultiplier": 1.0,
-  "AllowVegetableDehydrating": true,
-  "AllowFlowerDehydrating": false
-}
+### 🌸 1. Flower Mead Quality & Value Preservation
+- In vanilla Stardew Valley, processing valuable flower honey into mead loses the flower type, reducing precious Fairy Rose Honey into generic base-price mead.
+- **BetterProduct** preserves the underlying flower value and applies a configurable multiplier (`MeadMultiplier: 1.5x`), ensuring that Fairy Rose Mead and rare flower meads remain exceptionally profitable.
+
+### 🍳 2. Cooking Profit Margins & Value Scaling
+- Dynamically calculates the value of cooked dishes based on the total sale price of their constituent raw ingredients plus a configurable profit margin (`CookingProfitMargin: 1.25x` / +25%).
+- Makes home cooking profitable instead of a net gold loss compared to shipping raw ingredients.
+
+### ⚡ 3. Stamina Restoration & Buff Duration Scaling
+- **Stamina / Energy Scaling (`EnergyMultiplier: 1.25x`):** Boosts base energy restored by cooked dishes by +25%.
+- **Buff Duration Boost (`BuffDurationMultiplier: 1.5x`):** Extends food stat buff durations by +50%, allowing mining, fishing, speed, and luck buffs to last significantly longer through the day.
+
+### 🥫 4. Artisan Goods Rebalancing
+- **Vegetable Juice Multiplier (`JuiceMultiplier: 3.0x`):** Elevates vegetable juices to rival fruit wines in value.
+- **Preserves & Pickles (`PickleMultiplier: 2.5x`):** Increases preserves jar profitability.
+- **Aged Roe & Caviar (`AgedRoeMultiplier: 2.5x`, `CaviarPrice: 750g`):** Scales fish pond roe production and sturgeon caviar margins.
+
+---
+
+## ⚙️ Configuration (Generic Mod Config Menu)
+
+| Setting | Default | Description |
+| :--- | :---: | :--- |
+| `EnableCookingBalancing` | `true` | Enables ingredient-based cooking price calculations. |
+| `CookingProfitMargin` | `1.25` | Multiplier applied to raw ingredient prices for cooked meals (1.0 = break-even, 1.25 = +25% profit). |
+| `EnableEnergyBuff` | `true` | Multiplies energy/stamina gained from cooked food. |
+| `EnergyMultiplier` | `1.25` | Energy multiplier factor. |
+| `EnableBuffDurationBoost` | `true` | Extends buff durations granted by cooked meals. |
+| `BuffDurationMultiplier` | `1.5` | Buff duration multiplier (1.5 = +50% duration). |
+| `EnableMeadFix` | `true` | Retains flower honey value when brewed in kegs. |
+| `MeadMultiplier` | `1.5` | Multiplier for flower mead value. |
+| `EnableJuiceBuff` | `true` | Boosts vegetable juice multiplier. |
+| `JuiceMultiplier` | `3.0` | Value multiplier for vegetable juice. |
+| `EnablePickleBuff` | `true` | Boosts preserves jar pickle multiplier. |
+| `PickleMultiplier` | `2.5` | Value multiplier for pickled crops. |
+| `EnableRoeBuff` | `true` | Boosts aged roe and caviar prices. |
+| `AgedRoeMultiplier` | `2.5` | Multiplier for aged roe in preserves jars. |
+| `CaviarPrice` | `750` | Flat gold price for Caviar. |
+
+---
+
+## 🛠️ Building from Source
+
+```powershell
+dotnet build BetterProduct.csproj
 ```
 
-Configurable in-game via **Generic Mod Config Menu**.
+---
+
+## 📄 License
+Created by **feiluvnana** for Stardew Valley 1.6+. Built with SMAPI and Harmony.

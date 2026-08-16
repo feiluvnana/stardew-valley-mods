@@ -6,37 +6,37 @@ namespace BetterSkullCavernChest
         public bool EnableCustomRewards { get; set; } = true;
         public bool ExcludeCosmetics { get; set; } = true;
 
-        // Decaying Multi-Rolls (1st roll 100%, each next roll has decreasing chance)
+        // Decaying Multi-Rolls (1st roll 100%, each next roll has decreasing chance - Expected ~2.5 items)
         public int MaxRolls { get; set; } = 6;
-        public float Roll2Chance { get; set; } = 0.90f;
-        public float Roll3Chance { get; set; } = 0.70f;
-        public float Roll4Chance { get; set; } = 0.55f;
-        public float Roll5Chance { get; set; } = 0.30f;
-        public float Roll6Chance { get; set; } = 0.15f;
+        public float Roll2Chance { get; set; } = 0.80f;
+        public float Roll3Chance { get; set; } = 0.58f;
+        public float Roll4Chance { get; set; } = 0.40f;
+        public float Roll5Chance { get; set; } = 0.25f;
+        public float Roll6Chance { get; set; } = 0.10f;
 
-        // Stack Multipliers (Jackpot critical procs on stackable items - Regular Chests)
-        public float DoubleStackChance { get; set; } = 0.20f;
+        // Stack Multipliers (Jackpot critical procs on stackable items - Regular Chests, Expected 1.5x Multiplier)
+        public float DoubleStackChance { get; set; } = 0.15f;
         public float TripleStackChance { get; set; } = 0.10f;
         public float QuadrupleStackChance { get; set; } = 0.05f;
         public float QuintupleStackChance { get; set; } = 0.0f;
 
-        // Floor 100 Special Chest Buff Settings
+        // Floor 100 Special Chest Buff Settings (Expected ~5.0 items, Expected 3.0x Multiplier)
         public bool EnableFloor100Buff { get; set; } = true;
         public bool Floor100AllCategoriesEqual { get; set; } = true;
         public int Floor100MaxRolls { get; set; } = 12;
-        public float Floor100Roll2Chance { get; set; } = 0.98f;
-        public float Floor100Roll3Chance { get; set; } = 0.96f;
-        public float Floor100Roll4Chance { get; set; } = 0.92f;
-        public float Floor100Roll5Chance { get; set; } = 0.88f;
-        public float Floor100Roll6Chance { get; set; } = 0.80f;
-        public float Floor100Roll7Chance { get; set; } = 0.70f;
-        public float Floor100Roll8Chance { get; set; } = 0.58f;
-        public float Floor100Roll9Chance { get; set; } = 0.46f;
-        public float Floor100Roll10Chance { get; set; } = 0.32f;
-        public float Floor100Roll11Chance { get; set; } = 0.20f;
-        public float Floor100Roll12Chance { get; set; } = 0.10f;
-        public float Floor100DoubleStackChance { get; set; } = 0.30f;
-        public float Floor100TripleStackChance { get; set; } = 0.15f;
+        public float Floor100Roll2Chance { get; set; } = 0.94f;
+        public float Floor100Roll3Chance { get; set; } = 0.91f;
+        public float Floor100Roll4Chance { get; set; } = 0.86f;
+        public float Floor100Roll5Chance { get; set; } = 0.79f;
+        public float Floor100Roll6Chance { get; set; } = 0.71f;
+        public float Floor100Roll7Chance { get; set; } = 0.63f;
+        public float Floor100Roll8Chance { get; set; } = 0.53f;
+        public float Floor100Roll9Chance { get; set; } = 0.42f;
+        public float Floor100Roll10Chance { get; set; } = 0.30f;
+        public float Floor100Roll11Chance { get; set; } = 0.18f;
+        public float Floor100Roll12Chance { get; set; } = 0.05f;
+        public float Floor100DoubleStackChance { get; set; } = 0.20f;
+        public float Floor100TripleStackChance { get; set; } = 0.25f;
         public float Floor100QuadrupleStackChance { get; set; } = 0.10f;
         public float Floor100QuintupleStackChance { get; set; } = 0.05f;
 

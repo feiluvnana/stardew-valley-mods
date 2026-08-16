@@ -1,30 +1,45 @@
-# 🌵 ExtendedDesertFestival
+# 🌵 ExtendedDesertFestival (Stardew Valley 1.6+)
 
-**ExtendedDesertFestival** extends the exciting Calico Desert Festival from a Spring-only event into an all-season extravaganza in **Stardew Valley 1.6+**.
-
----
-
-## ✨ Features
-
-- **Four-Season Desert Festival:**
-  Enables the 3-day Calico Desert Festival on the **15th, 16th, and 17th** of **Summer**, **Fall**, and **Winter** (in addition to standard Spring).
-  - Each season can be toggled on/off independently via configuration.
-  - Automatically hooks into the calendar, bus transportation, and desert festival map layouts.
-
-- **Calico Egg Persistence (`KeepEggs: true`):**
-  In vanilla Stardew Valley, unused Calico Eggs are deleted at the end of the festival. **ExtendedDesertFestival** allows players to keep and hoard their Calico Eggs across seasons to purchase expensive shop rewards and prize items at subsequent festivals.
+**ExtendedDesertFestival** transforms the 1.6 Calico Desert Festival from a Spring-only event into a year-round festival across all four seasons in **Stardew Valley 1.6+**, complete with Calico Egg persistence between festivals.
 
 ---
 
-## ⚙️ Configuration (`config.json`)
+## ✨ Key Features
 
-```json
-{
-  "EnableSummer": true,
-  "EnableFall": true,
-  "EnableWinter": true,
-  "KeepEggs": true
-}
+### 🌸 1. Four-Season Desert Festival
+- **All Seasons Supported:** Celebrates the 3-day Calico Desert Festival on the **15th, 16th, and 17th** of **Summer**, **Fall**, and **Winter** (in addition to standard Spring).
+- **Independent Season Toggles:** Each individual season can be enabled or disabled independently in the config menu.
+- **Seamless Vanilla Integration:** Automatically hooks into town calendars, billboard event notices, bus schedules, and Calico Desert festival map layouts.
+
+### 🥚 2. Calico Egg Persistence
+- In vanilla Stardew Valley, any unused Calico Eggs are automatically deleted when the festival concludes.
+- **ExtendedDesertFestival** preserves your hard-earned Calico Eggs across seasons and years, allowing you to save up for high-tier shop rewards, prize tickets, and rare festival items.
+
+---
+
+## ⚙️ Configuration (Generic Mod Config Menu)
+
+| Setting | Default | Description |
+| :--- | :---: | :--- |
+| `EnableSummer` | `true` | Enables the Desert Festival on Summer 15–17. |
+| `EnableFall` | `true` | Enables the Desert Festival on Fall 15–17. |
+| `EnableWinter` | `true` | Enables the Desert Festival on Winter 15–17. |
+| `KeepEggs` | `true` | Prevents Calico Eggs from being wiped after festivals. |
+
+---
+
+## 🌐 Localization
+Full English and Vietnamese translations included.
+
+---
+
+## 🛠️ Building from Source
+
+```powershell
+dotnet build ExtendedDesertFestival.csproj
 ```
 
-Configurable in-game via **Generic Mod Config Menu**.
+---
+
+## 📄 License
+Created by **feiluvnana** for Stardew Valley 1.6+. Built with SMAPI and Harmony.

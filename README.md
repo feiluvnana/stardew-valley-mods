@@ -1,6 +1,6 @@
 # 🌟 feiluvnana's Stardew Valley Mod Collection (1.6+)
 
-A suite of high-performance, modular quality-of-life and progression enhancement mods for **Stardew Valley 1.6+**, built with SMAPI and Harmony.
+A suite of high-performance, modular quality-of-life, progression enhancement, and aesthetic mods for **Stardew Valley 1.6+**, built with SMAPI and Harmony.
 
 ---
 
@@ -8,13 +8,14 @@ A suite of high-performance, modular quality-of-life and progression enhancement
 
 | Mod | Version | Description | Key Features |
 | :--- | :---: | :--- | :--- |
-| [**BetterSkullCavernChest**](./BetterSkullCavernChest) | `1.1.0` | Complete overhaul of Skull Cavern treasure room loot mechanics. | 7 usage categories, Floor 100 special chest buffs (equal category shares, 7 decaying rolls, 2x-5x stack multipliers), GMCM menu. |
-| [**BetterProduct**](./BetterProduct) | `1.0.0` | Comprehensive artisan and cooking value / buff rebalancer. | Cooking profit margins, honey-type flower mead preservation, juice/pickle/roe/caviar buffs, energy & buff duration scaling. |
-| [**ExtendedDesertFestival**](./ExtendedDesertFestival) | `1.1.0` | Expands the Calico Desert Festival across all seasons. | Enables Desert Festival in Summer, Fall, and Winter (15th–17th), preserves Calico Eggs between festivals. |
-| [**ExtendedStackable**](./ExtendedStackable) | `1.0.0` | Stack size overhaul for normally unstackable items. | Stacks fishing tackle, 1.6 trinkets, rings, furniture, boots, clothing, and hats up to 999. |
-| [**BetterGeodeCracking**](./BetterGeodeCracking) | `1.0.0` | Bulk and instant geode/trove cracking without fees. | Free 0g geode cracking at Clint's, Shift+Click / button bulk stack cracking, instant opening, GMCM menu. |
-| [**BetterForge**](./BetterForge) | `1.0.0` | Volcano Forge, Mini-Forge, and Anvil overhauls. | 100% fair uniform weapon/tool enchantments, "never downgrade" trinket reforging, GMCM menu, and Prismatic Ascension powers. |
-| [**BetterMap**](./BetterMap) | `1.0.0` | Ginger Island map clutter and obstacle cleaner. | Removes beach-farm passage wreckage, clears Island West beach shipwreck, GMCM menu. |
+| [**BetterSkullCavernChest**](./BetterSkullCavernChest) | `1.1.0` | Dynamic loot overhaul for Skull Cavern treasure rooms. | 7 gameplay categories (54 items), decaying multi-roll chances, critical stack multipliers (up to 5x), and Floor 100 special chest buffs. |
+| [**BetterProduct**](./BetterProduct) | `1.0.0` | Comprehensive artisan and cooking value / buff rebalancer. | Flower-type honey mead preservation, profitable cooking margins (+25%), +50% food buff durations, +25% energy, and juice/pickle/roe/caviar boosts. |
+| [**BetterFurniture**](./BetterFurniture) | `1.0.0` | Interior decorating and luxury furniture expansion. | 4x4 spacious Princess King Bed with free placement anywhere, animated sconce flames, light sources, canopy layering, and farmhouse tile restorations. |
+| [**ExtendedDesertFestival**](./ExtendedDesertFestival) | `1.1.0` | Expands the Calico Desert Festival across all seasons. | Enables Desert Festival in Summer, Fall, and Winter (15th–17th), preserves Calico Eggs across seasons. |
+| [**ExtendedStackable**](./ExtendedStackable) | `1.0.0` | Stack size overhaul for normally unstackable items. | Stacks fishing tackle, 1.6 trinkets, rings, furniture, boots, clothing, and hats up to 999 with stat matching. |
+| [**BetterGeodeCracking**](./BetterGeodeCracking) | `1.0.0` | Bulk and instant geode/trove cracking without fees. | Free 0g cracking at Clint's, Shift+Click / "Crack All" button bulk processing, instant cracking toggle, and faithful RNG. |
+| [**BetterForge**](./BetterForge) | `1.0.0` | Volcano Forge, Mini-Forge, and Anvil overhauls. | 100% fair uniform weapon/tool enchantments, "Never Downgrade" trinket reforging, "Perfect" tier prefixes, and Prismatic Ascension powers. |
+| [**BetterMap**](./BetterMap) | `1.0.0` | Farmhouse doorway and Ginger Island farm clutter cleaner. | Widens all Farmhouse exit doorways to 3x1 tiles, removes Ginger Island Farm driftwood fence and bleached log piles. |
 
 ---
 
@@ -26,13 +27,14 @@ A suite of high-performance, modular quality-of-life and progression enhancement
    ```text
    Stardew Valley/Mods/
    └── [feiluvnana Mods]/
-       ├── BetterSkullCavernChest/
-       ├── BetterProduct/
-       ├── ExtendedDesertFestival/
-       ├── ExtendedStackable/
-       ├── BetterGeodeCracking/
        ├── BetterForge/
-       └── BetterMap/
+       ├── BetterFurniture/
+       ├── BetterGeodeCracking/
+       ├── BetterMap/
+       ├── BetterProduct/
+       ├── BetterSkullCavernChest/
+       ├── ExtendedDesertFestival/
+       └── ExtendedStackable/
    ```
 4. Run the game using **StardewModdingAPI.exe**.
 
@@ -49,18 +51,19 @@ All mods in this collection feature native integration with [Generic Mod Config 
 All mods are built targeting **.NET 6.0 / .NET 10.0** and the **Stardew Valley 1.6+** SMAPI environment.
 
 ### Build All Mods
-Run the following command from the root folder:
+Run the following commands from the root directory:
 ```powershell
-dotnet build BetterSkullCavernChest/BetterSkullCavernChest.csproj
+dotnet build BetterForge/BetterForge.csproj
+dotnet build BetterFurniture/BetterFurniture.csproj
+dotnet build BetterGeodeCracking/BetterGeodeCracking.csproj
+dotnet build BetterMap/BetterMap.csproj
 dotnet build BetterProduct/BetterProduct.csproj
+dotnet build BetterSkullCavernChest/BetterSkullCavernChest.csproj
 dotnet build ExtendedDesertFestival/ExtendedDesertFestival.csproj
 dotnet build ExtendedStackable/ExtendedStackable.csproj
-dotnet build BetterGeodeCracking/BetterGeodeCracking.csproj
-dotnet build BetterForge/BetterForge.csproj
-dotnet build BetterMap/BetterMap.csproj
 ```
 
 ---
 
 ## 📄 License & Credits
-Created by **feiluvnana** for Stardew Valley 1.6. Built with SMAPI and Harmony.
+Created by **feiluvnana** for Stardew Valley 1.6+. Built with SMAPI and Harmony.
