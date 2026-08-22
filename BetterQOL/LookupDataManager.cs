@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
 using StardewValley.Buildings;
 using StardewValley.Characters;
+using StardewValley.GameData.Locations;
 using StardewValley.ItemTypeDefinitions;
 using StardewValley.Monsters;
 using StardewValley.Objects;
@@ -148,7 +149,7 @@ namespace BetterQOL
             if (ModEntry.Config.ShowGiftTastes)
             {
                 var giftSection = new LookupSection(ModEntry.I18n.Get("lookup.section.gifts"));
-                var (lovedLinks, likedLinks) = GetNPCGiftPreferenceLinks(npc);
+                var (lovedLinks, likedLinks, neutralLinks, dislikedLinks) = GetNPCAllGiftPreferenceLinks(npc);
 
                 if (lovedLinks.Count > 0)
                 {
@@ -160,64 +161,95 @@ namespace BetterQOL
                     giftSection.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.npc.liked-gifts"), likedLinks));
                 }
 
+                if (neutralLinks.Count > 0)
+                {
+                    giftSection.Fields.Add(new LookupField("Neutral Gifts", neutralLinks));
+                }
+
+                if (dislikedLinks.Count > 0)
+                {
+                    giftSection.Fields.Add(new LookupField("Disliked / Hated", dislikedLinks));
+                }
+
                 subject.Sections.Add(giftSection);
             }
 
             return subject;
         }
 
-        private static (List<LookupLink> Loved, List<LookupLink> Liked) GetNPCGiftPreferenceLinks(NPC npc)
+        private static (List<LookupLink> Loved, List<LookupLink> Liked, List<LookupLink> Neutral, List<LookupLink> Disliked) GetNPCAllGiftPreferenceLinks(NPC npc)
         {
             var loved = new List<LookupLink>();
             var liked = new List<LookupLink>();
+            var neutral = new List<LookupLink>();
+            var disliked = new List<LookupLink>();
 
             try
             {
                 if (Game1.NPCGiftTastes != null && Game1.NPCGiftTastes.TryGetValue(npc.Name, out string? giftStr))
                 {
                     string[] parts = giftStr.Split('/');
+
+                    // Loved (index 1)
                     if (parts.Length > 1 && !string.IsNullOrEmpty(parts[1]))
                     {
                         foreach (string id in parts[1].Split(' '))
                         {
-                            string rawId = id;
-                            var data = ItemRegistry.GetData(rawId) ?? ItemRegistry.GetData($"(O){rawId}");
+                            var data = ItemRegistry.GetData(id) ?? ItemRegistry.GetData($"(O){id}");
                             if (data != null && !loved.Any(l => l.Text == data.DisplayName))
                             {
-                                loved.Add(new LookupLink(
-                                    text: data.DisplayName,
-                                    textColor: new Color(180, 50, 180),
-                                    icon: data.GetTexture(),
-                                    iconSourceRect: data.GetSourceRect(),
-                                    onClick: () =>
-                                    {
-                                        var item = ItemRegistry.Create(data.QualifiedItemId);
-                                        return item != null ? BuildItemSubject(item) : null;
-                                    }
-                                ));
+                                loved.Add(new LookupLink(data.DisplayName, null, new Color(180, 50, 180), data.GetTexture(), data.GetSourceRect(), () => {
+                                    var itm = ItemRegistry.Create(data.QualifiedItemId);
+                                    return itm != null ? BuildItemSubject(itm) : null;
+                                }));
                             }
                         }
                     }
 
+                    // Liked (index 3)
                     if (parts.Length > 3 && !string.IsNullOrEmpty(parts[3]))
                     {
                         foreach (string id in parts[3].Split(' '))
                         {
-                            string rawId = id;
-                            var data = ItemRegistry.GetData(rawId) ?? ItemRegistry.GetData($"(O){rawId}");
+                            var data = ItemRegistry.GetData(id) ?? ItemRegistry.GetData($"(O){id}");
                             if (data != null && !liked.Any(l => l.Text == data.DisplayName))
                             {
-                                liked.Add(new LookupLink(
-                                    text: data.DisplayName,
-                                    textColor: new Color(0, 140, 0),
-                                    icon: data.GetTexture(),
-                                    iconSourceRect: data.GetSourceRect(),
-                                    onClick: () =>
-                                    {
-                                        var item = ItemRegistry.Create(data.QualifiedItemId);
-                                        return item != null ? BuildItemSubject(item) : null;
-                                    }
-                                ));
+                                liked.Add(new LookupLink(data.DisplayName, null, new Color(0, 140, 0), data.GetTexture(), data.GetSourceRect(), () => {
+                                    var itm = ItemRegistry.Create(data.QualifiedItemId);
+                                    return itm != null ? BuildItemSubject(itm) : null;
+                                }));
+                            }
+                        }
+                    }
+
+                    // Disliked (index 5)
+                    if (parts.Length > 5 && !string.IsNullOrEmpty(parts[5]))
+                    {
+                        foreach (string id in parts[5].Split(' '))
+                        {
+                            var data = ItemRegistry.GetData(id) ?? ItemRegistry.GetData($"(O){id}");
+                            if (data != null && !disliked.Any(l => l.Text == data.DisplayName))
+                            {
+                                disliked.Add(new LookupLink(data.DisplayName, null, new Color(200, 60, 20), data.GetTexture(), data.GetSourceRect(), () => {
+                                    var itm = ItemRegistry.Create(data.QualifiedItemId);
+                                    return itm != null ? BuildItemSubject(itm) : null;
+                                }));
+                            }
+                        }
+                    }
+
+                    // Neutral (index 9)
+                    if (parts.Length > 9 && !string.IsNullOrEmpty(parts[9]))
+                    {
+                        foreach (string id in parts[9].Split(' '))
+                        {
+                            var data = ItemRegistry.GetData(id) ?? ItemRegistry.GetData($"(O){id}");
+                            if (data != null && !neutral.Any(l => l.Text == data.DisplayName))
+                            {
+                                neutral.Add(new LookupLink(data.DisplayName, null, Color.DarkSlateGray, data.GetTexture(), data.GetSourceRect(), () => {
+                                    var itm = ItemRegistry.Create(data.QualifiedItemId);
+                                    return itm != null ? BuildItemSubject(itm) : null;
+                                }));
                             }
                         }
                     }
@@ -225,12 +257,12 @@ namespace BetterQOL
             }
             catch { }
 
-            return (loved.Take(12).ToList(), liked.Take(12).ToList());
+            return (loved.Take(12).ToList(), liked.Take(12).ToList(), neutral.Take(8).ToList(), disliked.Take(8).ToList());
         }
 
         #endregion
 
-        #region 2. Item Lookup
+        #region 2. Item Lookup (Fish, Crops, Food, Artisan, Weapons, Progress)
 
         public static LookupSubject BuildItemSubject(Item item)
         {
@@ -253,7 +285,7 @@ namespace BetterQOL
             string categoryName = item.getCategoryName();
             subject.Subtitle = !string.IsNullOrEmpty(categoryName) ? categoryName : ModEntry.I18n.Get("lookup.type.item").ToString();
 
-            // Section 1: Overview & Value
+            // Section 1: Overview & Descriptions
             var overviewSection = new LookupSection(ModEntry.I18n.Get("lookup.section.overview"));
             string desc = item.getDescription();
             if (!string.IsNullOrEmpty(desc))
@@ -261,12 +293,7 @@ namespace BetterQOL
                 overviewSection.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.item.description"), desc, Color.DarkSlateGray));
             }
 
-            int sellPrice = item.sellToStorePrice();
-            if (sellPrice > 0)
-            {
-                overviewSection.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.item.sell-price"), $"{sellPrice}g", new Color(180, 100, 0)));
-            }
-
+            // Edibility (Health / Energy & Food Buffs)
             if (item is StardewValley.Object sObj && sObj.Edibility > -300)
             {
                 int energy = sObj.staminaRecoveredOnConsumption();
@@ -276,10 +303,44 @@ namespace BetterQOL
                     $"+{energy} {ModEntry.I18n.Get("lookup.item.energy")}, +{health} {ModEntry.I18n.Get("lookup.item.health")}",
                     new Color(0, 140, 0)
                 ));
+
+                // Food Buffs
+                var buffs = GetFoodBuffs(item);
+                if (buffs.Count > 0)
+                {
+                    overviewSection.Fields.Add(new LookupField("Buffs", string.Join(", ", buffs), new Color(180, 50, 180)));
+                }
+            }
+
+            // Sell Prices by Quality
+            int baseSellPrice = item.sellToStorePrice();
+            if (baseSellPrice > 0)
+            {
+                int silverPrice = (int)(baseSellPrice * 1.25);
+                int goldPrice = (int)(baseSellPrice * 1.5);
+                int iridiumPrice = (int)(baseSellPrice * 2.0);
+
+                overviewSection.Fields.Add(new LookupField(
+                    ModEntry.I18n.Get("lookup.item.sell-price"),
+                    $"{baseSellPrice}g (★ {silverPrice}g, ★★ {goldPrice}g, ★★★ {iridiumPrice}g)",
+                    new Color(180, 100, 0)
+                ));
             }
             subject.Sections.Add(overviewSection);
 
-            // Section 2: Museum & Bundles
+            // Section 2: Fish Details (Locations, Time, Seasons, Weather, Behavior)
+            if (item.Category == StardewValley.Object.FishCategory || IsFishItem(item))
+            {
+                AddFishDataSection(subject, item);
+            }
+
+            // Section 3: Crop / Seed Data (Growth Time, Regrow, Harvest Seasons)
+            AddCropDataSection(subject, item);
+
+            // Section 4: Artisan Processing (Keg, Preserves Jar, Dehydrator, Cask)
+            AddArtisanProductsSection(subject, item, baseSellPrice);
+
+            // Section 5: Museum & Bundles
             if (ModEntry.Config.ShowBundleAndMuseumInfo)
             {
                 var progressSection = new LookupSection(ModEntry.I18n.Get("lookup.section.progress"));
@@ -320,7 +381,7 @@ namespace BetterQOL
                 }
             }
 
-            // Section 3: Gift Preferences (Interactive Tappable NPC Links)
+            // Section 6: Gift Preferences (Interactive Tappable NPC Links)
             if (ModEntry.Config.ShowGiftTastes)
             {
                 var giftSection = new LookupSection(ModEntry.I18n.Get("lookup.section.gift-tastes"));
@@ -342,7 +403,7 @@ namespace BetterQOL
                 }
             }
 
-            // Section 4: Recipes Using This Item
+            // Section 7: Recipes Using This Item (Cooking & Crafting)
             if (ModEntry.Config.ShowItemRecipes)
             {
                 var recipes = GetRecipesUsingItemLinks(item);
@@ -355,6 +416,297 @@ namespace BetterQOL
             }
 
             return subject;
+        }
+
+        private static bool IsFishItem(Item item)
+        {
+            try
+            {
+                var fishData = DataLoader.Fish(Game1.content);
+                return fishData != null && (fishData.ContainsKey(item.ItemId) || fishData.ContainsKey(item.QualifiedItemId));
+            }
+            catch { return false; }
+        }
+
+        private static void AddFishDataSection(LookupSubject subject, Item item)
+        {
+            try
+            {
+                var fishDict = DataLoader.Fish(Game1.content);
+                if (fishDict == null || !fishDict.TryGetValue(item.ItemId, out string? fishRaw))
+                    return;
+
+                string[] parts = fishRaw.Split('/');
+                if (parts.Length < 6)
+                    return;
+
+                var section = new LookupSection("Fishing Details");
+
+                // 1. Difficulty & Behavior
+                string[] diffParts = parts[1].Split(' ');
+                string difficulty = diffParts[0];
+                string behavior = diffParts.Length > 1 ? diffParts[1] : "Mixed";
+                section.Fields.Add(new LookupField("Difficulty", $"{difficulty} ({char.ToUpper(behavior[0]) + behavior.Substring(1)})", new Color(200, 60, 20)));
+
+                // 2. Spawn Seasons
+                string seasons = string.Join(", ", parts[4].Split(' ').Select(s => ModEntry.I18n.Get($"season.{s.ToLower()}").ToString()));
+                section.Fields.Add(new LookupField("Seasons", seasons, new Color(46, 125, 50)));
+
+                // 3. Spawn Time
+                string[] timeParts = parts[3].Split(' ');
+                var timeRanges = new List<string>();
+                for (int i = 0; i < timeParts.Length; i += 2)
+                {
+                    if (i + 1 < timeParts.Length)
+                    {
+                        string start = FormatGameTime(timeParts[i]);
+                        string end = FormatGameTime(timeParts[i + 1]);
+                        timeRanges.Add($"{start} – {end}");
+                    }
+                }
+                section.Fields.Add(new LookupField("Time of Day", string.Join(", ", timeRanges), new Color(180, 100, 0)));
+
+                // 4. Weather
+                string weather = parts[5].ToLower() switch
+                {
+                    "sunny" => "Sunny (Nắng)",
+                    "rainy" => "Rainy (Mưa)",
+                    _ => "Any Weather (Bất kỳ)"
+                };
+                section.Fields.Add(new LookupField("Weather", weather, new Color(20, 110, 220)));
+
+                // 5. Min Skill
+                if (parts.Length > 7 && int.TryParse(parts[7], out int minSkill) && minSkill > 0)
+                {
+                    section.Fields.Add(new LookupField("Min Fishing Skill", $"Level {minSkill}", Color.DarkSlateGray));
+                }
+
+                // 6. Spawn Locations (Extracted from Data/Locations)
+                var spawnLocations = GetFishSpawnLocations(item.ItemId);
+                if (spawnLocations.Count > 0)
+                {
+                    section.Fields.Add(new LookupField("Locations", string.Join(", ", spawnLocations), new Color(20, 110, 220)));
+                }
+
+                subject.Sections.Add(section);
+            }
+            catch { }
+        }
+
+        private static List<string> GetFishSpawnLocations(string fishId)
+        {
+            var results = new List<string>();
+            try
+            {
+                var locDict = DataLoader.Locations(Game1.content);
+                if (locDict == null)
+                    return results;
+
+                foreach (var kvp in locDict)
+                {
+                    string locName = kvp.Key;
+                    var locData = kvp.Value;
+                    if (locData.Fish == null)
+                        continue;
+
+                    foreach (var fishEntry in locData.Fish)
+                    {
+                        if (fishEntry.ItemId == fishId || fishEntry.ItemId == $"(O){fishId}" || fishEntry.Id == fishId || fishEntry.Id == $"(O){fishId}")
+                        {
+                            string displayName = !string.IsNullOrEmpty(locData.DisplayName) ? locData.DisplayName : locName;
+                            if (!results.Contains(displayName))
+                            {
+                                results.Add(displayName);
+                            }
+                        }
+                    }
+                }
+            }
+            catch { }
+            return results;
+        }
+
+        private static string FormatGameTime(string rawTime)
+        {
+            if (int.TryParse(rawTime, out int t))
+            {
+                int hours = t / 100;
+                int mins = t % 100;
+                string period = hours >= 12 && hours < 24 ? "PM" : "AM";
+                if (hours > 12) hours -= 12;
+                if (hours == 0) hours = 12;
+                return $"{hours}:{(mins == 0 ? "00" : mins.ToString())} {period}";
+            }
+            return rawTime;
+        }
+
+        private static void AddCropDataSection(LookupSubject subject, Item item)
+        {
+            try
+            {
+                var crops = DataLoader.Crops(Game1.content);
+                if (crops == null) return;
+
+                // Check if this item is a seed or the harvested crop
+                foreach (var kvp in crops)
+                {
+                    string seedId = kvp.Key;
+                    var cropData = kvp.Value;
+                    if (seedId == item.ItemId || seedId == item.QualifiedItemId || cropData.HarvestItemId == item.ItemId || cropData.HarvestItemId == item.QualifiedItemId)
+                    {
+                        var section = new LookupSection("Crop & Farming Info");
+
+                        int totalDays = cropData.DaysInPhase != null ? cropData.DaysInPhase.Sum() : 0;
+                        section.Fields.Add(new LookupField("Growth Time", $"{totalDays} days", new Color(0, 140, 0)));
+
+                        if (cropData.RegrowDays > 0)
+                        {
+                            section.Fields.Add(new LookupField("Regrowth", $"Every {cropData.RegrowDays} days after first harvest", new Color(180, 100, 0)));
+                        }
+
+                        if (cropData.Seasons != null && cropData.Seasons.Count > 0)
+                        {
+                            string seasons = string.Join(", ", cropData.Seasons.Select(s => ModEntry.I18n.Get($"season.{s.ToString().ToLower()}").ToString()));
+                            section.Fields.Add(new LookupField("Harvest Seasons", seasons, new Color(46, 125, 50)));
+                        }
+
+                        if (cropData.IsRaised)
+                        {
+                            section.Fields.Add(new LookupField("Trellis Crop", "Yes (Cần Giàn - Không thể đi xuyên qua)", new Color(200, 60, 20)));
+                        }
+
+                        if (cropData.ExtraHarvestChance > 0)
+                        {
+                            section.Fields.Add(new LookupField("Extra Harvest Chance", $"{cropData.ExtraHarvestChance * 100:0.#}%", Color.DarkSlateGray));
+                        }
+
+                        subject.Sections.Add(section);
+                        break;
+                    }
+                }
+            }
+            catch { }
+        }
+
+        private static void AddArtisanProductsSection(LookupSubject subject, Item item, int basePrice)
+        {
+            if (basePrice <= 0) return;
+
+            var artisanLinks = new List<LookupLink>();
+
+            // Fruits -> Wine, Jelly, Dried Fruit
+            if (item.Category == StardewValley.Object.FruitsCategory)
+            {
+                int winePrice = basePrice * 3;
+                var wineData = ItemRegistry.GetData("(O)348");
+                artisanLinks.Add(new LookupLink(
+                    text: $"{item.DisplayName} Wine ({winePrice}g)",
+                    subtitle: "Keg",
+                    textColor: new Color(180, 50, 180),
+                    icon: wineData?.GetTexture(),
+                    iconSourceRect: wineData?.GetSourceRect()
+                ));
+
+                int jellyPrice = basePrice * 2 + 50;
+                var jellyData = ItemRegistry.GetData("(O)444");
+                artisanLinks.Add(new LookupLink(
+                    text: $"{item.DisplayName} Jelly ({jellyPrice}g)",
+                    subtitle: "Preserves Jar",
+                    textColor: new Color(200, 60, 20),
+                    icon: jellyData?.GetTexture(),
+                    iconSourceRect: jellyData?.GetSourceRect()
+                ));
+
+                int driedPrice = (int)(basePrice * 7.5);
+                var driedData = ItemRegistry.GetData("(O)DriedFruit");
+                if (driedData != null)
+                {
+                    artisanLinks.Add(new LookupLink(
+                        text: $"Dried {item.DisplayName} ({driedPrice}g)",
+                        subtitle: "Dehydrator (x5)",
+                        textColor: new Color(180, 100, 0),
+                        icon: driedData.GetTexture(),
+                        iconSourceRect: driedData.GetSourceRect()
+                    ));
+                }
+            }
+            // Vegetables -> Juice, Pickles
+            else if (item.Category == StardewValley.Object.VegetableCategory)
+            {
+                int juicePrice = (int)(basePrice * 2.25);
+                var juiceData = ItemRegistry.GetData("(O)350");
+                artisanLinks.Add(new LookupLink(
+                    text: $"{item.DisplayName} Juice ({juicePrice}g)",
+                    subtitle: "Keg",
+                    textColor: new Color(0, 140, 0),
+                    icon: juiceData?.GetTexture(),
+                    iconSourceRect: juiceData?.GetSourceRect()
+                ));
+
+                int picklePrice = basePrice * 2 + 50;
+                var pickleData = ItemRegistry.GetData("(O)342");
+                artisanLinks.Add(new LookupLink(
+                    text: $"Pickled {item.DisplayName} ({picklePrice}g)",
+                    subtitle: "Preserves Jar",
+                    textColor: new Color(180, 100, 0),
+                    icon: pickleData?.GetTexture(),
+                    iconSourceRect: pickleData?.GetSourceRect()
+                ));
+            }
+            // Fish -> Smoked Fish
+            else if (item.Category == StardewValley.Object.FishCategory || IsFishItem(item))
+            {
+                int smokedPrice = basePrice * 2;
+                var smokedData = ItemRegistry.GetData("(O)SmokedFish");
+                if (smokedData != null)
+                {
+                    artisanLinks.Add(new LookupLink(
+                        text: $"Smoked {item.DisplayName} ({smokedPrice}g)",
+                        subtitle: "Fish Smoker",
+                        textColor: new Color(200, 60, 20),
+                        icon: smokedData.GetTexture(),
+                        iconSourceRect: smokedData.GetSourceRect()
+                    ));
+                }
+            }
+
+            if (artisanLinks.Count > 0)
+            {
+                var section = new LookupSection("Artisan Processing & Value");
+                section.Fields.Add(new LookupField("Products", artisanLinks));
+                subject.Sections.Add(section);
+            }
+        }
+
+        private static List<string> GetFoodBuffs(Item item)
+        {
+            var buffs = new List<string>();
+            try
+            {
+                if (Game1.objectData.TryGetValue(item.ItemId, out var data) && data.Buffs != null)
+                {
+                    foreach (var buff in data.Buffs)
+                    {
+                        var attrs = buff.CustomAttributes;
+                        if (attrs != null)
+                        {
+                            if (attrs.FarmingLevel > 0) buffs.Add($"+{attrs.FarmingLevel} Farming");
+                            if (attrs.MiningLevel > 0) buffs.Add($"+{attrs.MiningLevel} Mining");
+                            if (attrs.FishingLevel > 0) buffs.Add($"+{attrs.FishingLevel} Fishing");
+                            if (attrs.ForagingLevel > 0) buffs.Add($"+{attrs.ForagingLevel} Foraging");
+                            if (attrs.CombatLevel > 0) buffs.Add($"+{attrs.CombatLevel} Combat");
+                            if (attrs.LuckLevel > 0) buffs.Add($"+{attrs.LuckLevel} Luck");
+                            if (attrs.Speed > 0) buffs.Add($"+{attrs.Speed} Speed");
+                            if (attrs.Defense > 0) buffs.Add($"+{attrs.Defense} Defense");
+                            if (attrs.Attack > 0) buffs.Add($"+{attrs.Attack} Attack");
+                            if (attrs.MaxStamina > 0) buffs.Add($"+{attrs.MaxStamina} Max Energy");
+                            if (attrs.MagneticRadius > 0) buffs.Add($"+{attrs.MagneticRadius} Magnetism");
+                        }
+                    }
+                }
+            }
+            catch { }
+            return buffs;
         }
 
         private static List<string> GetNeededBundles(Item item)
