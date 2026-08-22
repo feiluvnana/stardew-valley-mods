@@ -109,9 +109,15 @@ namespace BetterQOL
 
                 relSection.Fields.Add(new LookupField(
                     ModEntry.I18n.Get("lookup.npc.friendship"),
-                    $"{hearts}/{maxHearts} ♥ ({points} pts, {ptsInHeart}/250 to next)",
+                    $"{hearts}/{maxHearts} Hearts ({points} pts, {ptsInHeart}/250 to next)",
                     new Color(220, 20, 60)
                 ));
+
+                if (npc.currentLocation != null)
+                {
+                    string locName = npc.currentLocation.DisplayName ?? npc.currentLocation.Name;
+                    relSection.Fields.Add(new LookupField("Current Location", $"{locName} (Tile: {(int)npc.Tile.X}, {(int)npc.Tile.Y})", new Color(20, 110, 220)));
+                }
 
                 bool talkedToday = Game1.player.hasPlayerTalkedToNPC(npc.Name);
                 relSection.Fields.Add(new LookupField(
@@ -1280,7 +1286,7 @@ namespace BetterQOL
             {
                 statusSection.Fields.Add(new LookupField(
                     ModEntry.I18n.Get("lookup.animal.friendship"),
-                    $"{info.Hearts:0.0} / 5.0 ♥ ({info.FriendshipPoints} pts)",
+                    $"{info.Hearts:0.0} / 5.0 Hearts ({info.FriendshipPoints} pts)",
                     new Color(220, 20, 60)
                 ));
 
@@ -1329,7 +1335,7 @@ namespace BetterQOL
             {
                 statusSection.Fields.Add(new LookupField(
                     ModEntry.I18n.Get("lookup.animal.friendship"),
-                    $"{info.Hearts:0.0} / 5.0 ♥ ({info.FriendshipPoints} pts)",
+                    $"{info.Hearts:0.0} / 5.0 Hearts ({info.FriendshipPoints} pts)",
                     new Color(220, 20, 60)
                 ));
 
@@ -2148,6 +2154,99 @@ namespace BetterQOL
                 if (results.Count >= 40)
                     break;
             }
+
+            // 3. Search Monsters from DataLoader
+            try
+            {
+                var monsterDict = DataLoader.Monsters(Game1.content);
+                if (monsterDict != null)
+                {
+                    foreach (var kvp in monsterDict)
+                    {
+                        string mName = kvp.Key;
+                        if (mName.ToLower().Contains(q) && !results.Any(r => r.Text == mName))
+                        {
+                            string monsterData = kvp.Value;
+                            results.Add(new LookupLink(
+                                text: mName,
+                                subtitle: "Monster",
+                                textColor: new Color(200, 60, 20),
+                                icon: null,
+                                iconSourceRect: null,
+                                onClick: () =>
+                                {
+                                    var mSubject = new LookupSubject
+                                    {
+                                        Title = mName,
+                                        Subtitle = "Monster"
+                                    };
+                                    var mSection = new LookupSection("Combat Stats");
+                                    string[] parts = monsterData.Split('/');
+                                    if (parts.Length > 0) mSection.Fields.Add(new LookupField("Health", parts[0], new Color(220, 20, 60)));
+                                    if (parts.Length > 1) mSection.Fields.Add(new LookupField("Damage", parts[1], new Color(200, 60, 20)));
+                                    if (parts.Length > 7) mSection.Fields.Add(new LookupField("Defense", parts[7], new Color(20, 110, 220)));
+                                    if (parts.Length > 8) mSection.Fields.Add(new LookupField("Experience", parts[8], new Color(180, 100, 0)));
+                                    mSubject.Sections.Add(mSection);
+                                    return mSubject;
+                                }
+                            ));
+
+                            if (results.Count >= 40)
+                                break;
+                        }
+                    }
+                }
+            }
+            catch { }
+
+            // 4. Search Buildings & Farm Blueprints from DataLoader
+            try
+            {
+                var buildingDict = DataLoader.Buildings(Game1.content);
+                if (buildingDict != null)
+                {
+                    foreach (var kvp in buildingDict)
+                    {
+                        var bData = kvp.Value;
+                        string bName = bData.Name ?? kvp.Key;
+                        if (bName.ToLower().Contains(q) && !results.Any(r => r.Text == bName))
+                        {
+                            results.Add(new LookupLink(
+                                text: bName,
+                                subtitle: "Farm Building",
+                                textColor: new Color(180, 100, 0),
+                                icon: null,
+                                iconSourceRect: null,
+                                onClick: () =>
+                                {
+                                    var bSubject = new LookupSubject
+                                    {
+                                        Title = bName,
+                                        Subtitle = "Farm Building"
+                                    };
+                                    var bSection = new LookupSection("Building Details");
+                                    if (!string.IsNullOrEmpty(bData.Description)) bSection.Fields.Add(new LookupField("Description", bData.Description, Color.DarkSlateGray));
+                                    if (bData.BuildCost > 0) bSection.Fields.Add(new LookupField("Build Cost", $"{bData.BuildCost}g", new Color(180, 100, 0)));
+                                    if (bData.BuildMaterials != null && bData.BuildMaterials.Count > 0)
+                                    {
+                                        var matStrs = bData.BuildMaterials.Select(m => {
+                                            var mItem = ItemRegistry.GetData(m.ItemId);
+                                            return $"{mItem?.DisplayName ?? m.ItemId} (x{m.Amount})";
+                                        });
+                                        bSection.Fields.Add(new LookupField("Materials", string.Join(", ", matStrs), Game1.textColor));
+                                    }
+                                    bSubject.Sections.Add(bSection);
+                                    return bSubject;
+                                }
+                            ));
+
+                            if (results.Count >= 40)
+                                break;
+                        }
+                    }
+                }
+            }
+            catch { }
 
             return results;
         }
