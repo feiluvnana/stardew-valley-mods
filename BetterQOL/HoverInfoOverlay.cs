@@ -507,9 +507,9 @@ namespace BetterQOL
         private static void DrawWorldTooltip(SpriteBatch spriteBatch, TooltipModel tooltip, Vector2 screenPos)
         {
             SpriteFont font = Game1.smallFont;
-            const int paddingX = 20;
-            const int paddingY = 16;
-            const int iconSize = 30;
+            const int paddingX = 26;
+            const int paddingY = 22;
+            const int iconSize = 28;
             const int lineSpacing = 24;
 
             // Measure Title
@@ -526,7 +526,7 @@ namespace BetterQOL
 
             foreach (var line in tooltip.Lines)
             {
-                string wrapped = Game1.parseText(line.Text, font, 360);
+                string wrapped = Game1.parseText(line.Text, font, 340);
                 Vector2 size = font.MeasureString(wrapped);
                 if (size.X > maxLineWidth)
                 {
@@ -535,7 +535,7 @@ namespace BetterQOL
                 processedLines.Add((wrapped, size, line.Color));
             }
 
-            int boxWidth = (int)Math.Max(210, maxLineWidth + (paddingX * 2) + 12);
+            int boxWidth = (int)Math.Max(230, maxLineWidth + (paddingX * 2) + 16);
             int headerHeight = (int)Math.Max(iconSize, titleSize.Y);
 
             int contentLinesHeight = 0;
@@ -544,8 +544,8 @@ namespace BetterQOL
                 contentLinesHeight += (int)Math.Max(lineSpacing, pl.Size.Y + 2);
             }
 
-            int dividerHeight = 10;
-            int boxHeight = (paddingY * 2) + headerHeight + dividerHeight + contentLinesHeight + 6;
+            int dividerHeight = 12;
+            int boxHeight = (paddingY * 2) + headerHeight + dividerHeight + contentLinesHeight + 12;
 
             // Compute Position with screen boundary clamping
             int targetX = (int)screenPos.X + 24;
@@ -593,7 +593,7 @@ namespace BetterQOL
             }
 
             // Draw Title
-            Utility.drawTextWithShadow(spriteBatch, tooltip.Title, font, new Vector2(textStartX, currentY + 2), Game1.textColor);
+            Utility.drawTextWithShadow(spriteBatch, tooltip.Title, font, new Vector2(textStartX, currentY + 1), Game1.textColor);
             currentY += headerHeight + 6;
 
             // Subtle divider line
