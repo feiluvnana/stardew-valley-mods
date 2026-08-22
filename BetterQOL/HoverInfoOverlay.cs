@@ -47,7 +47,7 @@ namespace BetterQOL
             helper.Events.Display.RenderedHud += OnRenderedHud;
         }
 
-        #region 1. In-World Hover Overlay (UI Info Suite 2 Style)
+        #region 1. In-World Hover Overlay
 
         private static void OnRenderedHud(object? sender, RenderedHudEventArgs e)
         {
@@ -218,7 +218,7 @@ namespace BetterQOL
                 tooltip.Lines.Add(new TooltipLine(ModEntry.I18n.Get("hover.crop.regrow-cycle", new { days = info.RegrowDays }), Color.DarkSlateGray));
             }
 
-            // Water & Fertilizer (UI Info Suite 2 Style)
+            // Water & Fertilizer
             if (Config.ShowWaterAndFertilizer)
             {
                 if (info.IsWatered)
@@ -281,7 +281,7 @@ namespace BetterQOL
                 return tooltip;
             }
 
-            // Cask Aging Info (UI Info Suite 2 Style)
+            // Cask Aging Info
             if (info.IsCask && info.IsProcessing)
             {
                 string nextQualityName = info.CaskNextQuality switch
@@ -502,53 +502,66 @@ namespace BetterQOL
 
         #endregion
 
-        #region 3. Native Compact UI Rendering
+        #region 3. Polished Compact UI Rendering
 
         private static void DrawWorldTooltip(SpriteBatch spriteBatch, TooltipModel tooltip, Vector2 screenPos)
         {
             SpriteFont font = Game1.smallFont;
-            const int paddingX = 14;
-            const int paddingY = 10;
-            const int iconSize = 28;
-            const int lineSpacing = 22;
+            const int paddingX = 20;
+            const int paddingY = 16;
+            const int iconSize = 30;
+            const int lineSpacing = 24;
 
+            // Measure Title
             Vector2 titleSize = font.MeasureString(tooltip.Title);
             float headerWidth = titleSize.X;
             if (tooltip.IconTexture != null)
             {
-                headerWidth += iconSize + 8;
+                headerWidth += iconSize + 10;
             }
 
+            // Measure Lines with wrapping if necessary
             float maxLineWidth = headerWidth;
+            var processedLines = new List<(string WrappedText, Vector2 Size, Color Color)>();
+
             foreach (var line in tooltip.Lines)
             {
-                Vector2 lineSize = font.MeasureString(line.Text);
-                if (lineSize.X > maxLineWidth)
+                string wrapped = Game1.parseText(line.Text, font, 360);
+                Vector2 size = font.MeasureString(wrapped);
+                if (size.X > maxLineWidth)
                 {
-                    maxLineWidth = lineSize.X;
+                    maxLineWidth = size.X;
                 }
+                processedLines.Add((wrapped, size, line.Color));
             }
 
-            int boxWidth = (int)Math.Max(180, maxLineWidth + (paddingX * 2));
+            int boxWidth = (int)Math.Max(210, maxLineWidth + (paddingX * 2) + 12);
             int headerHeight = (int)Math.Max(iconSize, titleSize.Y);
-            int contentHeight = headerHeight + 4 + (tooltip.Lines.Count * lineSpacing);
-            int boxHeight = contentHeight + (paddingY * 2);
+
+            int contentLinesHeight = 0;
+            foreach (var pl in processedLines)
+            {
+                contentLinesHeight += (int)Math.Max(lineSpacing, pl.Size.Y + 2);
+            }
+
+            int dividerHeight = 10;
+            int boxHeight = (paddingY * 2) + headerHeight + dividerHeight + contentLinesHeight + 6;
 
             // Compute Position with screen boundary clamping
-            int targetX = (int)screenPos.X + 20;
-            int targetY = (int)screenPos.Y + 20;
+            int targetX = (int)screenPos.X + 24;
+            int targetY = (int)screenPos.Y + 24;
 
             if (targetX + boxWidth > Game1.uiViewport.Width)
             {
-                targetX = (int)screenPos.X - boxWidth - 12;
+                targetX = (int)screenPos.X - boxWidth - 16;
             }
             if (targetY + boxHeight > Game1.uiViewport.Height)
             {
-                targetY = (int)screenPos.Y - boxHeight - 12;
+                targetY = (int)screenPos.Y - boxHeight - 16;
             }
 
-            targetX = Math.Max(8, Math.Min(targetX, Game1.uiViewport.Width - boxWidth - 8));
-            targetY = Math.Max(8, Math.Min(targetY, Game1.uiViewport.Height - boxHeight - 8));
+            targetX = Math.Max(12, Math.Min(targetX, Game1.uiViewport.Width - boxWidth - 12));
+            targetY = Math.Max(12, Math.Min(targetY, Game1.uiViewport.Height - boxHeight - 12));
 
             // Native Stardew Parchment Box
             IClickableMenu.drawTextureBox(
@@ -576,22 +589,22 @@ namespace BetterQOL
                 spriteBatch.Draw(tooltip.IconTexture, new Rectangle(destRect.X + 1, destRect.Y + 1, iconSize, iconSize), srcRect, Color.Black * 0.35f);
                 spriteBatch.Draw(tooltip.IconTexture, destRect, srcRect, Color.White);
 
-                textStartX += iconSize + 8;
+                textStartX += iconSize + 10;
             }
 
             // Draw Title
             Utility.drawTextWithShadow(spriteBatch, tooltip.Title, font, new Vector2(textStartX, currentY + 2), Game1.textColor);
-            currentY += headerHeight + 4;
+            currentY += headerHeight + 6;
 
-            // Subtle divider
+            // Subtle divider line
             spriteBatch.Draw(Game1.staminaRect, new Rectangle(targetX + paddingX, (int)currentY, boxWidth - (paddingX * 2), 2), Color.SaddleBrown * 0.25f);
-            currentY += 4;
+            currentY += 8;
 
             // Draw Content Lines
-            foreach (var line in tooltip.Lines)
+            foreach (var pl in processedLines)
             {
-                Utility.drawTextWithShadow(spriteBatch, line.Text, font, new Vector2(targetX + paddingX, currentY), line.Color);
-                currentY += lineSpacing;
+                Utility.drawTextWithShadow(spriteBatch, pl.WrappedText, font, new Vector2(targetX + paddingX, currentY), pl.Color);
+                currentY += (int)Math.Max(lineSpacing, pl.Size.Y + 2);
             }
         }
 
