@@ -46,7 +46,7 @@ namespace BetterQOL
         /// <summary>Allow identical boots to stack.</summary>
         public bool EnableBootsStacking { get; set; } = true;
 
-        // ---------------- Hover Information & Timers ----------------
+        // ---------------- Hover Information & Timers (UI Info Suite 2 Style) ----------------
         /// <summary>Whether to show crop growth time, harvest readiness, and soil info when hovering.</summary>
         public bool EnableCropHover { get; set; } = true;
 
@@ -67,6 +67,15 @@ namespace BetterQOL
 
         /// <summary>Whether to display the exact clock time when machines will finish.</summary>
         public bool ShowExactFinishTime { get; set; } = true;
+
+        /// <summary>Whether to show item sell price in inventory/menu tooltips.</summary>
+        public bool ShowItemSellPriceOnHover { get; set; } = true;
+
+        /// <summary>Whether to show Community Center bundle need in inventory/menu tooltips.</summary>
+        public bool ShowBundleNeedOnHover { get; set; } = true;
+
+        /// <summary>Whether to show Museum donation status in inventory/menu tooltips.</summary>
+        public bool ShowMuseumNeedOnHover { get; set; } = true;
 
         /// <summary>Optional key to hold to show hover tooltips (default None: always shows on hover).</summary>
         public SButton HoverHotkey { get; set; } = SButton.None;

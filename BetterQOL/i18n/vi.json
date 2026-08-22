@@ -36,7 +36,7 @@
   "config.enable-boots-stacking.name": "Xếp Chồng Giày Ủng",
   "config.enable-boots-stacking.tooltip": "Cho phép các đôi giày / ủng cùng loại xếp chồng lên nhau.",
 
-  "config.section.hover-info": "Thông Tin & Bộ Đếm Thời Gian Khi Di Chuột",
+  "config.section.hover-info": "Thông Tin Khi Di Chuột (Kiểu UI Info Suite 2)",
   "config.enable-crop-hover.name": "Thời Gian Lớn & Thông Tin Cây Trồng",
   "config.enable-crop-hover.tooltip": "Hiển thị số ngày còn lại đến khi thu hoạch, giai đoạn phát triển, tình trạng tưới nước và phân bón khi di chuột vào cây trồng.",
   "config.enable-machine-hover.name": "Bộ Đếm Thời Gian Máy Móc",
@@ -51,6 +51,12 @@
   "config.show-item-icon-in-tooltip.tooltip": "Hiển thị hình ảnh biểu tượng của nông sản / thành phẩm bên cạnh tiêu đề.",
   "config.show-exact-finish-time.name": "Hiện Giờ Hoàn Thành Chính Xác",
   "config.show-exact-finish-time.tooltip": "Hiển thị mốc giờ trong game mà máy móc sẽ xử lý xong (ví dụ: Hôm nay lúc 4:20 PM).",
+  "config.show-item-sell-price-on-hover.name": "Hiện Giá Bán Vật Phẩm Khi Di Chuột",
+  "config.show-item-sell-price-on-hover.tooltip": "Hiển thị giá bán đơn lẻ và tổng giá bán cả chồng khi di chuột vào vật phẩm trong menu/túi đồ.",
+  "config.show-bundle-need-on-hover.name": "Hiện Gói Quà Cần Vật Phẩm",
+  "config.show-bundle-need-on-hover.tooltip": "Hiển thị tên gói quà Trung tâm Cộng đồng đang cần vật phẩm này khi di chuột trong túi đồ.",
+  "config.show-museum-need-on-hover.name": "Hiện Trạng Thái Bảo Tàng Khi Di Chuột",
+  "config.show-museum-need-on-hover.tooltip": "Hiển thị xem vật phẩm đã hiến tặng hay có thể hiến tặng cho Bảo tàng Gunther khi di chuột trong túi đồ.",
   "config.hover-hotkey.name": "Phím Kích Hoạt Xem Thông Tin",
   "config.hover-hotkey.tooltip": "Phím cần giữ để hiện thông tin khi di chuột. Chọn 'None' để luôn luôn hiển thị khi di chuột.",
 
@@ -147,6 +153,12 @@
   "hover.animal.needs-petting": "Chưa vuốt ve ✗",
   "hover.animal.friendship": "Tình bạn: {{hearts}}/{{max}} ♥",
   "hover.animal.produce-ready": "Sản phẩm: {{item}} (Đã có!)",
+
+  "hover.item.sell-price": "Giá Bán: {{price}}đ",
+  "hover.item.sell-price-stack": "Giá Bán: {{price}}đ ({{total}}đ / {{count}} cái)",
+  "hover.item.bundle-needed": "Cần Cho Gói Quà: {{bundles}}",
+  "hover.item.museum-needed": "Bảo Tàng: Có thể hiến tặng ✓",
+  "hover.item.museum-donated": "Bảo Tàng: Đã hiến tặng ✓",
 
   "season.spring": "Mùa Xuân",
   "season.summer": "Mùa Hạ",

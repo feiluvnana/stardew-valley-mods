@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
@@ -45,7 +46,10 @@ namespace BetterQOL
             Monitor = monitor;
 
             helper.Events.Display.RenderedHud += OnRenderedHud;
+            helper.Events.Display.RenderedActiveMenu += OnRenderedActiveMenu;
         }
+
+        #region 1. In-World Hover Overlay (UI Info Suite 2 Style)
 
         private static void OnRenderedHud(object? sender, RenderedHudEventArgs e)
         {
@@ -162,22 +166,165 @@ namespace BetterQOL
                 }
             }
 
-            // Render Tooltip if found
+            // Render World Tooltip if found
             if (tooltip != null)
             {
-                DrawTooltip(e.SpriteBatch, tooltip, screenPos);
+                DrawWorldTooltip(e.SpriteBatch, tooltip, screenPos);
             }
         }
 
-        #region Tooltip Builders
+        #endregion
+
+        #region 2. Menu Item Hover Overlay (UI Info Suite 2 Style)
+
+        private static void OnRenderedActiveMenu(object? sender, RenderedActiveMenuEventArgs e)
+        {
+            if (!Context.IsWorldReady || Game1.activeClickableMenu == null)
+                return;
+
+            Item? hoveredItem = GetHoveredItemFromActiveMenu(Game1.activeClickableMenu);
+            if (hoveredItem == null)
+                return;
+
+            var extraLines = new List<TooltipLine>();
+
+            // 1. Sell Price
+            if (Config.ShowItemSellPriceOnHover)
+            {
+                int singlePrice = hoveredItem.sellToStorePrice();
+                if (singlePrice > 0)
+                {
+                    string priceText;
+                    if (hoveredItem.Stack > 1)
+                    {
+                        int totalPrice = singlePrice * hoveredItem.Stack;
+                        priceText = ModEntry.I18n.Get("hover.item.sell-price-stack", new { price = singlePrice, total = totalPrice, count = hoveredItem.Stack });
+                    }
+                    else
+                    {
+                        priceText = ModEntry.I18n.Get("hover.item.sell-price", new { price = singlePrice });
+                    }
+
+                    extraLines.Add(new TooltipLine(priceText, new Color(180, 100, 0)));
+                }
+            }
+
+            // 2. Community Center Bundle Needs
+            if (Config.ShowBundleNeedOnHover)
+            {
+                var neededBundles = GetNeededBundlesForItem(hoveredItem);
+                if (neededBundles.Count > 0)
+                {
+                    string bundleText = ModEntry.I18n.Get("hover.item.bundle-needed", new { bundles = string.Join(", ", neededBundles) });
+                    extraLines.Add(new TooltipLine(bundleText, new Color(180, 50, 180)));
+                }
+            }
+
+            // 3. Museum Donation Status
+            if (Config.ShowMuseumNeedOnHover)
+            {
+                bool isMuseumItem = (hoveredItem is StardewValley.Object obj && (obj.Type == "Arch" || obj.Type == "Minerals"))
+                                 || hoveredItem.Category == StardewValley.Object.mineralsCategory;
+                if (isMuseumItem)
+                {
+                    bool isDonated = Game1.netWorldState.Value.MuseumPieces.Values.Contains(hoveredItem.ItemId)
+                                  || Game1.netWorldState.Value.MuseumPieces.Values.Contains(hoveredItem.QualifiedItemId);
+                    if (!isDonated)
+                    {
+                        extraLines.Add(new TooltipLine(ModEntry.I18n.Get("hover.item.museum-needed"), new Color(200, 60, 20)));
+                    }
+                    else
+                    {
+                        extraLines.Add(new TooltipLine(ModEntry.I18n.Get("hover.item.museum-donated"), new Color(0, 140, 0)));
+                    }
+                }
+            }
+
+            if (extraLines.Count > 0)
+            {
+                DrawMenuExtraTooltip(e.SpriteBatch, extraLines);
+            }
+        }
+
+        private static Item? GetHoveredItemFromActiveMenu(IClickableMenu menu)
+        {
+            if (menu is ItemGrabMenu itemGrabMenu && itemGrabMenu.hoveredItem != null)
+            {
+                return itemGrabMenu.hoveredItem;
+            }
+
+            if (menu is GameMenu gameMenu && gameMenu.pages != null && gameMenu.currentTab < gameMenu.pages.Count)
+            {
+                var activePage = gameMenu.pages[gameMenu.currentTab];
+                if (activePage is InventoryPage invPage && invPage.hoveredItem != null)
+                {
+                    return invPage.hoveredItem;
+                }
+                if (activePage is CraftingPage craftPage && craftPage.hoverItem != null)
+                {
+                    return craftPage.hoverItem;
+                }
+            }
+
+            if (menu is ShopMenu shopMenu && shopMenu.hoveredItem is Item shopItem)
+            {
+                return shopItem;
+            }
+
+            if (menu is InventoryMenu invMenu)
+            {
+                return invMenu.getItemAt(Game1.getMouseX(), Game1.getMouseY());
+            }
+
+            return null;
+        }
+
+        private static List<string> GetNeededBundlesForItem(Item item)
+        {
+            var results = new List<string>();
+            try
+            {
+                if (Game1.netWorldState.Value.Bundles == null || Game1.netWorldState.Value.BundleData == null)
+                    return results;
+
+                foreach (var kvp in Game1.netWorldState.Value.BundleData)
+                {
+                    string[] parts = kvp.Value.Split('/');
+                    if (parts.Length < 3)
+                        continue;
+
+                    string bundleName = parts[0];
+                    string[] reqs = parts[2].Split(' ');
+
+                    for (int i = 0; i < reqs.Length; i += 3)
+                    {
+                        if (i >= reqs.Length) break;
+                        string reqId = reqs[i];
+                        if (reqId == item.ItemId || reqId == item.QualifiedItemId)
+                        {
+                            if (!results.Contains(bundleName))
+                            {
+                                results.Add(bundleName);
+                            }
+                        }
+                    }
+                }
+            }
+            catch { }
+            return results;
+        }
+
+        #endregion
+
+        #region 3. Tooltip Builders
 
         private static TooltipModel BuildCropTooltip(HoeDirt hoeDirt, bool isGardenPot)
         {
             var info = CropHelper.GetCropInfo(hoeDirt);
             var tooltip = new TooltipModel
             {
-                Title = info?.CropName ?? ModEntry.I18n.Get("hover.crop.generic"),
-                Subtitle = isGardenPot ? ModEntry.I18n.Get("hover.type.garden-pot-crop") : ModEntry.I18n.Get("hover.type.crop"),
+                Title = info?.CropName ?? ModEntry.I18n.Get("hover.crop.generic").ToString(),
+                Subtitle = isGardenPot ? ModEntry.I18n.Get("hover.type.garden-pot-crop").ToString() : null,
                 IconTexture = Config.ShowItemIconInTooltip ? info?.IconTexture : null,
                 IconSourceRect = Config.ShowItemIconInTooltip ? info?.IconSourceRect : null
             };
@@ -191,7 +338,7 @@ namespace BetterQOL
                 return tooltip;
             }
 
-            // Ready / Growth time
+            // Days remaining / Ready state
             if (info.IsReadyToHarvest)
             {
                 tooltip.Lines.Add(new TooltipLine(ModEntry.I18n.Get("hover.crop.ready-to-harvest"), new Color(0, 140, 0)));
@@ -208,13 +355,13 @@ namespace BetterQOL
                 }
             }
 
-            // Regrow info
+            // Regrow schedule
             if (info.IsRegrowable)
             {
                 tooltip.Lines.Add(new TooltipLine(ModEntry.I18n.Get("hover.crop.regrow-cycle", new { days = info.RegrowDays }), Color.DarkSlateGray));
             }
 
-            // Water & Fertilizer
+            // Water & Fertilizer (UI Info Suite 2 Style)
             if (Config.ShowWaterAndFertilizer)
             {
                 if (info.IsWatered)
@@ -243,12 +390,12 @@ namespace BetterQOL
             var tooltip = new TooltipModel
             {
                 Title = info.MachineName,
-                Subtitle = ModEntry.I18n.Get("hover.type.machine"),
+                Subtitle = null,
                 IconTexture = Config.ShowItemIconInTooltip ? info.HeldItemTexture : null,
                 IconSourceRect = Config.ShowItemIconInTooltip ? info.HeldItemSourceRect : null
             };
 
-            // Held item name
+            // Held item product
             if (!string.IsNullOrEmpty(info.HeldItemName))
             {
                 string heldLabel = info.HeldItemStack > 1
@@ -277,7 +424,7 @@ namespace BetterQOL
                 return tooltip;
             }
 
-            // Cask Aging Info
+            // Cask Aging Info (UI Info Suite 2 Style)
             if (info.IsCask && info.IsProcessing)
             {
                 string nextQualityName = info.CaskNextQuality switch
@@ -341,7 +488,7 @@ namespace BetterQOL
             var tooltip = new TooltipModel
             {
                 Title = info?.Name ?? ModEntry.I18n.Get("hover.fruit-tree.generic"),
-                Subtitle = info?.Subtitle,
+                Subtitle = null,
                 IconTexture = Config.ShowItemIconInTooltip ? info?.IconTexture : null,
                 IconSourceRect = Config.ShowItemIconInTooltip ? info?.IconSourceRect : null
             };
@@ -384,8 +531,7 @@ namespace BetterQOL
             var info = TreeHelper.GetTreeInfo(tree);
             var tooltip = new TooltipModel
             {
-                Title = info?.Name ?? ModEntry.I18n.Get("hover.tree.generic"),
-                Subtitle = info?.Subtitle
+                Title = info?.Name ?? ModEntry.I18n.Get("hover.tree.generic")
             };
 
             if (info == null)
@@ -418,8 +564,7 @@ namespace BetterQOL
             var info = TreeHelper.GetBushInfo(bush);
             var tooltip = new TooltipModel
             {
-                Title = info?.Name ?? ModEntry.I18n.Get("hover.bush.generic"),
-                Subtitle = info?.Subtitle
+                Title = info?.Name ?? ModEntry.I18n.Get("hover.bush.generic")
             };
 
             if (info == null)
@@ -449,8 +594,7 @@ namespace BetterQOL
 
             var tooltip = new TooltipModel
             {
-                Title = ModEntry.I18n.Get("hover.giant-crop.title", new { name = displayName }),
-                Subtitle = ModEntry.I18n.Get("hover.type.giant-crop")
+                Title = ModEntry.I18n.Get("hover.giant-crop.title", new { name = displayName })
             };
 
             if (Config.ShowItemIconInTooltip && itemData != null)
@@ -471,8 +615,7 @@ namespace BetterQOL
         {
             var tooltip = new TooltipModel
             {
-                Title = info.Name,
-                Subtitle = info.TypeName
+                Title = $"{info.Name} ({info.TypeName})"
             };
 
             // Pet status
@@ -502,31 +645,23 @@ namespace BetterQOL
 
         #endregion
 
-        #region Tooltip Rendering
+        #region 4. Native Compact UI Rendering
 
-        private static void DrawTooltip(SpriteBatch spriteBatch, TooltipModel tooltip, Vector2 screenPos)
+        private static void DrawWorldTooltip(SpriteBatch spriteBatch, TooltipModel tooltip, Vector2 screenPos)
         {
             SpriteFont font = Game1.smallFont;
-            const int paddingX = 18;
-            const int paddingY = 14;
-            const int iconSize = 32;
-            const int lineSpacing = 24;
+            const int paddingX = 14;
+            const int paddingY = 10;
+            const int iconSize = 28;
+            const int lineSpacing = 22;
 
-            // Measure Title & Subtitle
             Vector2 titleSize = font.MeasureString(tooltip.Title);
-            Vector2 subSize = !string.IsNullOrEmpty(tooltip.Subtitle) ? font.MeasureString(tooltip.Subtitle) : Vector2.Zero;
-
             float headerWidth = titleSize.X;
             if (tooltip.IconTexture != null)
             {
-                headerWidth += iconSize + 10;
-            }
-            if (subSize.X > 0)
-            {
-                headerWidth = Math.Max(headerWidth, subSize.X);
+                headerWidth += iconSize + 8;
             }
 
-            // Measure Lines
             float maxLineWidth = headerWidth;
             foreach (var line in tooltip.Lines)
             {
@@ -537,14 +672,14 @@ namespace BetterQOL
                 }
             }
 
-            int boxWidth = (int)Math.Max(220, maxLineWidth + (paddingX * 2));
-            int headerHeight = (int)Math.Max(iconSize, titleSize.Y + (subSize.Y > 0 ? subSize.Y * 0.8f : 0));
-            int contentHeight = headerHeight + 8 + (tooltip.Lines.Count * lineSpacing);
+            int boxWidth = (int)Math.Max(180, maxLineWidth + (paddingX * 2));
+            int headerHeight = (int)Math.Max(iconSize, titleSize.Y);
+            int contentHeight = headerHeight + 4 + (tooltip.Lines.Count * lineSpacing);
             int boxHeight = contentHeight + (paddingY * 2);
 
             // Compute Position with screen boundary clamping
-            int targetX = (int)screenPos.X + 24;
-            int targetY = (int)screenPos.Y + 24;
+            int targetX = (int)screenPos.X + 20;
+            int targetY = (int)screenPos.Y + 20;
 
             if (targetX + boxWidth > Game1.uiViewport.Width)
             {
@@ -558,7 +693,7 @@ namespace BetterQOL
             targetX = Math.Max(8, Math.Min(targetX, Game1.uiViewport.Width - boxWidth - 8));
             targetY = Math.Max(8, Math.Min(targetY, Game1.uiViewport.Height - boxHeight - 8));
 
-            // Draw Background Box
+            // Native Stardew Parchment Box
             IClickableMenu.drawTextureBox(
                 spriteBatch,
                 Game1.menuTexture,
@@ -572,44 +707,90 @@ namespace BetterQOL
                 drawShadow: true
             );
 
-            // Draw Header
             float currentY = targetY + paddingY;
             float textStartX = targetX + paddingX;
 
+            // Draw Icon
             if (tooltip.IconTexture != null)
             {
                 Rectangle srcRect = tooltip.IconSourceRect ?? new Rectangle(0, 0, tooltip.IconTexture.Width, tooltip.IconTexture.Height);
                 Rectangle destRect = new Rectangle(targetX + paddingX, (int)currentY, iconSize, iconSize);
 
-                // Icon shadow
-                spriteBatch.Draw(tooltip.IconTexture, new Rectangle(destRect.X + 2, destRect.Y + 2, iconSize, iconSize), srcRect, Color.Black * 0.3f);
+                spriteBatch.Draw(tooltip.IconTexture, new Rectangle(destRect.X + 1, destRect.Y + 1, iconSize, iconSize), srcRect, Color.Black * 0.35f);
                 spriteBatch.Draw(tooltip.IconTexture, destRect, srcRect, Color.White);
 
-                textStartX += iconSize + 10;
+                textStartX += iconSize + 8;
             }
 
             // Draw Title
-            Utility.drawTextWithShadow(spriteBatch, tooltip.Title, font, new Vector2(textStartX, currentY), Game1.textColor);
+            Utility.drawTextWithShadow(spriteBatch, tooltip.Title, font, new Vector2(textStartX, currentY + 2), Game1.textColor);
+            currentY += headerHeight + 4;
 
-            // Draw Subtitle
-            if (!string.IsNullOrEmpty(tooltip.Subtitle))
-            {
-                float subY = currentY + titleSize.Y - 2;
-                Utility.drawTextWithShadow(spriteBatch, tooltip.Subtitle, font, new Vector2(textStartX, subY), Color.DimGray, 0.85f);
-                currentY = subY + (subSize.Y * 0.85f) + 6;
-            }
-            else
-            {
-                currentY += Math.Max(iconSize, titleSize.Y) + 6;
-            }
-
-            // Draw subtle divider
-            int dividerY = (int)currentY;
-            spriteBatch.Draw(Game1.staminaRect, new Rectangle(targetX + paddingX, dividerY, boxWidth - (paddingX * 2), 2), Color.SaddleBrown * 0.25f);
-            currentY += 6;
+            // Subtle divider
+            spriteBatch.Draw(Game1.staminaRect, new Rectangle(targetX + paddingX, (int)currentY, boxWidth - (paddingX * 2), 2), Color.SaddleBrown * 0.25f);
+            currentY += 4;
 
             // Draw Content Lines
             foreach (var line in tooltip.Lines)
+            {
+                Utility.drawTextWithShadow(spriteBatch, line.Text, font, new Vector2(targetX + paddingX, currentY), line.Color);
+                currentY += lineSpacing;
+            }
+        }
+
+        private static void DrawMenuExtraTooltip(SpriteBatch spriteBatch, List<TooltipLine> lines)
+        {
+            SpriteFont font = Game1.smallFont;
+            int mouseX = Game1.getMouseX();
+            int mouseY = Game1.getMouseY();
+
+            const int paddingX = 12;
+            const int paddingY = 8;
+            const int lineSpacing = 20;
+
+            float maxLineWidth = 0;
+            foreach (var line in lines)
+            {
+                Vector2 lineSize = font.MeasureString(line.Text);
+                if (lineSize.X > maxLineWidth)
+                {
+                    maxLineWidth = lineSize.X;
+                }
+            }
+
+            int boxWidth = (int)Math.Max(140, maxLineWidth + (paddingX * 2));
+            int boxHeight = (lines.Count * lineSpacing) + (paddingY * 2);
+
+            int targetX = mouseX + 24;
+            int targetY = mouseY + 36;
+
+            if (targetX + boxWidth > Game1.uiViewport.Width)
+            {
+                targetX = mouseX - boxWidth - 12;
+            }
+            if (targetY + boxHeight > Game1.uiViewport.Height)
+            {
+                targetY = mouseY - boxHeight - 12;
+            }
+
+            targetX = Math.Max(8, Math.Min(targetX, Game1.uiViewport.Width - boxWidth - 8));
+            targetY = Math.Max(8, Math.Min(targetY, Game1.uiViewport.Height - boxHeight - 8));
+
+            IClickableMenu.drawTextureBox(
+                spriteBatch,
+                Game1.menuTexture,
+                new Rectangle(0, 256, 60, 60),
+                targetX,
+                targetY,
+                boxWidth,
+                boxHeight,
+                Color.White,
+                1f,
+                drawShadow: true
+            );
+
+            float currentY = targetY + paddingY;
+            foreach (var line in lines)
             {
                 Utility.drawTextWithShadow(spriteBatch, line.Text, font, new Vector2(targetX + paddingX, currentY), line.Color);
                 currentY += lineSpacing;

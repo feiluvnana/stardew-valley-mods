@@ -247,7 +247,7 @@ namespace BetterQOL
                 setValue: value => Config.EnableBootsStacking = value
             );
 
-            // ---------------- Section 4: Hover Information & Timers ----------------
+            // ---------------- Section 4: Hover Information & Timers (UI Info Suite 2 Style) ----------------
             configMenu.AddSectionTitle(
                 mod: ModManifest,
                 text: () => I18n.Get("config.section.hover-info")
@@ -307,6 +307,30 @@ namespace BetterQOL
                 tooltip: () => I18n.Get("config.show-exact-finish-time.tooltip"),
                 getValue: () => Config.ShowExactFinishTime,
                 setValue: value => Config.ShowExactFinishTime = value
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.show-item-sell-price-on-hover.name"),
+                tooltip: () => I18n.Get("config.show-item-sell-price-on-hover.tooltip"),
+                getValue: () => Config.ShowItemSellPriceOnHover,
+                setValue: value => Config.ShowItemSellPriceOnHover = value
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.show-bundle-need-on-hover.name"),
+                tooltip: () => I18n.Get("config.show-bundle-need-on-hover.tooltip"),
+                getValue: () => Config.ShowBundleNeedOnHover,
+                setValue: value => Config.ShowBundleNeedOnHover = value
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.show-museum-need-on-hover.name"),
+                tooltip: () => I18n.Get("config.show-museum-need-on-hover.tooltip"),
+                getValue: () => Config.ShowMuseumNeedOnHover,
+                setValue: value => Config.ShowMuseumNeedOnHover = value
             );
 
             configMenu.AddKeybind(

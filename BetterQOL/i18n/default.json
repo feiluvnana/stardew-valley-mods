@@ -36,7 +36,7 @@
   "config.enable-boots-stacking.name": "Enable Boots Stacking",
   "config.enable-boots-stacking.tooltip": "Allow identical boots to stack.",
 
-  "config.section.hover-info": "Hover Information & Timers",
+  "config.section.hover-info": "Hover Information & Timers (UI Info Suite 2 Style)",
   "config.enable-crop-hover.name": "Crop Grow Times & Info",
   "config.enable-crop-hover.tooltip": "Show days remaining to harvest, growth stage, water, and fertilizer when hovering over crops.",
   "config.enable-machine-hover.name": "Machine Processing Timers",
@@ -51,6 +51,12 @@
   "config.show-item-icon-in-tooltip.tooltip": "Display item sprite previews next to titles in hover tooltips.",
   "config.show-exact-finish-time.name": "Show Exact Finish Clock Time",
   "config.show-exact-finish-time.tooltip": "Display the estimated clock time (e.g. 4:20 PM) when machines finish processing.",
+  "config.show-item-sell-price-on-hover.name": "Show Item Sell Price on Hover",
+  "config.show-item-sell-price-on-hover.tooltip": "Display single and stack sell prices when hovering over items in menus.",
+  "config.show-bundle-need-on-hover.name": "Show Bundle Needs on Hover",
+  "config.show-bundle-need-on-hover.tooltip": "Display Community Center bundle requirements when hovering over items in menus.",
+  "config.show-museum-need-on-hover.name": "Show Museum Donation on Hover",
+  "config.show-museum-need-on-hover.tooltip": "Display Museum donation status when hovering over items in menus.",
   "config.hover-hotkey.name": "Hover Activation Hotkey",
   "config.hover-hotkey.tooltip": "Key to hold down to show hover tooltips. Set to 'None' to always show on hover.",
 
@@ -147,6 +153,12 @@
   "hover.animal.needs-petting": "Needs petting ✗",
   "hover.animal.friendship": "Friendship: {{hearts}}/{{max}} ♥",
   "hover.animal.produce-ready": "Produce: {{item}} (Ready!)",
+
+  "hover.item.sell-price": "Sell Price: {{price}}g",
+  "hover.item.sell-price-stack": "Sell: {{price}}g ({{total}}g for {{count}}x)",
+  "hover.item.bundle-needed": "Needed for: {{bundles}}",
+  "hover.item.museum-needed": "Museum: Can be donated ✓",
+  "hover.item.museum-donated": "Museum: Already donated ✓",
 
   "season.spring": "Spring",
   "season.summer": "Summer",
