@@ -121,5 +121,25 @@
   "config.enable-omni-geodes.name": "Bật Hốc Tinh Toàn Năng",
   "config.enable-omni-geodes.tooltip": "Cho phép Hốc tinh toàn năng xuất hiện.",
   "config.enable-calico-eggs.name": "Bật Trứng Calico",
-  "config.enable-calico-eggs.tooltip": "Cho phép Trứng Calico xuất hiện."
+  "config.enable-calico-eggs.tooltip": "Cho phép Trứng Calico xuất hiện.",
+
+  "config.section.fishing-chests": "Cài Đặt Rương Kho Báu Câu Cá",
+  "config.enable-fishing-chest-buff.name": "Bật Tăng Cường Rương Câu Cá",
+  "config.enable-fishing-chest-buff.tooltip": "Cải thiện rương kho báu câu cá chuẩn với số lượng tài nguyên tối thiểu hợp lý, loại bỏ rác vụn và bảo toàn phần thưởng gốc.",
+  "config.filter-fishing-chest-junk.name": "Loại Bỏ Rác & Vật Phẩm Vụn",
+  "config.filter-fishing-chest-junk.tooltip": "Loại bỏ rác thải khó chịu (đĩa CD vỡ, báo ướt) và các cọc 1x đá/gỗ vụn khỏi rương kho báu câu cá.",
+  "config.boost-fishing-resource-stacks.name": "Tăng Số Lượng Tài Nguyên",
+  "config.boost-fishing-resource-stacks.tooltip": "Đảm bảo mức tối thiểu hữu dụng cho quặng, than đá, mồi câu, hốc tinh và vật phẩm tiêu hao.",
+  "config.fishing-resource-stack-multiplier.name": "Hệ Số Nhân Tài Nguyên Câu Cá",
+  "config.fishing-resource-stack-multiplier.tooltip": "Hệ số nhân áp dụng cho tài nguyên có thể xếp chồng trong rương câu cá thường (1.0x đến 3.0x).",
+  "config.enable-fishing-artifact-protection.name": "Hỗ Trợ Tìm Cổ Vật Hiếm",
+  "config.enable-fishing-artifact-protection.tooltip": "Tăng nhẹ cơ hội nhận được Trứng Khủng Long và Hạt Giống Cổ Đại nếu chưa sở hữu.",
+
+  "config.section.golden-fishing-chests": "Rương Kho Báu Câu Cá Vàng (1.6)",
+  "config.enable-golden-chest-buff.name": "Bật Tăng Cường Rương Vàng",
+  "config.enable-golden-chest-buff.tooltip": "Nâng cấp rương kho báu câu cá vàng (Mở khóa từ Thông Thạo Câu Cá) với phần thưởng cao cấp, sách kỹ năng, thạch biển và số lượng lớn.",
+  "config.golden-chest-stack-multiplier.name": "Hệ Số Nhân Rương Vàng",
+  "config.golden-chest-stack-multiplier.tooltip": "Hệ số nhân số lượng cho các vật phẩm trong Rương Câu Cá Vàng (1.0x đến 5.0x).",
+  "config.golden-chest-pearl-bonus.name": "Tăng Tỉ Lệ Ngọc Trai Rương Vàng",
+  "config.golden-chest-pearl-bonus.tooltip": "Tăng đáng kể cơ hội nhận được Ngọc Trai từ Rương Kho Báu Câu Cá Vàng."
 }

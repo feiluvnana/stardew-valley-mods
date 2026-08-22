@@ -127,5 +127,25 @@
   "config.enable-omni-geodes.name": "Enable Omni Geodes",
   "config.enable-omni-geodes.tooltip": "Allow Omni Geodes to appear.",
   "config.enable-calico-eggs.name": "Enable Calico Eggs",
-  "config.enable-calico-eggs.tooltip": "Allow Calico Eggs to appear."
+  "config.enable-calico-eggs.tooltip": "Allow Calico Eggs to appear.",
+
+  "config.section.fishing-chests": "Fishing Treasure Chest Settings",
+  "config.enable-fishing-chest-buff.name": "Enable Fishing Chest Buff",
+  "config.enable-fishing-chest-buff.tooltip": "Enhance standard fishing treasure chests with generous stack floors, zero junk duds, and vanilla item fairness.",
+  "config.filter-fishing-chest-junk.name": "Filter Trash & Duds",
+  "config.filter-fishing-chest-junk.tooltip": "Remove frustrating trash items (broken CD, soggy newspaper) and low 1x stone/wood clutter from fishing chests.",
+  "config.boost-fishing-resource-stacks.name": "Boost Resource Stacks",
+  "config.boost-fishing-resource-stacks.tooltip": "Guarantee practical minimum stack sizes for ores, coal, bait, geodes, and consumables.",
+  "config.fishing-resource-stack-multiplier.name": "Resource Stack Multiplier",
+  "config.fishing-resource-stack-multiplier.tooltip": "Multiplier for stackable resource drops in standard fishing chests (1.0x to 3.0x).",
+  "config.enable-fishing-artifact-protection.name": "Artifact Bad-Luck Protection",
+  "config.enable-fishing-artifact-protection.tooltip": "Provides slight bonus checks for missing Dinosaur Eggs and Ancient Seeds.",
+
+  "config.section.golden-fishing-chests": "1.6 Golden Fishing Treasure Chests",
+  "config.enable-golden-chest-buff.name": "Enable Golden Chest Buff",
+  "config.enable-golden-chest-buff.tooltip": "Enhance 1.6 Fishing Mastery Golden Chests with high-tier rewards, power books, jellies, and large stacks.",
+  "config.golden-chest-stack-multiplier.name": "Golden Chest Stack Multiplier",
+  "config.golden-chest-stack-multiplier.tooltip": "Multiplier applied to stackable items found in Golden Fishing Chests (1.0x to 5.0x).",
+  "config.golden-chest-pearl-bonus.name": "Boost Golden Chest Pearls",
+  "config.golden-chest-pearl-bonus.tooltip": "Significantly boost the odds of finding Pearls in Golden Fishing Chests."
 }

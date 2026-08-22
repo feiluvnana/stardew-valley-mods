@@ -1,9 +1,0 @@
-{
-  "Name": "Better Skull Cavern Chest",
-  "Author": "feiluvnana",
-  "Version": "1.1.0",
-  "Description": "Enhances Skull Cavern treasure chests with a wide variety of configurable rewards while excluding hats, clothes, and decorations.",
-  "UniqueID": "feiluvnana.BetterSkullCavernChest",
-  "MinimumApiVersion": "4.0.0",
-  "EntryDll": "BetterSkullCavernChest.dll"
-}

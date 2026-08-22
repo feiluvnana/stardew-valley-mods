@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using StardewValley;
 using StardewValley.Objects;
 
-namespace BetterSkullCavernChest
+namespace BetterChest
 {
     public enum LootCategory
     {

@@ -6,15 +6,15 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v6.0": {
-      "BetterSkullCavernChest/1.1.0": {
+      "BetterQOL/1.0.0": {
         "runtime": {
-          "BetterSkullCavernChest.dll": {}
+          "BetterQOL.dll": {}
         }
       }
     }
   },
   "libraries": {
-    "BetterSkullCavernChest/1.1.0": {
+    "BetterQOL/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

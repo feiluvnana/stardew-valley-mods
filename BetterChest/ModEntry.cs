@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using HarmonyLib;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
@@ -8,7 +9,7 @@ using StardewValley;
 using StardewValley.Locations;
 using StardewValley.Objects;
 
-namespace BetterSkullCavernChest
+namespace BetterChest
 {
     public interface IGenericModConfigMenuApi
     {
@@ -21,7 +22,7 @@ namespace BetterSkullCavernChest
 
     public class ModEntry : Mod
     {
-        private const string GeneratedModDataKey = "feiluvnana.BetterSkullCavernChest/Generated";
+        private const string GeneratedModDataKey = "feiluvnana.BetterChest/Generated";
 
         public static ModConfig Config { get; private set; } = null!;
         public static IMonitor ModMonitor { get; private set; } = null!;
@@ -34,6 +35,9 @@ namespace BetterSkullCavernChest
             ModMonitor = Monitor;
             I18n = helper.Translation;
             ModHelper = helper;
+
+            var harmony = new Harmony(ModManifest.UniqueID);
+            FishingPatches.Apply(harmony);
 
             helper.Events.Player.Warped += OnWarped;
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
@@ -703,6 +707,84 @@ namespace BetterSkullCavernChest
                 tooltip: () => I18n.Get("config.enable-calico-eggs.tooltip"),
                 getValue: () => Config.EnableCalicoEggs,
                 setValue: value => Config.EnableCalicoEggs = value
+            );
+
+            // =========================================================================
+            // === FISHING TREASURE CHESTS GMCM SECTION                              ===
+            // =========================================================================
+            configMenu.AddSectionTitle(
+                mod: ModManifest,
+                text: () => I18n.Get("config.section.fishing-chests")
+            );
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.enable-fishing-chest-buff.name"),
+                tooltip: () => I18n.Get("config.enable-fishing-chest-buff.tooltip"),
+                getValue: () => Config.EnableFishingChestBuff,
+                setValue: value => Config.EnableFishingChestBuff = value
+            );
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.filter-fishing-chest-junk.name"),
+                tooltip: () => I18n.Get("config.filter-fishing-chest-junk.tooltip"),
+                getValue: () => Config.FilterFishingChestJunk,
+                setValue: value => Config.FilterFishingChestJunk = value
+            );
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.boost-fishing-resource-stacks.name"),
+                tooltip: () => I18n.Get("config.boost-fishing-resource-stacks.tooltip"),
+                getValue: () => Config.BoostFishingResourceStacks,
+                setValue: value => Config.BoostFishingResourceStacks = value
+            );
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.fishing-resource-stack-multiplier.name"),
+                tooltip: () => I18n.Get("config.fishing-resource-stack-multiplier.tooltip"),
+                getValue: () => Config.FishingResourceStackMultiplier,
+                setValue: value => Config.FishingResourceStackMultiplier = value,
+                min: 1.0f,
+                max: 3.0f,
+                interval: 0.1f
+            );
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.enable-fishing-artifact-protection.name"),
+                tooltip: () => I18n.Get("config.enable-fishing-artifact-protection.tooltip"),
+                getValue: () => Config.EnableFishingArtifactProtection,
+                setValue: value => Config.EnableFishingArtifactProtection = value
+            );
+
+            // =========================================================================
+            // === 1.6 GOLDEN FISHING CHESTS GMCM SECTION                            ===
+            // =========================================================================
+            configMenu.AddSectionTitle(
+                mod: ModManifest,
+                text: () => I18n.Get("config.section.golden-fishing-chests")
+            );
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.enable-golden-chest-buff.name"),
+                tooltip: () => I18n.Get("config.enable-golden-chest-buff.tooltip"),
+                getValue: () => Config.EnableGoldenChestBuff,
+                setValue: value => Config.EnableGoldenChestBuff = value
+            );
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.golden-chest-stack-multiplier.name"),
+                tooltip: () => I18n.Get("config.golden-chest-stack-multiplier.tooltip"),
+                getValue: () => Config.GoldenChestStackMultiplier,
+                setValue: value => Config.GoldenChestStackMultiplier = value,
+                min: 1.0f,
+                max: 5.0f,
+                interval: 0.1f
+            );
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.golden-chest-pearl-bonus.name"),
+                tooltip: () => I18n.Get("config.golden-chest-pearl-bonus.tooltip"),
+                getValue: () => Config.GoldenChestPearlBonus,
+                setValue: value => Config.GoldenChestPearlBonus = value
             );
         }
     }

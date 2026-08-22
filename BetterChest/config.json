@@ -64,5 +64,13 @@
   "EnableMysteryBoxes": true,
   "EnableArtifactTroves": true,
   "EnableOmniGeodes": true,
-  "EnableCalicoEggs": true
+  "EnableCalicoEggs": true,
+  "EnableFishingChestBuff": true,
+  "FilterFishingChestJunk": true,
+  "BoostFishingResourceStacks": true,
+  "FishingResourceStackMultiplier": 1.5,
+  "EnableGoldenChestBuff": true,
+  "GoldenChestStackMultiplier": 2.0,
+  "GoldenChestPearlBonus": true,
+  "EnableFishingArtifactProtection": true
 }

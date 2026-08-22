@@ -1,8 +1,10 @@
-namespace BetterSkullCavernChest
+namespace BetterChest
 {
     public class ModConfig
     {
-        // General
+        // =========================================================================
+        // === 1. SKULL CAVERN CHEST SETTINGS                                    ===
+        // =========================================================================
         public bool EnableCustomRewards { get; set; } = true;
         public bool ExcludeCosmetics { get; set; } = true;
 
@@ -81,5 +83,19 @@ namespace BetterSkullCavernChest
         public bool EnableArtifactTroves { get; set; } = true;
         public bool EnableOmniGeodes { get; set; } = true;
         public bool EnableCalicoEggs { get; set; } = true;
+
+        // =========================================================================
+        // === 2. FISHING TREASURE CHEST BUFF SETTINGS                            ===
+        // =========================================================================
+        public bool EnableFishingChestBuff { get; set; } = true;
+        public bool FilterFishingChestJunk { get; set; } = true;
+        public bool BoostFishingResourceStacks { get; set; } = true;
+        public float FishingResourceStackMultiplier { get; set; } = 1.5f;
+
+        // 1.6 Golden Fishing Treasure Chest Enhancements
+        public bool EnableGoldenChestBuff { get; set; } = true;
+        public float GoldenChestStackMultiplier { get; set; } = 2.0f;
+        public bool GoldenChestPearlBonus { get; set; } = true;
+        public bool EnableFishingArtifactProtection { get; set; } = true;
     }
 }

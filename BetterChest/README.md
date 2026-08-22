@@ -1,37 +1,24 @@
-# 💎 BetterSkullCavernChest
+# 💎 BetterChest
 
-**BetterSkullCavernChest** transforms Skull Cavern treasure room chests from static, repetitive drops into a dynamic **7 Usage-Based Gameplay Categories** loot engine with **Decaying Multi-Rolls**, **Critical Jackpot Stack Multipliers**, and a dedicated **Supercharged Floor 100 Special Chest System**.
-
----
-
-## ✨ Features
-
-### 🌟 1. 7 Usage-Based Gameplay Categories (54 Validated Items)
-- 🌟 **Legendary:** Prismatic Shard, Magic Rock Candy, Golden Animal Cracker, Auto-Petter, Galaxy Soul, Stardrop Tea, Prize Ticket.
-- 🌾 **Agriculture:** Hyper Speed-Gro, Deluxe Fertilizer, Deluxe Retaining Soil, Tree Fertilizer, Iridium Sprinklers, Pressure Nozzles, Enrichers, Rare Seeds, Starfruit Seeds.
-- ⛏️ **Mining:** Radioactive Ore & Bar (Qi room gated), Iridium Ore & Bar, Cinder Shards, Mega Bombs, Jade (Staircase trading), Diamond.
-- 🎣 **Fishing:** Magic Bait, Trap Bobber, Curiosity Lure, Deluxe Bait, Challenge Bait, Sea Jelly, River Jelly, Cave Jelly, Seafoam Pudding, Dish O' The Sea.
-- ⚔️ **Combat:** Tiger & Purple Slime Eggs, Dragon Teeth, Fairy Dust, Monster Musk, Life Elixir, Triple Shot Espresso.
-- 🌲 **Foraging:** Hardwood, Mystic Tree Seed, Golden Coconut, Magma Cap, Purple Mushroom, Desert & Farm Warp Totems.
-- 🎁 **Lootboxes & Troves:** Omni Geodes, Mystery Boxes, Artifact Troves, Golden Mystery Boxes, Calico Eggs (15–50), Treasure Totems.
+**BetterChest** is a comprehensive loot overhaul for **Stardew Valley 1.6+**, enhancing both **Skull Cavern Treasure Rooms** and **Fishing Treasure Chests** (Standard and 1.6 Golden Chests) with dynamic gameplay loot engines, decaying multi-rolls, critical stack multipliers, and vanilla-faithful quality improvements.
 
 ---
 
-### 📦 2. Regular Treasure Chests vs 🏆 Floor 100 Special Chests
+## ✨ Key Modules
 
-| Feature | 📦 Regular Treasure Chests | 🏆 Floor 100 Special Chest (Floor 100/200/300) |
-| :--- | :---: | :---: |
-| **Category Selection Rates** | **Equal Weight (~14.285% each)** across all 7 categories | **Equal Weight (~14.285% each)** across all 7 categories |
-| **Max Rolls per Chest** | **6 Rolls** | **12 Rolls** |
-| **Decaying Roll Success Rates** | R1: 100%<br>R2: 80%<br>R3: 58%<br>R4: 40%<br>R5: 25%<br>R6: 10% | R1: 100%<br>R2: 94%<br>R3: 91%<br>R4: 86%<br>R5: 79%<br>R6: 71%<br>R7: 63%<br>R8: 53%<br>R9: 42%<br>R10: 30%<br>R11: 18%<br>R12: 5% |
-| **Critical Stack Multipliers** | 2x: 15%<br>3x: 10%<br>4x: 5%<br>*(Total Crit: **30%**, Expected: **1.50×**)* | **2x: 20%**<br>**3x: 25%**<br>**4x: 10%**<br>**5x (Mega Jackpot): 5%**<br>*(Total Crit: **60%**, Expected: **3.00× on Crit**)* |
+### 🏔️ Module 1: Skull Cavern Treasure Chests
+- **7 Usage-Based Gameplay Categories (54 Validated Items):** Legendary, Agriculture, Mining, Fishing, Combat, Foraging, and Lootboxes & Troves.
+- **Decaying Multi-Rolls:** Regular chests roll up to 6 items with decreasing roll probabilities (~2.5 items expected).
+- **Critical Jackpot Stack Multipliers:** 2x (15%), 3x (10%), 4x (5%) jackpot procs on stackable items.
+- **Supercharged Floor 100 Special Chests:** 12-roll ceiling with boosted stack crits up to 5x Mega Jackpot and equal category distribution.
+- **Zero Cosmetic Junk:** Filters out hats, shirts, and decorative items.
 
----
-
-### 🛡️ 3. Zero Junk / Invalid Item Protection
-- Fully compatible with Stardew Valley 1.6 item IDs.
-- Protects single-count items (Auto-Petter) from illegal multi-stack duplication.
-- Strips decorative cosmetic junk (hats, shirts, floor dividers).
+### 🎣 Module 2: Vanilla-Faithful Fishing Treasure Chests
+- **Authentic Vanilla Loot Pools:** Preserves all classic rewards (*Neptune's Glaive*, *Broken Trident*, *Dinosaur Egg*, *Ancient Seed*, *Lost Books*, *Gems*, *Tackle*, and *Power Books*).
+- **Meaningful Resource Floors:** Boosts min stacks (8–25 Coal/Ores instead of 1–3, 15–40 Bait, 3–8 Geodes).
+- **Trash & Dud Removal:** Automatically filters frustrating 1x stone, 1x wood, and broken trash items.
+- **1.6 Golden Chest Enhancements:** Boosted Pearl rates (15–25%), bonus marine jellies (*Sea/River/Cave Jelly*), skill books, and high-tier fishing food (*Seafoam Pudding*, *Dish O' The Sea*).
+- **Artifact Protection:** Bad-luck mitigation for museum completion (*Dinosaur Egg*, *Ancient Seed*).
 
 ---
 
@@ -164,7 +151,15 @@
   "EnableMysteryBoxes": true,
   "EnableArtifactTroves": true,
   "EnableOmniGeodes": true,
-  "EnableCalicoEggs": true
+  "EnableCalicoEggs": true,
+  "EnableFishingChestBuff": true,
+  "FilterFishingChestJunk": true,
+  "BoostFishingResourceStacks": true,
+  "FishingResourceStackMultiplier": 1.5,
+  "EnableGoldenChestBuff": true,
+  "GoldenChestStackMultiplier": 2.0,
+  "GoldenChestPearlBonus": true,
+  "EnableFishingArtifactProtection": true
 }
 ```
 
@@ -175,7 +170,7 @@ Configurable in-game via **Generic Mod Config Menu**.
 ## 🛠️ Building from Source
 
 ```powershell
-dotnet build BetterSkullCavernChest.csproj
+dotnet build BetterChest.csproj
 ```
 
 ---
