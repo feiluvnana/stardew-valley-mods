@@ -68,7 +68,7 @@ namespace BetterQOL
             );
 
             // 3. Search Box (top-right header)
-            int searchBoxW = 200;
+            int searchBoxW = 270;
             int searchBoxH = 48;
             int searchBoxX = xPositionOnScreen + width - searchBoxW - 54;
             int searchBoxY = headerTopY + 2;

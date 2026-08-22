@@ -8,10 +8,13 @@ using StardewValley.Buildings;
 using StardewValley.Characters;
 using StardewValley.GameData.Locations;
 using StardewValley.ItemTypeDefinitions;
+using StardewValley.Locations;
 using StardewValley.Monsters;
 using StardewValley.Objects;
+using StardewValley.SpecialOrders;
 using StardewValley.TerrainFeatures;
 using StardewValley.TokenizableStrings;
+using StardewValley.Tools;
 
 namespace BetterQOL
 {
@@ -345,6 +348,15 @@ namespace BetterQOL
                     new Color(180, 100, 0)
                 ));
             }
+
+            // Number Owned (in inventory + storage chests across the world)
+            var (invCount, storageCount) = GetItemOwnedCounts(item);
+            int totalOwned = invCount + storageCount;
+            string ownedStr = totalOwned > 0
+                ? $"{invCount} in inventory, {storageCount} in storage ({totalOwned} total)"
+                : "0 owned (none in inventory or chests)";
+            overviewSection.Fields.Add(new LookupField("Number Owned", ownedStr, totalOwned > 0 ? new Color(0, 140, 0) : Color.DarkSlateGray));
+
             subject.Sections.Add(overviewSection);
 
             // Section 2: Fish Details (Locations, Time, Seasons, Weather, Behavior)
@@ -356,10 +368,16 @@ namespace BetterQOL
             // Section 3: Crop / Seed Data (Growth Time, Regrow, Harvest Seasons)
             AddCropDataSection(subject, item);
 
-            // Section 4: Artisan Processing (Keg, Preserves Jar, Dehydrator, Cask)
+            // Section 4: Weapons & Equipment (Damage, Crit, Defense, Forges, Enchantments)
+            AddWeaponAndCombatSection(subject, item);
+
+            // Section 5: Tool Details (Upgrade level, Enchantments, Attached Bait/Tackles)
+            AddToolSection(subject, item);
+
+            // Section 6: Artisan Processing (Keg, Preserves Jar, Dehydrator, Cask, Fish Smoker)
             AddArtisanProductsSection(subject, item, baseSellPrice);
 
-            // Section 5: Museum & Bundles
+            // Section 7: Museum & Bundles
             if (ModEntry.Config.ShowBundleAndMuseumInfo)
             {
                 var progressSection = new LookupSection(ModEntry.I18n.Get("lookup.section.progress"));
@@ -400,7 +418,7 @@ namespace BetterQOL
                 }
             }
 
-            // Section 6: Gift Preferences (Interactive Tappable NPC Links)
+            // Section 8: Gift Preferences (Interactive Tappable NPC Links)
             if (ModEntry.Config.ShowGiftTastes)
             {
                 var giftSection = new LookupSection(ModEntry.I18n.Get("lookup.section.gift-tastes"));
@@ -422,7 +440,7 @@ namespace BetterQOL
                 }
             }
 
-            // Section 7: Recipes Using This Item (Cooking & Crafting)
+            // Section 9: Recipes Using This Item (Cooking & Crafting)
             if (ModEntry.Config.ShowItemRecipes)
             {
                 var recipes = GetRecipesUsingItemLinks(item);
@@ -435,6 +453,190 @@ namespace BetterQOL
             }
 
             return subject;
+        }
+
+        private static (int InventoryCount, int StorageCount) GetItemOwnedCounts(Item item)
+        {
+            int inventory = 0;
+            int storage = 0;
+            string itemId = item.ItemId;
+            string qId = item.QualifiedItemId;
+
+            try
+            {
+                // 1. Inventory
+                foreach (var invItem in Game1.player.Items)
+                {
+                    if (invItem != null && (invItem.ItemId == itemId || invItem.QualifiedItemId == qId))
+                    {
+                        inventory += invItem.Stack;
+                    }
+                }
+
+                // 2. Storage across all locations (Chests, Fridges, Junimo Chests, Auto-Grabbers)
+                foreach (var loc in Game1.locations)
+                {
+                    if (loc == null) continue;
+
+                    foreach (var obj in loc.objects.Values)
+                    {
+                        if (obj is Chest chest && chest.Items != null)
+                        {
+                            foreach (var cItem in chest.Items)
+                            {
+                                if (cItem != null && (cItem.ItemId == itemId || cItem.QualifiedItemId == qId))
+                                {
+                                    storage += cItem.Stack;
+                                }
+                            }
+                        }
+                    }
+
+                    if (loc is FarmHouse house && house.fridge.Value != null && house.fridge.Value.Items != null)
+                    {
+                        foreach (var fItem in house.fridge.Value.Items)
+                        {
+                            if (fItem != null && (fItem.ItemId == itemId || fItem.QualifiedItemId == qId))
+                            {
+                                storage += fItem.Stack;
+                            }
+                        }
+                    }
+
+                    if (loc.buildings.Count > 0)
+                    {
+                        foreach (var b in loc.buildings)
+                        {
+                            if (b.indoors.Value != null)
+                            {
+                                foreach (var obj in b.indoors.Value.objects.Values)
+                                {
+                                    if (obj is Chest chest && chest.Items != null)
+                                    {
+                                        foreach (var cItem in chest.Items)
+                                        {
+                                            if (cItem != null && (cItem.ItemId == itemId || cItem.QualifiedItemId == qId))
+                                            {
+                                                storage += cItem.Stack;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch { }
+
+            return (inventory, storage);
+        }
+
+        private static void AddWeaponAndCombatSection(LookupSubject subject, Item item)
+        {
+            try
+            {
+                if (item is MeleeWeapon weapon)
+                {
+                    var section = new LookupSection("Combat & Weapon Stats");
+                    section.Fields.Add(new LookupField("Damage", $"{weapon.minDamage.Value} - {weapon.maxDamage.Value}", new Color(200, 60, 20)));
+
+                    double critChance = weapon.critChance.Value * 100;
+                    section.Fields.Add(new LookupField("Critical Strike", $"{critChance:0.#}% (x{weapon.critMultiplier.Value:0.#} dmg)", new Color(180, 50, 180)));
+
+                    if (weapon.speed.Value != 0)
+                        section.Fields.Add(new LookupField("Speed", $"{(weapon.speed.Value > 0 ? "+" : "")}{weapon.speed.Value}", weapon.speed.Value > 0 ? new Color(0, 140, 0) : new Color(200, 60, 20)));
+
+                    if (weapon.addedDefense.Value != 0)
+                        section.Fields.Add(new LookupField("Defense", $"{(weapon.addedDefense.Value > 0 ? "+" : "")}{weapon.addedDefense.Value}", new Color(20, 110, 220)));
+
+                    if (weapon.addedAreaOfEffect.Value != 0)
+                        section.Fields.Add(new LookupField("Added Reach", $"+{weapon.addedAreaOfEffect.Value}", Color.DarkSlateGray));
+
+                    if (weapon.knockback.Value != 1f)
+                        section.Fields.Add(new LookupField("Knockback", $"{weapon.knockback.Value:0.0}", Color.DarkSlateGray));
+
+                    int forges = weapon.GetTotalForgeLevels();
+                    if (forges > 0)
+                        section.Fields.Add(new LookupField("Volcano Forges", $"Level {forges} / 3", new Color(180, 100, 0)));
+
+                    if (weapon.enchantments.Count > 0)
+                    {
+                        string enchants = string.Join(", ", weapon.enchantments.Select(e => e.GetName()));
+                        section.Fields.Add(new LookupField("Enchantments", enchants, new Color(180, 50, 180)));
+                    }
+
+                    subject.Sections.Add(section);
+                }
+                else if (item is Boots boots)
+                {
+                    var section = new LookupSection("Equipment Stats");
+                    if (boots.defenseBonus.Value > 0)
+                        section.Fields.Add(new LookupField("Defense", $"+{boots.defenseBonus.Value}", new Color(20, 110, 220)));
+                    if (boots.immunityBonus.Value > 0)
+                        section.Fields.Add(new LookupField("Immunity", $"+{boots.immunityBonus.Value}", new Color(0, 140, 0)));
+                    subject.Sections.Add(section);
+                }
+                else if (item is Ring ring)
+                {
+                    var section = new LookupSection("Ring Effects");
+                    if (ring is CombinedRing combined && combined.combinedRings.Count > 0)
+                    {
+                        var ringLinks = new List<LookupLink>();
+                        foreach (var subRing in combined.combinedRings)
+                        {
+                            var rData = ItemRegistry.GetData(subRing.QualifiedItemId);
+                            ringLinks.Add(new LookupLink(subRing.DisplayName, null, Game1.textColor, rData?.GetTexture(), rData?.GetSourceRect(), () => BuildItemSubject(subRing)));
+                        }
+                        section.Fields.Add(new LookupField("Combined Rings", ringLinks));
+                    }
+                    subject.Sections.Add(section);
+                }
+            }
+            catch { }
+        }
+
+        private static void AddToolSection(LookupSubject subject, Item item)
+        {
+            try
+            {
+                if (item is Tool tool && item is not MeleeWeapon)
+                {
+                    var section = new LookupSection("Tool Details");
+                    string upgradeName = tool.UpgradeLevel switch
+                    {
+                        0 => "Basic (Standard)",
+                        1 => "Copper Upgrade",
+                        2 => "Steel Upgrade",
+                        3 => "Gold Upgrade",
+                        4 => "Iridium Upgrade",
+                        _ => "Standard"
+                    };
+                    section.Fields.Add(new LookupField("Upgrade Level", upgradeName, new Color(180, 100, 0)));
+
+                    if (tool.enchantments.Count > 0)
+                    {
+                        string enchants = string.Join(", ", tool.enchantments.Select(e => e.GetName()));
+                        section.Fields.Add(new LookupField("Enchantments", enchants, new Color(180, 50, 180)));
+                    }
+
+                    if (tool is FishingRod rod)
+                    {
+                        var bait = rod.GetBait();
+                        section.Fields.Add(new LookupField("Bait Attached", bait != null ? $"{bait.DisplayName} (x{bait.Stack})" : "None", bait != null ? new Color(0, 140, 0) : Color.DarkSlateGray));
+
+                        var tackles = rod.GetTackle();
+                        if (tackles != null && tackles.Count > 0)
+                        {
+                            var tackleNames = tackles.Where(t => t != null).Select(t => $"{t.DisplayName} ({t.uses.Value}/{FishingRod.maxTackleUses} uses left)");
+                            section.Fields.Add(new LookupField("Tackles", string.Join(", ", tackleNames), new Color(20, 110, 220)));
+                        }
+                    }
+
+                    subject.Sections.Add(section);
+                }
+            }
+            catch { }
         }
 
         private static bool IsFishItem(Item item)
@@ -1598,7 +1800,27 @@ namespace BetterQOL
 
         private static LookupSection BuildSpecialEventsSection()
         {
-            var section = new LookupSection("TV & Traveling Merchant");
+            var section = new LookupSection("Events, TV & Quests");
+
+            // Bookseller (1.6 Feature)
+            bool isBookseller = Game1.getLocationFromName("Town")?.characters.Any(c => c.Name.Equals("Bookseller", StringComparison.OrdinalIgnoreCase)) == true;
+            section.Fields.Add(new LookupField("Bookseller", isBookseller ? "Visiting Town today! (Behind JojaMart)" : "Not visiting today", isBookseller ? new Color(180, 50, 180) : Color.DarkSlateGray));
+
+            // Tool Upgrade at Clint's
+            if (Game1.player.daysLeftForToolUpgrade.Value > 0)
+            {
+                int days = Game1.player.daysLeftForToolUpgrade.Value;
+                string readyText = days == 1 ? "Ready tomorrow!" : $"Ready in {days} days";
+                section.Fields.Add(new LookupField("Tool Upgrade", $"Clint is upgrading a tool ({readyText})", new Color(180, 100, 0)));
+            }
+
+            // Active Quests & Special Orders
+            int billboardQuests = Game1.player.questLog.Count;
+            int specialOrders = Game1.player.team.specialOrders.Count;
+            if (billboardQuests > 0 || specialOrders > 0)
+            {
+                section.Fields.Add(new LookupField("Active Quests", $"{billboardQuests} billboard quest(s), {specialOrders} special order(s) active", new Color(20, 110, 220)));
+            }
 
             // Queen of Sauce
             int day = Game1.dayOfMonth;
@@ -1786,6 +2008,54 @@ namespace BetterQOL
                     if (maxHay > 0)
                     {
                         section.Fields.Add(new LookupField("Silo Hay", $"{hay} / {maxHay} Hay", hay < maxHay / 4 ? new Color(200, 60, 20) : Game1.textColor));
+                    }
+                }
+            }
+            catch { }
+
+            // Greenhouse Crops
+            try
+            {
+                var greenhouse = Game1.getLocationFromName("Greenhouse");
+                if (greenhouse != null)
+                {
+                    int ghUnwatered = 0;
+                    int ghReady = 0;
+                    foreach (var pair in greenhouse.terrainFeatures.Pairs)
+                    {
+                        if (pair.Value is HoeDirt dirt && dirt.crop != null && !dirt.crop.dead.Value)
+                        {
+                            if (dirt.readyForHarvest()) ghReady++;
+                            else if (dirt.needsWatering() && dirt.state.Value != HoeDirt.watered) ghUnwatered++;
+                        }
+                    }
+                    if (ghUnwatered > 0 || ghReady > 0)
+                    {
+                        section.Fields.Add(new LookupField("Greenhouse", $"{ghUnwatered} unwatered, {ghReady} ready to harvest", ghUnwatered > 0 ? new Color(200, 60, 20) : new Color(0, 140, 0)));
+                    }
+                }
+            }
+            catch { }
+
+            // Ginger Island Farm (if unlocked)
+            try
+            {
+                var islandFarm = Game1.getLocationFromName("IslandWest");
+                if (islandFarm != null)
+                {
+                    int islUnwatered = 0;
+                    int islReady = 0;
+                    foreach (var pair in islandFarm.terrainFeatures.Pairs)
+                    {
+                        if (pair.Value is HoeDirt dirt && dirt.crop != null && !dirt.crop.dead.Value)
+                        {
+                            if (dirt.readyForHarvest()) islReady++;
+                            else if (dirt.needsWatering() && dirt.state.Value != HoeDirt.watered) islUnwatered++;
+                        }
+                    }
+                    if (islUnwatered > 0 || islReady > 0)
+                    {
+                        section.Fields.Add(new LookupField("Island Farm", $"{islUnwatered} unwatered, {islReady} ready to harvest", islUnwatered > 0 ? new Color(200, 60, 20) : new Color(0, 140, 0)));
                     }
                 }
             }
