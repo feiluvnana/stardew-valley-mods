@@ -214,7 +214,7 @@ namespace BetterForge
                         original: projectileUpdateMethod,
                         postfix: new HarmonyMethod(typeof(TrinketPatches), nameof(Projectile_update_Postfix))
                     );
-                    Monitor.Log("Hooked Projectile.update for Magic Quiver Piercing & Execute successfully.", LogLevel.Trace);
+                    Monitor.Log("Hooked Projectile.update for Magic Quiver Piercing successfully.", LogLevel.Trace);
                 }
             }
             catch (Exception ex)
@@ -605,12 +605,19 @@ namespace BetterForge
             }
         }
 
-        // Patch GameLocation.damageMonster to grant +10% Crit Chance for Ascended Spur
+        // Patch GameLocation.damageMonster for Spur +10% Crit Chance and Magic Quiver +15% Crit Chance
         public static void GameLocation_damageMonster_Prefix(Farmer who, ref float critChance)
         {
-            if (who != null && (TrinketAscensionLogic.HasAscendedTrinket(who, "spur") || TrinketAscensionLogic.HasAscendedTrinket(who, "goldenspur") || TrinketAscensionLogic.HasAscendedTrinket(who, "iridiumspur") || TrinketAscensionLogic.HasAscendedTrinket(who, "iridium")))
+            if (who == null) return;
+
+            if (TrinketAscensionLogic.HasAscendedTrinket(who, "spur") || TrinketAscensionLogic.HasAscendedTrinket(who, "goldenspur") || TrinketAscensionLogic.HasAscendedTrinket(who, "iridiumspur") || TrinketAscensionLogic.HasAscendedTrinket(who, "iridium"))
             {
                 critChance += 0.10f; // +10% Critical Strike Chance
+            }
+
+            if (TrinketAscensionLogic.HasAscendedTrinket(who, "quiver") || TrinketAscensionLogic.HasAscendedTrinket(who, "magicquiver"))
+            {
+                critChance += 0.15f; // +15% Critical Strike Chance
             }
         }
 
@@ -708,7 +715,7 @@ namespace BetterForge
         {
             if (__instance == null || location == null) return;
 
-            // 1. Magic Quiver Arrow: Multi-target sweeping piercing & execution
+            // 1. Magic Quiver Arrow: Multi-target sweeping piercing
             if (__instance is BasicProjectile bp && bp.projectileID.Value == 14)
             {
                 Farmer? farmer = bp.GetPlayerWhoFiredMe(location);
@@ -727,7 +734,6 @@ namespace BetterForge
                             if (hitList.Add(monster))
                             {
                                 location.damageMonster(monster.GetBoundingBox(), bp.damageToFarmer.Value, bp.damageToFarmer.Value + 1, false, farmer, true);
-                                TrinketAscensionLogic.TriggerQuiverExecute(monster, farmer, location);
                                 location.playSound("hitEnemy");
                                 Game1.createRadialDebris(location, 12, (int)monster.Position.X + 32, (int)monster.Position.Y + 32, 4, false);
                             }

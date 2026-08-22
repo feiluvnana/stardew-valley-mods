@@ -38,13 +38,15 @@ A lightweight, high-performance quality-of-life mod for **Stardew Valley 1.6+** 
 
 | Option | Default | Description |
 | :--- | :---: | :--- |
-| `FreeCracking` | `true` | When enabled, cracking geodes costs 0g. |
-| `CustomCrackingPrice` | `0` | Price per geode if FreeCracking is turned off (0–100g). |
+| `FreeCracking` | `false` | When enabled, cracking geodes costs 0g. |
+| `CustomCrackingPrice` | `25` | Price per geode if FreeCracking is turned off (0–100g). |
 | `InstantCracking` | `false` | When enabled, skips Clint's animation for single cracks as well. |
 | `ShowCrackAllButton` | `true` | Displays the "Crack All" button in the Geode Menu. |
 | `BulkBatchSize` | `999` | Maximum quantity cracked in a single bulk action. |
 | `ShowSummaryToast` | `true` | Shows a HUD popup summarizing cracked geodes. |
-| `InstantGeodeCrusher` | `false` | Enables instant processing on farm Geode Crusher machines. |
+| `AllowSpecialGeodesInCrusher` | `true` | Enables processing Mystery Boxes, Golden Mystery Boxes, Artifact Troves, and Golden Coconuts in Geode Crushers. |
+| `InstantGeodeCrusher` | `true` | Enables instant processing on farm Geode Crusher machines. |
+| `GeodeCrusherRequiresCoal` | `false` | Whether Geode Crusher machines require coal to run. |
 
 ---
 

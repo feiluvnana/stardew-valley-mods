@@ -415,28 +415,7 @@ namespace BetterForge
             who.applyBuff(unifiedBuff);
         }
 
-        // 5. Magic Quiver: Execute monsters below 15% HP or <= 30 HP
-        public static bool TriggerQuiverExecute(Monster monster, Farmer who, GameLocation location)
-        {
-            if (monster == null || who == null || location == null) return false;
-
-            if (monster.Health > 0)
-            {
-                bool isLowHp = monster.Health <= (int)(monster.MaxHealth * 0.15f) || monster.Health <= 30;
-                if (isLowHp)
-                {
-                    int fatalDamage = monster.Health + 50;
-                    monster.takeDamage(fatalDamage, 0, 0, false, 1.0, "hitEnemy");
-                    location.playSound("shadowDie");
-                    location.playSound("crit");
-                    Game1.createRadialDebris(location, 12, (int)monster.Position.X + 32, (int)monster.Position.Y + 32, 8, false);
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        // 6. Ice Rod: Shatter ice + Frost Shockwave (30% Attack) + Frost Slow (Does not destroy rocks/ores)
+        // 5. Ice Rod: Shatter ice + Frost Shockwave (30% Attack) + Frost Slow (Does not destroy rocks/ores)
         public static void TriggerIceShatterAndSlowNearby(Monster monster, Farmer who)
         {
             if (monster == null || who?.currentLocation == null) return;

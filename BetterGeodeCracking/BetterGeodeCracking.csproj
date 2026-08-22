@@ -4,6 +4,7 @@
     <RootNamespace>BetterGeodeCracking</RootNamespace>
     <Version>1.0.0</Version>
     <TargetFramework>net6.0</TargetFramework>
+    <EnableHarmony>true</EnableHarmony>
     <Platforms>AnyCPU</Platforms>
     <EnableModDeploy>false</EnableModDeploy>
     <OutputPath>.</OutputPath>
