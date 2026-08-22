@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -10,37 +11,53 @@ namespace BetterQOL
 {
     public class LookupMenu : IClickableMenu
     {
-        private readonly LookupSubject Subject;
+        private LookupSubject? CurrentSubject;
+        private readonly Stack<LookupSubject> History = new();
         private readonly List<ClickableComponent> Components = new();
 
         private ClickableTextureComponent? CloseButton;
+        private ClickableTextureComponent? BackButton;
         private ClickableTextureComponent? UpButton;
         private ClickableTextureComponent? DownButton;
 
+        private TextBox? SearchBox;
+        private ClickableComponent? SearchBoxComponent;
+        private string LastSearchText = string.Empty;
+        private List<LookupLink> SearchResults = new();
+
         private int ScrollOffset = 0;
         private int MaxScrollOffset = 0;
-        private const int ScrollStep = 36;
+        private const int ScrollStep = 40;
 
-        public LookupMenu(LookupSubject subject)
+        private readonly List<LookupLink> ActiveClickableLinks = new();
+        private LookupLink? HoveredLink = null;
+
+        public LookupMenu(LookupSubject? initialSubject = null)
             : base(
-                x: (Game1.uiViewport.Width - Math.Min(760, Game1.uiViewport.Width - 48)) / 2,
-                y: (Game1.uiViewport.Height - Math.Min(600, Game1.uiViewport.Height - 48)) / 2,
-                width: Math.Min(760, Game1.uiViewport.Width - 48),
-                height: Math.Min(600, Game1.uiViewport.Height - 48),
+                x: (Game1.uiViewport.Width - Math.Min(840, Game1.uiViewport.Width - 48)) / 2,
+                y: (Game1.uiViewport.Height - Math.Min(650, Game1.uiViewport.Height - 48)) / 2,
+                width: Math.Min(840, Game1.uiViewport.Width - 48),
+                height: Math.Min(650, Game1.uiViewport.Height - 48),
                 showUpperRightCloseButton: true
             )
         {
-            Subject = subject;
+            CurrentSubject = initialSubject;
             Game1.playSound("bigSelect");
 
             InitializeComponents();
+
+            if (CurrentSubject == null && SearchBox != null)
+            {
+                SearchBox.Selected = true;
+                Game1.keyboardDispatcher.Subscriber = SearchBox;
+            }
         }
 
         private void InitializeComponents()
         {
             Components.Clear();
 
-            // Close button
+            // 1. Close Button
             CloseButton = new ClickableTextureComponent(
                 new Rectangle(xPositionOnScreen + width - 36, yPositionOnScreen - 8, 48, 48),
                 Game1.mouseCursors,
@@ -49,9 +66,37 @@ namespace BetterQOL
             );
             Components.Add(CloseButton);
 
-            // Up / Down Scroll Buttons
+            // 2. Back Button
+            BackButton = new ClickableTextureComponent(
+                new Rectangle(xPositionOnScreen + 24, yPositionOnScreen + 26, 44, 44),
+                Game1.mouseCursors,
+                new Rectangle(352, 495, 12, 11),
+                3.5f
+            );
+
+            // 3. Search Box
+            int searchBoxW = 280;
+            int searchBoxH = 48;
+            int searchBoxX = xPositionOnScreen + width - searchBoxW - 56;
+            int searchBoxY = yPositionOnScreen + 24;
+
+            SearchBox = new TextBox(
+                Game1.content.Load<Texture2D>("LooseSprites\\textBox"),
+                null,
+                Game1.smallFont,
+                Game1.textColor
+            )
+            {
+                X = searchBoxX,
+                Y = searchBoxY,
+                Width = searchBoxW,
+                Height = searchBoxH
+            };
+            SearchBoxComponent = new ClickableComponent(new Rectangle(searchBoxX, searchBoxY, searchBoxW, searchBoxH), "SearchBox");
+
+            // 4. Scroll Buttons
             UpButton = new ClickableTextureComponent(
-                new Rectangle(xPositionOnScreen + width - 32, yPositionOnScreen + 104, 44, 48),
+                new Rectangle(xPositionOnScreen + width - 32, yPositionOnScreen + 94, 44, 48),
                 Game1.mouseCursors,
                 new Rectangle(421, 459, 11, 12),
                 4f
@@ -59,7 +104,7 @@ namespace BetterQOL
             Components.Add(UpButton);
 
             DownButton = new ClickableTextureComponent(
-                new Rectangle(xPositionOnScreen + width - 32, yPositionOnScreen + height - 60, 44, 48),
+                new Rectangle(xPositionOnScreen + width - 32, yPositionOnScreen + height - 56, 44, 48),
                 Game1.mouseCursors,
                 new Rectangle(421, 472, 11, 12),
                 4f
@@ -67,12 +112,99 @@ namespace BetterQOL
             Components.Add(DownButton);
         }
 
+        public void NavigateTo(LookupSubject subject)
+        {
+            if (CurrentSubject != null)
+            {
+                History.Push(CurrentSubject);
+            }
+            CurrentSubject = subject;
+            ScrollOffset = 0;
+            if (SearchBox != null)
+            {
+                SearchBox.Text = string.Empty;
+                SearchBox.Selected = false;
+                Game1.keyboardDispatcher.Subscriber = null;
+            }
+            SearchResults.Clear();
+            Game1.playSound("smallSelect");
+        }
+
+        public void NavigateBack()
+        {
+            if (History.Count > 0)
+            {
+                CurrentSubject = History.Pop();
+                ScrollOffset = 0;
+                Game1.playSound("smallSelect");
+            }
+            else if (CurrentSubject != null)
+            {
+                CurrentSubject = null;
+                ScrollOffset = 0;
+                if (SearchBox != null)
+                {
+                    SearchBox.Selected = true;
+                    Game1.keyboardDispatcher.Subscriber = SearchBox;
+                }
+                Game1.playSound("smallSelect");
+            }
+        }
+
+        public override void update(GameTime time)
+        {
+            base.update(time);
+
+            if (SearchBox != null)
+            {
+                SearchBox.Update();
+                if (SearchBox.Text != LastSearchText)
+                {
+                    LastSearchText = SearchBox.Text;
+                    ScrollOffset = 0;
+                    if (!string.IsNullOrWhiteSpace(LastSearchText))
+                    {
+                        SearchResults = LookupDataManager.SearchAll(LastSearchText);
+                    }
+                    else
+                    {
+                        SearchResults.Clear();
+                    }
+                }
+            }
+        }
+
+        public override void performHoverAction(int x, int y)
+        {
+            base.performHoverAction(x, y);
+
+            CloseButton?.tryHover(x, y, 0.2f);
+            BackButton?.tryHover(x, y, 0.2f);
+            UpButton?.tryHover(x, y, 0.2f);
+            DownButton?.tryHover(x, y, 0.2f);
+
+            HoveredLink = null;
+            foreach (var link in ActiveClickableLinks)
+            {
+                if (link.Bounds.Contains(x, y))
+                {
+                    HoveredLink = link;
+                    break;
+                }
+            }
+        }
+
         public override void receiveLeftClick(int x, int y, bool playSound = true)
         {
             if (CloseButton != null && CloseButton.containsPoint(x, y))
             {
-                Game1.playSound("bigDeSelect");
-                exitThisMenu();
+                CloseMenu();
+                return;
+            }
+
+            if ((History.Count > 0 || (CurrentSubject != null && !string.IsNullOrEmpty(LastSearchText))) && BackButton != null && BackButton.containsPoint(x, y))
+            {
+                NavigateBack();
                 return;
             }
 
@@ -90,18 +222,53 @@ namespace BetterQOL
                 return;
             }
 
+            // Click Search Box
+            if (SearchBoxComponent != null && SearchBoxComponent.containsPoint(x, y))
+            {
+                if (SearchBox != null)
+                {
+                    SearchBox.Selected = true;
+                    Game1.keyboardDispatcher.Subscriber = SearchBox;
+                }
+                return;
+            }
+            else
+            {
+                if (SearchBox != null && SearchBox.Selected)
+                {
+                    SearchBox.Selected = false;
+                    Game1.keyboardDispatcher.Subscriber = null;
+                }
+            }
+
+            // Click Clickable Link
+            if (HoveredLink?.OnClick != null)
+            {
+                var nextSubject = HoveredLink.OnClick();
+                if (nextSubject != null)
+                {
+                    NavigateTo(nextSubject);
+                    return;
+                }
+            }
+
             // Click outside bounds closes menu
             if (!new Rectangle(xPositionOnScreen, yPositionOnScreen, width, height).Contains(x, y))
             {
-                Game1.playSound("bigDeSelect");
-                exitThisMenu();
+                CloseMenu();
             }
         }
 
         public override void receiveRightClick(int x, int y, bool playSound = true)
         {
-            Game1.playSound("bigDeSelect");
-            exitThisMenu();
+            if (History.Count > 0 || CurrentSubject != null)
+            {
+                NavigateBack();
+            }
+            else
+            {
+                CloseMenu();
+            }
         }
 
         public override void receiveScrollWheelAction(int direction)
@@ -120,10 +287,34 @@ namespace BetterQOL
 
         public override void receiveKeyPress(Keys key)
         {
-            if (key == Keys.Escape || (key == (Keys)ModEntry.Config.LookupKey))
+            if (SearchBox != null && SearchBox.Selected)
             {
-                Game1.playSound("bigDeSelect");
-                exitThisMenu();
+                if (key == Keys.Escape)
+                {
+                    SearchBox.Selected = false;
+                    Game1.keyboardDispatcher.Subscriber = null;
+                }
+                else if (key == Keys.Enter && SearchResults.Count > 0)
+                {
+                    var firstResult = SearchResults[0];
+                    var nextSubject = firstResult.OnClick?.Invoke();
+                    if (nextSubject != null)
+                    {
+                        NavigateTo(nextSubject);
+                    }
+                }
+                return;
+            }
+
+            if (key == Keys.Escape || key == (Keys)ModEntry.Config.LookupKey)
+            {
+                CloseMenu();
+                return;
+            }
+
+            if (key == Keys.Back)
+            {
+                NavigateBack();
                 return;
             }
 
@@ -137,10 +328,23 @@ namespace BetterQOL
             }
         }
 
+        private void CloseMenu()
+        {
+            if (SearchBox != null)
+            {
+                SearchBox.Selected = false;
+                Game1.keyboardDispatcher.Subscriber = null;
+            }
+            Game1.playSound("bigDeSelect");
+            exitThisMenu();
+        }
+
         public override void draw(SpriteBatch b)
         {
+            ActiveClickableLinks.Clear();
+
             // Dark background overlay
-            b.Draw(Game1.fadeToBlackRect, new Rectangle(0, 0, Game1.uiViewport.Width, Game1.uiViewport.Height), Color.Black * 0.5f);
+            b.Draw(Game1.fadeToBlackRect, new Rectangle(0, 0, Game1.uiViewport.Width, Game1.uiViewport.Height), Color.Black * 0.55f);
 
             // Main Parchment Box
             IClickableMenu.drawTextureBox(
@@ -156,86 +360,242 @@ namespace BetterQOL
                 drawShadow: true
             );
 
-            // 1. Draw Header
+            // 1. Draw Top Header Bar
             int headerX = xPositionOnScreen + 32;
-            int headerY = yPositionOnScreen + 28;
-            int textStartX = headerX;
+            int headerY = yPositionOnScreen + 24;
 
-            // Portrait or Icon
-            if (Subject.Portrait != null)
+            bool canGoBack = History.Count > 0 || (CurrentSubject != null && !string.IsNullOrEmpty(LastSearchText));
+            if (canGoBack && BackButton != null)
             {
-                Rectangle src = Subject.PortraitSourceRect ?? new Rectangle(0, 0, 64, 64);
-                b.Draw(Subject.Portrait, new Rectangle(headerX, headerY, 64, 64), src, Color.White);
-                textStartX += 76;
-            }
-            else if (Subject.MainIcon != null)
-            {
-                Rectangle src = Subject.MainIconSourceRect ?? new Rectangle(0, 0, Subject.MainIcon.Width, Subject.MainIcon.Height);
-                b.Draw(Subject.MainIcon, new Rectangle(headerX, headerY, 56, 56), src, Color.White);
-                textStartX += 68;
+                BackButton.draw(b);
+                headerX += 48;
             }
 
-            // Title
-            Utility.drawTextWithShadow(b, Subject.Title, Game1.dialogueFont, new Vector2(textStartX, headerY - 4), Game1.textColor);
-
-            // Subtitle
-            if (!string.IsNullOrEmpty(Subject.Subtitle))
+            if (CurrentSubject != null)
             {
-                Utility.drawTextWithShadow(b, Subject.Subtitle, Game1.smallFont, new Vector2(textStartX, headerY + 36), Color.DimGray);
+                // Subject Portrait or Icon
+                if (CurrentSubject.Portrait != null)
+                {
+                    Rectangle src = CurrentSubject.PortraitSourceRect ?? new Rectangle(0, 0, 64, 64);
+                    b.Draw(CurrentSubject.Portrait, new Rectangle(headerX, headerY, 56, 56), src, Color.White);
+                    headerX += 68;
+                }
+                else if (CurrentSubject.MainIcon != null)
+                {
+                    Rectangle src = CurrentSubject.MainIconSourceRect ?? new Rectangle(0, 0, CurrentSubject.MainIcon.Width, CurrentSubject.MainIcon.Height);
+                    b.Draw(CurrentSubject.MainIcon, new Rectangle(headerX, headerY, 48, 48), src, Color.White);
+                    headerX += 58;
+                }
+
+                // Title & Subtitle
+                Utility.drawTextWithShadow(b, CurrentSubject.Title, Game1.dialogueFont, new Vector2(headerX, headerY - 4), Game1.textColor);
+                if (!string.IsNullOrEmpty(CurrentSubject.Subtitle))
+                {
+                    Utility.drawTextWithShadow(b, CurrentSubject.Subtitle, Game1.smallFont, new Vector2(headerX, headerY + 34), Color.DimGray);
+                }
+            }
+            else
+            {
+                // Search Mode Title
+                Utility.drawTextWithShadow(b, "Find Anything (F1)", Game1.dialogueFont, new Vector2(headerX, headerY - 2), Game1.textColor);
+                Utility.drawTextWithShadow(b, "Type to query any item, villager, monster, or recipe...", Game1.smallFont, new Vector2(headerX, headerY + 34), Color.DimGray);
             }
 
-            // Header Divider Line
-            int dividerY = yPositionOnScreen + 104;
-            b.Draw(Game1.staminaRect, new Rectangle(xPositionOnScreen + 24, dividerY, width - 48, 2), Color.SaddleBrown * 0.35f);
+            // Search Box
+            if (SearchBox != null)
+            {
+                SearchBox.Draw(b);
 
-            // 2. Scrollable Body
+                // Search icon
+                int iconX = SearchBox.X - 30;
+                int iconY = SearchBox.Y + 10;
+                Utility.drawTextWithShadow(b, "🔍", Game1.smallFont, new Vector2(iconX, iconY), Game1.textColor);
+
+                if (string.IsNullOrEmpty(SearchBox.Text) && !SearchBox.Selected)
+                {
+                    Utility.drawTextWithShadow(b, "Type to search...", Game1.smallFont, new Vector2(SearchBox.X + 16, SearchBox.Y + 12), Color.Gray * 0.8f);
+                }
+            }
+
+            // Header Divider
+            int dividerY = yPositionOnScreen + 88;
+            b.Draw(Game1.staminaRect, new Rectangle(xPositionOnScreen + 24, dividerY, width - 48, 2), Color.SaddleBrown * 0.3f);
+
+            // 2. Draw Content Area (Search Results or Subject Details)
             int contentX = xPositionOnScreen + 36;
             int contentY = dividerY + 14;
             int contentWidth = width - 88;
-            int contentHeight = height - 134;
+            int contentHeight = height - 120;
             int contentBottom = contentY + contentHeight;
 
             int currentY = contentY - ScrollOffset;
             int totalContentHeight = 0;
 
-            foreach (var section in Subject.Sections)
+            if (!string.IsNullOrWhiteSpace(LastSearchText))
             {
-                // Section Title
-                if (currentY >= contentY - 30 && currentY <= contentBottom)
+                // Render Search Results Mode
+                if (SearchResults.Count == 0)
                 {
-                    Utility.drawTextWithShadow(b, section.Title, Game1.dialogueFont, new Vector2(contentX, currentY), new Color(115, 40, 10));
+                    Utility.drawTextWithShadow(b, $"No results found for '{LastSearchText}'", Game1.smallFont, new Vector2(contentX, contentY + 20), Color.DarkSlateGray);
                 }
-                currentY += 34;
-                totalContentHeight += 34;
-
-                // Section Fields
-                foreach (var field in section.Fields)
+                else
                 {
-                    string label = !string.IsNullOrEmpty(field.Label) ? $"{field.Label}: " : string.Empty;
-                    Vector2 labelSize = Game1.smallFont.MeasureString(label);
-
-                    int valWidth = contentWidth - (int)labelSize.X - 24;
-                    string wrappedValue = Game1.parseText(field.Value, Game1.smallFont, Math.Max(180, valWidth));
-                    Vector2 valSize = Game1.smallFont.MeasureString(wrappedValue);
-                    int lineH = (int)Math.Max(26, valSize.Y + 4);
-
-                    if (currentY >= contentY - lineH && currentY <= contentBottom)
+                    foreach (var result in SearchResults)
                     {
-                        Utility.drawTextWithShadow(b, label, Game1.smallFont, new Vector2(contentX + 12, currentY), Game1.textColor);
-                        Utility.drawTextWithShadow(b, wrappedValue, Game1.smallFont, new Vector2(contentX + 12 + labelSize.X, currentY), field.ValueColor);
+                        int rowHeight = 44;
+                        Rectangle rowBounds = new Rectangle(contentX, currentY, contentWidth, rowHeight);
+                        result.Bounds = rowBounds;
+                        ActiveClickableLinks.Add(result);
+
+                        if (currentY >= contentY - rowHeight && currentY <= contentBottom)
+                        {
+                            bool isHovered = HoveredLink == result;
+
+                            // Highlight row background
+                            if (isHovered)
+                            {
+                                b.Draw(Game1.staminaRect, rowBounds, Color.SaddleBrown * 0.15f);
+                            }
+
+                            // Icon
+                            int itemIconX = contentX + 8;
+                            if (result.Icon != null)
+                            {
+                                Rectangle src = result.IconSourceRect ?? new Rectangle(0, 0, result.Icon.Width, result.Icon.Height);
+                                b.Draw(result.Icon, new Rectangle(itemIconX, currentY + 6, 32, 32), src, Color.White);
+                            }
+
+                            // Title & Subtitle
+                            int labelX = itemIconX + 44;
+                            Utility.drawTextWithShadow(b, result.Text, Game1.dialogueFont, new Vector2(labelX, currentY + 2), isHovered ? Color.DarkBlue : result.TextColor, 0.7f);
+
+                            if (!string.IsNullOrEmpty(result.Subtitle))
+                            {
+                                Utility.drawTextWithShadow(b, result.Subtitle, Game1.smallFont, new Vector2(labelX + 220, currentY + 10), Color.DarkSlateGray);
+                            }
+
+                            // Arrow hint
+                            Utility.drawTextWithShadow(b, ">", Game1.dialogueFont, new Vector2(contentX + contentWidth - 28, currentY + 4), Color.SaddleBrown * 0.5f, 0.7f);
+
+                            // Divider line
+                            b.Draw(Game1.staminaRect, new Rectangle(contentX, currentY + rowHeight - 2, contentWidth, 1), Color.SaddleBrown * 0.15f);
+                        }
+
+                        currentY += rowHeight;
+                        totalContentHeight += rowHeight;
+                    }
+                }
+            }
+            else if (CurrentSubject != null)
+            {
+                // Render Full Detailed Subject Sections
+                foreach (var section in CurrentSubject.Sections)
+                {
+                    // Section Header
+                    if (currentY >= contentY - 32 && currentY <= contentBottom)
+                    {
+                        Utility.drawTextWithShadow(b, section.Title, Game1.dialogueFont, new Vector2(contentX, currentY), new Color(115, 40, 10));
+                    }
+                    currentY += 34;
+                    totalContentHeight += 34;
+
+                    foreach (var field in section.Fields)
+                    {
+                        string label = !string.IsNullOrEmpty(field.Label) ? $"{field.Label}: " : string.Empty;
+                        Vector2 labelSize = Game1.smallFont.MeasureString(label);
+
+                        if (field.Links.Count > 0)
+                        {
+                            // Draw Links Grid / Chips
+                            if (currentY >= contentY - 24 && currentY <= contentBottom)
+                            {
+                                Utility.drawTextWithShadow(b, label, Game1.smallFont, new Vector2(contentX + 12, currentY), Game1.textColor);
+                            }
+                            currentY += 26;
+                            totalContentHeight += 26;
+
+                            int chipX = contentX + 24;
+                            int chipSpacing = 12;
+
+                            foreach (var link in field.Links)
+                            {
+                                Vector2 textSize = Game1.smallFont.MeasureString(link.Text);
+                                int chipWidth = (int)textSize.X + (link.Icon != null ? 36 : 18);
+                                int chipHeight = 30;
+
+                                if (chipX + chipWidth > contentX + contentWidth)
+                                {
+                                    chipX = contentX + 24;
+                                    currentY += chipHeight + 6;
+                                    totalContentHeight += chipHeight + 6;
+                                }
+
+                                Rectangle chipBounds = new Rectangle(chipX, currentY, chipWidth, chipHeight);
+                                link.Bounds = chipBounds;
+                                ActiveClickableLinks.Add(link);
+
+                                if (currentY >= contentY - chipHeight && currentY <= contentBottom)
+                                {
+                                    bool isHovered = HoveredLink == link;
+
+                                    // Chip Background
+                                    IClickableMenu.drawTextureBox(
+                                        b,
+                                        Game1.menuTexture,
+                                        new Rectangle(0, 256, 60, 60),
+                                        chipBounds.X,
+                                        chipBounds.Y,
+                                        chipBounds.Width,
+                                        chipBounds.Height,
+                                        isHovered ? Color.Wheat : Color.White,
+                                        0.6f,
+                                        drawShadow: false
+                                    );
+
+                                    int drawTextX = chipBounds.X + 8;
+                                    if (link.Icon != null)
+                                    {
+                                        Rectangle src = link.IconSourceRect ?? new Rectangle(0, 0, link.Icon.Width, link.Icon.Height);
+                                        b.Draw(link.Icon, new Rectangle(drawTextX, chipBounds.Y + 4, 22, 22), src, Color.White);
+                                        drawTextX += 26;
+                                    }
+
+                                    Utility.drawTextWithShadow(b, link.Text, Game1.smallFont, new Vector2(drawTextX, chipBounds.Y + 5), isHovered ? Color.DarkBlue : link.TextColor);
+                                }
+
+                                chipX += chipWidth + chipSpacing;
+                            }
+
+                            currentY += 36;
+                            totalContentHeight += 36;
+                        }
+                        else
+                        {
+                            // Standard Text Field
+                            int valWidth = contentWidth - (int)labelSize.X - 24;
+                            string wrappedValue = Game1.parseText(field.Value ?? string.Empty, Game1.smallFont, Math.Max(180, valWidth));
+                            Vector2 valSize = Game1.smallFont.MeasureString(wrappedValue);
+                            int lineH = (int)Math.Max(26, valSize.Y + 4);
+
+                            if (currentY >= contentY - lineH && currentY <= contentBottom)
+                            {
+                                Utility.drawTextWithShadow(b, label, Game1.smallFont, new Vector2(contentX + 12, currentY), Game1.textColor);
+                                Utility.drawTextWithShadow(b, wrappedValue, Game1.smallFont, new Vector2(contentX + 12 + labelSize.X, currentY), field.ValueColor);
+                            }
+
+                            currentY += lineH;
+                            totalContentHeight += lineH;
+                        }
                     }
 
-                    currentY += lineH;
-                    totalContentHeight += lineH;
+                    currentY += 12;
+                    totalContentHeight += 12;
                 }
-
-                currentY += 12;
-                totalContentHeight += 12;
             }
 
             MaxScrollOffset = Math.Max(0, totalContentHeight - contentHeight + 20);
 
-            // 3. Draw Controls
+            // 3. Draw Controls & Scrollbars
             CloseButton?.draw(b);
 
             if (MaxScrollOffset > 0)
@@ -243,10 +603,10 @@ namespace BetterQOL
                 UpButton?.draw(b);
                 DownButton?.draw(b);
 
-                // Scrollbar track & thumb
+                // Scrollbar
                 int trackX = xPositionOnScreen + width - 20;
-                int trackY = yPositionOnScreen + 154;
-                int trackH = height - 224;
+                int trackY = yPositionOnScreen + 144;
+                int trackH = height - 210;
 
                 b.Draw(Game1.staminaRect, new Rectangle(trackX, trackY, 6, trackH), Color.SaddleBrown * 0.2f);
 

@@ -13,13 +13,33 @@ using StardewValley.TerrainFeatures;
 
 namespace BetterQOL
 {
+    public class LookupLink
+    {
+        public string Text { get; set; } = string.Empty;
+        public string? Subtitle { get; set; }
+        public Texture2D? Icon { get; set; }
+        public Rectangle? IconSourceRect { get; set; }
+        public Color TextColor { get; set; } = Game1.textColor;
+        public Func<LookupSubject?>? OnClick { get; set; }
+        public Rectangle Bounds { get; set; }
+
+        public LookupLink(string text, string? subtitle = null, Color? textColor = null, Texture2D? icon = null, Rectangle? iconSourceRect = null, Func<LookupSubject?>? onClick = null)
+        {
+            Text = text;
+            Subtitle = subtitle;
+            TextColor = textColor ?? Game1.textColor;
+            Icon = icon;
+            IconSourceRect = iconSourceRect;
+            OnClick = onClick;
+        }
+    }
+
     public class LookupField
     {
         public string Label { get; set; } = string.Empty;
-        public string Value { get; set; } = string.Empty;
+        public string? Value { get; set; }
         public Color ValueColor { get; set; } = Game1.textColor;
-        public Texture2D? Icon { get; set; }
-        public Rectangle? IconSourceRect { get; set; }
+        public List<LookupLink> Links { get; set; } = new();
 
         public LookupField(string label, string value, Color? valueColor = null)
         {
@@ -28,13 +48,10 @@ namespace BetterQOL
             ValueColor = valueColor ?? Game1.textColor;
         }
 
-        public LookupField(string label, string value, Color valueColor, Texture2D? icon, Rectangle? iconSourceRect)
+        public LookupField(string label, List<LookupLink> links)
         {
             Label = label;
-            Value = value;
-            ValueColor = valueColor;
-            Icon = icon;
-            IconSourceRect = iconSourceRect;
+            Links = links;
         }
     }
 
@@ -131,24 +148,16 @@ namespace BetterQOL
             if (ModEntry.Config.ShowGiftTastes)
             {
                 var giftSection = new LookupSection(ModEntry.I18n.Get("lookup.section.gifts"));
-                var (lovedItems, likedItems) = GetNPCGiftPreferences(npc);
+                var (lovedLinks, likedLinks) = GetNPCGiftPreferenceLinks(npc);
 
-                if (lovedItems.Count > 0)
+                if (lovedLinks.Count > 0)
                 {
-                    giftSection.Fields.Add(new LookupField(
-                        ModEntry.I18n.Get("lookup.npc.loved-gifts"),
-                        string.Join(", ", lovedItems.Take(12)),
-                        new Color(180, 50, 180)
-                    ));
+                    giftSection.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.npc.loved-gifts"), lovedLinks));
                 }
 
-                if (likedItems.Count > 0)
+                if (likedLinks.Count > 0)
                 {
-                    giftSection.Fields.Add(new LookupField(
-                        ModEntry.I18n.Get("lookup.npc.liked-gifts"),
-                        string.Join(", ", likedItems.Take(12)),
-                        new Color(0, 120, 0)
-                    ));
+                    giftSection.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.npc.liked-gifts"), likedLinks));
                 }
 
                 subject.Sections.Add(giftSection);
@@ -157,10 +166,10 @@ namespace BetterQOL
             return subject;
         }
 
-        private static (List<string> Loved, List<string> Liked) GetNPCGiftPreferences(NPC npc)
+        private static (List<LookupLink> Loved, List<LookupLink> Liked) GetNPCGiftPreferenceLinks(NPC npc)
         {
-            var loved = new List<string>();
-            var liked = new List<string>();
+            var loved = new List<LookupLink>();
+            var liked = new List<LookupLink>();
 
             try
             {
@@ -171,10 +180,21 @@ namespace BetterQOL
                     {
                         foreach (string id in parts[1].Split(' '))
                         {
-                            var data = ItemRegistry.GetData(id) ?? ItemRegistry.GetData($"(O){id}");
-                            if (data != null && !loved.Contains(data.DisplayName))
+                            string rawId = id;
+                            var data = ItemRegistry.GetData(rawId) ?? ItemRegistry.GetData($"(O){rawId}");
+                            if (data != null && !loved.Any(l => l.Text == data.DisplayName))
                             {
-                                loved.Add(data.DisplayName);
+                                loved.Add(new LookupLink(
+                                    text: data.DisplayName,
+                                    textColor: new Color(180, 50, 180),
+                                    icon: data.GetTexture(),
+                                    iconSourceRect: data.GetSourceRect(),
+                                    onClick: () =>
+                                    {
+                                        var item = ItemRegistry.Create(data.QualifiedItemId);
+                                        return item != null ? BuildItemSubject(item) : null;
+                                    }
+                                ));
                             }
                         }
                     }
@@ -183,10 +203,21 @@ namespace BetterQOL
                     {
                         foreach (string id in parts[3].Split(' '))
                         {
-                            var data = ItemRegistry.GetData(id) ?? ItemRegistry.GetData($"(O){id}");
-                            if (data != null && !liked.Contains(data.DisplayName))
+                            string rawId = id;
+                            var data = ItemRegistry.GetData(rawId) ?? ItemRegistry.GetData($"(O){rawId}");
+                            if (data != null && !liked.Any(l => l.Text == data.DisplayName))
                             {
-                                liked.Add(data.DisplayName);
+                                liked.Add(new LookupLink(
+                                    text: data.DisplayName,
+                                    textColor: new Color(0, 140, 0),
+                                    icon: data.GetTexture(),
+                                    iconSourceRect: data.GetSourceRect(),
+                                    onClick: () =>
+                                    {
+                                        var item = ItemRegistry.Create(data.QualifiedItemId);
+                                        return item != null ? BuildItemSubject(item) : null;
+                                    }
+                                ));
                             }
                         }
                     }
@@ -194,9 +225,7 @@ namespace BetterQOL
             }
             catch { }
 
-            loved.Sort();
-            liked.Sort();
-            return (loved, liked);
+            return (loved.Take(12).ToList(), liked.Take(12).ToList());
         }
 
         #endregion
@@ -291,18 +320,36 @@ namespace BetterQOL
                 }
             }
 
-            // Section 3: Recipes Using This Item
+            // Section 3: Gift Preferences (Interactive Tappable NPC Links)
+            if (ModEntry.Config.ShowGiftTastes)
+            {
+                var giftSection = new LookupSection(ModEntry.I18n.Get("lookup.section.gift-tastes"));
+                var (lovers, likers) = GetItemGiftTastesLinks(item);
+
+                if (lovers.Count > 0)
+                {
+                    giftSection.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.item.loved-by"), lovers));
+                }
+
+                if (likers.Count > 0)
+                {
+                    giftSection.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.item.liked-by"), likers));
+                }
+
+                if (giftSection.Fields.Count > 0)
+                {
+                    subject.Sections.Add(giftSection);
+                }
+            }
+
+            // Section 4: Recipes Using This Item
             if (ModEntry.Config.ShowItemRecipes)
             {
-                var recipes = GetRecipesUsingItem(item);
+                var recipes = GetRecipesUsingItemLinks(item);
                 if (recipes.Count > 0)
                 {
                     var recipeSection = new LookupSection(ModEntry.I18n.Get("lookup.section.recipes"));
-                    recipeSection.Fields.Add(new LookupField(
-                        ModEntry.I18n.Get("lookup.item.used-in-recipes"),
-                        string.Join(", ", recipes.Take(15)),
-                        Game1.textColor
-                    ));
+                    recipeSection.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.item.used-in-recipes"), recipes));
                     subject.Sections.Add(recipeSection);
                 }
             }
@@ -377,17 +424,65 @@ namespace BetterQOL
             return results;
         }
 
-        private static List<string> GetRecipesUsingItem(Item item)
+        private static (List<LookupLink> Lovers, List<LookupLink> Likers) GetItemGiftTastesLinks(Item item)
         {
-            var recipes = new List<string>();
+            var lovers = new List<LookupLink>();
+            var likers = new List<LookupLink>();
+
+            foreach (var npc in Utility.getAllCharacters())
+            {
+                if (npc == null || !npc.IsVillager || npc.IsMonster || string.IsNullOrEmpty(npc.Name))
+                    continue;
+
+                int taste = npc.getGiftTasteForThisItem(item);
+                if (taste == NPC.gift_taste_love && !lovers.Any(l => l.Text == (npc.displayName ?? npc.Name)))
+                {
+                    var targetNPC = npc;
+                    lovers.Add(new LookupLink(
+                        text: targetNPC.displayName ?? targetNPC.Name,
+                        textColor: new Color(180, 50, 180),
+                        icon: targetNPC.Portrait,
+                        iconSourceRect: new Rectangle(0, 0, 64, 64),
+                        onClick: () => BuildNPCSubject(targetNPC)
+                    ));
+                }
+                else if (taste == NPC.gift_taste_like && !likers.Any(l => l.Text == (npc.displayName ?? npc.Name)))
+                {
+                    var targetNPC = npc;
+                    likers.Add(new LookupLink(
+                        text: targetNPC.displayName ?? targetNPC.Name,
+                        textColor: new Color(0, 140, 0),
+                        icon: targetNPC.Portrait,
+                        iconSourceRect: new Rectangle(0, 0, 64, 64),
+                        onClick: () => BuildNPCSubject(targetNPC)
+                    ));
+                }
+            }
+
+            return (lovers.Take(12).ToList(), likers.Take(12).ToList());
+        }
+
+        private static List<LookupLink> GetRecipesUsingItemLinks(Item item)
+        {
+            var recipes = new List<LookupLink>();
 
             foreach (var kvp in CraftingRecipe.craftingRecipes)
             {
                 string recipeName = kvp.Key;
                 string recipeStr = kvp.Value;
-                if (RecipeContainsItem(recipeStr, item) && !recipes.Contains(recipeName))
+                if (RecipeContainsItem(recipeStr, item) && !recipes.Any(r => r.Text == recipeName))
                 {
-                    recipes.Add(recipeName);
+                    var recipe = new CraftingRecipe(recipeName, isCookingRecipe: false);
+                    var outputItem = recipe.createItem();
+                    var itemData = outputItem != null ? ItemRegistry.GetData(outputItem.QualifiedItemId) : null;
+
+                    recipes.Add(new LookupLink(
+                        text: recipe.DisplayName,
+                        textColor: Game1.textColor,
+                        icon: itemData?.GetTexture(),
+                        iconSourceRect: itemData?.GetSourceRect(),
+                        onClick: () => outputItem != null ? BuildItemSubject(outputItem) : null
+                    ));
                 }
             }
 
@@ -395,14 +490,23 @@ namespace BetterQOL
             {
                 string recipeName = kvp.Key;
                 string recipeStr = kvp.Value;
-                if (RecipeContainsItem(recipeStr, item) && !recipes.Contains(recipeName))
+                if (RecipeContainsItem(recipeStr, item) && !recipes.Any(r => r.Text == recipeName))
                 {
-                    recipes.Add(recipeName);
+                    var recipe = new CraftingRecipe(recipeName, isCookingRecipe: true);
+                    var outputItem = recipe.createItem();
+                    var itemData = outputItem != null ? ItemRegistry.GetData(outputItem.QualifiedItemId) : null;
+
+                    recipes.Add(new LookupLink(
+                        text: recipe.DisplayName,
+                        textColor: Game1.textColor,
+                        icon: itemData?.GetTexture(),
+                        iconSourceRect: itemData?.GetSourceRect(),
+                        onClick: () => outputItem != null ? BuildItemSubject(outputItem) : null
+                    ));
                 }
             }
 
-            recipes.Sort();
-            return recipes;
+            return recipes.Take(12).ToList();
         }
 
         private static bool RecipeContainsItem(string recipeStr, Item item)
@@ -463,22 +567,32 @@ namespace BetterQOL
             subject.Sections.Add(statsSection);
 
             var dropsSection = new LookupSection(ModEntry.I18n.Get("lookup.section.drops"));
-            var dropNames = new List<string>();
+            var dropLinks = new List<LookupLink>();
             foreach (var dropId in monster.objectsToDrop)
             {
-                var dropData = ItemRegistry.GetData(dropId) ?? ItemRegistry.GetData($"(O){dropId}");
-                if (dropData != null && !dropNames.Contains(dropData.DisplayName))
+                string rawId = dropId;
+                var dropData = ItemRegistry.GetData(rawId) ?? ItemRegistry.GetData($"(O){rawId}");
+                if (dropData != null && !dropLinks.Any(l => l.Text == dropData.DisplayName))
                 {
-                    dropNames.Add(dropData.DisplayName);
+                    dropLinks.Add(new LookupLink(
+                        text: dropData.DisplayName,
+                        textColor: Game1.textColor,
+                        icon: dropData.GetTexture(),
+                        iconSourceRect: dropData.GetSourceRect(),
+                        onClick: () =>
+                        {
+                            var item = ItemRegistry.Create(dropData.QualifiedItemId);
+                            return item != null ? BuildItemSubject(item) : null;
+                        }
+                    ));
                 }
             }
 
-            if (dropNames.Count > 0)
+            if (dropLinks.Count > 0)
             {
                 dropsSection.Fields.Add(new LookupField(
                     ModEntry.I18n.Get("lookup.monster.possible-drops"),
-                    string.Join(", ", dropNames),
-                    Game1.textColor
+                    dropLinks
                 ));
             }
             else
@@ -736,10 +850,18 @@ namespace BetterQOL
 
             if (pond.neededItem.Value != null)
             {
+                var reqData = ItemRegistry.GetData(pond.neededItem.Value.QualifiedItemId);
+                var reqLink = new LookupLink(
+                    text: $"{pond.neededItemCount.Value}x {pond.neededItem.Value.DisplayName}",
+                    textColor: new Color(200, 60, 20),
+                    icon: reqData?.GetTexture(),
+                    iconSourceRect: reqData?.GetSourceRect(),
+                    onClick: () => BuildItemSubject(pond.neededItem.Value)
+                );
+
                 section.Fields.Add(new LookupField(
                     ModEntry.I18n.Get("lookup.building.quest-item"),
-                    $"{pond.neededItemCount.Value}x {pond.neededItem.Value.DisplayName}",
-                    new Color(200, 60, 20)
+                    new List<LookupLink> { reqLink }
                 ));
             }
 
@@ -762,6 +884,80 @@ namespace BetterQOL
 
             subject.Sections.Add(section);
             return subject;
+        }
+
+        #endregion
+
+        #region 7. Find Anything Query Engine (Live Search)
+
+        public static List<LookupLink> SearchAll(string query)
+        {
+            var results = new List<LookupLink>();
+            if (string.IsNullOrWhiteSpace(query))
+                return results;
+
+            string q = query.Trim().ToLower();
+
+            // 1. Search Villagers
+            foreach (var npc in Utility.getAllCharacters())
+            {
+                if (npc != null && npc.IsVillager && !npc.IsMonster && !string.IsNullOrEmpty(npc.Name))
+                {
+                    string name = npc.displayName ?? npc.Name;
+                    if (name.ToLower().Contains(q) && !results.Any(r => r.Text == name))
+                    {
+                        var target = npc;
+                        results.Add(new LookupLink(
+                            text: name,
+                            subtitle: "Villager",
+                            textColor: new Color(180, 50, 180),
+                            icon: target.Portrait,
+                            iconSourceRect: new Rectangle(0, 0, 64, 64),
+                            onClick: () => BuildNPCSubject(target)
+                        ));
+                    }
+                }
+            }
+
+            // 2. Search Items across all categories using typeDef.GetAllIds()
+            foreach (var typeDef in ItemRegistry.ItemTypes)
+            {
+                if (typeDef == null)
+                    continue;
+
+                foreach (string id in typeDef.GetAllIds())
+                {
+                    var itemData = typeDef.GetData(id);
+                    if (itemData != null && !string.IsNullOrEmpty(itemData.DisplayName))
+                    {
+                        if (itemData.DisplayName.ToLower().Contains(q) && !results.Any(r => r.Text == itemData.DisplayName))
+                        {
+                            var data = itemData;
+                            string catName = !string.IsNullOrEmpty(data.ObjectType) ? data.ObjectType : "Item";
+                            results.Add(new LookupLink(
+                                text: data.DisplayName,
+                                subtitle: catName,
+                                textColor: Game1.textColor,
+                                icon: data.GetTexture(),
+                                iconSourceRect: data.GetSourceRect(),
+                                onClick: () =>
+                                {
+                                    var item = ItemRegistry.Create(data.QualifiedItemId);
+                                    return item != null ? BuildItemSubject(item) : null;
+                                }
+                            ));
+
+                            if (results.Count >= 40)
+                                break;
+                        }
+                    }
+                }
+
+                if (results.Count >= 40)
+                    break;
+            }
+
+            return results;
         }
 
         #endregion
