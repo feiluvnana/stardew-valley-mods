@@ -246,5 +246,9 @@
   "lookup.recycling.yields": "Sản Phẩm Tái Chế",
 
   "lookup.section.geode-info": "Thông Tin Đập Trứng Địa Chất",
-  "lookup.section.fertilizer-info": "Tác Dụng Phân Bón"
+  "lookup.section.fertilizer-info": "Tác Dụng Phân Bón",
+  "lookup.section.machine-info": "Tính Năng & Hoạt Động Của Máy",
+  "lookup.machine.processing": "Chức Năng Xử Lý",
+  "lookup.section.sapling-info": "Hướng Dẫn Trồng Cây Ăn Quả",
+  "lookup.section.special-item": "Thông Tin Vật Phẩm Đặc Biệt"
 }

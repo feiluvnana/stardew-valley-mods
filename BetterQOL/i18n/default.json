@@ -246,5 +246,9 @@
   "lookup.recycling.yields": "Recycling Yields",
 
   "lookup.section.geode-info": "Geode & Cracking Details",
-  "lookup.section.fertilizer-info": "Fertilizer Effects"
+  "lookup.section.fertilizer-info": "Fertilizer Effects",
+  "lookup.section.machine-info": "Machine Function & Operation",
+  "lookup.machine.processing": "Processing Function",
+  "lookup.section.sapling-info": "Fruit Tree Maturation Guide",
+  "lookup.section.special-item": "Special Item Details"
 }

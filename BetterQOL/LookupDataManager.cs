@@ -401,28 +401,37 @@ namespace BetterQOL
             // Section 9: Tool Details (Upgrade level, Enchantments, Attached Bait/Tackles)
             AddToolSection(subject, item);
 
-            // Section 10: Animal Processing & Incubation (Eggs, Milk, Wool, Truffles)
+            // Section 10: Machine Operations & Farm Equipment
+            AddMachineItemSection(subject, item);
+
+            // Section 11: Fruit Tree Sapling Guide
+            AddFruitTreeSaplingSection(subject, item);
+
+            // Section 12: Special Item Details & Lore (Currencies, Consumables, 1.6 Items)
+            AddSpecialItemLoreSection(subject, item);
+
+            // Section 13: Animal Processing & Incubation (Eggs, Milk, Wool, Truffles)
             AddAnimalProductProcessingSection(subject, item);
 
-            // Section 11: Geodes, Artifact Troves & Mystery Boxes
+            // Section 14: Geodes, Artifact Troves & Mystery Boxes
             AddGeodeAndMysteryBoxSection(subject, item);
 
-            // Section 12: Fertilizer Details (Soil & Tree Growth Effects)
+            // Section 15: Fertilizer Details (Soil & Tree Growth Effects)
             AddFertilizerDetailsSection(subject, item);
 
-            // Section 13: Recycling Machine Yields
+            // Section 16: Recycling Machine Yields
             AddRecyclingSection(subject, item);
 
-            // Section 14: Artisan Processing (Keg, Preserves Jar, Dehydrator, Cask, Fish Smoker, Oil, Mill)
+            // Section 17: Artisan Processing (Keg, Preserves Jar, Dehydrator, Cask, Fish Smoker, Oil, Mill, Seed Maker)
             AddArtisanProductsSection(subject, item, baseSellPrice);
 
-            // Section 15: Tailoring & Dyeing (Sewing Machine Product & Dye Pot Color)
+            // Section 18: Tailoring & Dyeing (Sewing Machine Product & Dye Pot Color)
             AddTailoringAndDyeSection(subject, item);
 
-            // Section 16: Collections & Perfection Tracker (Shipped, Caught, Cooked, Crafted)
+            // Section 19: Collections & Perfection Tracker (Shipped, Caught, Cooked, Crafted)
             AddCollectionAndPerfectionSection(subject, item);
 
-            // Section 17: Museum & Bundles
+            // Section 20: Museum & Bundles
             if (ModEntry.Config.ShowBundleAndMuseumInfo)
             {
                 var progressSection = new LookupSection(ModEntry.I18n.Get("lookup.section.progress"));
@@ -1786,6 +1795,16 @@ namespace BetterQOL
                 artisanLinks.Add(new LookupLink("3x Sugar (3x 50g = 150g)", "Mill (Overnight)", Game1.textColor, sugar?.GetTexture(), sugar?.GetSourceRect()));
             }
 
+            // Seed Maker (Crops & Fruits)
+            if (item.Category == StardewValley.Object.FruitsCategory || item.Category == StardewValley.Object.VegetableCategory)
+            {
+                artisanLinks.Add(new LookupLink(
+                    text: "1–3 Seeds (Average 2)",
+                    subtitle: "Seed Maker (20m, 0.5% Ancient Seed chance)",
+                    textColor: new Color(46, 125, 50)
+                ));
+            }
+
             // Cask Aging (Wine, Cheese, Pale Ale, Beer, Mead)
             if (name.Contains("wine") || name.Contains("cheese") || name.Contains("pale ale") || name.Contains("beer") || name.Contains("mead"))
             {
@@ -1804,6 +1823,269 @@ namespace BetterQOL
                 section.Fields.Add(new LookupField("Products", artisanLinks));
                 subject.Sections.Add(section);
             }
+        }
+
+        private static void AddMachineItemSection(LookupSubject subject, Item item)
+        {
+            try
+            {
+                string id = item.ItemId.ToLowerInvariant();
+                string name = item.Name.ToLowerInvariant();
+                string func = "";
+                string time = "";
+
+                if (name == "furnace" || id == "13")
+                {
+                    func = "Smelts 5 Copper/Iron/Gold Ore into 1 Bar (with 1 Coal), or 5 Iridium Ore into 1 Iridium Bar.";
+                    time = "Copper (30m), Iron (2h), Gold (5h), Iridium (8h), Refined Quartz (1.5h)";
+                }
+                else if (name.Contains("heavy furnace") || id == "heavyfurnace" || id == "278")
+                {
+                    func = "Smelts 25 Ore + 3 Coal into 5 Metal Bars simultaneously + bonus coal/geode chance!";
+                    time = "Copper (30m), Iron (2h), Gold (5h), Iridium (8h)";
+                }
+                else if (name.Contains("charcoal kiln") || id == "114")
+                {
+                    func = "Burns 10 Wood into 1 Coal.";
+                    time = "30 minutes";
+                }
+                else if (name == "crystalarium" || id == "21")
+                {
+                    func = "Duplicates inserted minerals and gems indefinitely (Ruby, Diamond, Star Shards, Jade, etc.).";
+                    time = "Ruby (1.5d), Diamond (5d), Jade (1.7d), Star Shards (3.5d)";
+                }
+                else if (name == "seed maker" || id == "25")
+                {
+                    func = "Converts 1 harvestable crop into 1–3 seeds (average 2). 0.5% chance for Ancient Seeds, 1.99% for Mixed Seeds.";
+                    time = "20 minutes";
+                }
+                else if (name == "cheese press" || id == "16")
+                {
+                    func = "Converts Cow Milk into Cheese, or Goat Milk into Goat Cheese (Large milk guarantees Gold quality).";
+                    time = "3.3 hours";
+                }
+                else if (name == "mayonnaise machine" || id == "24")
+                {
+                    func = "Converts Eggs into Mayonnaise (Normal, Duck, Void, Dinosaur, or 3x Gold for Golden Egg).";
+                    time = "3 hours";
+                }
+                else if (name == "oil maker" || id == "19")
+                {
+                    func = "Converts Truffle into Truffle Oil (6h), or Corn / Sunflower / Sunflower Seeds into Cooking Oil (1–2d).";
+                    time = "6 hours to 2 days";
+                }
+                else if (name == "loom" || id == "17")
+                {
+                    func = "Weaves Wool into Cloth (Silver/Gold/Iridium wool has a chance to produce 2x Cloth).";
+                    time = "4 hours";
+                }
+                else if (name == "keg" || id == "12")
+                {
+                    func = "Brews Fruits into Wine (3x base price), Vegetables into Juice (2.25x), Coffee (5x beans), Pale Ale, Beer, Mead.";
+                    time = "Wine (6.25d), Juice (4d), Pale Ale (1.5d), Coffee (2h)";
+                }
+                else if (name == "preserves jar" || id == "15")
+                {
+                    func = "Preserves Fruits into Jelly (2x + 50g), Vegetables into Pickles (2x + 50g), and Fish Roe into Aged Roe / Caviar.";
+                    time = "2 to 3 days";
+                }
+                else if (name == "cask" || id == "163")
+                {
+                    func = "Ages Wine, Cheese, Goat Cheese, Pale Ale, Beer, and Mead up to Iridium quality (2x base sell value). Placeable in Cellar.";
+                    time = "Wine (56d), Cheese (14d), Beer/Pale Ale (34d)";
+                }
+                else if (name.Contains("dehydrator"))
+                {
+                    func = "Dries 5 Fruits or 5 Mushrooms into Dried products (7.5x base value + 25g). Consumes no coal.";
+                    time = "1 day (24 hours)";
+                }
+                else if (name.Contains("fish smoker") || name.Contains("smoker"))
+                {
+                    func = "Smokes 1 Fish + 1 Coal into Smoked Fish (2x base fish price, preserves fish quality, counts as Artisan Good).";
+                    time = "50 minutes";
+                }
+                else if (name.Contains("bait maker"))
+                {
+                    func = "Converts 1 Fish into 5–10 Targeted Species Bait that exclusively attracts that fish type!";
+                    time = "10 minutes";
+                }
+                else if (name.Contains("deluxe worm bin"))
+                {
+                    func = "Produces 4–5 Deluxe Bait every morning (+12 fishing bar size & faster bite rate).";
+                    time = "Daily (Morning)";
+                }
+                else if (name.Contains("worm bin") || id == "154")
+                {
+                    func = "Produces 2–5 standard Bait every morning without requiring insect meat.";
+                    time = "Daily (Morning)";
+                }
+                else if (name == "bone mill" || id == "90")
+                {
+                    func = "Crushes 1 Bone Item or Fossil into 3–5 Quality Fertilizer, Speed-Gro, Deluxe Speed-Gro, or Tree Fertilizer.";
+                    time = "1.5 hours";
+                }
+                else if (name == "geode crusher" || id == "182")
+                {
+                    func = "Automatically cracks 1 Geode using 1 Coal on the farm (same drops as Clint's blacksmith).";
+                    time = "1 hour";
+                }
+                else if (name == "solar panel" || id == "231")
+                {
+                    func = "Generates 1 Battery Pack after 7 full sunny days outdoors.";
+                    time = "7 sunny days";
+                }
+                else if (name == "mini-forge" || id == "230")
+                {
+                    func = "Portable Volcano Forge for weapons, tools, enchantments, and ring combinations on the farm.";
+                    time = "Instantaneous";
+                }
+                else if (name == "anvil")
+                {
+                    func = "Reforges stats and rolls on 1.6 combat trinkets using 3 Iridium Bars.";
+                    time = "Instantaneous";
+                }
+                else if (name == "auto-grabber" || id == "165")
+                {
+                    func = "Automatically collects animal products (Eggs, Milk, Wool, Feathers) in Coops and Barns every morning.";
+                    time = "Daily (Morning)";
+                }
+                else if (name == "auto-petter" || id == "272")
+                {
+                    func = "Automatically pets all farm animals in the building daily, maintaining friendship and happiness.";
+                    time = "Daily (Morning)";
+                }
+                else if (name.Contains("statue of perfection"))
+                {
+                    func = "Produces 2–8 Iridium Ore every morning (Grandpa's shrine evaluation reward).";
+                    time = "Daily (Morning)";
+                }
+                else if (name.Contains("statue of true perfection"))
+                {
+                    func = "Produces 1 Prismatic Shard every morning (100% Perfection reward in Qi's Walnut Room).";
+                    time = "Daily (Morning)";
+                }
+                else if (name.Contains("statue of blessings"))
+                {
+                    func = "Touch every morning to receive a unique daily blessing (e.g. infinite energy, +luck, speed boost, butterfly frenzy).";
+                    time = "Daily (Morning)";
+                }
+                else if (name.Contains("statue of the dwarf king"))
+                {
+                    func = "Touch every morning to choose 1 of 2 powerful mining/combat buffs for the day.";
+                    time = "Daily (Morning)";
+                }
+                else
+                {
+                    return;
+                }
+
+                var section = new LookupSection(ModEntry.I18n.Get("lookup.section.machine-info"));
+                section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.machine.processing"), func, new Color(0, 140, 0)));
+                if (!string.IsNullOrEmpty(time))
+                {
+                    section.Fields.Add(new LookupField("Processing Duration", time, new Color(180, 100, 0)));
+                }
+                subject.Sections.Add(section);
+            }
+            catch { }
+        }
+
+        private static void AddFruitTreeSaplingSection(LookupSubject subject, Item item)
+        {
+            try
+            {
+                string name = item.Name.ToLowerInvariant();
+                if (!name.Contains("sapling") && !name.Contains("tree"))
+                    return;
+
+                string season = "";
+                if (name.Contains("cherry")) { season = "Spring"; }
+                else if (name.Contains("apricot")) { season = "Spring"; }
+                else if (name.Contains("orange")) { season = "Summer"; }
+                else if (name.Contains("peach")) { season = "Summer"; }
+                else if (name.Contains("banana")) { season = "Summer (or Greenhouse / Ginger Island)"; }
+                else if (name.Contains("mango")) { season = "Summer (or Greenhouse / Ginger Island)"; }
+                else if (name.Contains("apple")) { season = "Fall"; }
+                else if (name.Contains("pomegranate")) { season = "Fall"; }
+                else if (name.Contains("mystic")) { season = "All Seasons (Tapper: Mystic Syrup)"; }
+                else return;
+
+                var section = new LookupSection(ModEntry.I18n.Get("lookup.section.sapling-info"));
+                section.Fields.Add(new LookupField("Harvest Season", season, new Color(46, 125, 50)));
+                section.Fields.Add(new LookupField("Maturation Time", "28 full days to grow into a mature fruit tree.", new Color(180, 100, 0)));
+                section.Fields.Add(new LookupField("Surrounding Spacing", "All 8 adjacent tiles must remain completely clear of paths, weeds, objects, and other trees.", new Color(200, 60, 20)));
+                section.Fields.Add(new LookupField("Fruit Quality Aging", "Produces Normal quality year 1, Silver quality year 2, Gold quality year 3, and Iridium quality year 4+!", new Color(180, 50, 180)));
+                subject.Sections.Add(section);
+            }
+            catch { }
+        }
+
+        private static void AddSpecialItemLoreSection(LookupSubject subject, Item item)
+        {
+            try
+            {
+                string id = item.ItemId.ToLowerInvariant();
+                string name = item.Name.ToLowerInvariant();
+
+                string desc = "";
+                if (name == "stardrop tea" || id == "stardroptea")
+                {
+                    desc = "Gift to any NPC to instantly grant +250 friendship points (1 full heart!). Can be given multiple times per day and ignores weekly gift limits.";
+                }
+                else if (name == "prize ticket" || id == "prizeticket")
+                {
+                    desc = "Earned from daily help requests and festival victories. Redeem at Mayor Lewis's Prize Machine in the Manor for progressive rewards.";
+                }
+                else if (name == "calico egg" || id == "calicoegg")
+                {
+                    desc = "Desert Festival currency. Earned from festival activities and challenges to buy exclusive items and mastery books.";
+                }
+                else if (name == "golden walnut" || id == "73")
+                {
+                    desc = "Ginger Island currency (130 total). Used to awaken Island Parrots, build shortcuts, and unlock Qi's Walnut Room at 100 walnuts.";
+                }
+                else if (name == "qi gem" || id == "858")
+                {
+                    desc = "Special currency earned by completing Mr. Qi's Special Orders in the Walnut Room. Used to purchase endgame recipes and items.";
+                }
+                else if (name == "cinder shard" || id == "848")
+                {
+                    desc = "Volcano Dungeon resource. Used to power the Volcano Forge for weapon forging, enchanting, and infusing rings.";
+                }
+                else if (name == "magic rock candy" || id == "279")
+                {
+                    desc = "Ultimate prismatic consumable: Grants +2 Mining, +5 Luck, +2 Speed, +5 Defense, +5 Attack for 8m 24s. Traded at Desert Trader on Thursdays for 3 Prismatic Shards.";
+                }
+                else if (name == "tent kit" || id == "tentkit")
+                {
+                    desc = "Single-use outdoor campsite kit. Allows sleeping in the wilderness for 1 night to wake up on-location the next morning.";
+                }
+                else if (name == "sonar bobber" || id == "sonarbobber")
+                {
+                    desc = "Advanced fishing tackle: Displays a real-time preview icon of what fish is currently on your line before catching it!";
+                }
+                else if (name == "challenge bait" || id == "challengebait")
+                {
+                    desc = "High-stakes fishing bait: Catch up to 3 fish at once if the fish never leaves the fishing bar during the catch!";
+                }
+                else if (name == "deluxe bait" || id == "deluxebait")
+                {
+                    desc = "Enhanced fishing bait: Increases the fishing green bar size by +12 pixels and accelerates bite time by 67%.";
+                }
+                else if (name.Contains("faraway") || id == "farawaystone")
+                {
+                    desc = "Mysterious otherworldly relic. Place on the ancient pylon in the Wizard's basement to summon the legendary Meowmere sword!";
+                }
+                else
+                {
+                    return;
+                }
+
+                var section = new LookupSection(ModEntry.I18n.Get("lookup.section.special-item"));
+                section.Fields.Add(new LookupField("Special Function & Lore", desc, new Color(180, 50, 180)));
+                subject.Sections.Add(section);
+            }
+            catch { }
         }
 
         private static void AddTailoringAndDyeSection(LookupSubject subject, Item item)
