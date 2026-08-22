@@ -517,7 +517,7 @@ namespace BetterQOL
                     section.Fields.Add(new LookupField("Min Fishing Skill", $"Level {minSkill}", Color.DarkSlateGray));
                 }
 
-                // 6. Spawn Locations (Extracted from Data/Locations with TokenParser)
+                // 6. Spawn Locations (Extracted and mapped to friendly location names)
                 var spawnLocations = GetFishSpawnLocations(item.ItemId);
                 if (spawnLocations.Count > 0)
                 {
@@ -549,15 +549,10 @@ namespace BetterQOL
                     {
                         if (fishEntry.ItemId == fishId || fishEntry.ItemId == $"(O){fishId}" || fishEntry.Id == fishId || fishEntry.Id == $"(O){fishId}")
                         {
-                            string rawName = !string.IsNullOrEmpty(locData.DisplayName) ? locData.DisplayName : locKey;
-                            string cleanName = TokenParser.ParseText(rawName);
-                            if (string.IsNullOrEmpty(cleanName))
+                            string friendlyName = GetFriendlyLocationName(locKey, locData, fishEntry);
+                            if (!results.Contains(friendlyName))
                             {
-                                cleanName = rawName;
-                            }
-                            if (!results.Contains(cleanName))
-                            {
-                                results.Add(cleanName);
+                                results.Add(friendlyName);
                             }
                         }
                     }
@@ -565,6 +560,63 @@ namespace BetterQOL
             }
             catch { }
             return results;
+        }
+
+        private static string GetFriendlyLocationName(string locKey, LocationData locData, SpawnFishData fishEntry)
+        {
+            // Specific friendly names for standard Stardew fishing areas
+            if (locKey.Equals("Forest", StringComparison.OrdinalIgnoreCase))
+            {
+                if (fishEntry.FishAreaId == "Pond") return "Forest Pond";
+                if (fishEntry.FishAreaId == "River") return "Forest River";
+                return "Cindersap Forest";
+            }
+            if (locKey.Equals("Town", StringComparison.OrdinalIgnoreCase)) return "Pelican Town (River)";
+            if (locKey.Equals("Mountain", StringComparison.OrdinalIgnoreCase)) return "Mountain Lake";
+            if (locKey.Equals("Beach", StringComparison.OrdinalIgnoreCase)) return "The Ocean (Beach)";
+            if (locKey.Equals("Woods", StringComparison.OrdinalIgnoreCase)) return "Secret Woods";
+            if (locKey.Equals("Desert", StringComparison.OrdinalIgnoreCase)) return "Calico Desert";
+            if (locKey.Equals("UndergroundMine", StringComparison.OrdinalIgnoreCase))
+            {
+                if (!string.IsNullOrEmpty(fishEntry.FishAreaId))
+                    return $"The Mines (Floor {fishEntry.FishAreaId})";
+                return "The Mines";
+            }
+            if (locKey.Equals("Sewer", StringComparison.OrdinalIgnoreCase)) return "The Sewers";
+            if (locKey.Equals("BugLand", StringComparison.OrdinalIgnoreCase)) return "Mutant Bug Lair";
+            if (locKey.Equals("WitchSwamp", StringComparison.OrdinalIgnoreCase)) return "Witch's Swamp";
+            if (locKey.Equals("Submarine", StringComparison.OrdinalIgnoreCase)) return "Night Market Submarine";
+            if (locKey.Equals("IslandSouth", StringComparison.OrdinalIgnoreCase)) return "Ginger Island (South Ocean)";
+            if (locKey.Equals("IslandWest", StringComparison.OrdinalIgnoreCase)) return "Ginger Island (West Ocean/River)";
+            if (locKey.Equals("IslandNorth", StringComparison.OrdinalIgnoreCase)) return "Ginger Island (River)";
+            if (locKey.Equals("IslandSouthEastCave", StringComparison.OrdinalIgnoreCase)) return "Pirate Cove";
+            if (locKey.Equals("Caldera", StringComparison.OrdinalIgnoreCase)) return "Volcano Caldera";
+
+            // Fallback 1: Resolve tokenized display names (e.g. [LocalizedText Strings\StringsFromCSFiles:...])
+            if (!string.IsNullOrEmpty(locData.DisplayName))
+            {
+                string raw = locData.DisplayName;
+                if (raw.StartsWith("[LocalizedText ") && raw.EndsWith("]"))
+                {
+                    try
+                    {
+                        string token = raw.Substring("[LocalizedText ".Length);
+                        token = token.Substring(0, token.Length - 1).Trim();
+                        string loaded = Game1.content.LoadString(token);
+                        if (!string.IsNullOrEmpty(loaded))
+                            return loaded;
+                    }
+                    catch { }
+                }
+
+                string parsed = TokenParser.ParseText(raw);
+                if (!string.IsNullOrEmpty(parsed) && !parsed.StartsWith("["))
+                {
+                    return parsed;
+                }
+            }
+
+            return locKey;
         }
 
         private static string FormatGameTime(string rawTime)
