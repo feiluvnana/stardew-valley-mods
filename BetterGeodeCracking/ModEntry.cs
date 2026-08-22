@@ -18,7 +18,7 @@ namespace BetterGeodeCracking
             ModMonitor = Monitor;
             I18n = helper.Translation;
 
-            GeodePatches.Apply(ModManifest.UniqueID, Monitor, Config);
+            GeodeMenuHandler.Initialize(Helper, Monitor);
 
             Helper.Events.Content.AssetRequested += OnAssetRequested;
             Helper.Events.GameLoop.GameLaunched += OnGameLaunched;

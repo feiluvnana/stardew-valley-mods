@@ -1,5 +1,4 @@
 using System;
-using HarmonyLib;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 
@@ -19,10 +18,6 @@ namespace BetterProduct
 
             CookingBalancer.Initialize(Config, Monitor);
             ArtisanBalancer.Initialize(Config, Monitor);
-            MeadPatches.Initialize(Config, Monitor);
-
-            var harmony = new Harmony(ModManifest.UniqueID);
-            MeadPatches.Apply(harmony);
 
             helper.Events.Content.AssetRequested += CookingBalancer.OnAssetRequested;
             helper.Events.Content.AssetRequested += ArtisanBalancer.OnAssetRequested;
@@ -42,6 +37,7 @@ namespace BetterProduct
                 {
                     Helper.WriteConfig(Config);
                     Helper.GameContent.InvalidateCache("Data/Objects");
+                    Helper.GameContent.InvalidateCache("Data/Machines");
                     Helper.GameContent.InvalidateCache("Data/CookingRecipes");
                 }
             );

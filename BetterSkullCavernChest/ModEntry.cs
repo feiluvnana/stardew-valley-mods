@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using HarmonyLib;
 using Microsoft.Xna.Framework;
-using Netcode;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
@@ -23,133 +21,148 @@ namespace BetterSkullCavernChest
 
     public class ModEntry : Mod
     {
+        private const string GeneratedModDataKey = "feiluvnana.BetterSkullCavernChest/Generated";
+
         public static ModConfig Config { get; private set; } = null!;
         public static IMonitor ModMonitor { get; private set; } = null!;
         public static ITranslationHelper I18n { get; private set; } = null!;
-
-        private static readonly AccessTools.FieldRef<MineShaft, NetBool>? NetIsTreasureRoomRef =
-            AccessTools.FieldRefAccess<MineShaft, NetBool>("netIsTreasureRoom");
+        public static IModHelper ModHelper { get; private set; } = null!;
 
         public override void Entry(IModHelper helper)
         {
             Config = helper.ReadConfig<ModConfig>();
             ModMonitor = Monitor;
             I18n = helper.Translation;
+            ModHelper = helper;
 
-            var harmony = new Harmony(ModManifest.UniqueID);
-            try
-            {
-                var addLevelChestsMethod = AccessTools.Method(typeof(MineShaft), "addLevelChests");
-                if (addLevelChestsMethod != null)
-                {
-                    harmony.Patch(
-                        original: addLevelChestsMethod,
-                        postfix: new HarmonyMethod(typeof(ModEntry), nameof(MineShaft_addLevelChests_Postfix))
-                    );
-                }
-
-                Monitor.Log("Harmony patches for BetterSkullCavernChest applied successfully.", LogLevel.Trace);
-            }
-            catch (Exception ex)
-            {
-                Monitor.Log($"Failed to apply BetterSkullCavernChest harmony patches: {ex}", LogLevel.Error);
-            }
-
+            helper.Events.Player.Warped += OnWarped;
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
         }
 
-        public static void MineShaft_addLevelChests_Postfix(MineShaft? __instance)
+        private void OnWarped(object? sender, WarpedEventArgs e)
         {
-            if (__instance == null || __instance.mineLevel <= 120)
+            if (e.NewLocation is MineShaft shaft && shaft.mineLevel > 120)
+            {
+                ProcessMineShaftChests(shaft);
+            }
+        }
+
+        public static void ProcessMineShaftChests(MineShaft shaft)
+        {
+            if (shaft == null || shaft.mineLevel <= 120)
                 return;
 
-            bool isTreasureRoom = NetIsTreasureRoomRef != null && NetIsTreasureRoomRef(__instance).Value;
-            bool isForcedSpecialChest = __instance.mineLevel == 220 || __instance.mineLevel == 320 || __instance.mineLevel == 420;
+            bool isTreasureRoom = false;
+            try
+            {
+                var netIsTreasureRoomField = ModHelper?.Reflection.GetField<Netcode.NetBool>(shaft, "netIsTreasureRoom", required: false);
+                if (netIsTreasureRoomField != null)
+                {
+                    isTreasureRoom = netIsTreasureRoomField.GetValue()?.Value ?? false;
+                }
+            }
+            catch
+            {
+                // Fallback
+            }
+
+            bool isForcedSpecialChest = shaft.mineLevel == 220 || shaft.mineLevel == 320 || shaft.mineLevel == 420;
 
             if (!isTreasureRoom && !isForcedSpecialChest)
                 return;
 
-            if (__instance.Objects == null)
+            if (shaft.Objects == null)
                 return;
 
             // Ensure special chest exists on repeatable runs for Floor 100/200/300 even if marked consumed by vanilla
             if (isForcedSpecialChest)
             {
                 Vector2 vector = new Vector2(9f, 9f);
-                if (__instance.mineLevel == 320)
+                if (shaft.mineLevel == 320)
                     vector.X += 1f;
 
-                if (!__instance.overlayObjects.ContainsKey(vector) && !__instance.Objects.ContainsKey(vector))
+                if (!shaft.overlayObjects.ContainsKey(vector) && !shaft.Objects.ContainsKey(vector))
                 {
                     Chest chest = new Chest(new List<Item>(), vector);
                     chest.SetBigCraftableSpriteIndex(344);
-                    __instance.overlayObjects[vector] = chest;
+                    shaft.overlayObjects[vector] = chest;
                 }
 
-                if (__instance.mineLevel == 320 || __instance.mineLevel == 420)
+                if (shaft.mineLevel == 320 || shaft.mineLevel == 420)
                 {
                     Vector2 secVector = vector + new Vector2(-2f, 0f);
-                    if (!__instance.overlayObjects.ContainsKey(secVector) && !__instance.Objects.ContainsKey(secVector))
+                    if (!shaft.overlayObjects.ContainsKey(secVector) && !shaft.Objects.ContainsKey(secVector))
                     {
                         Chest secChest = new Chest(new List<Item>(), secVector)
                         {
                             Tint = new Color(255, 210, 200)
                         };
                         secChest.SetBigCraftableSpriteIndex(344);
-                        __instance.overlayObjects[secVector] = secChest;
+                        shaft.overlayObjects[secVector] = secChest;
                     }
                 }
 
-                if (__instance.mineLevel == 420)
+                if (shaft.mineLevel == 420)
                 {
                     Vector2 tertVector = vector + new Vector2(2f, 0f);
-                    if (!__instance.overlayObjects.ContainsKey(tertVector) && !__instance.Objects.ContainsKey(tertVector))
+                    if (!shaft.overlayObjects.ContainsKey(tertVector) && !shaft.Objects.ContainsKey(tertVector))
                     {
                         Chest tertChest = new Chest(new List<Item>(), tertVector)
                         {
                             Tint = new Color(216, 255, 240)
                         };
                         tertChest.SetBigCraftableSpriteIndex(344);
-                        __instance.overlayObjects[tertVector] = tertChest;
+                        shaft.overlayObjects[tertVector] = tertChest;
                     }
                 }
             }
 
-            foreach (var obj in __instance.Objects.Values)
+            var allChests = new List<Chest>();
+            foreach (var obj in shaft.Objects.Values)
             {
-                if (obj is Chest chest)
-                {
-                    bool isSpecial = isForcedSpecialChest || (chest.giftbox.Value == false && chest.bigCraftableSpriteIndex.Value == 344);
+                if (obj is Chest c) allChests.Add(c);
+            }
+            foreach (var obj in shaft.overlayObjects.Values)
+            {
+                if (obj is Chest c && !allChests.Contains(c)) allChests.Add(c);
+            }
 
-                    if (Config.EnableCustomRewards)
+            foreach (var chest in allChests)
+            {
+                if (chest.modData.ContainsKey(GeneratedModDataKey))
+                    continue;
+
+                chest.modData[GeneratedModDataKey] = "true";
+                bool isSpecial = isForcedSpecialChest || (chest.giftbox.Value == false && chest.bigCraftableSpriteIndex.Value == 344);
+
+                if (Config.EnableCustomRewards)
+                {
+                    var rewards = RewardGenerator.GenerateRewards(Config, Game1.random, isSpecialChest: isSpecial);
+                    if (rewards.Count > 0)
                     {
-                        var rewards = RewardGenerator.GenerateRewards(Config, Game1.random, isSpecialChest: isSpecial);
-                        if (rewards.Count > 0)
+                        chest.Items.Clear();
+                        foreach (var reward in rewards)
                         {
-                            chest.Items.Clear();
-                            foreach (var reward in rewards)
-                            {
-                                chest.Items.Add(reward);
-                            }
+                            chest.Items.Add(reward);
                         }
                     }
-                    else if (Config.ExcludeCosmetics)
+                }
+                else if (Config.ExcludeCosmetics)
+                {
+                    for (int i = chest.Items.Count - 1; i >= 0; i--)
                     {
-                        for (int i = chest.Items.Count - 1; i >= 0; i--)
+                        if (chest.Items[i] != null && RewardGenerator.IsCosmeticItem(chest.Items[i]))
                         {
-                            if (chest.Items[i] != null && RewardGenerator.IsCosmeticItem(chest.Items[i]))
-                            {
-                                chest.Items.RemoveAt(i);
-                            }
+                            chest.Items.RemoveAt(i);
                         }
+                    }
 
-                        if (chest.Items.Count == 0)
+                    if (chest.Items.Count == 0)
+                    {
+                        var fallback = RewardGenerator.GenerateRewards(Config, Game1.random, isSpecialChest: isSpecial);
+                        foreach (var item in fallback)
                         {
-                            var fallback = RewardGenerator.GenerateRewards(Config, Game1.random, isSpecialChest: isSpecial);
-                            foreach (var item in fallback)
-                            {
-                                chest.Items.Add(item);
-                            }
+                            chest.Items.Add(item);
                         }
                     }
                 }

@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
+using StardewValley;
+using StardewValley.GameData;
+using StardewValley.GameData.Machines;
 using StardewValley.GameData.Objects;
 
 namespace BetterProduct
@@ -32,42 +35,97 @@ namespace BetterProduct
                     }
                 }, AssetEditPriority.Late);
             }
-        }
-
-        public static int CalculatePreservePrice(StardewValley.Object obj, int originalPrice)
-        {
-            if (obj == null)
-                return originalPrice;
-
-            // Check preserve types
-            if (obj.preserve.Value.HasValue)
+            else if (e.NameWithoutLocale.IsEquivalentTo("Data/Machines"))
             {
-                var preserveType = obj.preserve.Value.Value;
-
-                if (Config.EnableJuiceBuff && preserveType == StardewValley.Object.PreserveType.Juice)
+                e.Edit(asset =>
                 {
-                    if (obj.Price > 0)
+                    var data = asset.AsDictionary<string, MachineData>().Data;
+
+                    // Keg edits ((BC)12)
+                    if (data.TryGetValue("(BC)12", out var keg) && keg.OutputRules != null)
                     {
-                        // In vanilla: 2.25 * base. Buff with Config.JuiceMultiplier / 2.25
-                        float scale = Config.JuiceMultiplier / 2.25f;
-                        return Math.Max(originalPrice, (int)Math.Round(originalPrice * scale));
-                    }
-                }
-                else if (Config.EnablePickleBuff && preserveType == StardewValley.Object.PreserveType.Pickle)
-                {
-                    // In vanilla: 50 + 2 * base. Buff with Config.PickleMultiplier / 2.0
-                    float scale = Config.PickleMultiplier / 2.0f;
-                    return Math.Max(originalPrice, (int)Math.Round(originalPrice * scale));
-                }
-                else if (Config.EnableRoeBuff && preserveType == StardewValley.Object.PreserveType.AgedRoe)
-                {
-                    // In vanilla: 2 * base roe. Buff with Config.AgedRoeMultiplier / 2.0
-                    float scale = Config.AgedRoeMultiplier / 2.0f;
-                    return Math.Max(originalPrice, (int)Math.Round(originalPrice * scale));
-                }
-            }
+                        foreach (var rule in keg.OutputRules)
+                        {
+                            if (rule.OutputItem == null) continue;
 
-            return originalPrice;
+                            foreach (var output in rule.OutputItem)
+                            {
+                                // Mead rebalancing from Honey
+                                if (Config.EnableMeadFix && (output.ItemId == "459" || output.ItemId == "(O)459" || output.Id == "Mead"))
+                                {
+                                    output.PreserveId = "DROP_IN_PRESERVE_ID";
+                                    output.CopyPrice = true;
+                                    output.PriceModifiers = new List<QuantityModifier>
+                                    {
+                                        new()
+                                        {
+                                            Modification = QuantityModifier.ModificationType.Multiply,
+                                            Amount = Config.MeadMultiplier
+                                        }
+                                    };
+                                }
+
+                                // Juice rebalancing
+                                if (Config.EnableJuiceBuff && (output.ItemId == "350" || output.ItemId == "(O)350" || output.PreserveType == "Juice"))
+                                {
+                                    output.PriceModifiers ??= new List<QuantityModifier>();
+                                    var multMod = output.PriceModifiers.Find(m => m.Modification == QuantityModifier.ModificationType.Multiply);
+                                    if (multMod != null)
+                                    {
+                                        multMod.Amount = Config.JuiceMultiplier;
+                                    }
+                                    else
+                                    {
+                                        output.PriceModifiers.Add(new QuantityModifier
+                                        {
+                                            Modification = QuantityModifier.ModificationType.Multiply,
+                                            Amount = Config.JuiceMultiplier
+                                        });
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Preserves Jar edits ((BC)15)
+                    if (data.TryGetValue("(BC)15", out var preservesJar) && preservesJar.OutputRules != null)
+                    {
+                        foreach (var rule in preservesJar.OutputRules)
+                        {
+                            if (rule.OutputItem == null) continue;
+
+                            foreach (var output in rule.OutputItem)
+                            {
+                                // Pickles rebalancing
+                                if (Config.EnablePickleBuff && (output.ItemId == "342" || output.ItemId == "(O)342" || output.PreserveType == "Pickle"))
+                                {
+                                    if (output.PriceModifiers != null)
+                                    {
+                                        var multMod = output.PriceModifiers.Find(m => m.Modification == QuantityModifier.ModificationType.Multiply);
+                                        if (multMod != null)
+                                        {
+                                            multMod.Amount = Config.PickleMultiplier;
+                                        }
+                                    }
+                                }
+
+                                // Aged Roe rebalancing
+                                if (Config.EnableRoeBuff && (output.ItemId == "447" || output.ItemId == "(O)447" || output.PreserveType == "AgedRoe"))
+                                {
+                                    if (output.PriceModifiers != null)
+                                    {
+                                        var multMod = output.PriceModifiers.Find(m => m.Modification == QuantityModifier.ModificationType.Multiply);
+                                        if (multMod != null)
+                                        {
+                                            multMod.Amount = Config.AgedRoeMultiplier;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }, AssetEditPriority.Late);
+            }
         }
     }
 }

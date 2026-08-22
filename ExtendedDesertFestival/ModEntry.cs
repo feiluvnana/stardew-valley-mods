@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Reflection;
-using HarmonyLib;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
@@ -28,43 +26,6 @@ namespace ExtendedDesertFestival
             Config = helper.ReadConfig<ModConfig>();
             ModMonitor = Monitor;
             I18n = helper.Translation;
-
-            var harmony = new Harmony(ModManifest.UniqueID);
-            try
-            {
-                // Patch Utility.TryGetPassiveFestivalDataForDay
-                MethodInfo tryGetPassiveMethod = AccessTools.Method(
-                    typeof(Utility),
-                    nameof(Utility.TryGetPassiveFestivalDataForDay),
-                    new[] { typeof(int), typeof(Season), typeof(string), typeof(string).MakeByRefType(), typeof(PassiveFestivalData).MakeByRefType(), typeof(bool) }
-                );
-
-                if (tryGetPassiveMethod != null)
-                {
-                    harmony.Patch(
-                        original: tryGetPassiveMethod,
-                        postfix: new HarmonyMethod(typeof(ModEntry), nameof(Utility_TryGetPassiveFestivalDataForDay_Postfix))
-                    );
-                    Monitor.Log("Hooked Utility.TryGetPassiveFestivalDataForDay successfully.", LogLevel.Trace);
-                }
-
-                // Patch DesertFestival.CleanupFestival
-                MethodInfo cleanupMethod = AccessTools.Method(typeof(StardewValley.Locations.DesertFestival), "CleanupFestival");
-                if (cleanupMethod != null)
-                {
-                    harmony.Patch(
-                        original: cleanupMethod,
-                        postfix: new HarmonyMethod(typeof(ModEntry), nameof(DesertFestival_CleanupFestival_Postfix))
-                    );
-                    Monitor.Log("Hooked DesertFestival.CleanupFestival successfully.", LogLevel.Trace);
-                }
-
-                Monitor.Log("Harmony patches for ExtendedDesertFestival applied successfully.", LogLevel.Trace);
-            }
-            catch (Exception ex)
-            {
-                Monitor.Log($"Failed to apply ExtendedDesertFestival harmony patches: {ex}", LogLevel.Error);
-            }
 
             helper.Events.Content.AssetRequested += OnAssetRequested;
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
@@ -133,27 +94,7 @@ namespace ExtendedDesertFestival
             }
         }
 
-        public static void Utility_TryGetPassiveFestivalDataForDay_Postfix(int dayOfMonth, Season season, string locationContextId, ref string id, ref PassiveFestivalData data, ref bool __result)
-        {
-            if (IsDesertFestivalDay(dayOfMonth, season))
-            {
-                if (Utility.TryGetPassiveFestivalData("DesertFestival", out var dfData))
-                {
-                    id = "DesertFestival";
-                    data = dfData;
-                    __result = true;
-                }
-            }
-        }
 
-        public static void DesertFestival_CleanupFestival_Postfix()
-        {
-            if (Config.KeepEggs && Game1.player?.team?.itemsToRemoveOvernight != null)
-            {
-                Game1.player.team.itemsToRemoveOvernight.Remove("CalicoEgg");
-                Game1.player.team.itemsToRemoveOvernight.Remove("(O)CalicoEgg");
-            }
-        }
 
         private void OnGameLaunched(object? sender, GameLaunchedEventArgs e)
         {
