@@ -15,7 +15,7 @@ A suite of high-performance, modular quality-of-life, progression enhancement, a
 | [**ExtendedStackable**](./ExtendedStackable) | `1.0.0` | Stack size overhaul for normally unstackable items. | Stacks fishing tackle, 1.6 trinkets, rings, furniture, boots, clothing, and hats up to 999 with stat matching. |
 | [**BetterGeodeCracking**](./BetterGeodeCracking) | `1.0.0` | Bulk and instant geode/trove cracking without fees. | Free 0g cracking at Clint's, Shift+Click / "Crack All" button bulk processing, instant cracking toggle, and faithful RNG. |
 | [**BetterForge**](./BetterForge) | `1.0.0` | Volcano Forge, Mini-Forge, and Anvil overhauls. | 100% fair uniform weapon/tool enchantments, "Never Downgrade" trinket reforging, "Perfect" tier prefixes, and Prismatic Ascension powers. |
-| [**BetterTool**](./BetterTool) | `1.0.0` | Directional hopper and machine automation overhaul. | Top-to-bottom gravity pipelines: feed machines below, harvest machines above, transfer to chests below, chainable multi-stage hoppers. |
+| [**BetterTool**](./BetterTool) | `1.0.0` | 4-Directional hopper and machine automation overhaul. | 4-way omnidirectional auto-feed and auto-harvest (N, S, W, E), smart routing to adjacent chests/bins, crab pot & cask support. |
 | [**BetterMap**](./BetterMap) | `1.0.0` | Farmhouse doorway and Ginger Island farm clutter cleaner. | Widens all Farmhouse exit doorways to 3x1 tiles, removes Ginger Island Farm driftwood fence and bleached log piles. |
 
 ---

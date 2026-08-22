@@ -12,6 +12,14 @@ namespace BetterTool
 {
     public static class HopperManager
     {
+        private static readonly Vector2[] CardinalOffsets = new[]
+        {
+            new Vector2(0, -1), // North
+            new Vector2(0, 1),  // South
+            new Vector2(-1, 0), // West
+            new Vector2(1, 0)   // East
+        };
+
         /// <summary>
         /// Checks whether the given chest is an AutoLoader Hopper.
         /// </summary>
@@ -50,10 +58,10 @@ namespace BetterTool
         }
 
         /// <summary>
-        /// Performs strictly downward automation for a hopper:
-        /// 1. Pulls / harvests finished products from the machine directly ABOVE (Y - 1).
-        /// 2. Pushes / feeds raw materials into the machine directly BELOW (Y + 1), OR
-        ///    transfers items downward into a Chest / Mini-Shipping Bin directly BELOW (Y + 1).
+        /// Performs 4-directional automation for a hopper:
+        /// 1. Pulls / harvests finished products from all 4 adjacent machines (North, South, West, East).
+        /// 2. Pushes / feeds raw materials into all 4 adjacent machines (North, South, West, East).
+        /// 3. Transfers collected items into any adjacent Chest or Mini-Shipping Bin.
         /// </summary>
         public static void ProcessHopper(Chest hopper, GameLocation location, Farmer? who = null)
         {
@@ -64,41 +72,54 @@ namespace BetterTool
             var config = ModEntry.Config;
             var hopperPos = hopper.TileLocation;
 
-            var abovePos = new Vector2(hopperPos.X, hopperPos.Y - 1f);
-            var belowPos = new Vector2(hopperPos.X, hopperPos.Y + 1f);
+            var adjacentChests = new List<Chest>();
+            var connectedMachines = new List<StardewValley.Object>();
 
-            // Step 1: Harvest from machine directly ABOVE (Y - 1) [Non-vanilla]
-            if (config.EnableAutoHarvest && location.objects.TryGetValue(abovePos, out var aboveObj) && aboveObj != null)
+            foreach (var offset in CardinalOffsets)
             {
-                if (aboveObj is not Chest || aboveObj.heldObject.Value != null)
+                var targetPos = hopperPos + offset;
+                if (location.objects.TryGetValue(targetPos, out var obj) && obj != null)
                 {
-                    TryHarvestFromAboveMachine(aboveObj, hopper, location, who);
+                    if (obj is Chest chest && !IsHopper(chest))
+                    {
+                        adjacentChests.Add(chest);
+                    }
+                    else if (obj is not Chest || obj.heldObject.Value != null)
+                    {
+                        connectedMachines.Add(obj);
+                    }
                 }
             }
 
-            // Step 2: Push downward to object directly BELOW (Y + 1)
-            if (location.objects.TryGetValue(belowPos, out var belowObj) && belowObj != null)
+            // Step 1: Harvest from all adjacent machines (4 directions)
+            if (config.EnableAutoHarvest)
             {
-                if (belowObj is Chest belowChest)
+                foreach (var machine in connectedMachines)
                 {
-                    // Output destination: Chest, MiniShippingBin, or another Hopper below [Non-vanilla]
-                    if (config.EnableChestOutputTransfer)
-                    {
-                        TryTransferToBelowChest(hopper, belowChest, location);
-                    }
+                    TryHarvestMachine(machine, hopper, adjacentChests, location, who);
                 }
-                else
+            }
+
+            // Step 2: Feed raw materials into all adjacent empty machines (4 directions)
+            foreach (var machine in connectedMachines)
+            {
+                TryReloadMachine(machine, hopper, location, who);
+            }
+
+            // Step 3: Transfer any remaining collected items into adjacent output chests
+            if (config.EnableChestOutputTransfer && adjacentChests.Count > 0 && hopper.Items.Count > 0)
+            {
+                foreach (var chest in adjacentChests)
                 {
-                    // Machine to feed below
-                    TryReloadBelowMachine(belowObj, hopper, location, who);
+                    TryTransferToChest(hopper, chest, location);
                 }
             }
         }
 
         /// <summary>
-        /// Transfers items downward from the hopper into a chest or mini-shipping bin below it.
+        /// Transfers items from the hopper into a designated output chest or mini-shipping bin.
         /// </summary>
-        private static void TryTransferToBelowChest(Chest hopper, Chest targetChest, GameLocation location)
+        private static void TryTransferToChest(Chest hopper, Chest targetChest, GameLocation location)
         {
             if (hopper == null || targetChest == null || hopper.Items.Count == 0)
                 return;
@@ -131,9 +152,9 @@ namespace BetterTool
         }
 
         /// <summary>
-        /// Attempts to harvest finished products from a machine directly above the hopper.
+        /// Attempts to harvest finished products from an adjacent machine into connected chests or the hopper.
         /// </summary>
-        private static bool TryHarvestFromAboveMachine(StardewValley.Object machine, Chest hopper, GameLocation location, Farmer who)
+        private static bool TryHarvestMachine(StardewValley.Object machine, Chest hopper, List<Chest> adjacentChests, GameLocation location, Farmer who)
         {
             if (machine == null)
                 return false;
@@ -149,29 +170,30 @@ namespace BetterTool
                 if (crabPot.readyForHarvest.Value && crabPot.heldObject.Value != null)
                 {
                     var crabItem = crabPot.heldObject.Value;
-                    int initialStack = crabItem.Stack;
-                    var leftover = hopper.addItem(crabItem);
-
-                    if (leftover == null || leftover.Stack < initialStack)
+                    Chest? targetStorage = FindStorageWithSpace(crabItem, adjacentChests, hopper, config.EnableChestOutputTransfer);
+                    if (targetStorage != null)
                     {
-                        crabPot.heldObject.Value = (leftover != null && leftover.Stack > 0) ? (leftover as StardewValley.Object) : null;
-                        crabPot.readyForHarvest.Value = (crabPot.heldObject.Value != null);
-                        crabPot.tileIndexToShow = 710;
+                        var leftover = targetStorage.addItem(crabItem);
+                        if (leftover == null || leftover.Stack < crabItem.Stack)
+                        {
+                            crabPot.heldObject.Value = (leftover != null && leftover.Stack > 0) ? (leftover as StardewValley.Object) : null;
+                            crabPot.readyForHarvest.Value = (crabPot.heldObject.Value != null);
+                            crabPot.tileIndexToShow = 710;
 
-                        if (config.PlaySoundEffects)
-                            location.localSound("coin");
+                            if (config.PlaySoundEffects)
+                                location.localSound("coin");
 
-                        return true;
+                            return true;
+                        }
                     }
                 }
                 return false;
             }
 
             // Handle Casks
-            if (machine is Cask)
+            if (machine is Cask && !config.EnableCaskService)
             {
-                if (!config.EnableCaskService)
-                    return false;
+                return false;
             }
 
             // Standard Machines
@@ -201,10 +223,14 @@ namespace BetterTool
             if (producedItem == null)
                 return false;
 
-            var leftoverItem = hopper.addItem(producedItem);
+            Chest? destination = FindStorageWithSpace(producedItem, adjacentChests, hopper, config.EnableChestOutputTransfer);
+            if (destination == null)
+                return false;
+
+            var leftoverItem = destination.addItem(producedItem);
             if (leftoverItem != null && leftoverItem.Stack == producedItem.Stack)
             {
-                // Hopper has no space
+                // Destination has no space
                 return false;
             }
 
@@ -261,9 +287,9 @@ namespace BetterTool
         }
 
         /// <summary>
-        /// Attempts to reload empty machines directly below the hopper.
+        /// Attempts to reload empty machines with items from the hopper.
         /// </summary>
-        private static bool TryReloadBelowMachine(StardewValley.Object machine, Chest hopper, GameLocation location, Farmer who)
+        private static bool TryReloadMachine(StardewValley.Object machine, Chest hopper, GameLocation location, Farmer who)
         {
             if (machine == null || hopper == null || hopper.Items.Count == 0)
                 return false;
@@ -315,6 +341,59 @@ namespace BetterTool
                     {
                         location.localSound("furnace");
                     }
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Finds the best storage container with capacity for the item.
+        /// </summary>
+        private static Chest? FindStorageWithSpace(Item item, List<Chest> adjacentChests, Chest hopper, bool preferAdjacentChests)
+        {
+            if (preferAdjacentChests && adjacentChests.Count > 0)
+            {
+                foreach (var chest in adjacentChests)
+                {
+                    if (CanHoldItem(chest, item))
+                        return chest;
+                }
+            }
+
+            if (CanHoldItem(hopper, item))
+                return hopper;
+
+            if (!preferAdjacentChests && adjacentChests.Count > 0)
+            {
+                foreach (var chest in adjacentChests)
+                {
+                    if (CanHoldItem(chest, item))
+                        return chest;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Checks whether the given chest has room for the item.
+        /// </summary>
+        private static bool CanHoldItem(Chest chest, Item item)
+        {
+            if (chest == null || item == null)
+                return false;
+
+            int capacity = chest.GetActualCapacity();
+            if (chest.Items.Count < capacity)
+                return true;
+
+            // Check if stackable with existing item
+            foreach (var existing in chest.Items)
+            {
+                if (existing != null && existing.canStackWith(item) && existing.Stack < existing.maximumStackSize())
+                {
                     return true;
                 }
             }

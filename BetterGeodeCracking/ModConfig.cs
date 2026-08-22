@@ -20,6 +20,9 @@ namespace BetterGeodeCracking
         /// <summary>Whether to show a summary toast notification after bulk cracking.</summary>
         public bool ShowSummaryToast { get; set; } = true;
 
+        /// <summary>Whether Geode Crusher machines can process Mystery Boxes, Golden Mystery Boxes, Artifact Troves, and Golden Coconuts.</summary>
+        public bool AllowSpecialGeodesInCrusher { get; set; } = true;
+
         /// <summary>Whether Geode Crusher machines on the farm crack geodes instantly.</summary>
         public bool InstantGeodeCrusher { get; set; } = true;
 

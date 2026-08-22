@@ -1,6 +1,6 @@
 {
-  "EnableSummer": true,
-  "EnableFall": true,
+  "EnableSummer": false,
+  "EnableFall": false,
   "EnableWinter": true,
   "KeepEggs": true,
   "FestivalStartDay": 22,

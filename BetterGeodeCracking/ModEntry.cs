@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using HarmonyLib;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley.GameData.Machines;
+using StardewValley.GameData.Objects;
 
 namespace BetterGeodeCracking
 {
@@ -18,6 +20,9 @@ namespace BetterGeodeCracking
             ModMonitor = Monitor;
             I18n = helper.Translation;
 
+            var harmony = new Harmony(ModManifest.UniqueID);
+            GeodeCrusherPatches.Apply(harmony);
+
             GeodeMenuHandler.Initialize(Helper, Monitor);
 
             Helper.Events.Content.AssetRequested += OnAssetRequested;
@@ -26,7 +31,24 @@ namespace BetterGeodeCracking
 
         private void OnAssetRequested(object? sender, AssetRequestedEventArgs e)
         {
-            if (e.NameWithoutLocale.IsEquivalentTo("Data/Machines"))
+            if (e.NameWithoutLocale.IsEquivalentTo("Data/Objects"))
+            {
+                e.Edit(asset =>
+                {
+                    if (Config.AllowSpecialGeodesInCrusher)
+                    {
+                        var data = asset.AsDictionary<string, ObjectData>().Data;
+                        foreach (var obj in data.Values)
+                        {
+                            if (obj.ContextTags != null && obj.ContextTags.Contains("geode_crusher_ignored"))
+                            {
+                                obj.ContextTags.Remove("geode_crusher_ignored");
+                            }
+                        }
+                    }
+                });
+            }
+            else if (e.NameWithoutLocale.IsEquivalentTo("Data/Machines"))
             {
                 e.Edit(asset =>
                 {
@@ -71,10 +93,12 @@ namespace BetterGeodeCracking
                 mod: ModManifest,
                 reset: () => {
                     Config = new ModConfig();
+                    Helper.GameContent.InvalidateCache("Data/Objects");
                     Helper.GameContent.InvalidateCache("Data/Machines");
                 },
                 save: () => {
                     Helper.WriteConfig(Config);
+                    Helper.GameContent.InvalidateCache("Data/Objects");
                     Helper.GameContent.InvalidateCache("Data/Machines");
                 }
             );
@@ -141,6 +165,18 @@ namespace BetterGeodeCracking
             configMenu.AddSectionTitle(
                 mod: ModManifest,
                 text: () => I18n.Get("config.section.farm-machines")
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.allow-special-geodes-in-crusher.name"),
+                tooltip: () => I18n.Get("config.allow-special-geodes-in-crusher.tooltip"),
+                getValue: () => Config.AllowSpecialGeodesInCrusher,
+                setValue: value => {
+                    Config.AllowSpecialGeodesInCrusher = value;
+                    Helper.GameContent.InvalidateCache("Data/Objects");
+                    Helper.GameContent.InvalidateCache("Data/Machines");
+                }
             );
 
             configMenu.AddBoolOption(

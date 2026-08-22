@@ -274,7 +274,7 @@ namespace BetterGeodeCracking
             if (Game1.activeClickableMenu is not GeodeMenu menu || menu.waitingForServerResponse)
                 return;
 
-            if (!e.Button.IsUseToolButton())
+            if (!e.Button.IsUseToolButton() && !e.Button.IsActionButton())
                 return;
 
             UpdateCrackAllButton(menu);
@@ -284,18 +284,20 @@ namespace BetterGeodeCracking
 
             bool isCrackAllClicked = Config.ShowCrackAllButton && CrackAllButton != null && (CrackAllButton.containsPoint(mouseX, mouseY) || (Game1.options.SnappyMenus && menu.currentlySnappedComponent == CrackAllButton));
             bool isAnvilClicked = menu.geodeSpot != null && menu.geodeSpot.containsPoint(mouseX, mouseY);
+            bool isShiftDown = Helper.Input.IsDown(SButton.LeftShift) || Helper.Input.IsDown(SButton.RightShift);
 
             if (isCrackAllClicked)
             {
                 Helper.Input.Suppress(e.Button);
 
                 Item? targetItem = menu.heldItem;
-                if (targetItem == null)
+                if (targetItem == null || !GeodeCrackerLogic.IsCrackable(targetItem))
                 {
+                    targetItem = null;
                     // If Crack All is clicked without holding an item, crack first geode stack found in inventory
                     foreach (var invItem in Game1.player.Items)
                     {
-                        if (invItem != null && Utility.IsGeode(invItem))
+                        if (invItem != null && GeodeCrackerLogic.IsCrackable(invItem))
                         {
                             targetItem = invItem;
                             break;
@@ -303,7 +305,7 @@ namespace BetterGeodeCracking
                     }
                 }
 
-                if (targetItem != null && Utility.IsGeode(targetItem))
+                if (targetItem != null && GeodeCrackerLogic.IsCrackable(targetItem))
                 {
                     int countToCrack = Math.Min(targetItem.Stack, Config.BulkBatchSize);
                     int pricePerGeode = Config.FreeCracking ? 0 : Math.Max(0, Config.CrackingPrice);
@@ -343,38 +345,97 @@ namespace BetterGeodeCracking
                     Game1.playSound("cancel");
                 }
             }
-            else if (isAnvilClicked && Config.InstantCracking && menu.heldItem != null && Utility.IsGeode(menu.heldItem))
+            else if (isAnvilClicked)
             {
-                Helper.Input.Suppress(e.Button);
-
-                int pricePerGeode = Config.FreeCracking ? 0 : Math.Max(0, Config.CrackingPrice);
-                if (pricePerGeode > 0 && Game1.player.Money < pricePerGeode)
+                Item? targetItem = menu.heldItem;
+                if (targetItem == null || !GeodeCrackerLogic.IsCrackable(targetItem))
                 {
-                    menu.wiggleWordsTimer = 500;
-                    Game1.dayTimeMoneyBox.moneyShakeTimer = 1000;
-                    return;
+                    if (isShiftDown)
+                    {
+                        foreach (var invItem in Game1.player.Items)
+                        {
+                            if (invItem != null && GeodeCrackerLogic.IsCrackable(invItem))
+                            {
+                                targetItem = invItem;
+                                break;
+                            }
+                        }
+                    }
                 }
 
-                var result = GeodeCrackerLogic.ProcessBatch(Game1.player, menu.heldItem, 1, Config);
-                if (result.CountCracked > 0)
+                if (targetItem != null && GeodeCrackerLogic.IsCrackable(targetItem))
                 {
-                    if (menu.heldItem.Stack <= 0)
+                    if (isShiftDown)
                     {
-                        menu.heldItem = null;
-                    }
+                        // Shift+Click on Anvil -> crack entire stack instantly
+                        Helper.Input.Suppress(e.Button);
 
-                    int sparkX = (menu.geodeSpot?.bounds.X ?? menu.xPositionOnScreen) + 392 - 32;
-                    int sparkY = (menu.geodeSpot?.bounds.Y ?? menu.yPositionOnScreen) + 192 - 32;
-                    menu.sparkle = new TemporaryAnimatedSprite(
-                        "TileSheets\\animations",
-                        new Rectangle(0, 640, 64, 64),
-                        100f,
-                        8,
-                        0,
-                        new Vector2(sparkX, sparkY),
-                        flicker: false,
-                        flipped: false
-                    );
+                        int countToCrack = Math.Min(targetItem.Stack, Config.BulkBatchSize);
+                        int pricePerGeode = Config.FreeCracking ? 0 : Math.Max(0, Config.CrackingPrice);
+                        if (pricePerGeode > 0 && Game1.player.Money < pricePerGeode)
+                        {
+                            menu.wiggleWordsTimer = 500;
+                            Game1.dayTimeMoneyBox.moneyShakeTimer = 1000;
+                            return;
+                        }
+
+                        var result = GeodeCrackerLogic.ProcessBatch(Game1.player, targetItem, countToCrack, Config);
+                        if (result.CountCracked > 0)
+                        {
+                            if (targetItem == menu.heldItem && targetItem.Stack <= 0)
+                            {
+                                menu.heldItem = null;
+                            }
+
+                            int sparkX = (menu.geodeSpot?.bounds.X ?? menu.xPositionOnScreen) + 392 - 32;
+                            int sparkY = (menu.geodeSpot?.bounds.Y ?? menu.yPositionOnScreen) + 192 - 32;
+                            menu.sparkle = new TemporaryAnimatedSprite(
+                                "TileSheets\\animations",
+                                new Rectangle(0, 640, 64, 64),
+                                100f,
+                                8,
+                                0,
+                                new Vector2(sparkX, sparkY),
+                                flicker: false,
+                                flipped: false
+                            );
+                        }
+                    }
+                    else if (Config.InstantCracking && targetItem == menu.heldItem)
+                    {
+                        // Single crack instant mode
+                        Helper.Input.Suppress(e.Button);
+
+                        int pricePerGeode = Config.FreeCracking ? 0 : Math.Max(0, Config.CrackingPrice);
+                        if (pricePerGeode > 0 && Game1.player.Money < pricePerGeode)
+                        {
+                            menu.wiggleWordsTimer = 500;
+                            Game1.dayTimeMoneyBox.moneyShakeTimer = 1000;
+                            return;
+                        }
+
+                        var result = GeodeCrackerLogic.ProcessBatch(Game1.player, menu.heldItem, 1, Config);
+                        if (result.CountCracked > 0)
+                        {
+                            if (menu.heldItem.Stack <= 0)
+                            {
+                                menu.heldItem = null;
+                            }
+
+                            int sparkX = (menu.geodeSpot?.bounds.X ?? menu.xPositionOnScreen) + 392 - 32;
+                            int sparkY = (menu.geodeSpot?.bounds.Y ?? menu.yPositionOnScreen) + 192 - 32;
+                            menu.sparkle = new TemporaryAnimatedSprite(
+                                "TileSheets\\animations",
+                                new Rectangle(0, 640, 64, 64),
+                                100f,
+                                8,
+                                0,
+                                new Vector2(sparkX, sparkY),
+                                flicker: false,
+                                flipped: false
+                            );
+                        }
+                    }
                 }
             }
         }

@@ -1,0 +1,10 @@
+{
+  "EnableAutoHarvest": true,
+  "EnableChestOutputTransfer": true,
+  "EnablePeriodicProcessing": true,
+  "ProcessIntervalTicks": 60,
+  "EnableCrabPotService": true,
+  "EnableCaskService": true,
+  "HopperCapacity": 36,
+  "PlaySoundEffects": true
+}

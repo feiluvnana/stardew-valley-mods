@@ -15,12 +15,26 @@ namespace BetterGeodeCracking
     public static class GeodeCrackerLogic
     {
         /// <summary>
+        /// Determines if an item is a crackable geode, mystery box, artifact trove, or golden coconut.
+        /// </summary>
+        public static bool IsCrackable(Item? item)
+        {
+            if (item == null) return false;
+            string qid = item.QualifiedItemId;
+            if (qid == "(O)MysteryBox" || qid == "(O)GoldenMysteryBox" || qid.Contains("MysteryBox"))
+                return true;
+            if (qid == "(O)791" || qid == "(O)275")
+                return true;
+            return Utility.IsGeode(item, disallow_special_geodes: false);
+        }
+
+        /// <summary>
         /// Cracks a batch of geodes from a stack, generating treasures faithfully according to vanilla 1.6 mechanics.
         /// </summary>
         public static GeodeBatchResult ProcessBatch(Farmer who, Item geodeStack, int requestedCount, ModConfig config)
         {
             var result = new GeodeBatchResult();
-            if (geodeStack == null || !Utility.IsGeode(geodeStack) || requestedCount <= 0)
+            if (geodeStack == null || !IsCrackable(geodeStack) || requestedCount <= 0)
                 return result;
 
             int available = geodeStack.Stack;
@@ -38,7 +52,7 @@ namespace BetterGeodeCracking
 
             var rawTreasures = new List<Item>();
             string qualifiedItemId = geodeStack.QualifiedItemId;
-            bool isMysteryBox = qualifiedItemId == "(O)MysteryBox" || qualifiedItemId == "(O)GoldenMysteryBox";
+            bool isMysteryBox = qualifiedItemId == "(O)MysteryBox" || qualifiedItemId == "(O)GoldenMysteryBox" || qualifiedItemId.Contains("MysteryBox");
             bool isGoldenCoconut = qualifiedItemId == "(O)791";
             bool isArtifactTrove = qualifiedItemId == "(O)275";
 
