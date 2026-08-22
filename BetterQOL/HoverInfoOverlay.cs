@@ -263,9 +263,9 @@ namespace BetterQOL
                 {
                     string qualityStar = info.HeldItemQuality switch
                     {
-                        1 => " (★ Silver)",
-                        2 => " (★★ Gold)",
-                        4 => " (★★★ Iridium)",
+                        1 => " (Silver)",
+                        2 => " (Gold)",
+                        4 => " (Iridium)",
                         _ => string.Empty
                     };
                     heldLabel += qualityStar;
