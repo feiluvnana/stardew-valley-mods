@@ -1320,19 +1320,489 @@ namespace BetterQOL
 
         public static LookupSubject BuildTileSubject(GameLocation location, Vector2 tilePos)
         {
+            return BuildWorldOverviewSubject(location, tilePos);
+        }
+
+        public static LookupSubject BuildWorldOverviewSubject(GameLocation? location = null, Vector2? tilePos = null)
+        {
+            string locName = location != null ? (location.DisplayName ?? location.Name) : $"{Game1.player.farmName.Value} Farm";
+            string title = tilePos.HasValue ? $"{locName} ({tilePos.Value.X}, {tilePos.Value.Y})" : $"{locName} - Daily Almanac";
+
             var subject = new LookupSubject
             {
-                Title = $"{location.DisplayName ?? location.Name} ({tilePos.X}, {tilePos.Y})",
-                Subtitle = "Tile Location"
+                Title = title,
+                Subtitle = GetFullDateString()
             };
 
-            var section = new LookupSection(ModEntry.I18n.Get("lookup.section.status"));
+            // 1. Calendar, Birthdays & Festivals
+            subject.Sections.Add(BuildCalendarSection());
+
+            // 2. Daily Luck & Fortune
+            subject.Sections.Add(BuildDailyLuckSection());
+
+            // 3. Weather Forecast (Today & Tomorrow)
+            subject.Sections.Add(BuildWeatherSection(location));
+
+            // 4. TV & Special Events (Queen of Sauce & Traveling Merchant)
+            var eventSec = BuildSpecialEventsSection();
+            if (eventSec.Fields.Count > 0)
+            {
+                subject.Sections.Add(eventSec);
+            }
+
+            // 5. Farm & Chores Summary
+            subject.Sections.Add(BuildFarmSummarySection());
+
+            // 6. Tile Specifics (if clicked on tile)
+            if (location != null && tilePos.HasValue)
+            {
+                subject.Sections.Add(BuildTileDetailsSection(location, tilePos.Value));
+            }
+
+            return subject;
+        }
+
+        private static string GetFullDateString()
+        {
+            int day = Game1.dayOfMonth;
+            string dayOfWeek = ((day - 1) % 7) switch
+            {
+                0 => "Monday",
+                1 => "Tuesday",
+                2 => "Wednesday",
+                3 => "Thursday",
+                4 => "Friday",
+                5 => "Saturday",
+                6 => "Sunday",
+                _ => string.Empty
+            };
+            string seasonKey = $"season.{Game1.currentSeason.ToLower()}";
+            var tr = ModEntry.I18n.Get(seasonKey);
+            string season = tr.HasValue() ? tr.ToString() : (char.ToUpper(Game1.currentSeason[0]) + Game1.currentSeason.Substring(1));
+            return $"{dayOfWeek}, {season} {day}, Year {Game1.year}";
+        }
+
+        private static LookupSection BuildCalendarSection()
+        {
+            var section = new LookupSection("Calendar & Events");
+
+            // Today's Birthday
+            var todayBirthdayNpcs = new List<NPC>();
+            var upcomingBirthdays = new List<(NPC Npc, int DaysUntil)>();
+
+            foreach (var npc in Utility.getAllCharacters())
+            {
+                if (npc == null || !npc.IsVillager || npc.IsMonster || string.IsNullOrEmpty(npc.Name))
+                    continue;
+
+                if (string.Equals(npc.Birthday_Season, Game1.currentSeason, StringComparison.OrdinalIgnoreCase))
+                {
+                    if (npc.Birthday_Day == Game1.dayOfMonth)
+                    {
+                        todayBirthdayNpcs.Add(npc);
+                    }
+                    else if (npc.Birthday_Day > Game1.dayOfMonth && npc.Birthday_Day <= Game1.dayOfMonth + 7)
+                    {
+                        upcomingBirthdays.Add((npc, npc.Birthday_Day - Game1.dayOfMonth));
+                    }
+                }
+            }
+
+            if (todayBirthdayNpcs.Count > 0)
+            {
+                var bdayLinks = new List<LookupLink>();
+                foreach (var npc in todayBirthdayNpcs)
+                {
+                    var target = npc;
+                    bdayLinks.Add(new LookupLink(
+                        text: $"{target.displayName ?? target.Name} (Birthday Today!)",
+                        textColor: new Color(180, 50, 180),
+                        icon: target.Portrait,
+                        iconSourceRect: new Rectangle(0, 0, 64, 64),
+                        onClick: () => BuildNPCSubject(target)
+                    ));
+                }
+                section.Fields.Add(new LookupField("Today's Birthday", bdayLinks));
+            }
+            else
+            {
+                section.Fields.Add(new LookupField("Today's Birthday", "None", Color.DarkSlateGray));
+            }
+
+            if (upcomingBirthdays.Count > 0)
+            {
+                var upLinks = new List<LookupLink>();
+                foreach (var (npc, days) in upcomingBirthdays.OrderBy(u => u.DaysUntil))
+                {
+                    var target = npc;
+                    string dayText = days == 1 ? "Tomorrow" : $"In {days} days";
+                    upLinks.Add(new LookupLink(
+                        text: $"{target.displayName ?? target.Name} ({dayText})",
+                        textColor: Game1.textColor,
+                        icon: target.Portrait,
+                        iconSourceRect: new Rectangle(0, 0, 64, 64),
+                        onClick: () => BuildNPCSubject(target)
+                    ));
+                }
+                section.Fields.Add(new LookupField("Upcoming Birthdays", upLinks));
+            }
+
+            // Festivals / Special Days
+            string? festivalToday = GetFestivalName(Game1.currentSeason, Game1.dayOfMonth);
+            if (!string.IsNullOrEmpty(festivalToday))
+            {
+                section.Fields.Add(new LookupField("Festival Today", festivalToday, new Color(200, 60, 20)));
+            }
+
+            // Upcoming Festival
+            for (int d = Game1.dayOfMonth + 1; d <= Math.Min(28, Game1.dayOfMonth + 7); d++)
+            {
+                string? fest = GetFestivalName(Game1.currentSeason, d);
+                if (!string.IsNullOrEmpty(fest))
+                {
+                    int daysAway = d - Game1.dayOfMonth;
+                    section.Fields.Add(new LookupField("Upcoming Festival", $"{fest} (in {daysAway} days)", new Color(180, 100, 0)));
+                    break;
+                }
+            }
+
+            return section;
+        }
+
+        private static string? GetFestivalName(string season, int day)
+        {
+            string s = season.ToLower();
+            if (s == "spring")
+            {
+                if (day == 13) return "Egg Festival (Town Square, 9:00 AM - 2:00 PM)";
+                if (day == 24) return "Flower Dance (Cindersap Forest, 9:00 AM - 2:00 PM)";
+                if (day >= 15 && day <= 17) return "Desert Festival (Calico Desert)";
+            }
+            else if (s == "summer")
+            {
+                if (day == 11) return "Luau (The Beach, 9:00 AM - 2:00 PM)";
+                if (day == 28) return "Dance of the Moonlight Jellies (The Beach, 10:00 PM - 12:00 AM)";
+                if (day == 20 || day == 21) return "Trout Derby (Cindersap Forest)";
+            }
+            else if (s == "fall")
+            {
+                if (day == 16) return "Stardew Valley Fair (Town Square, 9:00 AM - 3:00 PM)";
+                if (day == 27) return "Spirit's Eve (Town Square, 10:00 PM - 11:50 PM)";
+            }
+            else if (s == "winter")
+            {
+                if (day == 8) return "Festival of Ice (Cindersap Forest, 9:00 AM - 2:00 PM)";
+                if (day >= 15 && day <= 17) return "Night Market (The Beach, 5:00 PM - 2:00 AM)";
+                if (day == 25) return "Feast of the Winter Star (Town Square, 9:00 AM - 2:00 PM)";
+                if (day == 12 || day == 13) return "SquidFest (The Beach)";
+            }
+            return null;
+        }
+
+        private static LookupSection BuildDailyLuckSection()
+        {
+            var section = new LookupSection("Daily Luck & Fortune");
+            double luck = Game1.player.DailyLuck;
+
+            string fortuneText;
+            Color fortuneColor;
+
+            if (luck > 0.07)
+            {
+                fortuneText = "The spirits are very happy today! They will do their best to shower everyone with good fortune. (Very Lucky)";
+                fortuneColor = new Color(0, 140, 0);
+            }
+            else if (luck > 0.02)
+            {
+                fortuneText = "The spirits are in good humor today. I think you'll have a little extra luck. (Lucky)";
+                fortuneColor = new Color(46, 125, 50);
+            }
+            else if (luck >= -0.02)
+            {
+                fortuneText = "The spirits feel neutral today. The day is in your hands. (Neutral)";
+                fortuneColor = Color.DarkSlateGray;
+            }
+            else if (luck >= -0.07)
+            {
+                fortuneText = "This is not your day. The spirits are somewhat displeased. (Unlucky)";
+                fortuneColor = new Color(200, 100, 20);
+            }
+            else
+            {
+                fortuneText = "The spirits are very displeased today. They will do their best to make your life difficult. (Very Unlucky)";
+                fortuneColor = new Color(220, 20, 60);
+            }
+
+            section.Fields.Add(new LookupField("Spirits Forecast", fortuneText, fortuneColor));
+
+            string luckSign = luck >= 0 ? $"+{luck:F3}" : $"{luck:F3}";
+            section.Fields.Add(new LookupField("Daily Luck Modifier", luckSign, luck >= 0 ? new Color(0, 140, 0) : new Color(200, 60, 20)));
+
+            if (Game1.player.hasSpecialCharm)
+            {
+                section.Fields.Add(new LookupField("Special Charm", "Active (+0.025 permanent luck bonus)", new Color(180, 50, 180)));
+            }
+
+            return section;
+        }
+
+        private static LookupSection BuildWeatherSection(GameLocation? location)
+        {
+            var section = new LookupSection("Weather Forecast");
+
+            // Today's Weather
+            string todayWeather = Game1.isGreenRain ? "Green Rain"
+                                : Game1.isLightning ? "Lightning Storm"
+                                : Game1.isSnowing ? "Snowing"
+                                : Game1.isRaining ? "Raining"
+                                : Game1.isDebrisWeather ? "Windy / Spring Debris"
+                                : "Sunny & Clear";
+
+            Color todayColor = (Game1.isRaining || Game1.isLightning || Game1.isGreenRain) ? new Color(20, 110, 220) : new Color(180, 100, 0);
+            section.Fields.Add(new LookupField("Today's Weather", todayWeather, todayColor));
+
+            // Tomorrow's Weather Forecast
+            string tomorrowKey = Game1.weatherForTomorrow;
+            string tomorrowWeather = tomorrowKey switch
+            {
+                Game1.weather_rain => "Rainy",
+                Game1.weather_lightning => "Lightning Storm",
+                Game1.weather_snow => "Snowy",
+                Game1.weather_green_rain => "Green Rain",
+                Game1.weather_debris => "Windy / Debris",
+                _ => "Sunny"
+            };
+
+            Color tomorrowColor = (tomorrowKey == Game1.weather_rain || tomorrowKey == Game1.weather_lightning || tomorrowKey == Game1.weather_green_rain)
+                ? new Color(20, 110, 220)
+                : new Color(180, 100, 0);
+
+            section.Fields.Add(new LookupField("Tomorrow's Forecast", tomorrowWeather, tomorrowColor));
+
+            // Ginger Island Forecast (if unlocked)
+            if (Game1.netWorldState.Value.IslandVisitors.Count > 0 || Game1.player.hasOrWillReceiveMail("Visited_Island"))
+            {
+                var islandLoc = Game1.getLocationFromName("IslandSouth");
+                if (islandLoc != null)
+                {
+                    string islandToday = islandLoc.IsRainingHere() ? "Rainy" : "Sunny";
+                    section.Fields.Add(new LookupField("Ginger Island Weather", islandToday, islandLoc.IsRainingHere() ? new Color(20, 110, 220) : new Color(180, 100, 0)));
+                }
+            }
+
+            return section;
+        }
+
+        private static LookupSection BuildSpecialEventsSection()
+        {
+            var section = new LookupSection("TV & Traveling Merchant");
+
+            // Queen of Sauce
+            int day = Game1.dayOfMonth;
+            int dayOfWeek = (day - 1) % 7; // 6 = Sun, 2 = Wed
+            if (dayOfWeek == 6)
+            {
+                var qos = GetQueenOfSauceRecipe(isSunday: true);
+                if (qos.HasValue)
+                {
+                    string status = qos.Value.Known ? "Already Known" : "New Recipe! (Watch TV to Learn)";
+                    Color statusColor = qos.Value.Known ? Color.DarkSlateGray : new Color(0, 140, 0);
+                    section.Fields.Add(new LookupField("Queen of Sauce (Sunday)", $"{qos.Value.RecipeName} - {status}", statusColor));
+                }
+            }
+            else if (dayOfWeek == 2)
+            {
+                var qos = GetQueenOfSauceRecipe(isSunday: false);
+                if (qos.HasValue)
+                {
+                    string status = qos.Value.Known ? "Already Known" : "New Recipe! (Watch TV to Learn)";
+                    Color statusColor = qos.Value.Known ? Color.DarkSlateGray : new Color(0, 140, 0);
+                    section.Fields.Add(new LookupField("Queen of Sauce (Rerun)", $"{qos.Value.RecipeName} - {status}", statusColor));
+                }
+            }
+
+            // Traveling Merchant
+            bool isCartDay = (dayOfWeek == 4 || dayOfWeek == 6) || (Game1.currentSeason == "winter" && day >= 15 && day <= 17);
+            if (isCartDay)
+            {
+                section.Fields.Add(new LookupField("Traveling Merchant", "Visiting Cindersap Forest today (Open 6:00 AM - 8:00 PM)", new Color(180, 50, 180)));
+            }
+            else
+            {
+                int daysToFri = ((4 - dayOfWeek) + 7) % 7;
+                if (daysToFri == 0) daysToFri = 7;
+                section.Fields.Add(new LookupField("Traveling Merchant", $"Next visit in {daysToFri} days (Friday)", Color.DarkSlateGray));
+            }
+
+            return section;
+        }
+
+        private static (string RecipeName, bool Known)? GetQueenOfSauceRecipe(bool isSunday)
+        {
+            try
+            {
+                var recipes = DataLoader.Tv_CookingChannel(Game1.content);
+                if (recipes == null) return null;
+
+                if (isSunday)
+                {
+                    int seasonOffset = Game1.currentSeason switch
+                    {
+                        "summer" => 28,
+                        "fall" => 56,
+                        "winter" => 84,
+                        _ => 0
+                    };
+                    int recipeNum = ((Game1.year - 1) * 112 + Game1.dayOfMonth + seasonOffset) / 7;
+                    if (recipes.TryGetValue(recipeNum.ToString(), out string? data))
+                    {
+                        string[] parts = data.Split('/');
+                        if (parts.Length > 0)
+                        {
+                            string recipeName = parts[0];
+                            bool known = Game1.player.cookingRecipes.ContainsKey(recipeName);
+                            return (recipeName, known);
+                        }
+                    }
+                }
+                else
+                {
+                    // Wednesday Rerun
+                    foreach (var kvp in recipes)
+                    {
+                        string[] parts = kvp.Value.Split('/');
+                        if (parts.Length > 0 && !Game1.player.cookingRecipes.ContainsKey(parts[0]))
+                        {
+                            return (parts[0], false);
+                        }
+                    }
+                }
+            }
+            catch { }
+            return null;
+        }
+
+        private static LookupSection BuildFarmSummarySection()
+        {
+            var section = new LookupSection("Farm & Daily Chores");
+
+            int unwateredCrops = 0;
+            int readyCrops = 0;
+            int deadCrops = 0;
+            int unpettedAnimals = 0;
+            int readyProduce = 0;
+            int readyMachines = 0;
+
+            try
+            {
+                var farm = Game1.getFarm();
+                if (farm != null)
+                {
+                    // Crops
+                    foreach (var pair in farm.terrainFeatures.Pairs)
+                    {
+                        if (pair.Value is HoeDirt dirt && dirt.crop != null)
+                        {
+                            if (dirt.crop.dead.Value) deadCrops++;
+                            else if (dirt.readyForHarvest()) readyCrops++;
+                            else if (dirt.needsWatering() && dirt.state.Value != HoeDirt.watered) unwateredCrops++;
+                        }
+                    }
+
+                    // Animals
+                    foreach (var animal in farm.getAllFarmAnimals())
+                    {
+                        if (!animal.wasPet.Value) unpettedAnimals++;
+                        if (animal.currentProduce.Value != null) readyProduce++;
+                    }
+
+                    // Machines on Farm & Indoors
+                    foreach (var obj in farm.objects.Values)
+                    {
+                        if (obj.readyForHarvest.Value) readyMachines++;
+                    }
+                    foreach (var building in farm.buildings)
+                    {
+                        if (building.indoors.Value != null)
+                        {
+                            foreach (var obj in building.indoors.Value.objects.Values)
+                            {
+                                if (obj.readyForHarvest.Value) readyMachines++;
+                            }
+                        }
+                    }
+                }
+            }
+            catch { }
+
+            // Crops Field
+            if (unwateredCrops == 0 && readyCrops == 0 && deadCrops == 0)
+            {
+                section.Fields.Add(new LookupField("Crops", "All crops watered & taken care of!", new Color(0, 140, 0)));
+            }
+            else
+            {
+                var cropParts = new List<string>();
+                if (unwateredCrops > 0) cropParts.Add($"{unwateredCrops} unwatered");
+                if (readyCrops > 0) cropParts.Add($"{readyCrops} ready to harvest");
+                if (deadCrops > 0) cropParts.Add($"{deadCrops} dead (clear with scythe)");
+                section.Fields.Add(new LookupField("Crops", string.Join(", ", cropParts), unwateredCrops > 0 ? new Color(200, 60, 20) : new Color(0, 140, 0)));
+            }
+
+            // Animals Field
+            if (unpettedAnimals == 0 && readyProduce == 0)
+            {
+                section.Fields.Add(new LookupField("Animals", "All animals loved & petted today!", new Color(0, 140, 0)));
+            }
+            else
+            {
+                var animalParts = new List<string>();
+                if (unpettedAnimals > 0) animalParts.Add($"{unpettedAnimals} need petting");
+                if (readyProduce > 0) animalParts.Add($"{readyProduce} produce ready");
+                section.Fields.Add(new LookupField("Animals", string.Join(", ", animalParts), unpettedAnimals > 0 ? new Color(200, 60, 20) : new Color(0, 140, 0)));
+            }
+
+            // Machines Field
+            if (readyMachines > 0)
+            {
+                section.Fields.Add(new LookupField("Machines", $"{readyMachines} machines ready to collect", new Color(0, 140, 0)));
+            }
+            else
+            {
+                section.Fields.Add(new LookupField("Machines", "No machines ready to collect", Color.DarkSlateGray));
+            }
+
+            // Silo Hay
+            try
+            {
+                var farm = Game1.getFarm();
+                if (farm != null)
+                {
+                    int hay = farm.piecesOfHay.Value;
+                    int maxHay = farm.buildings.Count(b => b.buildingType.Value.Contains("Silo")) * 240;
+                    if (maxHay > 0)
+                    {
+                        section.Fields.Add(new LookupField("Silo Hay", $"{hay} / {maxHay} Hay", hay < maxHay / 4 ? new Color(200, 60, 20) : Game1.textColor));
+                    }
+                }
+            }
+            catch { }
+
+            return section;
+        }
+
+        private static LookupSection BuildTileDetailsSection(GameLocation location, Vector2 tilePos)
+        {
+            var section = new LookupSection("Tile Location Details");
             section.Fields.Add(new LookupField("Location", location.DisplayName ?? location.Name, new Color(20, 110, 220)));
             section.Fields.Add(new LookupField("Tile Position", $"X: {tilePos.X}, Y: {tilePos.Y}", Game1.textColor));
-            section.Fields.Add(new LookupField("Weather", location.IsRainingHere() ? "Raining" : "Sunny", location.IsRainingHere() ? new Color(20, 110, 220) : new Color(180, 100, 0)));
 
-            subject.Sections.Add(section);
-            return subject;
+            bool isWater = location.isWaterTile((int)tilePos.X, (int)tilePos.Y);
+            bool isPassable = location.isTilePassable(new xTile.Dimensions.Location((int)tilePos.X, (int)tilePos.Y), Game1.viewport);
+
+            section.Fields.Add(new LookupField("Tile Type", isWater ? "Water Tile" : (isPassable ? "Walkable Ground" : "Obstacle / Blocked"), isWater ? new Color(20, 110, 220) : (isPassable ? new Color(0, 140, 0) : new Color(200, 60, 20))));
+
+            return section;
         }
 
         #endregion

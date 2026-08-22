@@ -42,16 +42,10 @@ namespace BetterQOL
                 showUpperRightCloseButton: true
             )
         {
-            CurrentSubject = initialSubject;
+            CurrentSubject = initialSubject ?? LookupDataManager.BuildWorldOverviewSubject();
             Game1.playSound("bigSelect");
 
             InitializeComponents();
-
-            if (CurrentSubject == null && SearchBox != null)
-            {
-                SearchBox.Selected = true;
-                Game1.keyboardDispatcher.Subscriber = SearchBox;
-            }
         }
 
         private void InitializeComponents()
