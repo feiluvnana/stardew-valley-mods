@@ -1,0 +1,10 @@
+{
+  "Name": "Better Tool",
+  "Author": "feiluvnana",
+  "Version": "1.0.0",
+  "Description": "Comprehensive hopper and machine automation overhaul for Stardew Valley 1.6+. Adds bidirectional auto-harvest, multi-direction loading, chest output routing, and configurable intervals.",
+  "UniqueID": "feiluvnana.BetterTool",
+  "EntryDll": "BetterTool.dll",
+  "MinimumApiVersion": "4.0.0",
+  "UpdateKeys": []
+}

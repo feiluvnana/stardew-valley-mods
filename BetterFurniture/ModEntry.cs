@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
+using StardewValley.GameData.Shops;
 
 namespace BetterFurniture
 {
@@ -13,21 +14,28 @@ namespace BetterFurniture
     {
         public static IMonitor ModMonitor { get; private set; } = null!;
         public static IModHelper ModHelper { get; private set; } = null!;
+        public static ITranslationHelper I18n { get; private set; } = null!;
 
         public override void Entry(IModHelper helper)
         {
             ModMonitor = Monitor;
             ModHelper = helper;
+            I18n = helper.Translation;
 
             var harmony = new Harmony(ModManifest.UniqueID);
             BedPatches.Apply(harmony, Monitor);
             FurniturePatches.Apply(harmony, Monitor);
 
             helper.Events.Content.AssetRequested += OnAssetRequested;
+            helper.Events.Content.LocaleChanged += (s, e) =>
+            {
+                helper.GameContent.InvalidateCache("Data/Furniture");
+                helper.GameContent.InvalidateCache("Data/Shops");
+            };
             helper.Events.GameLoop.SaveLoaded += (s, e) => FurniturePatches.FixAllLocationAndInventoryFurniture();
             helper.Events.GameLoop.DayStarted += (s, e) => FurniturePatches.FixAllLocationAndInventoryFurniture();
 
-            Monitor.Log("BetterFurniture initialized with 4x4 bed enhancements, floor restorations, and wall decor patches.", LogLevel.Debug);
+            Monitor.Log("BetterFurniture initialized with 4x4 bed enhancements, floor restorations, wall decor patches, and Pierre shop integration.", LogLevel.Debug);
         }
 
         private void OnAssetRequested(object? sender, AssetRequestedEventArgs e)
@@ -88,13 +96,54 @@ namespace BetterFurniture
                 {
                     var data = asset.AsDictionary<string, string>().Data;
 
-                    data["feiluvnana.BetterFurniture.PrincessDoubleBed"] = "Princess Double Bed/bed double/4 4/4 4/1/10000/-1/Princess Double Bed/0/Mods\\feiluvnana.BetterFurniture\\PrincessDoubleBed/true";
-                    data["feiluvnana.BetterFurniture.PrincessPastelWindow"] = "Princess Pastel Window/window/2 2/2 2/1/2000/-1/Princess Pastel Window/0/Mods\\feiluvnana.BetterFurniture\\PrincessPastelWindow/true";
-                    data["feiluvnana.BetterFurniture.PrincessWallSconce"] = "Princess Wall Sconce/painting/1 2/1 2/1/1000/-1/Princess Wall Sconce/0/Mods\\feiluvnana.BetterFurniture\\PrincessWallSconce/true";
-                    data["feiluvnana.BetterFurniture.PrincessNightstand"] = "Princess Nightstand/lamp/1 2/1 1/1/2000/-1/Princess Nightstand/0/Mods\\feiluvnana.BetterFurniture\\PrincessNightstand/true";
-                    data["feiluvnana.BetterFurniture.PrincessGrandRug"] = "Princess Grand Rug/rug/4 3/4 3/2/3000/-1/Princess Grand Rug/0/Mods\\feiluvnana.BetterFurniture\\PrincessGrandRug/true";
-                    data["feiluvnana.BetterFurniture.PrincessRococoMirror"] = "Princess Rococo Mirror/painting/2 2/2 2/1/2500/-1/Princess Rococo Mirror/0/Mods\\feiluvnana.BetterFurniture\\PrincessRococoMirror/true";
-                    data["feiluvnana.BetterFurniture.PrincessBedCanopy"] = "Princess Bed Canopy/painting/4 3/4 3/1/3500/-1/Princess Bed Canopy/0/Mods\\feiluvnana.BetterFurniture\\PrincessBedCanopy/true";
+                    string bedName = I18n.Get("furniture.princess_double_bed.name");
+                    string windowName = I18n.Get("furniture.princess_pastel_window.name");
+                    string sconceName = I18n.Get("furniture.princess_wall_sconce.name");
+                    string nightstandName = I18n.Get("furniture.princess_nightstand.name");
+                    string rugName = I18n.Get("furniture.princess_grand_rug.name");
+                    string mirrorName = I18n.Get("furniture.princess_rococo_mirror.name");
+                    string canopyName = I18n.Get("furniture.princess_bed_canopy.name");
+
+                    data["feiluvnana.BetterFurniture.PrincessDoubleBed"] = $"Princess Double Bed/bed double/4 4/4 4/1/10000/-1/{bedName}/0/Mods\\feiluvnana.BetterFurniture\\PrincessDoubleBed/true";
+                    data["feiluvnana.BetterFurniture.PrincessPastelWindow"] = $"Princess Pastel Window/window/2 2/2 2/1/2000/-1/{windowName}/0/Mods\\feiluvnana.BetterFurniture\\PrincessPastelWindow/true";
+                    data["feiluvnana.BetterFurniture.PrincessWallSconce"] = $"Princess Wall Sconce/painting/1 2/1 2/1/1000/-1/{sconceName}/0/Mods\\feiluvnana.BetterFurniture\\PrincessWallSconce/true";
+                    data["feiluvnana.BetterFurniture.PrincessNightstand"] = $"Princess Nightstand/lamp/1 2/1 1/1/2000/-1/{nightstandName}/0/Mods\\feiluvnana.BetterFurniture\\PrincessNightstand/true";
+                    data["feiluvnana.BetterFurniture.PrincessGrandRug"] = $"Princess Grand Rug/rug/4 3/4 3/2/3000/-1/{rugName}/0/Mods\\feiluvnana.BetterFurniture\\PrincessGrandRug/true";
+                    data["feiluvnana.BetterFurniture.PrincessRococoMirror"] = $"Princess Rococo Mirror/painting/2 2/2 2/1/2500/-1/{mirrorName}/0/Mods\\feiluvnana.BetterFurniture\\PrincessRococoMirror/true";
+                    data["feiluvnana.BetterFurniture.PrincessBedCanopy"] = $"Princess Bed Canopy/painting/4 3/4 3/1/3500/-1/{canopyName}/0/Mods\\feiluvnana.BetterFurniture\\PrincessBedCanopy/true";
+                });
+            }
+            // Data/Shops edits (SeedShop / Pierre's General Store)
+            else if (e.NameWithoutLocale.IsEquivalentTo("Data/Shops"))
+            {
+                e.Edit(asset =>
+                {
+                    var data = asset.AsDictionary<string, ShopData>().Data;
+                    if (data.TryGetValue("SeedShop", out var seedShop))
+                    {
+                        var itemsToAdd = new List<string>
+                        {
+                            "feiluvnana.BetterFurniture.PrincessDoubleBed",
+                            "feiluvnana.BetterFurniture.PrincessPastelWindow",
+                            "feiluvnana.BetterFurniture.PrincessWallSconce",
+                            "feiluvnana.BetterFurniture.PrincessNightstand",
+                            "feiluvnana.BetterFurniture.PrincessGrandRug",
+                            "feiluvnana.BetterFurniture.PrincessRococoMirror",
+                            "feiluvnana.BetterFurniture.PrincessBedCanopy"
+                        };
+
+                        foreach (var itemId in itemsToAdd)
+                        {
+                            seedShop.Items.RemoveAll(i => i.Id == itemId);
+                            seedShop.Items.Add(new ShopItemData
+                            {
+                                Id = itemId,
+                                ItemId = $"(F){itemId}",
+                                Price = 0,
+                                AvailableStock = -1
+                            });
+                        }
+                    }
                 });
             }
         }

@@ -1,0 +1,24 @@
+{
+  "config.section.hopper.name": "Hopper Automation Settings",
+  
+  "config.auto-harvest.name": "Enable Auto-Harvest",
+  "config.auto-harvest.tooltip": "If enabled, hoppers placed below a machine (Y - 1) will automatically pull and harvest finished items into the hopper.",
+
+  "config.adjacent-chest-output.name": "Transfer Output to Chest Below",
+  "config.adjacent-chest-output.tooltip": "If enabled, hoppers will automatically transfer collected items downward into a regular chest or mini-shipping bin placed directly below them (Y + 1).",
+
+  "config.process-interval.name": "Processing Interval (Ticks)",
+  "config.process-interval.tooltip": "How frequently in game ticks the hopper checks connected machines and chests. (60 ticks = 1 real-world second).",
+
+  "config.sound-effects.name": "Play Sound Effects",
+  "config.sound-effects.tooltip": "Plays subtle sound effects when items are loaded into machines below or harvested from machines above.",
+
+  "config.hopper-capacity.name": "Hopper Inventory Capacity",
+  "config.hopper-capacity.tooltip": "Total storage capacity of the hopper (36 slots default, or 70 slots expanded like Big Chest).",
+
+  "config.service-crab-pots.name": "Auto-Bait Crab Pots",
+  "config.service-crab-pots.tooltip": "Allows hoppers to load bait into crab pots below and collect catches from crab pots above.",
+
+  "config.service-casks.name": "Service Casks",
+  "config.service-casks.tooltip": "Allows hoppers to load aging ingredients into casks below and collect aged products from casks above."
+}

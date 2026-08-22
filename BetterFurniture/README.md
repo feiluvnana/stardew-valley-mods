@@ -25,7 +25,15 @@
 - **Princess Wallpaper & Warm Cream Wallpaper**: Delicate pastel floral and cream wallpaper options (`Maps/walls_and_floors`).
 - **Pastel Kitchen Floor & Kid Floor**: Matching flooring patterns (`Maps/walls_and_floors`).
 
-### 🛠️ 4. Robust Engine & Sync Patches
+### 🛒 4. Pierre's General Store Integration
+- All BetterFurniture items are stocked directly at **Pierre's General Store** (`SeedShop`) at the very end of his store inventory.
+- Price: **0g** for convenient early and mid-game decorating.
+
+### 🌐 5. Multi-Language & Vietnamese Localization
+- Built-in internationalization (`i18n`) support for English (`default.json`) and Vietnamese (`vi.json`).
+- Dynamic real-time translation switching supported.
+
+### 🛠️ 6. Robust Engine & Sync Patches
 - **Auto-Syncing**: Automatically recalculates furniture bounding boxes and types upon save load and day start to ensure custom furniture coordinates remain persistent and glitch-free.
 - **Wall Decor & Canopy Drawing**: Patches `Furniture.draw` to provide custom sprite offsets, flame particle rendering, and layering priorities.
 
@@ -33,15 +41,15 @@
 
 ## 📦 Furniture List & Data IDs
 
-| Item Name | Type | Tile Size | Price | Item ID |
-| :--- | :---: | :---: | :---: | :--- |
-| **Princess Double Bed** | Bed (Double) | `4x4` | `10,000g` | `feiluvnana.BetterFurniture.PrincessDoubleBed` |
-| **Princess Pastel Window** | Window | `2x2` | `2,000g` | `feiluvnana.BetterFurniture.PrincessPastelWindow` |
-| **Princess Wall Sconce** | Wall Torch / Light | `1x2` | `1,000g` | `feiluvnana.BetterFurniture.PrincessWallSconce` |
-| **Princess Nightstand** | Lamp / Table | `1x2` | `2,000g` | `feiluvnana.BetterFurniture.PrincessNightstand` |
-| **Princess Grand Rug** | Rug | `4x3` | `3,000g` | `feiluvnana.BetterFurniture.PrincessGrandRug` |
-| **Princess Rococo Mirror** | Wall Decor | `2x2` | `2,500g` | `feiluvnana.BetterFurniture.PrincessRococoMirror` |
-| **Princess Bed Canopy** | Wall Canopy | `4x3` | `3,500g` | `feiluvnana.BetterFurniture.PrincessBedCanopy` |
+| Item Name (EN) | Tên Vật Phẩm (VI) | Type | Tile Size | Pierre Shop Price | Item ID |
+| :--- | :--- | :---: | :---: | :---: | :--- |
+| **Princess Double Bed** | **Giường Đôi Công Chúa** | Bed (Double) | `4x4` | `0g` | `feiluvnana.BetterFurniture.PrincessDoubleBed` |
+| **Princess Pastel Window** | **Cửa Sổ Pastel Công Chúa** | Window | `2x2` | `0g` | `feiluvnana.BetterFurniture.PrincessPastelWindow` |
+| **Princess Wall Sconce** | **Đèn Treo Tường Công Chúa** | Wall Torch / Light | `1x2` | `0g` | `feiluvnana.BetterFurniture.PrincessWallSconce` |
+| **Princess Nightstand** | **Tủ Đầu Giường Công Chúa** | Lamp / Table | `1x2` | `0g` | `feiluvnana.BetterFurniture.PrincessNightstand` |
+| **Princess Grand Rug** | **Thảm Lớn Công Chúa** | Rug | `4x3` | `0g` | `feiluvnana.BetterFurniture.PrincessGrandRug` |
+| **Princess Rococo Mirror** | **Gương Rococo Công Chúa** | Wall Decor | `2x2` | `0g` | `feiluvnana.BetterFurniture.PrincessRococoMirror` |
+| **Princess Bed Canopy** | **Màn Trướng Giường Công Chúa** | Wall Canopy | `4x3` | `0g` | `feiluvnana.BetterFurniture.PrincessBedCanopy` |
 
 ---
 

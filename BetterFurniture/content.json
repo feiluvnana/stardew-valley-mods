@@ -76,13 +76,55 @@
       "Action": "EditData",
       "Target": "Data/Furniture",
       "Entries": {
-        "feiluvnana.BetterFurniture.PrincessDoubleBed": "Princess Double Bed/bed double/4 4/4 4/1/10000/-1/Princess Double Bed/0/Mods\\feiluvnana.BetterFurniture\\PrincessDoubleBed/true",
-        "feiluvnana.BetterFurniture.PrincessPastelWindow": "Princess Pastel Window/window/2 2/2 2/1/2000/-1/Princess Pastel Window/0/Mods\\feiluvnana.BetterFurniture\\PrincessPastelWindow/true",
-        "feiluvnana.BetterFurniture.PrincessWallSconce": "Princess Wall Sconce/painting/1 2/1 2/1/1000/-1/Princess Wall Sconce/0/Mods\\feiluvnana.BetterFurniture\\PrincessWallSconce/true",
-        "feiluvnana.BetterFurniture.PrincessNightstand": "Princess Nightstand/lamp/1 2/1 1/1/2000/-1/Princess Nightstand/0/Mods\\feiluvnana.BetterFurniture\\PrincessNightstand/true",
-        "feiluvnana.BetterFurniture.PrincessGrandRug": "Princess Grand Rug/rug/4 3/4 3/2/3000/-1/Princess Grand Rug/0/Mods\\feiluvnana.BetterFurniture\\PrincessGrandRug/true",
-        "feiluvnana.BetterFurniture.PrincessRococoMirror": "Princess Rococo Mirror/painting/2 2/2 2/1/2500/-1/Princess Rococo Mirror/0/Mods\\feiluvnana.BetterFurniture\\PrincessRococoMirror/true",
-        "feiluvnana.BetterFurniture.PrincessBedCanopy": "Princess Bed Canopy/painting/4 3/4 3/1/3500/-1/Princess Bed Canopy/0/Mods\\feiluvnana.BetterFurniture\\PrincessBedCanopy/true"
+        "feiluvnana.BetterFurniture.PrincessDoubleBed": "Princess Double Bed/bed double/4 4/4 4/1/10000/-1/{{i18n:furniture.princess_double_bed.name}}/0/Mods\\feiluvnana.BetterFurniture\\PrincessDoubleBed/true",
+        "feiluvnana.BetterFurniture.PrincessPastelWindow": "Princess Pastel Window/window/2 2/2 2/1/2000/-1/{{i18n:furniture.princess_pastel_window.name}}/0/Mods\\feiluvnana.BetterFurniture\\PrincessPastelWindow/true",
+        "feiluvnana.BetterFurniture.PrincessWallSconce": "Princess Wall Sconce/painting/1 2/1 2/1/1000/-1/{{i18n:furniture.princess_wall_sconce.name}}/0/Mods\\feiluvnana.BetterFurniture\\PrincessWallSconce/true",
+        "feiluvnana.BetterFurniture.PrincessNightstand": "Princess Nightstand/lamp/1 2/1 1/1/2000/-1/{{i18n:furniture.princess_nightstand.name}}/0/Mods\\feiluvnana.BetterFurniture\\PrincessNightstand/true",
+        "feiluvnana.BetterFurniture.PrincessGrandRug": "Princess Grand Rug/rug/4 3/4 3/2/3000/-1/{{i18n:furniture.princess_grand_rug.name}}/0/Mods\\feiluvnana.BetterFurniture\\PrincessGrandRug/true",
+        "feiluvnana.BetterFurniture.PrincessRococoMirror": "Princess Rococo Mirror/painting/2 2/2 2/1/2500/-1/{{i18n:furniture.princess_rococo_mirror.name}}/0/Mods\\feiluvnana.BetterFurniture\\PrincessRococoMirror/true",
+        "feiluvnana.BetterFurniture.PrincessBedCanopy": "Princess Bed Canopy/painting/4 3/4 3/1/3500/-1/{{i18n:furniture.princess_bed_canopy.name}}/0/Mods\\feiluvnana.BetterFurniture\\PrincessBedCanopy/true"
+      }
+    },
+    {
+      "Action": "EditData",
+      "Target": "Data/Shops",
+      "TargetField": [ "SeedShop", "Items" ],
+      "Entries": {
+        "feiluvnana.BetterFurniture.PrincessDoubleBed": {
+          "Id": "feiluvnana.BetterFurniture.PrincessDoubleBed",
+          "ItemId": "(F)feiluvnana.BetterFurniture.PrincessDoubleBed",
+          "Price": 0
+        },
+        "feiluvnana.BetterFurniture.PrincessPastelWindow": {
+          "Id": "feiluvnana.BetterFurniture.PrincessPastelWindow",
+          "ItemId": "(F)feiluvnana.BetterFurniture.PrincessPastelWindow",
+          "Price": 0
+        },
+        "feiluvnana.BetterFurniture.PrincessWallSconce": {
+          "Id": "feiluvnana.BetterFurniture.PrincessWallSconce",
+          "ItemId": "(F)feiluvnana.BetterFurniture.PrincessWallSconce",
+          "Price": 0
+        },
+        "feiluvnana.BetterFurniture.PrincessNightstand": {
+          "Id": "feiluvnana.BetterFurniture.PrincessNightstand",
+          "ItemId": "(F)feiluvnana.BetterFurniture.PrincessNightstand",
+          "Price": 0
+        },
+        "feiluvnana.BetterFurniture.PrincessGrandRug": {
+          "Id": "feiluvnana.BetterFurniture.PrincessGrandRug",
+          "ItemId": "(F)feiluvnana.BetterFurniture.PrincessGrandRug",
+          "Price": 0
+        },
+        "feiluvnana.BetterFurniture.PrincessRococoMirror": {
+          "Id": "feiluvnana.BetterFurniture.PrincessRococoMirror",
+          "ItemId": "(F)feiluvnana.BetterFurniture.PrincessRococoMirror",
+          "Price": 0
+        },
+        "feiluvnana.BetterFurniture.PrincessBedCanopy": {
+          "Id": "feiluvnana.BetterFurniture.PrincessBedCanopy",
+          "ItemId": "(F)feiluvnana.BetterFurniture.PrincessBedCanopy",
+          "Price": 0
+        }
       }
     }
   ]

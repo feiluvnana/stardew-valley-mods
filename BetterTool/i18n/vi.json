@@ -1,0 +1,24 @@
+{
+  "config.section.hopper.name": "Cài Đặt Tự Động Hóa Hopper (Phễu)",
+  
+  "config.auto-harvest.name": "Bật Tự Động Thu Hoạch",
+  "config.auto-harvest.tooltip": "Nếu bật, phễu đặt phía dưới máy móc (Y - 1) sẽ tự động thu hoạch thành phẩm vào phễu.",
+
+  "config.adjacent-chest-output.name": "Chuyển Thành Phẩm Xuống Rương Phía Dưới",
+  "config.adjacent-chest-output.tooltip": "Nếu bật, phễu sẽ tự động chuyển vật phẩm thu hoạch được xuống rương hoặc thùng xuất khẩu mini đặt trực tiếp phía dưới phễu (Y + 1).",
+
+  "config.process-interval.name": "Tần Suất Xử Lý (Tick)",
+  "config.process-interval.tooltip": "Tần suất phễu kiểm tra máy móc và rương (60 tick = 1 giây thực tế).",
+
+  "config.sound-effects.name": "Hiệu Ứng Âm Thanh",
+  "config.sound-effects.tooltip": "Phát âm thanh nhẹ nhàng khi nạp vật phẩm vào máy phía dưới hoặc thu hoạch từ máy phía trên.",
+
+  "config.hopper-capacity.name": "Sức Chứa Của Phễu",
+  "config.hopper-capacity.tooltip": "Tổng số ô chứa của phễu (36 ô mặc định, hoặc mở rộng 70 ô như Rương Lớn).",
+
+  "config.service-crab-pots.name": "Tự Động Thả Mồi Bẫy Cua",
+  "config.service-crab-pots.tooltip": "Cho phép phễu nạp mồi câu vào bẫy cua phía dưới và thu hoạch hải sản từ bẫy cua phía trên.",
+
+  "config.service-casks.name": "Tự Động Hóa Thùng Ủ Rượu (Cask)",
+  "config.service-casks.tooltip": "Cho phép phễu nạp nguyên liệu vào thùng ủ phía dưới và thu hoạch sản phẩm đã ủ từ thùng phía trên."
+}
