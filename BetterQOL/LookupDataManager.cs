@@ -541,6 +541,9 @@ namespace BetterQOL
                 foreach (var kvp in locDict)
                 {
                     string locKey = kvp.Key;
+                    if (locKey.Equals("fishingGame", StringComparison.OrdinalIgnoreCase) || locKey.Equals("Temp", StringComparison.OrdinalIgnoreCase))
+                        continue;
+
                     var locData = kvp.Value;
                     if (locData.Fish == null)
                         continue;

@@ -513,9 +513,9 @@ namespace BetterQOL
                 foreach (var section in CurrentSubject.Sections)
                 {
                     // Section Header
-                    Utility.drawTextWithShadow(b, section.Title, Game1.dialogueFont, new Vector2(contentX, currentY), new Color(115, 40, 10));
-                    currentY += 36;
-                    calculatedContentHeight += 36;
+                    Utility.drawTextWithShadow(b, section.Title, Game1.dialogueFont, new Vector2(contentX + 4, currentY), new Color(115, 40, 10));
+                    currentY += 46;
+                    calculatedContentHeight += 46;
 
                     foreach (var field in section.Fields)
                     {
@@ -524,11 +524,11 @@ namespace BetterQOL
 
                         if (field.Links.Count > 0)
                         {
-                            Utility.drawTextWithShadow(b, label, Game1.smallFont, new Vector2(contentX + 10, currentY), Game1.textColor);
-                            currentY += 28;
-                            calculatedContentHeight += 28;
+                            Utility.drawTextWithShadow(b, label, Game1.smallFont, new Vector2(contentX + 12, currentY), Game1.textColor);
+                            currentY += 34;
+                            calculatedContentHeight += 34;
 
-                            int chipX = contentX + 14;
+                            int chipX = contentX + 16;
                             int chipSpacing = 10;
                             int chipHeight = 36;
                             int chipIconSize = 24;
@@ -540,7 +540,7 @@ namespace BetterQOL
 
                                 if (chipX + chipWidth > contentX + contentWidth - 8)
                                 {
-                                    chipX = contentX + 14;
+                                    chipX = contentX + 16;
                                     currentY += chipHeight + 8;
                                     calculatedContentHeight += chipHeight + 8;
                                 }
@@ -584,26 +584,27 @@ namespace BetterQOL
                                 chipX += chipWidth + chipSpacing;
                             }
 
-                            currentY += chipHeight + 10;
-                            calculatedContentHeight += chipHeight + 10;
+                            currentY += chipHeight + 14;
+                            calculatedContentHeight += chipHeight + 14;
                         }
                         else
                         {
-                            int valWidth = contentWidth - (int)labelSize.X - 24;
+                            int valWidth = contentWidth - (int)labelSize.X - 32;
                             string wrappedValue = Game1.parseText(field.Value ?? string.Empty, Game1.smallFont, Math.Max(140, valWidth));
                             Vector2 valSize = Game1.smallFont.MeasureString(wrappedValue);
-                            int lineH = (int)Math.Max(26, valSize.Y + 4);
+                            int lineH = (int)Math.Max(30, valSize.Y + 8);
 
-                            Utility.drawTextWithShadow(b, label, Game1.smallFont, new Vector2(contentX + 10, currentY), Game1.textColor);
-                            Utility.drawTextWithShadow(b, wrappedValue, Game1.smallFont, new Vector2(contentX + 10 + labelSize.X, currentY), field.ValueColor);
+                            Utility.drawTextWithShadow(b, label, Game1.smallFont, new Vector2(contentX + 12, currentY), Game1.textColor);
+                            Utility.drawTextWithShadow(b, wrappedValue, Game1.smallFont, new Vector2(contentX + 12 + labelSize.X, currentY), field.ValueColor);
 
                             currentY += lineH;
                             calculatedContentHeight += lineH;
                         }
                     }
 
-                    currentY += 14;
-                    calculatedContentHeight += 14;
+                    b.Draw(Game1.staminaRect, new Rectangle(contentX + 6, currentY + 6, contentWidth - 12, 1), Color.SaddleBrown * 0.15f);
+                    currentY += 24;
+                    calculatedContentHeight += 24;
                 }
             }
 
