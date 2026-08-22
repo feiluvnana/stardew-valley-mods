@@ -1,12 +1,20 @@
 # 📦 BetterQOL (Stardew Valley 1.6+)
 
-A comprehensive quality-of-life suite for **Stardew Valley 1.6+**, combining real-time crop grow times, machine processing timers, tree maturation, unstackable item stack size overrides, and fast geode/mystery box processing. Built with SMAPI and Harmony.
+A comprehensive quality-of-life suite for **Stardew Valley 1.6+**, combining Lookup Anything (`F1`), real-time crop grow times, machine processing timers, tree maturation, unstackable item stack size overrides, and fast geode/mystery box processing. Built with SMAPI and Harmony.
 
 ---
 
 ## ✨ Key Features
 
-### 🔍 1. Real-Time Hover Tooltips & Timers
+### 🔎 1. Lookup Anything (`F1` Hotkey)
+Press **F1** anywhere in the game world or inside menus/inventories to inspect rich, real-time data:
+* **👤 Villagers & NPCs:** Displays high-res portrait, birthday, talked today status, weekly gifts given, relationship hearts with exact point progress, and complete lists of **Loved (★★★★★)** and **Liked (★★★)** gifts.
+* **🎒 Items & Inventory:** Displays sell value, health/energy restoration, **Museum donation status** (donated or needed), **Community Center bundle requirements**, who loves/likes the item, and **Crafting/Cooking recipes** using the item.
+* **⚔️ Monsters:** Displays combat stats (HP bar, attack damage, defense, XP gained) and full possible loot drop tables.
+* **🐄 Farm Animals & Pets:** Displays friendship hearts, happiness rating (0-255), mood reason (e.g. hungry, left outside), petting status, and ready produce.
+* **🐟 Fish Ponds & Buildings:** Displays fish population, max capacity, next spawn countdown, output chances, and needed quest items.
+
+### 🔍 2. Real-Time Hover Tooltips & Timers
 Hover over any interactive tile or farm entity to inspect real-time progress:
 * **🌱 Crops & Soil:** Displays produce name, item sprite icon, growth phase (`Stage 3/5`), days remaining until harvest (`Ready in 3 days` / `★ Ready to Harvest!`), regrow cycle info (`Regrows every 4 days`), watering status (`Watered ✓` / `Unwatered ✗`), and fertilizer applied. Supports Garden Pots and Paddy Crops.
 * **⚙️ Processing Machines:** Displays machine output item name/icon, remaining processing time (`2h 30m` / `1d 4h`), and exact completion clock time (`Today at 4:20 PM` / `Tomorrow at 9:00 AM`). Highlights finished machines with `★ Ready to Collect!`.
@@ -16,12 +24,12 @@ Hover over any interactive tile or farm entity to inspect real-time progress:
 * **🌲 Wild Trees & Bushes:** Displays growth stage (`Stage 4/5`), moss availability (`Has Moss ✓`), tapper status, and Tea Bush maturation/harvest windows.
 * **🐄 Farm Animals & Pets:** Displays daily petting status (`Petted today ✓` / `Needs petting ✗`), friendship hearts (`5.0 / 5.0 ♥`), and produce readiness.
 
-### 💎 2. Blacksmith & Geode Processing Overhaul
+### 💎 3. Blacksmith & Geode Processing Overhaul
 * **⚡ Instant Cracking:** Skip the 2.7-second delay to crack open items immediately.
 * **🔨 "Crack All" & Shift+Click Bulk Processing:** Crack entire stacks at once either by clicking the dedicated "Crack All" button or holding Shift while clicking the anvil at standard 25g cost.
 * **🚜 Geode Crusher Improvements:** On-farm Geode Crushers with optional instant processing and no-coal mode.
 
-### 🎒 3. Extended Stack Size Overhaul
+### 🎒 4. Extended Stack Size Overhaul
 Remove vanilla inventory stack limits and stack previously unstackable items up to **999** (or custom configured size):
 * **🎣 Fishing Tackle & Bobbers:** Stacks tackles that share identical durability.
 * **🔮 1.6 Trinkets:** Stacks identical trinkets (preserving stats and ascension status).
@@ -38,6 +46,11 @@ All options can be configured in-game via **Generic Mod Config Menu (GMCM)** or 
 
 | Category | Option | Default | Description |
 | :--- | :--- | :---: | :--- |
+| **Lookup** | `EnableLookupAnything` | `true` | Enable F1 lookup cards. |
+| **Lookup** | `LookupKey` | `F1` | Hotkey to trigger lookup card. |
+| **Lookup** | `ShowGiftTastes` | `true` | Display loved/liked gifts in lookup cards. |
+| **Lookup** | `ShowItemRecipes` | `true` | Display crafting/cooking recipes in lookup cards. |
+| **Lookup** | `ShowBundleAndMuseumInfo` | `true` | Display bundle and museum status on items. |
 | **Hover Info** | `EnableCropHover` | `true` | Show crop grow time, days to harvest, and soil info. |
 | **Hover Info** | `EnableMachineHover` | `true` | Show machine processing countdown and finish times. |
 | **Hover Info** | `EnableTreeHover` | `true` | Show fruit tree maturation and wild tree stages. |

@@ -70,5 +70,21 @@ namespace BetterQOL
 
         /// <summary>Optional key to hold to show hover tooltips (default None: always shows on hover).</summary>
         public SButton HoverHotkey { get; set; } = SButton.None;
+
+        // ---------------- Lookup Anything (F1 by default) ----------------
+        /// <summary>Whether the Lookup Anything feature is enabled.</summary>
+        public bool EnableLookupAnything { get; set; } = true;
+
+        /// <summary>Key to press to open the detailed lookup window for whatever is hovered.</summary>
+        public SButton LookupKey { get; set; } = SButton.F1;
+
+        /// <summary>Whether to display loved/liked gift tastes in lookup cards.</summary>
+        public bool ShowGiftTastes { get; set; } = true;
+
+        /// <summary>Whether to display crafting and cooking recipes using the item in lookup cards.</summary>
+        public bool ShowItemRecipes { get; set; } = true;
+
+        /// <summary>Whether to display Community Center bundle and Museum donation needs in lookup cards.</summary>
+        public bool ShowBundleAndMuseumInfo { get; set; } = true;
     }
 }

@@ -2,6 +2,7 @@ using System;
 using HarmonyLib;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
+using StardewValley;
 using StardewValley.GameData.Machines;
 
 namespace BetterQOL
@@ -26,10 +27,31 @@ namespace BetterQOL
             GeodeMenuHandler.Initialize(helper, Monitor);
             HoverInfoOverlay.Initialize(helper, Monitor);
 
+            helper.Events.Input.ButtonPressed += OnButtonPressed;
             helper.Events.Content.AssetRequested += OnAssetRequested;
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
 
-            Monitor.Log("BetterQOL initialized successfully: Extended Stackable limits, Geode Cracking overhaul, and Hover Information/Timers are active.", LogLevel.Debug);
+            Monitor.Log("BetterQOL initialized successfully: Extended Stackable limits, Geode Cracking overhaul, Hover Information, and Lookup Anything are active.", LogLevel.Debug);
+        }
+
+        private void OnButtonPressed(object? sender, ButtonPressedEventArgs e)
+        {
+            if (!Config.EnableLookupAnything || e.Button != Config.LookupKey)
+                return;
+
+            if (Game1.activeClickableMenu is LookupMenu)
+            {
+                Game1.exitActiveMenu();
+                Helper.Input.Suppress(e.Button);
+                return;
+            }
+
+            var subject = LookupTargetFinder.FindTargetSubject();
+            if (subject != null)
+            {
+                Game1.activeClickableMenu = new LookupMenu(subject);
+                Helper.Input.Suppress(e.Button);
+            }
         }
 
         private void OnAssetRequested(object? sender, AssetRequestedEventArgs e)
@@ -293,6 +315,52 @@ namespace BetterQOL
                 tooltip: () => I18n.Get("config.hover-hotkey.tooltip"),
                 getValue: () => Config.HoverHotkey,
                 setValue: value => Config.HoverHotkey = value
+            );
+
+            // ---------------- Section 5: Lookup Anything ----------------
+            configMenu.AddSectionTitle(
+                mod: ModManifest,
+                text: () => I18n.Get("config.section.lookup-anything")
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.enable-lookup-anything.name"),
+                tooltip: () => I18n.Get("config.enable-lookup-anything.tooltip"),
+                getValue: () => Config.EnableLookupAnything,
+                setValue: value => Config.EnableLookupAnything = value
+            );
+
+            configMenu.AddKeybind(
+                mod: ModManifest,
+                name: () => I18n.Get("config.lookup-key.name"),
+                tooltip: () => I18n.Get("config.lookup-key.tooltip"),
+                getValue: () => Config.LookupKey,
+                setValue: value => Config.LookupKey = value
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.show-gift-tastes.name"),
+                tooltip: () => I18n.Get("config.show-gift-tastes.tooltip"),
+                getValue: () => Config.ShowGiftTastes,
+                setValue: value => Config.ShowGiftTastes = value
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.show-item-recipes.name"),
+                tooltip: () => I18n.Get("config.show-item-recipes.tooltip"),
+                getValue: () => Config.ShowItemRecipes,
+                setValue: value => Config.ShowItemRecipes = value
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.show-bundle-and-museum-info.name"),
+                tooltip: () => I18n.Get("config.show-bundle-and-museum-info.tooltip"),
+                getValue: () => Config.ShowBundleAndMuseumInfo,
+                setValue: value => Config.ShowBundleAndMuseumInfo = value
             );
         }
 

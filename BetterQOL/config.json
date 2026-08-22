@@ -19,5 +19,10 @@
   "ShowWaterAndFertilizer": true,
   "ShowItemIconInTooltip": true,
   "ShowExactFinishTime": true,
-  "HoverHotkey": "None"
+  "HoverHotkey": "None",
+  "EnableLookupAnything": true,
+  "LookupKey": "F1",
+  "ShowGiftTastes": true,
+  "ShowItemRecipes": true,
+  "ShowBundleAndMuseumInfo": true
 }
