@@ -10,13 +10,11 @@ A suite of high-performance, modular quality-of-life, progression enhancement, a
 | :--- | :---: | :--- | :--- |
 | [**BetterIndustry**](./BetterIndustry) | `1.0.0` | Comprehensive artisan goods, cooking, and machine automation suite. | Flower mead value retention, profitable cooking (+25%), extended food buffs (+50%), 4-way omnidirectional auto-feed/harvest hoppers, and crab pot/cask support. |
 | [**BetterSkullCavernChest**](./BetterSkullCavernChest) | `1.1.0` | Dynamic loot overhaul for Skull Cavern treasure rooms. | 7 gameplay categories (54 items), decaying multi-roll chances, critical stack multipliers (up to 5x), and Floor 100 special chest buffs. |
-| [**BetterProduct**](./BetterProduct) | `1.0.0` | Comprehensive artisan and cooking value / buff rebalancer. | Flower-type honey mead preservation, profitable cooking margins (+25%), +50% food buff durations, +25% energy, and juice/pickle/roe/caviar boosts. |
 | [**BetterFurniture**](./BetterFurniture) | `1.0.0` | Interior decorating and luxury furniture expansion. | 4x4 spacious Princess King Bed with free placement anywhere, animated sconce flames, light sources, canopy layering, and farmhouse tile restorations. |
 | [**ExtendedDesertFestival**](./ExtendedDesertFestival) | `1.1.0` | Expands the Calico Desert Festival across all seasons. | Enables Desert Festival in Summer, Fall, and Winter (15th–17th), preserves Calico Eggs across seasons. |
 | [**ExtendedStackable**](./ExtendedStackable) | `1.0.0` | Stack size overhaul for normally unstackable items. | Stacks fishing tackle, 1.6 trinkets, rings, furniture, boots, clothing, and hats up to 999 with stat matching. |
 | [**BetterGeodeCracking**](./BetterGeodeCracking) | `1.0.0` | Bulk and instant geode/trove cracking without fees. | Free 0g cracking at Clint's, Shift+Click / "Crack All" button bulk processing, instant cracking toggle, and faithful RNG. |
 | [**BetterForge**](./BetterForge) | `1.0.0` | Volcano Forge, Mini-Forge, and Anvil overhauls. | 100% fair uniform weapon/tool enchantments, "Never Downgrade" trinket reforging, "Perfect" tier prefixes, and Prismatic Ascension powers. |
-| [**BetterTool**](./BetterTool) | `1.0.0` | 4-Directional hopper and machine automation overhaul. | 4-way omnidirectional auto-feed and auto-harvest (N, S, W, E), smart routing to adjacent chests/bins, crab pot & cask support. |
 | [**BetterMap**](./BetterMap) | `1.0.0` | Farmhouse doorway and Ginger Island farm clutter cleaner. | Widens all Farmhouse exit doorways to 3x1 tiles, removes Ginger Island Farm driftwood fence and bleached log piles. |
 
 ---
@@ -34,9 +32,7 @@ A suite of high-performance, modular quality-of-life, progression enhancement, a
        ├── BetterGeodeCracking/
        ├── BetterIndustry/
        ├── BetterMap/
-       ├── BetterProduct/
        ├── BetterSkullCavernChest/
-       ├── BetterTool/
        ├── ExtendedDesertFestival/
        └── ExtendedStackable/
    ```
@@ -62,9 +58,7 @@ dotnet build BetterFurniture/BetterFurniture.csproj
 dotnet build BetterGeodeCracking/BetterGeodeCracking.csproj
 dotnet build BetterIndustry/BetterIndustry.csproj
 dotnet build BetterMap/BetterMap.csproj
-dotnet build BetterProduct/BetterProduct.csproj
 dotnet build BetterSkullCavernChest/BetterSkullCavernChest.csproj
-dotnet build BetterTool/BetterTool.csproj
 dotnet build ExtendedDesertFestival/ExtendedDesertFestival.csproj
 dotnet build ExtendedStackable/ExtendedStackable.csproj
 ```

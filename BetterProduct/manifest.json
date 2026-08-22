@@ -1,9 +1,0 @@
-{
-  "Name": "BetterProduct",
-  "Author": "feiluvnana",
-  "Version": "1.0.0",
-  "Description": "Balances cooking dishes and artisan products without nerfs. Underwhelming products are buffed for fair profit, energy, and buff durations.",
-  "UniqueID": "feiluvnana.BetterProduct",
-  "MinimumApiVersion": "4.0.0",
-  "EntryDll": "BetterProduct.dll"
-}
