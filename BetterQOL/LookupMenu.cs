@@ -534,20 +534,21 @@ namespace BetterQOL
                             currentY += 28;
                             calculatedContentHeight += 28;
 
-                            int chipX = contentX + 16;
-                            int chipSpacing = 8;
+                            int chipX = contentX + 14;
+                            int chipSpacing = 10;
+                            int chipHeight = 36;
+                            int chipIconSize = 24;
 
                             foreach (var link in field.Links)
                             {
                                 Vector2 textSize = Game1.smallFont.MeasureString(link.Text);
-                                int chipWidth = (int)textSize.X + (link.Icon != null ? 36 : 18);
-                                int chipHeight = 28;
+                                int chipWidth = (int)textSize.X + (link.Icon != null ? chipIconSize + 16 : 14) + 12;
 
                                 if (chipX + chipWidth > contentX + contentWidth - 8)
                                 {
-                                    chipX = contentX + 16;
-                                    currentY += chipHeight + 6;
-                                    calculatedContentHeight += chipHeight + 6;
+                                    chipX = contentX + 14;
+                                    currentY += chipHeight + 8;
+                                    calculatedContentHeight += chipHeight + 8;
                                 }
 
                                 Rectangle chipBounds = new Rectangle(chipX, currentY, chipWidth, chipHeight);
@@ -556,34 +557,41 @@ namespace BetterQOL
 
                                 bool isHovered = HoveredLink == link;
 
-                                IClickableMenu.drawTextureBox(
-                                    b,
-                                    Game1.menuTexture,
-                                    new Rectangle(0, 256, 60, 60),
-                                    chipBounds.X,
-                                    chipBounds.Y,
-                                    chipBounds.Width,
-                                    chipBounds.Height,
-                                    isHovered ? Color.Wheat : Color.White,
-                                    0.6f,
-                                    drawShadow: false
-                                );
+                                // Clean smooth chip background
+                                Color bgColor = isHovered ? new Color(255, 245, 215) : new Color(248, 230, 192);
+                                Color borderColor = isHovered ? new Color(110, 35, 10) : new Color(185, 135, 90);
 
-                                int drawTextX = chipBounds.X + 8;
+                                b.Draw(Game1.staminaRect, chipBounds, bgColor);
+
+                                // 1px Crisp Outline
+                                b.Draw(Game1.staminaRect, new Rectangle(chipBounds.X, chipBounds.Y, chipBounds.Width, 1), borderColor);
+                                b.Draw(Game1.staminaRect, new Rectangle(chipBounds.X, chipBounds.Bottom - 1, chipBounds.Width, 1), borderColor);
+                                b.Draw(Game1.staminaRect, new Rectangle(chipBounds.X, chipBounds.Y, 1, chipBounds.Height), borderColor);
+                                b.Draw(Game1.staminaRect, new Rectangle(chipBounds.Right - 1, chipBounds.Y, 1, chipBounds.Height), borderColor);
+
+                                int drawIconX = chipBounds.X + 8;
+                                int drawTextX = drawIconX;
+
                                 if (link.Icon != null)
                                 {
+                                    int iconY = chipBounds.Y + (chipHeight - chipIconSize) / 2;
                                     Rectangle src = link.IconSourceRect ?? new Rectangle(0, 0, link.Icon.Width, link.Icon.Height);
-                                    b.Draw(link.Icon, new Rectangle(drawTextX, chipBounds.Y + 3, 22, 22), src, Color.White);
-                                    drawTextX += 26;
+                                    b.Draw(link.Icon, new Rectangle(drawIconX, iconY, chipIconSize, chipIconSize), src, Color.White);
+                                    drawTextX += chipIconSize + 8;
+                                }
+                                else
+                                {
+                                    drawTextX += 2;
                                 }
 
-                                Utility.drawTextWithShadow(b, link.Text, Game1.smallFont, new Vector2(drawTextX, chipBounds.Y + 4), isHovered ? Color.DarkBlue : link.TextColor);
+                                int textY = chipBounds.Y + (chipHeight - (int)textSize.Y) / 2 + 1;
+                                Utility.drawTextWithShadow(b, link.Text, Game1.smallFont, new Vector2(drawTextX, textY), isHovered ? Color.DarkBlue : link.TextColor);
 
                                 chipX += chipWidth + chipSpacing;
                             }
 
-                            currentY += 36;
-                            calculatedContentHeight += 36;
+                            currentY += chipHeight + 10;
+                            calculatedContentHeight += chipHeight + 10;
                         }
                         else
                         {

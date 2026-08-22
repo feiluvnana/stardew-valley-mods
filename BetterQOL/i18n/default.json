@@ -189,8 +189,8 @@
   "lookup.npc.status-married": "Spouse (Married)",
   "lookup.npc.status-roommate": "Roommate",
   "lookup.npc.status-dating": "Dating (Boyfriend/Girlfriend)",
-  "lookup.npc.loved-gifts": "Loved Gifts (★★★★★)",
-  "lookup.npc.liked-gifts": "Liked Gifts (★★★)",
+  "lookup.npc.loved-gifts": "Loved Gifts (Loved)",
+  "lookup.npc.liked-gifts": "Liked Gifts (Liked)",
 
   "lookup.type.item": "Item",
   "lookup.item.description": "Description",
@@ -202,8 +202,8 @@
   "lookup.item.museum-donated": "Donated ✓",
   "lookup.item.museum-needed": "Not donated yet (Needs donation!) ✗",
   "lookup.item.bundles": "Needed for Bundles",
-  "lookup.item.loved-by": "Loved by (★★★★★)",
-  "lookup.item.liked-by": "Liked by (★★★)",
+  "lookup.item.loved-by": "Loved by",
+  "lookup.item.liked-by": "Liked by",
   "lookup.item.used-in-recipes": "Used in Recipes",
 
   "lookup.type.monster": "Monster",

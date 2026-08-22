@@ -189,8 +189,8 @@
   "lookup.npc.status-married": "Vợ / Chồng (Đã Kết Hôn)",
   "lookup.npc.status-roommate": "Bạn Cùng Phòng",
   "lookup.npc.status-dating": "Đang Hẹn Hò (Bạn Trai / Bạn Gái)",
-  "lookup.npc.loved-gifts": "Món Quà Cực Thích (★★★★★)",
-  "lookup.npc.liked-gifts": "Món Quà Thích (★★★)",
+  "lookup.npc.loved-gifts": "Món Quà Cực Thích",
+  "lookup.npc.liked-gifts": "Món Quà Thích",
 
   "lookup.type.item": "Vật Phẩm",
   "lookup.item.description": "Mô Tả",
@@ -202,8 +202,8 @@
   "lookup.item.museum-donated": "Đã Hiến Tặng ✓",
   "lookup.item.museum-needed": "Chưa Hiến Tặng (Cần Hiến Tặng!) ✗",
   "lookup.item.bundles": "Cần Cho Gói Quà",
-  "lookup.item.loved-by": "Cực Thích Bởi (★★★★★)",
-  "lookup.item.liked-by": "Thích Bởi (★★★)",
+  "lookup.item.loved-by": "Cực Thích Bởi",
+  "lookup.item.liked-by": "Thích Bởi",
   "lookup.item.used-in-recipes": "Dùng Trong Công Thức",
 
   "lookup.type.monster": "Quái Vật",
