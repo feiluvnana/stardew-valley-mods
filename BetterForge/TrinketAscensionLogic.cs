@@ -487,7 +487,7 @@ namespace BetterForge
             }
         }
 
-        // 7. Basilisk Paw: Reflect 50% damage & 20% lifesteal on hit (heal 3-8 HP)
+        // 6. Basilisk Paw: Reflect 50% damage & 20% lifesteal on hit (heal 3-8 HP)
         public static void TriggerDamageReflect(Monster attacker, Farmer victim, int incomingDamage)
         {
             if (attacker == null || victim == null || incomingDamage <= 0 || victim.currentLocation == null) return;

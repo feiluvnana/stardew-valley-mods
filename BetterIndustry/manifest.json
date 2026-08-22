@@ -1,0 +1,10 @@
+{
+  "Name": "BetterIndustry",
+  "Author": "feiluvnana",
+  "Version": "1.0.0",
+  "Description": "Comprehensive artisan goods, cooking, and machine automation suite for Stardew Valley 1.6+. Combines flower honey mead retention, balanced food margins, and 4-directional omni-hopper automation.",
+  "UniqueID": "feiluvnana.BetterIndustry",
+  "EntryDll": "BetterIndustry.dll",
+  "MinimumApiVersion": "4.0.0",
+  "UpdateKeys": []
+}

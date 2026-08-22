@@ -28,7 +28,7 @@ Hold a trinket and forge it at the Anvil using **1 Prismatic Shard** to permanen
 - **🧚 Fairy Box:** Provides guaranteed baseline healing every pulse (even out of combat), heals nearby multiplayer allies, and grants **+1 Defense** for 15 seconds (*Fairy Blessing*).
 - **🦜 Parrot Egg:** **Doubles gold coin drops** and grants a **+35% chance** for bonus monster loot drops upon defeat.
 - **✨ Golden Spur:** Increases Critical Strike Chance by **+10%**, and the critical speed boost provides **+3 Attack** (*Spur Fury*).
-- **🏹 Magic Quiver:** Spectral arrows **pierce through all enemies** and instantly **execute monsters below 20% HP**.
+- **🏹 Magic Quiver:** Spectral arrows **pierce through all enemies** and grant **+15% Critical Strike Chance**.
 - **❄️ Ice Rod:** Striking frozen enemies shatters the ice and triggers an **ice blast** (deals 30% Attack damage and slows nearby enemies).
 - **🦎 Basilisk Paw:** **Reflects 50% incoming damage** back to attackers, and attacks have a **20% chance to lifesteal** (heal 3–8 HP).
 

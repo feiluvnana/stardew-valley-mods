@@ -8,6 +8,7 @@ A suite of high-performance, modular quality-of-life, progression enhancement, a
 
 | Mod | Version | Description | Key Features |
 | :--- | :---: | :--- | :--- |
+| [**BetterIndustry**](./BetterIndustry) | `1.0.0` | Comprehensive artisan goods, cooking, and machine automation suite. | Flower mead value retention, profitable cooking (+25%), extended food buffs (+50%), 4-way omnidirectional auto-feed/harvest hoppers, and crab pot/cask support. |
 | [**BetterSkullCavernChest**](./BetterSkullCavernChest) | `1.1.0` | Dynamic loot overhaul for Skull Cavern treasure rooms. | 7 gameplay categories (54 items), decaying multi-roll chances, critical stack multipliers (up to 5x), and Floor 100 special chest buffs. |
 | [**BetterProduct**](./BetterProduct) | `1.0.0` | Comprehensive artisan and cooking value / buff rebalancer. | Flower-type honey mead preservation, profitable cooking margins (+25%), +50% food buff durations, +25% energy, and juice/pickle/roe/caviar boosts. |
 | [**BetterFurniture**](./BetterFurniture) | `1.0.0` | Interior decorating and luxury furniture expansion. | 4x4 spacious Princess King Bed with free placement anywhere, animated sconce flames, light sources, canopy layering, and farmhouse tile restorations. |
@@ -31,6 +32,7 @@ A suite of high-performance, modular quality-of-life, progression enhancement, a
        ├── BetterForge/
        ├── BetterFurniture/
        ├── BetterGeodeCracking/
+       ├── BetterIndustry/
        ├── BetterMap/
        ├── BetterProduct/
        ├── BetterSkullCavernChest/
@@ -58,6 +60,7 @@ Run the following commands from the root directory:
 dotnet build BetterForge/BetterForge.csproj
 dotnet build BetterFurniture/BetterFurniture.csproj
 dotnet build BetterGeodeCracking/BetterGeodeCracking.csproj
+dotnet build BetterIndustry/BetterIndustry.csproj
 dotnet build BetterMap/BetterMap.csproj
 dotnet build BetterProduct/BetterProduct.csproj
 dotnet build BetterSkullCavernChest/BetterSkullCavernChest.csproj
