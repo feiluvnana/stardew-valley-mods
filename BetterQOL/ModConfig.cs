@@ -84,8 +84,11 @@ namespace BetterQOL
         /// <summary>Whether the Lookup Anything feature is enabled.</summary>
         public bool EnableLookupAnything { get; set; } = true;
 
-        /// <summary>Key to press to open the detailed lookup window for whatever is hovered.</summary>
+        /// <summary>Keyboard key to press to open the detailed lookup window (default: F1).</summary>
         public SButton LookupKey { get; set; } = SButton.F1;
+
+        /// <summary>Controller button to press to open the detailed lookup window (default: RightStick / R3).</summary>
+        public SButton ControllerLookupKey { get; set; } = SButton.RightStick;
 
         /// <summary>Whether to display loved/liked gift tastes in lookup cards.</summary>
         public bool ShowGiftTastes { get; set; } = true;

@@ -37,7 +37,10 @@ namespace BetterQOL
 
         private void OnButtonPressed(object? sender, ButtonPressedEventArgs e)
         {
-            if (!Config.EnableLookupAnything || e.Button != Config.LookupKey)
+            bool isLookupTriggered = (Config.LookupKey != SButton.None && e.Button == Config.LookupKey)
+                                  || (Config.ControllerLookupKey != SButton.None && e.Button == Config.ControllerLookupKey);
+
+            if (!Config.EnableLookupAnything || !isLookupTriggered)
                 return;
 
             if (Game1.activeClickableMenu is LookupMenu)
@@ -362,6 +365,14 @@ namespace BetterQOL
                 tooltip: () => I18n.Get("config.lookup-key.tooltip"),
                 getValue: () => Config.LookupKey,
                 setValue: value => Config.LookupKey = value
+            );
+
+            configMenu.AddKeybind(
+                mod: ModManifest,
+                name: () => I18n.Get("config.controller-lookup-key.name"),
+                tooltip: () => I18n.Get("config.controller-lookup-key.tooltip"),
+                getValue: () => Config.ControllerLookupKey,
+                setValue: value => Config.ControllerLookupKey = value
             );
 
             configMenu.AddBoolOption(

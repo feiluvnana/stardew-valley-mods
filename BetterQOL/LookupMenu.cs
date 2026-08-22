@@ -283,6 +283,38 @@ namespace BetterQOL
             }
         }
 
+        public override void receiveGamePadButton(Buttons b)
+        {
+            base.receiveGamePadButton(b);
+
+            if (b == Buttons.B)
+            {
+                NavigateBack();
+            }
+            else if (b == Buttons.Y)
+            {
+                if (SearchBox != null)
+                {
+                    SearchBox.Selected = !SearchBox.Selected;
+                    Game1.keyboardDispatcher.Subscriber = SearchBox.Selected ? SearchBox : null;
+                }
+            }
+            else if (b == Buttons.RightThumbstickDown || b == Buttons.DPadDown || b == Buttons.RightTrigger)
+            {
+                ScrollOffset = Math.Min(MaxScrollOffset, ScrollOffset + ScrollStep * 2);
+                Game1.playSound("shiny4");
+            }
+            else if (b == Buttons.RightThumbstickUp || b == Buttons.DPadUp || b == Buttons.LeftTrigger)
+            {
+                ScrollOffset = Math.Max(0, ScrollOffset - ScrollStep * 2);
+                Game1.playSound("shiny4");
+            }
+            else if (b == Buttons.RightStick || b == Buttons.Back)
+            {
+                CloseMenu();
+            }
+        }
+
         public override void receiveKeyPress(Keys key)
         {
             if (SearchBox != null && SearchBox.Selected)

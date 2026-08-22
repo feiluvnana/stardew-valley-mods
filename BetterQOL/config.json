@@ -25,6 +25,7 @@
   "HoverHotkey": "None",
   "EnableLookupAnything": true,
   "LookupKey": "F1",
+  "ControllerLookupKey": "RightStick",
   "ShowGiftTastes": true,
   "ShowItemRecipes": true,
   "ShowBundleAndMuseumInfo": true
