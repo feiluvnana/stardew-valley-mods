@@ -1,9 +1,0 @@
-{
-  "Name": "Better Geode Cracking",
-  "Author": "feiluvnana",
-  "Version": "1.0.0",
-  "Description": "Enables instant and bulk geode/trove cracking without fee at Clint's shop, with full GMCM customization.",
-  "UniqueID": "feiluvnana.BetterGeodeCracking",
-  "MinimumApiVersion": "4.0.0",
-  "EntryDll": "BetterGeodeCracking.dll"
-}

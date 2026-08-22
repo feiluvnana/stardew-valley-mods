@@ -1,9 +1,0 @@
-{
-  "Name": "Extended Stackable",
-  "Author": "feiluvnana",
-  "Version": "1.0.0",
-  "Description": "Makes tackles/bobbers (with matching durability), trinkets, decorations/furniture, rings, clothing, and boots stackable.",
-  "UniqueID": "feiluvnana.ExtendedStackable",
-  "MinimumApiVersion": "4.0.0",
-  "EntryDll": "ExtendedStackable.dll"
-}
