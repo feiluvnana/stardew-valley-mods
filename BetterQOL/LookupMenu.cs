@@ -19,14 +19,14 @@ namespace BetterQOL
 
         private int ScrollOffset = 0;
         private int MaxScrollOffset = 0;
-        private const int ScrollStep = 32;
+        private const int ScrollStep = 36;
 
         public LookupMenu(LookupSubject subject)
             : base(
-                x: (Game1.uiViewport.Width - Math.Min(760, Game1.uiViewport.Width - 64)) / 2,
-                y: (Game1.uiViewport.Height - Math.Min(600, Game1.uiViewport.Height - 64)) / 2,
-                width: Math.Min(760, Game1.uiViewport.Width - 64),
-                height: Math.Min(600, Game1.uiViewport.Height - 64),
+                x: (Game1.uiViewport.Width - Math.Min(760, Game1.uiViewport.Width - 48)) / 2,
+                y: (Game1.uiViewport.Height - Math.Min(600, Game1.uiViewport.Height - 48)) / 2,
+                width: Math.Min(760, Game1.uiViewport.Width - 48),
+                height: Math.Min(600, Game1.uiViewport.Height - 48),
                 showUpperRightCloseButton: true
             )
         {
@@ -51,7 +51,7 @@ namespace BetterQOL
 
             // Up / Down Scroll Buttons
             UpButton = new ClickableTextureComponent(
-                new Rectangle(xPositionOnScreen + width - 32, yPositionOnScreen + 100, 44, 48),
+                new Rectangle(xPositionOnScreen + width - 32, yPositionOnScreen + 104, 44, 48),
                 Game1.mouseCursors,
                 new Rectangle(421, 459, 11, 12),
                 4f
@@ -193,12 +193,7 @@ namespace BetterQOL
             int contentY = dividerY + 14;
             int contentWidth = width - 88;
             int contentHeight = height - 134;
-
-            // Scissor Rect for clean scrolling
-            Rectangle originalScissor = b.GraphicsDevice.ScissorRectangle;
-            b.GraphicsDevice.ScissorRectangle = new Rectangle(contentX, contentY, contentWidth, contentHeight);
-
-            SpriteBatchState state = BeginScissorBatch(b);
+            int contentBottom = contentY + contentHeight;
 
             int currentY = contentY - ScrollOffset;
             int totalContentHeight = 0;
@@ -206,7 +201,10 @@ namespace BetterQOL
             foreach (var section in Subject.Sections)
             {
                 // Section Title
-                Utility.drawTextWithShadow(b, section.Title, Game1.dialogueFont, new Vector2(contentX, currentY), new Color(115, 40, 10));
+                if (currentY >= contentY - 30 && currentY <= contentBottom)
+                {
+                    Utility.drawTextWithShadow(b, section.Title, Game1.dialogueFont, new Vector2(contentX, currentY), new Color(115, 40, 10));
+                }
                 currentY += 34;
                 totalContentHeight += 34;
 
@@ -216,17 +214,17 @@ namespace BetterQOL
                     string label = !string.IsNullOrEmpty(field.Label) ? $"{field.Label}: " : string.Empty;
                     Vector2 labelSize = Game1.smallFont.MeasureString(label);
 
-                    // Draw label
-                    Utility.drawTextWithShadow(b, label, Game1.smallFont, new Vector2(contentX + 12, currentY), Game1.textColor);
-
-                    // Word wrap value
                     int valWidth = contentWidth - (int)labelSize.X - 24;
                     string wrappedValue = Game1.parseText(field.Value, Game1.smallFont, Math.Max(180, valWidth));
                     Vector2 valSize = Game1.smallFont.MeasureString(wrappedValue);
-
-                    Utility.drawTextWithShadow(b, wrappedValue, Game1.smallFont, new Vector2(contentX + 12 + labelSize.X, currentY), field.ValueColor);
-
                     int lineH = (int)Math.Max(26, valSize.Y + 4);
+
+                    if (currentY >= contentY - lineH && currentY <= contentBottom)
+                    {
+                        Utility.drawTextWithShadow(b, label, Game1.smallFont, new Vector2(contentX + 12, currentY), Game1.textColor);
+                        Utility.drawTextWithShadow(b, wrappedValue, Game1.smallFont, new Vector2(contentX + 12 + labelSize.X, currentY), field.ValueColor);
+                    }
+
                     currentY += lineH;
                     totalContentHeight += lineH;
                 }
@@ -234,8 +232,6 @@ namespace BetterQOL
                 currentY += 12;
                 totalContentHeight += 12;
             }
-
-            EndScissorBatch(b, state, originalScissor);
 
             MaxScrollOffset = Math.Max(0, totalContentHeight - contentHeight + 20);
 
@@ -260,23 +256,6 @@ namespace BetterQOL
             }
 
             drawMouse(b);
-        }
-
-        private struct SpriteBatchState { }
-
-        private SpriteBatchState BeginScissorBatch(SpriteBatch b)
-        {
-            b.End();
-            var rasterizerState = new RasterizerState { ScissorTestEnable = true };
-            b.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, rasterizerState);
-            return new SpriteBatchState();
-        }
-
-        private void EndScissorBatch(SpriteBatch b, SpriteBatchState state, Rectangle originalScissor)
-        {
-            b.End();
-            b.GraphicsDevice.ScissorRectangle = originalScissor;
-            b.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null);
         }
     }
 }

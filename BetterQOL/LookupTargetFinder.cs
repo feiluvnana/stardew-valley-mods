@@ -19,10 +19,35 @@ namespace BetterQOL
             // 1. If a menu is open, inspect hovered items or elements in menu
             if (Game1.activeClickableMenu != null)
             {
-                return FindTargetInMenu(Game1.activeClickableMenu);
+                var menuSubject = FindTargetInMenu(Game1.activeClickableMenu);
+                if (menuSubject != null)
+                    return menuSubject;
             }
 
-            // 2. If in world, inspect hovered entities, characters, objects, or terrain
+            // 2. Check OnScreenMenus (e.g. Toolbar / Hotbar)
+            if (Game1.onScreenMenus != null)
+            {
+                int mouseX = Game1.getMouseX();
+                int mouseY = Game1.getMouseY();
+                foreach (var onScreenMenu in Game1.onScreenMenus)
+                {
+                    if (onScreenMenu is Toolbar toolbar && toolbar.buttons != null)
+                    {
+                        for (int i = 0; i < toolbar.buttons.Count; i++)
+                        {
+                            if (toolbar.buttons[i].containsPoint(mouseX, mouseY))
+                            {
+                                if (i >= 0 && i < Game1.player.Items.Count && Game1.player.Items[i] != null)
+                                {
+                                    return LookupDataManager.BuildItemSubject(Game1.player.Items[i]);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // 3. If in world, inspect hovered entities, characters, objects, or terrain
             if (Context.IsWorldReady && Game1.currentLocation != null)
             {
                 return FindTargetInWorld(Game1.currentLocation);
@@ -33,20 +58,28 @@ namespace BetterQOL
 
         private static LookupSubject? FindTargetInMenu(IClickableMenu menu)
         {
+            int mouseX = Game1.getMouseX();
+            int mouseY = Game1.getMouseY();
+
             // GameMenu (Inventory, Crafting, Social)
             if (menu is GameMenu gameMenu && gameMenu.pages != null && gameMenu.currentTab < gameMenu.pages.Count)
             {
                 var activePage = gameMenu.pages[gameMenu.currentTab];
-                if (activePage is InventoryPage invPage && invPage.hoveredItem != null)
+                if (activePage is InventoryPage invPage)
                 {
-                    return LookupDataManager.BuildItemSubject(invPage.hoveredItem);
+                    var item = invPage.hoveredItem ?? invPage.inventory?.getItemAt(mouseX, mouseY);
+                    if (item != null)
+                    {
+                        return LookupDataManager.BuildItemSubject(item);
+                    }
                 }
 
                 if (activePage is CraftingPage craftPage)
                 {
-                    if (craftPage.hoverItem != null)
+                    var item = craftPage.hoverItem ?? craftPage.inventory?.getItemAt(mouseX, mouseY);
+                    if (item != null)
                     {
-                        return LookupDataManager.BuildItemSubject(craftPage.hoverItem);
+                        return LookupDataManager.BuildItemSubject(item);
                     }
                     if (craftPage.hoverRecipe != null)
                     {
@@ -69,15 +102,35 @@ namespace BetterQOL
             }
 
             // ItemGrabMenu (Chest / Inventory)
-            if (menu is ItemGrabMenu itemGrabMenu && itemGrabMenu.hoveredItem != null)
+            if (menu is ItemGrabMenu itemGrabMenu)
             {
-                return LookupDataManager.BuildItemSubject(itemGrabMenu.hoveredItem);
+                var item = itemGrabMenu.hoveredItem
+                        ?? itemGrabMenu.inventory?.getItemAt(mouseX, mouseY)
+                        ?? itemGrabMenu.ItemsToGrabMenu?.getItemAt(mouseX, mouseY);
+                if (item != null)
+                {
+                    return LookupDataManager.BuildItemSubject(item);
+                }
             }
 
             // ShopMenu
-            if (menu is ShopMenu shopMenu && shopMenu.hoveredItem is Item shopItem)
+            if (menu is ShopMenu shopMenu)
             {
-                return LookupDataManager.BuildItemSubject(shopItem);
+                var item = (shopMenu.hoveredItem as Item) ?? shopMenu.inventory?.getItemAt(mouseX, mouseY);
+                if (item != null)
+                {
+                    return LookupDataManager.BuildItemSubject(item);
+                }
+            }
+
+            // MenuWithInventory
+            if (menu is MenuWithInventory menuWithInv)
+            {
+                var item = menuWithInv.hoveredItem ?? menuWithInv.inventory?.getItemAt(mouseX, mouseY);
+                if (item != null)
+                {
+                    return LookupDataManager.BuildItemSubject(item);
+                }
             }
 
             return null;
@@ -94,7 +147,16 @@ namespace BetterQOL
             // 1. Characters / NPCs / Monsters / Pets
             foreach (var character in location.characters)
             {
-                if (character != null && character.GetBoundingBox().Contains(absX, absY))
+                if (character == null)
+                    continue;
+
+                // Generous bounding box for body/head and feet
+                Rectangle spriteBox = new Rectangle((int)character.Position.X - 16, (int)character.Position.Y - 80, 96, 128);
+                bool hitsCharacter = spriteBox.Contains(absX, absY)
+                                  || character.GetBoundingBox().Contains(absX, absY)
+                                  || character.TilePoint == tilePos.ToPoint();
+
+                if (hitsCharacter)
                 {
                     if (character is Monster monster)
                     {
@@ -114,7 +176,11 @@ namespace BetterQOL
             // 2. Farm Animals
             foreach (var animal in location.animals.Values)
             {
-                if (animal != null && animal.GetBoundingBox().Contains(absX, absY))
+                if (animal == null)
+                    continue;
+
+                Rectangle animalBox = new Rectangle((int)animal.Position.X - 16, (int)animal.Position.Y - 64, 96, 96);
+                if (animalBox.Contains(absX, absY) || animal.GetBoundingBox().Contains(absX, absY) || animal.TilePoint == tilePos.ToPoint())
                 {
                     return LookupDataManager.BuildAnimalSubject(animal);
                 }
@@ -148,7 +214,7 @@ namespace BetterQOL
                 return LookupDataManager.BuildItemSubject(obj);
             }
 
-            // 5. Terrain Features (Crops in HoeDirt, Fruit Trees, etc.)
+            // 5. Terrain Features (Crops in HoeDirt, Fruit Trees, Wild Trees, Bushes)
             if (location.terrainFeatures.TryGetValue(tilePos, out var feature))
             {
                 if (feature is HoeDirt hoeDirt && hoeDirt.crop != null)
@@ -160,25 +226,31 @@ namespace BetterQOL
                         return LookupDataManager.BuildItemSubject(cropItem);
                     }
                 }
-                if (feature is FruitTree fruitTree && fruitTree.GetData()?.Fruit != null && fruitTree.GetData()!.Fruit.Count > 0)
+                if (feature is FruitTree fruitTree)
                 {
-                    string fruitId = fruitTree.GetData()!.Fruit[0].ItemId;
-                    var fruitItem = ItemRegistry.Create(fruitId);
-                    if (fruitItem != null)
-                    {
-                        return LookupDataManager.BuildItemSubject(fruitItem);
-                    }
+                    return LookupDataManager.BuildFruitTreeSubject(fruitTree);
+                }
+                if (feature is Tree tree)
+                {
+                    return LookupDataManager.BuildTreeSubject(tree);
+                }
+                if (feature is Bush bush)
+                {
+                    return LookupDataManager.BuildBushSubject(bush);
                 }
             }
 
-            // 6. Fallback: Check facing tile / player standing tile
-            Vector2 playerTile = Game1.player.Tile;
-            if (location.Objects.TryGetValue(playerTile, out var playerObj))
+            // 6. Large Terrain Features (Bushes spanning larger areas)
+            foreach (var largeFeature in location.largeTerrainFeatures)
             {
-                return LookupDataManager.BuildItemSubject(playerObj);
+                if (largeFeature is Bush largeBush && largeBush.getBoundingBox().Contains(absX, absY))
+                {
+                    return LookupDataManager.BuildBushSubject(largeBush);
+                }
             }
 
-            return null;
+            // 7. Fallback: Tile Location Info
+            return LookupDataManager.BuildTileSubject(location, tilePos);
         }
 
         private static NPC? GetHoveredSocialNPC(SocialPage socialPage)

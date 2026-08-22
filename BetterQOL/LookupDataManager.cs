@@ -9,6 +9,7 @@ using StardewValley.Characters;
 using StardewValley.ItemTypeDefinitions;
 using StardewValley.Monsters;
 using StardewValley.Objects;
+using StardewValley.TerrainFeatures;
 
 namespace BetterQOL
 {
@@ -72,7 +73,7 @@ namespace BetterQOL
                 PortraitSourceRect = new Rectangle(0, 0, 64, 64)
             };
 
-            string birthdaySeason = ModEntry.I18n.Get($"season.{npc.Birthday_Season?.ToLower() ?? "spring"}");
+            string birthdaySeason = ModEntry.I18n.Get($"season.{npc.Birthday_Season?.ToLower() ?? "spring"}").ToString();
             subject.Subtitle = ModEntry.I18n.Get("lookup.npc.subtitle", new { season = birthdaySeason, day = npc.Birthday_Day });
 
             // Section 1: Relationship
@@ -161,23 +162,37 @@ namespace BetterQOL
             var loved = new List<string>();
             var liked = new List<string>();
 
-            foreach (var kvp in Game1.objectData)
+            try
             {
-                string itemId = kvp.Key;
-                var item = ItemRegistry.Create(itemId);
-                if (item == null)
-                    continue;
+                if (Game1.NPCGiftTastes != null && Game1.NPCGiftTastes.TryGetValue(npc.Name, out string? giftStr))
+                {
+                    string[] parts = giftStr.Split('/');
+                    if (parts.Length > 1 && !string.IsNullOrEmpty(parts[1]))
+                    {
+                        foreach (string id in parts[1].Split(' '))
+                        {
+                            var data = ItemRegistry.GetData(id) ?? ItemRegistry.GetData($"(O){id}");
+                            if (data != null && !loved.Contains(data.DisplayName))
+                            {
+                                loved.Add(data.DisplayName);
+                            }
+                        }
+                    }
 
-                int taste = npc.getGiftTasteForThisItem(item);
-                if (taste == NPC.gift_taste_love && !loved.Contains(item.DisplayName))
-                {
-                    loved.Add(item.DisplayName);
-                }
-                else if (taste == NPC.gift_taste_like && !liked.Contains(item.DisplayName))
-                {
-                    liked.Add(item.DisplayName);
+                    if (parts.Length > 3 && !string.IsNullOrEmpty(parts[3]))
+                    {
+                        foreach (string id in parts[3].Split(' '))
+                        {
+                            var data = ItemRegistry.GetData(id) ?? ItemRegistry.GetData($"(O){id}");
+                            if (data != null && !liked.Contains(data.DisplayName))
+                            {
+                                liked.Add(data.DisplayName);
+                            }
+                        }
+                    }
                 }
             }
+            catch { }
 
             loved.Sort();
             liked.Sort();
@@ -207,7 +222,7 @@ namespace BetterQOL
             }
 
             string categoryName = item.getCategoryName();
-            subject.Subtitle = !string.IsNullOrEmpty(categoryName) ? categoryName : ModEntry.I18n.Get("lookup.type.item");
+            subject.Subtitle = !string.IsNullOrEmpty(categoryName) ? categoryName : ModEntry.I18n.Get("lookup.type.item").ToString();
 
             // Section 1: Overview & Value
             var overviewSection = new LookupSection(ModEntry.I18n.Get("lookup.section.overview"));
@@ -245,8 +260,13 @@ namespace BetterQOL
                                  || item.Category == StardewValley.Object.mineralsCategory;
                 if (isMuseumItem)
                 {
-                    bool isDonated = Game1.netWorldState.Value.MuseumPieces.Values.Contains(item.ItemId)
-                                  || Game1.netWorldState.Value.MuseumPieces.Values.Contains(item.QualifiedItemId);
+                    bool isDonated = Game1.netWorldState.Value.MuseumPieces.Values.Any(v =>
+                        v == item.ItemId ||
+                        v == item.QualifiedItemId ||
+                        (item is StardewValley.Object s && v == s.ParentSheetIndex.ToString()) ||
+                        v == $"(O){item.ItemId}"
+                    );
+
                     progressSection.Fields.Add(new LookupField(
                         ModEntry.I18n.Get("lookup.item.museum"),
                         isDonated ? ModEntry.I18n.Get("lookup.item.museum-donated") : ModEntry.I18n.Get("lookup.item.museum-needed"),
@@ -271,29 +291,7 @@ namespace BetterQOL
                 }
             }
 
-            // Section 3: Gift Tastes
-            if (ModEntry.Config.ShowGiftTastes)
-            {
-                var giftSection = new LookupSection(ModEntry.I18n.Get("lookup.section.gift-tastes"));
-                var (lovers, likers) = GetItemGiftTastes(item);
-
-                if (lovers.Count > 0)
-                {
-                    giftSection.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.item.loved-by"), string.Join(", ", lovers), new Color(180, 50, 180)));
-                }
-
-                if (likers.Count > 0)
-                {
-                    giftSection.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.item.liked-by"), string.Join(", ", likers), new Color(0, 140, 0)));
-                }
-
-                if (giftSection.Fields.Count > 0)
-                {
-                    subject.Sections.Add(giftSection);
-                }
-            }
-
-            // Section 4: Recipes Using This Item
+            // Section 3: Recipes Using This Item
             if (ModEntry.Config.ShowItemRecipes)
             {
                 var recipes = GetRecipesUsingItem(item);
@@ -317,31 +315,59 @@ namespace BetterQOL
             var results = new List<string>();
             try
             {
-                if (Game1.netWorldState.Value.Bundles == null)
+                if (Game1.player.hasCompletedCommunityCenter() || Game1.MasterPlayer.mailReceived.Contains("JojaMember"))
                     return results;
 
-                var bundleData = Game1.netWorldState.Value.BundleData;
-                if (bundleData == null)
+                var bundleData = DataLoader.Bundles(Game1.content);
+                if (bundleData == null || Game1.netWorldState.Value.Bundles == null)
                     return results;
 
                 foreach (var kvp in bundleData)
                 {
-                    string[] parts = kvp.Value.Split('/');
+                    string bundleKey = kvp.Key;
+                    string[] keyParts = bundleKey.Split('/');
+                    if (keyParts.Length < 2 || !int.TryParse(keyParts[1], out int bundleId))
+                        continue;
+
+                    string bundleValue = kvp.Value;
+                    string[] parts = bundleValue.Split('/');
                     if (parts.Length < 3)
                         continue;
 
-                    string bundleName = parts[0];
-                    string[] reqs = parts[2].Split(' ');
+                    string bundleName = parts.Length >= 6 && !string.IsNullOrEmpty(parts[5]) ? parts[5] : parts[0];
+                    string[] reqParts = parts[2].Split(' ');
 
-                    for (int i = 0; i < reqs.Length; i += 3)
+                    if (Game1.netWorldState.Value.Bundles.TryGetValue(bundleId, out bool[] ingredientSlots))
                     {
-                        if (i >= reqs.Length) break;
-                        string reqId = reqs[i];
-                        if (reqId == item.ItemId || reqId == item.QualifiedItemId)
+                        int itemsRequired = parts.Length > 4 && int.TryParse(parts[4], out int req) ? req : ingredientSlots.Length;
+                        int filledCount = ingredientSlots.Count(b => b);
+                        if (filledCount >= itemsRequired)
+                            continue;
+
+                        for (int k = 0; k < ingredientSlots.Length; k++)
                         {
-                            if (!results.Contains(bundleName))
+                            if (!ingredientSlots[k])
                             {
-                                results.Add(bundleName);
+                                int reqIndex = k * 3;
+                                if (reqIndex + 2 >= reqParts.Length)
+                                    break;
+
+                                string reqId = reqParts[reqIndex];
+                                int reqMinQuality = int.TryParse(reqParts[reqIndex + 2], out int q) ? q : 0;
+
+                                bool idMatch = reqId == item.ItemId ||
+                                               reqId == item.QualifiedItemId ||
+                                               (item is StardewValley.Object obj && (reqId == obj.ParentSheetIndex.ToString() || reqId == obj.ItemId));
+                                bool catMatch = int.TryParse(reqId, out int cat) && cat < 0 && item.Category == cat;
+                                bool qualityMatch = item.Quality >= reqMinQuality;
+
+                                if ((idMatch || catMatch) && qualityMatch)
+                                {
+                                    if (!results.Contains(bundleName))
+                                    {
+                                        results.Add(bundleName);
+                                    }
+                                }
                             }
                         }
                     }
@@ -349,32 +375,6 @@ namespace BetterQOL
             }
             catch { }
             return results;
-        }
-
-        private static (List<string> Lovers, List<string> Likers) GetItemGiftTastes(Item item)
-        {
-            var lovers = new List<string>();
-            var likers = new List<string>();
-
-            foreach (var npc in Utility.getAllCharacters())
-            {
-                if (npc == null || !npc.IsVillager || npc.IsMonster || string.IsNullOrEmpty(npc.Name))
-                    continue;
-
-                int taste = npc.getGiftTasteForThisItem(item);
-                if (taste == NPC.gift_taste_love && !lovers.Contains(npc.displayName ?? npc.Name))
-                {
-                    lovers.Add(npc.displayName ?? npc.Name);
-                }
-                else if (taste == NPC.gift_taste_like && !likers.Contains(npc.displayName ?? npc.Name))
-                {
-                    likers.Add(npc.displayName ?? npc.Name);
-                }
-            }
-
-            lovers.Sort();
-            likers.Sort();
-            return (lovers, likers);
         }
 
         private static List<string> GetRecipesUsingItem(Item item)
@@ -432,7 +432,7 @@ namespace BetterQOL
             var subject = new LookupSubject
             {
                 Title = monster.displayName ?? monster.Name,
-                Subtitle = ModEntry.I18n.Get("lookup.type.monster")
+                Subtitle = ModEntry.I18n.Get("lookup.type.monster").ToString()
             };
 
             var statsSection = new LookupSection(ModEntry.I18n.Get("lookup.section.combat"));
@@ -523,9 +523,9 @@ namespace BetterQOL
                 ));
 
                 int happiness = animal.happiness.Value;
-                string mood = happiness >= 200 ? ModEntry.I18n.Get("lookup.animal.mood-very-happy")
-                            : happiness >= 100 ? ModEntry.I18n.Get("lookup.animal.mood-happy")
-                            : ModEntry.I18n.Get("lookup.animal.mood-unhappy");
+                string mood = happiness >= 200 ? ModEntry.I18n.Get("lookup.animal.mood-very-happy").ToString()
+                            : happiness >= 100 ? ModEntry.I18n.Get("lookup.animal.mood-happy").ToString()
+                            : ModEntry.I18n.Get("lookup.animal.mood-unhappy").ToString();
 
                 statusSection.Fields.Add(new LookupField(
                     ModEntry.I18n.Get("lookup.animal.happiness"),
@@ -553,7 +553,7 @@ namespace BetterQOL
             var subject = new LookupSubject
             {
                 Title = pet.Name,
-                Subtitle = pet.petType.Value ?? ModEntry.I18n.Get("hover.type.pet")
+                Subtitle = pet.petType.Value ?? ModEntry.I18n.Get("hover.type.pet").ToString()
             };
 
             var statusSection = new LookupSection(ModEntry.I18n.Get("lookup.section.status"));
@@ -578,18 +578,134 @@ namespace BetterQOL
 
         #endregion
 
-        #region 5. Fish Pond / Building Lookup
+        #region 5. Tree & Bush Lookup
+
+        public static LookupSubject BuildTreeSubject(Tree tree)
+        {
+            var info = TreeHelper.GetTreeInfo(tree);
+            var subject = new LookupSubject
+            {
+                Title = info?.Name ?? ModEntry.I18n.Get("hover.tree.generic").ToString(),
+                Subtitle = ModEntry.I18n.Get("hover.type.tree").ToString()
+            };
+
+            var section = new LookupSection(ModEntry.I18n.Get("lookup.section.status"));
+            if (info != null)
+            {
+                section.Fields.Add(new LookupField(
+                    ModEntry.I18n.Get("hover.tree.stage", new { stage = info.GrowthStage + 1, total = 5 }),
+                    info.IsMature ? ModEntry.I18n.Get("hover.tree.fully-grown") : $"Stage {info.GrowthStage + 1}/5",
+                    info.IsMature ? new Color(0, 140, 0) : new Color(180, 100, 0)
+                ));
+
+                section.Fields.Add(new LookupField(
+                    "Moss",
+                    info.HasMoss ? ModEntry.I18n.Get("hover.tree.has-moss") : ModEntry.I18n.Get("lookup.common.no"),
+                    info.HasMoss ? new Color(46, 125, 50) : Color.DarkSlateGray
+                ));
+
+                section.Fields.Add(new LookupField(
+                    "Tapper",
+                    info.IsTapped ? ModEntry.I18n.Get("hover.tree.tapped") : ModEntry.I18n.Get("lookup.common.no"),
+                    info.IsTapped ? new Color(20, 110, 220) : Color.DarkSlateGray
+                ));
+            }
+            subject.Sections.Add(section);
+            return subject;
+        }
+
+        public static LookupSubject BuildFruitTreeSubject(FruitTree fruitTree)
+        {
+            var info = TreeHelper.GetFruitTreeInfo(fruitTree);
+            var subject = new LookupSubject
+            {
+                Title = info?.Name ?? ModEntry.I18n.Get("hover.fruit-tree.generic").ToString(),
+                Subtitle = ModEntry.I18n.Get("hover.type.fruit-tree").ToString()
+            };
+
+            if (info?.IconTexture != null)
+            {
+                subject.MainIcon = info.IconTexture;
+                subject.MainIconSourceRect = info.IconSourceRect;
+            }
+
+            var section = new LookupSection(ModEntry.I18n.Get("lookup.section.status"));
+            if (info != null)
+            {
+                if (!info.IsMature)
+                {
+                    section.Fields.Add(new LookupField(
+                        "Maturation",
+                        ModEntry.I18n.Get("hover.fruit-tree.maturing", new { days = info.DaysUntilMature }),
+                        new Color(180, 100, 0)
+                    ));
+                }
+                else
+                {
+                    section.Fields.Add(new LookupField(
+                        "Fruit Count",
+                        $"{info.FruitsOnTree} / 3",
+                        info.FruitsOnTree > 0 ? new Color(0, 140, 0) : Color.DarkSlateGray
+                    ));
+
+                    section.Fields.Add(new LookupField(
+                        "Season",
+                        info.IsInSeason ? ModEntry.I18n.Get("hover.fruit-tree.in-season") : ModEntry.I18n.Get("hover.fruit-tree.out-of-season"),
+                        info.IsInSeason ? new Color(20, 110, 220) : Color.DarkSlateGray
+                    ));
+                }
+            }
+            subject.Sections.Add(section);
+            return subject;
+        }
+
+        public static LookupSubject BuildBushSubject(Bush bush)
+        {
+            var info = TreeHelper.GetBushInfo(bush);
+            var subject = new LookupSubject
+            {
+                Title = info?.Name ?? ModEntry.I18n.Get("hover.bush.generic").ToString(),
+                Subtitle = ModEntry.I18n.Get("hover.bush.generic").ToString()
+            };
+
+            var section = new LookupSection(ModEntry.I18n.Get("lookup.section.status"));
+            if (info != null)
+            {
+                if (info.IsTeaBush && !info.IsMature)
+                {
+                    section.Fields.Add(new LookupField(
+                        "Maturation",
+                        ModEntry.I18n.Get("hover.bush.tea-maturing", new { days = info.DaysUntilMature }),
+                        new Color(180, 100, 0)
+                    ));
+                }
+                else if (info.IsInBloom)
+                {
+                    section.Fields.Add(new LookupField(
+                        "Harvest",
+                        ModEntry.I18n.Get("hover.bush.ready-to-harvest"),
+                        new Color(0, 140, 0)
+                    ));
+                }
+            }
+            subject.Sections.Add(section);
+            return subject;
+        }
+
+        #endregion
+
+        #region 6. Fish Pond / Building Lookup
 
         public static LookupSubject BuildFishPondSubject(FishPond pond)
         {
             string fishId = pond.fishType.Value;
             var fishData = ItemRegistry.GetData(fishId) ?? ItemRegistry.GetData($"(O){fishId}");
-            string fishName = fishData?.DisplayName ?? ModEntry.I18n.Get("lookup.building.fish");
+            string fishName = fishData?.DisplayName ?? ModEntry.I18n.Get("lookup.building.fish").ToString();
 
             var subject = new LookupSubject
             {
                 Title = ModEntry.I18n.Get("lookup.building.fish-pond-title", new { fish = fishName }),
-                Subtitle = ModEntry.I18n.Get("lookup.type.building")
+                Subtitle = ModEntry.I18n.Get("lookup.type.building").ToString()
             };
 
             if (fishData != null)
@@ -626,6 +742,23 @@ namespace BetterQOL
                     new Color(200, 60, 20)
                 ));
             }
+
+            subject.Sections.Add(section);
+            return subject;
+        }
+
+        public static LookupSubject BuildTileSubject(GameLocation location, Vector2 tilePos)
+        {
+            var subject = new LookupSubject
+            {
+                Title = $"{location.DisplayName ?? location.Name} ({tilePos.X}, {tilePos.Y})",
+                Subtitle = "Tile Location"
+            };
+
+            var section = new LookupSection(ModEntry.I18n.Get("lookup.section.status"));
+            section.Fields.Add(new LookupField("Location", location.DisplayName ?? location.Name, new Color(20, 110, 220)));
+            section.Fields.Add(new LookupField("Tile Position", $"X: {tilePos.X}, Y: {tilePos.Y}", Game1.textColor));
+            section.Fields.Add(new LookupField("Weather", location.IsRainingHere() ? "Raining" : "Sunny", location.IsRainingHere() ? new Color(20, 110, 220) : new Color(180, 100, 0)));
 
             subject.Sections.Add(section);
             return subject;
