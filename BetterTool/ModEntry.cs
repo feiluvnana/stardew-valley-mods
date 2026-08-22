@@ -32,7 +32,7 @@ namespace BetterTool
 
         private void OnUpdateTicked(object? sender, UpdateTickedEventArgs e)
         {
-            if (!Context.IsWorldReady || Game1.currentLocation == null)
+            if (!Config.EnablePeriodicProcessing || !Context.IsWorldReady || Game1.currentLocation == null)
                 return;
 
             uint interval = (uint)Math.Max(10, Config.ProcessIntervalTicks);
@@ -44,7 +44,7 @@ namespace BetterTool
 
         private void OnTimeChanged(object? sender, TimeChangedEventArgs e)
         {
-            if (!Context.IsWorldReady)
+            if (!Config.EnablePeriodicProcessing || !Context.IsWorldReady)
                 return;
 
             foreach (var location in Game1.locations)
@@ -66,7 +66,7 @@ namespace BetterTool
 
         private void OnDayStarted(object? sender, DayStartedEventArgs e)
         {
-            if (!Context.IsWorldReady)
+            if (!Config.EnablePeriodicProcessing || !Context.IsWorldReady)
                 return;
 
             foreach (var location in Game1.locations)
@@ -88,7 +88,7 @@ namespace BetterTool
 
         private void OnWarped(object? sender, WarpedEventArgs e)
         {
-            if (!Context.IsWorldReady || e.NewLocation == null)
+            if (!Config.EnablePeriodicProcessing || !Context.IsWorldReady || e.NewLocation == null)
                 return;
 
             HopperManager.ProcessLocation(e.NewLocation, Game1.player);
@@ -106,9 +106,10 @@ namespace BetterTool
                 save: () => Helper.WriteConfig(Config)
             );
 
+            // Section: Automation Features (Non-Vanilla Enhancements)
             configMenu.AddSectionTitle(
                 mod: ModManifest,
-                text: () => I18n.Get("config.section.hopper.name")
+                text: () => I18n.Get("config.section.automation.name")
             );
 
             configMenu.AddBoolOption(
@@ -121,10 +122,18 @@ namespace BetterTool
 
             configMenu.AddBoolOption(
                 mod: ModManifest,
-                name: () => I18n.Get("config.adjacent-chest-output.name"),
-                tooltip: () => I18n.Get("config.adjacent-chest-output.tooltip"),
-                getValue: () => Config.EnableAdjacentChestOutput,
-                setValue: value => Config.EnableAdjacentChestOutput = value
+                name: () => I18n.Get("config.chest-output-transfer.name"),
+                tooltip: () => I18n.Get("config.chest-output-transfer.tooltip"),
+                getValue: () => Config.EnableChestOutputTransfer,
+                setValue: value => Config.EnableChestOutputTransfer = value
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.periodic-processing.name"),
+                tooltip: () => I18n.Get("config.periodic-processing.tooltip"),
+                getValue: () => Config.EnablePeriodicProcessing,
+                setValue: value => Config.EnablePeriodicProcessing = value
             );
 
             configMenu.AddNumberOption(
@@ -138,12 +147,32 @@ namespace BetterTool
                 interval: 10
             );
 
+            // Section: Specific Machine Enhancements
+            configMenu.AddSectionTitle(
+                mod: ModManifest,
+                text: () => I18n.Get("config.section.machines.name")
+            );
+
             configMenu.AddBoolOption(
                 mod: ModManifest,
-                name: () => I18n.Get("config.sound-effects.name"),
-                tooltip: () => I18n.Get("config.sound-effects.tooltip"),
-                getValue: () => Config.PlaySoundEffects,
-                setValue: value => Config.PlaySoundEffects = value
+                name: () => I18n.Get("config.service-crab-pots.name"),
+                tooltip: () => I18n.Get("config.service-crab-pots.tooltip"),
+                getValue: () => Config.EnableCrabPotService,
+                setValue: value => Config.EnableCrabPotService = value
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.service-casks.name"),
+                tooltip: () => I18n.Get("config.service-casks.tooltip"),
+                getValue: () => Config.EnableCaskService,
+                setValue: value => Config.EnableCaskService = value
+            );
+
+            // Section: Hopper Customization
+            configMenu.AddSectionTitle(
+                mod: ModManifest,
+                text: () => I18n.Get("config.section.customization.name")
             );
 
             configMenu.AddNumberOption(
@@ -159,18 +188,10 @@ namespace BetterTool
 
             configMenu.AddBoolOption(
                 mod: ModManifest,
-                name: () => I18n.Get("config.service-crab-pots.name"),
-                tooltip: () => I18n.Get("config.service-crab-pots.tooltip"),
-                getValue: () => Config.ServiceCrabPots,
-                setValue: value => Config.ServiceCrabPots = value
-            );
-
-            configMenu.AddBoolOption(
-                mod: ModManifest,
-                name: () => I18n.Get("config.service-casks.name"),
-                tooltip: () => I18n.Get("config.service-casks.tooltip"),
-                getValue: () => Config.ServiceCasks,
-                setValue: value => Config.ServiceCasks = value
+                name: () => I18n.Get("config.sound-effects.name"),
+                tooltip: () => I18n.Get("config.sound-effects.tooltip"),
+                getValue: () => Config.PlaySoundEffects,
+                setValue: value => Config.PlaySoundEffects = value
             );
         }
     }

@@ -1,24 +1,31 @@
 {
-  "config.section.hopper.name": "Cài Đặt Tự Động Hóa Hopper (Phễu)",
+  "config.section.automation.name": "Tính Năng Tự Động Hóa",
   
-  "config.auto-harvest.name": "Bật Tự Động Thu Hoạch",
-  "config.auto-harvest.tooltip": "Nếu bật, phễu đặt phía dưới máy móc (Y - 1) sẽ tự động thu hoạch thành phẩm vào phễu.",
+  "config.auto-harvest.name": "Bật Tự Động Thu Hoạch (Khác Vanilla)",
+  "config.auto-harvest.tooltip": "Cho phép phễu đặt phía dưới máy móc (Y - 1) tự động thu hoạch thành phẩm vào phễu.",
 
-  "config.adjacent-chest-output.name": "Chuyển Thành Phẩm Xuống Rương Phía Dưới",
-  "config.adjacent-chest-output.tooltip": "Nếu bật, phễu sẽ tự động chuyển vật phẩm thu hoạch được xuống rương hoặc thùng xuất khẩu mini đặt trực tiếp phía dưới phễu (Y + 1).",
+  "config.chest-output-transfer.name": "Chuyển Xuống Rương Phía Dưới (Khác Vanilla)",
+  "config.chest-output-transfer.tooltip": "Cho phép phễu tự động chuyển vật phẩm thu hoạch được xuống rương hoặc thùng xuất khẩu mini đặt trực tiếp phía dưới phễu (Y + 1).",
+
+  "config.periodic-processing.name": "Tự Động Hóa Định Kỳ Nền (Khác Vanilla)",
+  "config.periodic-processing.tooltip": "Cho phép phễu liên tục kiểm tra và xử lý máy móc dưới nền mà không yêu cầu người chơi phải mở/đóng menu hoặc tương tác thủ công.",
 
   "config.process-interval.name": "Tần Suất Xử Lý (Tick)",
   "config.process-interval.tooltip": "Tần suất phễu kiểm tra máy móc và rương (60 tick = 1 giây thực tế).",
 
+  "config.section.machines.name": "Xử Lý Máy Móc Đặc Biệt",
+
+  "config.service-crab-pots.name": "Tự Động Bẫy Cua (Khác Vanilla)",
+  "config.service-crab-pots.tooltip": "Cho phép phễu nạp mồi câu vào bẫy cua phía dưới (Y + 1) và thu hoạch hải sản từ bẫy cua phía trên (Y - 1).",
+
+  "config.service-casks.name": "Tự Động Thùng Ủ Cask (Khác Vanilla)",
+  "config.service-casks.tooltip": "Cho phép phễu nạp nguyên liệu vào thùng ủ phía dưới (Y + 1) và thu hoạch sản phẩm đã ủ từ thùng phía trên (Y - 1).",
+
+  "config.section.customization.name": "Tùy Biến Phễu (Hopper)",
+
+  "config.hopper-capacity.name": "Sức Chứa Của Phễu (Khác Vanilla)",
+  "config.hopper-capacity.tooltip": "Tổng số ô chứa của phễu (36 ô mặc định vanilla, hoặc mở rộng 70 ô như Rương Lớn).",
+
   "config.sound-effects.name": "Hiệu Ứng Âm Thanh",
-  "config.sound-effects.tooltip": "Phát âm thanh nhẹ nhàng khi nạp vật phẩm vào máy phía dưới hoặc thu hoạch từ máy phía trên.",
-
-  "config.hopper-capacity.name": "Sức Chứa Của Phễu",
-  "config.hopper-capacity.tooltip": "Tổng số ô chứa của phễu (36 ô mặc định, hoặc mở rộng 70 ô như Rương Lớn).",
-
-  "config.service-crab-pots.name": "Tự Động Thả Mồi Bẫy Cua",
-  "config.service-crab-pots.tooltip": "Cho phép phễu nạp mồi câu vào bẫy cua phía dưới và thu hoạch hải sản từ bẫy cua phía trên.",
-
-  "config.service-casks.name": "Tự Động Hóa Thùng Ủ Rượu (Cask)",
-  "config.service-casks.tooltip": "Cho phép phễu nạp nguyên liệu vào thùng ủ phía dưới và thu hoạch sản phẩm đã ủ từ thùng phía trên."
+  "config.sound-effects.tooltip": "Phát âm thanh nhẹ nhàng khi nạp vật phẩm vào máy phía dưới hoặc thu hoạch từ máy phía trên."
 }

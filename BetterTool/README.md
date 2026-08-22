@@ -1,4 +1,4 @@
-# 🛠️ BetterTool (Better Hopper & Machine Automation)
+# 🛠️ BetterTool (Directional Hopper & Machine Automation)
 
 A balanced, directional automation overhaul for **Hoppers** and artisan machines in **Stardew Valley 1.6+**, built with SMAPI and Harmony.
 
@@ -19,17 +19,20 @@ BetterTool follows a clean, intuitive, physical top-to-bottom pipeline flow:
 
 ---
 
-## ⚙️ Configuration Options
+## ⚙️ Configuration Options (Non-Vanilla Feature Toggles)
 
-| Option | Default | Description |
-| :--- | :---: | :--- |
-| `EnableAutoHarvest` | `true` | Automatically collects finished products from machines above the hopper. |
-| `EnableAdjacentChestOutput` | `true` | Transfers items downward into a chest or mini-shipping bin placed directly below the hopper. |
-| `ProcessIntervalTicks` | `60` | Check frequency in game ticks (60 ticks = ~1 real second). |
-| `PlaySoundEffects` | `true` | Plays subtle sound effects when items are loaded or collected. |
-| `HopperCapacity` | `36` | Hopper storage capacity (`36` or `70` slots). |
-| `ServiceCrabPots` | `true` | Enables auto-baiting (below) and harvesting (above) of crab pots. |
-| `ServiceCasks` | `true` | Enables auto-loading (below) and harvesting (above) for cellar casks. |
+Every non-vanilla capability can be individually enabled, customized, or turned off via **Generic Mod Config Menu (GMCM)** or `config.json`:
+
+| Category | Option | Default | Vanilla Behavior | BetterTool Behavior |
+| :--- | :--- | :---: | :--- | :--- |
+| **Automation** | `EnableAutoHarvest` | `true` | Cannot harvest from machines above. | Automatically pulls finished goods from machines directly above. |
+| **Automation** | `EnableChestOutputTransfer` | `true` | Cannot transfer items into chests. | Transfers collected items into chests/shipping bins directly below. |
+| **Automation** | `EnablePeriodicProcessing` | `true` | Only checks when player interacts/closes menu. | Periodically checks and processes machines in the background. |
+| **Automation** | `ProcessIntervalTicks` | `60` | N/A | Check frequency in game ticks (60 ticks = 1 real second). |
+| **Machines** | `EnableCrabPotService` | `true` | Cannot bait or harvest crab pots. | Automatically baits crab pots below and harvests catches from above. |
+| **Machines** | `EnableCaskService` | `true` | Cannot harvest aged cask products. | Loads aging items below and harvests finished aged products from above. |
+| **Customization** | `HopperCapacity` | `36` | Fixed at 36 slots. | Configurable capacity (36 slots vanilla, or 70 slots expanded). |
+| **Customization** | `PlaySoundEffects` | `true` | Silent. | Plays subtle audio feedback on load/harvest/transfer. |
 
 ---
 

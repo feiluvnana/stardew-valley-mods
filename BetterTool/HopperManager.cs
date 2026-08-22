@@ -67,7 +67,7 @@ namespace BetterTool
             var abovePos = new Vector2(hopperPos.X, hopperPos.Y - 1f);
             var belowPos = new Vector2(hopperPos.X, hopperPos.Y + 1f);
 
-            // Step 1: Harvest from machine directly ABOVE (Y - 1)
+            // Step 1: Harvest from machine directly ABOVE (Y - 1) [Non-vanilla]
             if (config.EnableAutoHarvest && location.objects.TryGetValue(abovePos, out var aboveObj) && aboveObj != null)
             {
                 if (aboveObj is not Chest || aboveObj.heldObject.Value != null)
@@ -81,8 +81,8 @@ namespace BetterTool
             {
                 if (belowObj is Chest belowChest)
                 {
-                    // Output destination: Chest, MiniShippingBin, or another Hopper below
-                    if (config.EnableAdjacentChestOutput)
+                    // Output destination: Chest, MiniShippingBin, or another Hopper below [Non-vanilla]
+                    if (config.EnableChestOutputTransfer)
                     {
                         TryTransferToBelowChest(hopper, belowChest, location);
                     }
@@ -143,6 +143,9 @@ namespace BetterTool
             // Handle Crab Pots
             if (machine is CrabPot crabPot)
             {
+                if (!config.EnableCrabPotService)
+                    return false;
+
                 if (crabPot.readyForHarvest.Value && crabPot.heldObject.Value != null)
                 {
                     var crabItem = crabPot.heldObject.Value;
@@ -162,6 +165,13 @@ namespace BetterTool
                     }
                 }
                 return false;
+            }
+
+            // Handle Casks
+            if (machine is Cask)
+            {
+                if (!config.EnableCaskService)
+                    return false;
             }
 
             // Standard Machines
@@ -263,7 +273,7 @@ namespace BetterTool
             // Handle Crab Pots baiting
             if (machine is CrabPot crabPot)
             {
-                if (config.ServiceCrabPots && crabPot.bait.Value == null)
+                if (config.EnableCrabPotService && crabPot.bait.Value == null)
                 {
                     for (int i = 0; i < hopper.Items.Count; i++)
                     {
@@ -285,6 +295,12 @@ namespace BetterTool
                         }
                     }
                 }
+                return false;
+            }
+
+            // Handle Casks
+            if (machine is Cask && !config.EnableCaskService)
+            {
                 return false;
             }
 
