@@ -1,15 +1,10 @@
 {
   "button.crack-all": "Crack All",
   "tooltip.crack-all": "Crack Entire Stack (Shift+Click)",
-  "menu.description.free": "Clint can break these open for you for free.\n(Hold Shift or click 'Crack All' to open stack)",
-  "menu.description.price": "Clint can break these open for you for {{price}}g.\n(Hold Shift or click 'Crack All' to open stack)",
+  "menu.description.standard": "Clint can break these open for you for 25g.\n(Hold Shift or click 'Crack All' to open stack)",
   "toast.cracked-summary": "Cracked {{count}}x {{name}}",
 
   "config.section.blacksmith": "Blacksmith Geode Cracking",
-  "config.free-cracking.name": "Free Cracking",
-  "config.free-cracking.tooltip": "Makes geode, trove, coconut, and mystery box cracking completely free (0g) at Clint's shop.",
-  "config.cracking-price.name": "Custom Cracking Price",
-  "config.cracking-price.tooltip": "The gold cost per geode when Free Cracking is disabled.",
   "config.instant-cracking.name": "Instant Cracking",
   "config.instant-cracking.tooltip": "Skips the 2.7-second delay to crack geodes instantaneously.",
   "config.show-crack-all-button.name": "Show 'Crack All' Button",
@@ -20,8 +15,6 @@
   "config.show-summary-toast.tooltip": "Displays a HUD notification summarizing cracked geodes.",
 
   "config.section.farm-machines": "Farm Machine Options",
-  "config.allow-special-geodes-in-crusher.name": "Crush Mystery Boxes & Special Geodes",
-  "config.allow-special-geodes-in-crusher.tooltip": "Allows Mystery Boxes, Golden Mystery Boxes, Artifact Troves, and Golden Coconuts to be processed in Geode Crusher machines.",
   "config.instant-geode-crusher.name": "Instant Geode Crusher",
   "config.instant-geode-crusher.tooltip": "Makes Geode Crusher machines on the farm process geodes immediately.",
   "config.geode-crusher-requires-coal.name": "Geode Crusher Requires Coal",

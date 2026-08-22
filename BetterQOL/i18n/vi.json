@@ -1,15 +1,10 @@
 {
   "button.crack-all": "Đập tất cả",
   "tooltip.crack-all": "Đập toàn bộ chồng (Shift+Click)",
-  "menu.description.free": "Cứ để những viên đá hốc tinh lên đe, tôi sẽ đập miễn phí cho bạn.\n(Giữ Shift hoặc nhấn 'Đập tất cả' để mở hết)",
-  "menu.description.price": "Cứ để những viên đá hốc tinh lên đe rồi tôi sẽ đập cho bạn với giá {{price}}đ.\n(Giữ Shift hoặc nhấn 'Đập tất cả' để mở hết)",
+  "menu.description.standard": "Cứ để những viên đá hốc tinh lên đe rồi tôi sẽ đập cho bạn với giá 25đ.\n(Giữ Shift hoặc nhấn 'Đập tất cả' để mở hết)",
   "toast.cracked-summary": "Đã đập {{count}}x {{name}}",
 
   "config.section.blacksmith": "Đập Hốc Tinh ở Thợ Rèn",
-  "config.free-cracking.name": "Đập Miễn Phí",
-  "config.free-cracking.tooltip": "Đập vỡ hốc tinh, rương cổ vật, dừa vàng và hộp kỳ bí hoàn toàn miễn phí (0đ) tại tiệm Clint.",
-  "config.cracking-price.name": "Giá Đập Tùy Chỉnh",
-  "config.cracking-price.tooltip": "Số tiền cần trả cho mỗi hốc tinh khi tắt Đập Miễn Phí.",
   "config.instant-cracking.name": "Đập Tức Thì",
   "config.instant-cracking.tooltip": "Bỏ qua hoạt ảnh để đập hốc tinh ngay lập tức.",
   "config.show-crack-all-button.name": "Hiện Nút 'Đập Tất Cả'",
@@ -20,8 +15,6 @@
   "config.show-summary-toast.tooltip": "Hiển thị thông báo tóm tắt số lượng hốc tinh đã đập.",
 
   "config.section.farm-machines": "Tùy Chọn Máy Móc Nông Trại",
-  "config.allow-special-geodes-in-crusher.name": "Đập Hộp Kỳ Bí & Hốc Tinh Đặc Biệt",
-  "config.allow-special-geodes-in-crusher.tooltip": "Cho phép Hộp Kỳ Bí, Hộp Kỳ Bí Vàng, Rương Cổ Vật và Dừa Vàng được xử lý trong Máy Phá Hốc Tinh.",
   "config.instant-geode-crusher.name": "Máy Phá Hốc Tinh Tức Thì",
   "config.instant-geode-crusher.tooltip": "Giúp máy phá hốc tinh trên nông trại xử lý ngay lập tức.",
   "config.geode-crusher-requires-coal.name": "Máy Phá Hốc Tinh Cần Than",

@@ -19,7 +19,6 @@ namespace BetterQOL
 
         public static ClickableComponent? CrackAllButton { get; private set; }
         private static bool isHoveringCrackAll = false;
-        private static int lastAnimationTimer = 0;
 
         public static void Initialize(IModHelper helper, IMonitor monitor)
         {
@@ -159,13 +158,11 @@ namespace BetterQOL
             {
                 UpdateCrackAllButton(menu);
                 UpdateMenuDescription(menu);
-                lastAnimationTimer = 0;
             }
             else
             {
                 CrackAllButton = null;
                 isHoveringCrackAll = false;
-                lastAnimationTimer = 0;
             }
         }
 
@@ -185,14 +182,7 @@ namespace BetterQOL
         {
             if (menu.alertTimer <= 0)
             {
-                if (Config.FreeCracking)
-                {
-                    menu.descriptionText = ModEntry.I18n.Get("menu.description.free");
-                }
-                else if (Config.CrackingPrice != 25)
-                {
-                    menu.descriptionText = ModEntry.I18n.Get("menu.description.price", new { price = Config.CrackingPrice });
-                }
+                menu.descriptionText = ModEntry.I18n.Get("menu.description.standard");
             }
         }
 
@@ -201,25 +191,6 @@ namespace BetterQOL
             if (Game1.activeClickableMenu is GeodeMenu menu)
             {
                 UpdateMenuDescription(menu);
-
-                // Check if vanilla single crack animation just triggered (starts around 2700ms)
-                if (menu.geodeAnimationTimer > 0 && lastAnimationTimer == 0)
-                {
-                    if (Config.FreeCracking)
-                    {
-                        Game1.player.Money += 25; // Net 0g
-                    }
-                    else if (Config.CrackingPrice != 25)
-                    {
-                        int refund = 25 - Config.CrackingPrice;
-                        Game1.player.Money += refund;
-                    }
-                }
-                lastAnimationTimer = menu.geodeAnimationTimer;
-            }
-            else
-            {
-                lastAnimationTimer = 0;
             }
         }
 
@@ -307,15 +278,14 @@ namespace BetterQOL
 
                 if (targetItem != null && GeodeCrackerLogic.IsCrackable(targetItem))
                 {
-                    int countToCrack = Math.Min(targetItem.Stack, Config.BulkBatchSize);
-                    int pricePerGeode = Config.FreeCracking ? 0 : Math.Max(0, Config.CrackingPrice);
-                    if (pricePerGeode > 0 && Game1.player.Money < pricePerGeode)
+                    if (Game1.player.Money < GeodeCrackerLogic.CrackingPrice)
                     {
                         menu.wiggleWordsTimer = 500;
                         Game1.dayTimeMoneyBox.moneyShakeTimer = 1000;
                         return;
                     }
 
+                    int countToCrack = Math.Min(targetItem.Stack, Config.BulkBatchSize);
                     var result = GeodeCrackerLogic.ProcessBatch(Game1.player, targetItem, countToCrack, Config);
                     if (result.CountCracked > 0)
                     {
@@ -370,15 +340,14 @@ namespace BetterQOL
                         // Shift+Click on Anvil -> crack entire stack instantly
                         Helper.Input.Suppress(e.Button);
 
-                        int countToCrack = Math.Min(targetItem.Stack, Config.BulkBatchSize);
-                        int pricePerGeode = Config.FreeCracking ? 0 : Math.Max(0, Config.CrackingPrice);
-                        if (pricePerGeode > 0 && Game1.player.Money < pricePerGeode)
+                        if (Game1.player.Money < GeodeCrackerLogic.CrackingPrice)
                         {
                             menu.wiggleWordsTimer = 500;
                             Game1.dayTimeMoneyBox.moneyShakeTimer = 1000;
                             return;
                         }
 
+                        int countToCrack = Math.Min(targetItem.Stack, Config.BulkBatchSize);
                         var result = GeodeCrackerLogic.ProcessBatch(Game1.player, targetItem, countToCrack, Config);
                         if (result.CountCracked > 0)
                         {
@@ -406,8 +375,7 @@ namespace BetterQOL
                         // Single crack instant mode
                         Helper.Input.Suppress(e.Button);
 
-                        int pricePerGeode = Config.FreeCracking ? 0 : Math.Max(0, Config.CrackingPrice);
-                        if (pricePerGeode > 0 && Game1.player.Money < pricePerGeode)
+                        if (Game1.player.Money < GeodeCrackerLogic.CrackingPrice)
                         {
                             menu.wiggleWordsTimer = 500;
                             Game1.dayTimeMoneyBox.moneyShakeTimer = 1000;

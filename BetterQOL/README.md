@@ -1,16 +1,15 @@
 # 📦 BetterQOL (Stardew Valley 1.6+)
 
-A comprehensive quality-of-life suite for **Stardew Valley 1.6+**, combining unstackable item stack size overrides with fast and free geode/mystery box processing. Built with SMAPI and Harmony.
+A comprehensive quality-of-life suite for **Stardew Valley 1.6+**, combining unstackable item stack size overrides with fast geode/mystery box processing. Built with SMAPI and Harmony.
 
 ---
 
 ## ✨ Key Features
 
 ### 💎 1. Blacksmith & Geode Processing Overhaul
-* **Free 0g Cracking:** Cracking geodes, mystery boxes, artifact troves, and golden coconuts at Clint's can be made completely free (0g).
 * **⚡ Instant Cracking:** Skip the 2.7-second delay to crack open items immediately.
-* **🔨 "Crack All" & Shift+Click Bulk Processing:** Crack entire stacks at once either by clicking the dedicated "Crack All" button or holding Shift while clicking the anvil.
-* **🚜 Expanded Geode Crusher:** Crush Mystery Boxes, Golden Mystery Boxes, Artifact Troves, and Golden Coconuts directly in on-farm Geode Crushers with optional instant processing and no-coal mode.
+* **🔨 "Crack All" & Shift+Click Bulk Processing:** Crack entire stacks at once either by clicking the dedicated "Crack All" button or holding Shift while clicking the anvil at standard 25g cost.
+* **🚜 Geode Crusher Improvements:** On-farm Geode Crushers with optional instant processing and no-coal mode.
 
 ### 🎒 2. Extended Stack Size Overhaul
 Remove vanilla inventory stack limits and stack previously unstackable items up to **999** (or custom configured size):
@@ -29,13 +28,10 @@ All options can be configured in-game via **Generic Mod Config Menu (GMCM)** or 
 
 | Category | Option | Default | Description |
 | :--- | :--- | :---: | :--- |
-| **Blacksmith** | `FreeCracking` | `true` | Makes cracking completely free at Clint's (0g). |
-| **Blacksmith** | `CrackingPrice` | `0` | Gold fee per geode when free cracking is disabled. |
 | **Blacksmith** | `InstantCracking` | `false` | Skips single geode cracking animations. |
 | **Blacksmith** | `ShowCrackAllButton` | `true` | Displays the 'Crack All' button in Clint's menu. |
 | **Blacksmith** | `BulkBatchSize` | `999` | Max geodes cracked per bulk batch. |
 | **Blacksmith** | `ShowSummaryToast` | `true` | Displays HUD notification after bulk cracking. |
-| **Machines** | `AllowSpecialGeodesInCrusher` | `true` | Allows mystery boxes/troves in Geode Crushers. |
 | **Machines** | `InstantGeodeCrusher` | `false` | Geode Crushers process instantly (0 minutes). |
 | **Machines** | `GeodeCrusherRequiresCoal` | `true` | Whether Geode Crushers require coal. |
 | **Stacking** | `MaxStackSize` | `999` | Stack size limit for stackable items. |

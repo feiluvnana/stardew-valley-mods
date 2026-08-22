@@ -14,6 +14,8 @@ namespace BetterQOL
 
     public static class GeodeCrackerLogic
     {
+        public const int CrackingPrice = 25;
+
         /// <summary>
         /// Determines if an item is a crackable geode, mystery box, artifact trove, or golden coconut.
         /// </summary>
@@ -40,12 +42,8 @@ namespace BetterQOL
             int available = geodeStack.Stack;
             int countToCrack = Math.Min(available, requestedCount);
 
-            int pricePerGeode = config.FreeCracking ? 0 : Math.Max(0, config.CrackingPrice);
-            if (pricePerGeode > 0)
-            {
-                int affordable = who.Money / pricePerGeode;
-                countToCrack = Math.Min(countToCrack, affordable);
-            }
+            int affordable = who.Money / CrackingPrice;
+            countToCrack = Math.Min(countToCrack, affordable);
 
             if (countToCrack <= 0)
                 return result;
@@ -110,8 +108,8 @@ namespace BetterQOL
                 }
             }
 
-            // Deduct price if not free
-            int totalCost = pricePerGeode * countToCrack;
+            // Deduct standard cracking fee (25g per geode)
+            int totalCost = CrackingPrice * countToCrack;
             if (totalCost > 0)
             {
                 who.Money = Math.Max(0, who.Money - totalCost);

@@ -3,7 +3,6 @@ using HarmonyLib;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley.GameData.Machines;
-using StardewValley.GameData.Objects;
 
 namespace BetterQOL
 {
@@ -23,7 +22,6 @@ namespace BetterQOL
 
             var harmony = new Harmony(ModManifest.UniqueID);
             StackablePatches.Apply(harmony, Monitor);
-            GeodeCrusherPatches.Apply(harmony);
 
             GeodeMenuHandler.Initialize(helper, Monitor);
 
@@ -35,24 +33,7 @@ namespace BetterQOL
 
         private void OnAssetRequested(object? sender, AssetRequestedEventArgs e)
         {
-            if (e.NameWithoutLocale.IsEquivalentTo("Data/Objects"))
-            {
-                e.Edit(asset =>
-                {
-                    if (Config.AllowSpecialGeodesInCrusher)
-                    {
-                        var data = asset.AsDictionary<string, ObjectData>().Data;
-                        foreach (var obj in data.Values)
-                        {
-                            if (obj.ContextTags != null && obj.ContextTags.Contains("geode_crusher_ignored"))
-                            {
-                                obj.ContextTags.Remove("geode_crusher_ignored");
-                            }
-                        }
-                    }
-                });
-            }
-            else if (e.NameWithoutLocale.IsEquivalentTo("Data/Machines"))
+            if (e.NameWithoutLocale.IsEquivalentTo("Data/Machines"))
             {
                 e.Edit(asset =>
                 {
@@ -116,25 +97,6 @@ namespace BetterQOL
 
             configMenu.AddBoolOption(
                 mod: ModManifest,
-                name: () => I18n.Get("config.free-cracking.name"),
-                tooltip: () => I18n.Get("config.free-cracking.tooltip"),
-                getValue: () => Config.FreeCracking,
-                setValue: value => Config.FreeCracking = value
-            );
-
-            configMenu.AddNumberOption(
-                mod: ModManifest,
-                name: () => I18n.Get("config.cracking-price.name"),
-                tooltip: () => I18n.Get("config.cracking-price.tooltip"),
-                getValue: () => Config.CrackingPrice,
-                setValue: value => Config.CrackingPrice = value,
-                min: 0,
-                max: 100,
-                interval: 5
-            );
-
-            configMenu.AddBoolOption(
-                mod: ModManifest,
                 name: () => I18n.Get("config.instant-cracking.name"),
                 tooltip: () => I18n.Get("config.instant-cracking.tooltip"),
                 getValue: () => Config.InstantCracking,
@@ -172,18 +134,6 @@ namespace BetterQOL
             configMenu.AddSectionTitle(
                 mod: ModManifest,
                 text: () => I18n.Get("config.section.farm-machines")
-            );
-
-            configMenu.AddBoolOption(
-                mod: ModManifest,
-                name: () => I18n.Get("config.allow-special-geodes-in-crusher.name"),
-                tooltip: () => I18n.Get("config.allow-special-geodes-in-crusher.tooltip"),
-                getValue: () => Config.AllowSpecialGeodesInCrusher,
-                setValue: value =>
-                {
-                    Config.AllowSpecialGeodesInCrusher = value;
-                    InvalidateAssetCaches();
-                }
             );
 
             configMenu.AddBoolOption(
@@ -277,7 +227,6 @@ namespace BetterQOL
 
         private void InvalidateAssetCaches()
         {
-            Helper.GameContent.InvalidateCache("Data/Objects");
             Helper.GameContent.InvalidateCache("Data/Machines");
         }
     }

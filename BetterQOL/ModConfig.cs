@@ -3,12 +3,6 @@ namespace BetterQOL
     public class ModConfig
     {
         // ---------------- Blacksmith Geode Cracking ----------------
-        /// <summary>Whether geode, trove, coconut, and mystery box cracking is completely free (0g) at Clint's.</summary>
-        public bool FreeCracking { get; set; } = true;
-
-        /// <summary>Cost in gold per geode when FreeCracking is disabled.</summary>
-        public int CrackingPrice { get; set; } = 0;
-
         /// <summary>Whether to skip the cracking animation for instantaneous results in single clicks.</summary>
         public bool InstantCracking { get; set; } = false;
 
@@ -22,8 +16,6 @@ namespace BetterQOL
         public bool ShowSummaryToast { get; set; } = true;
 
         // ---------------- Farm Machine Options (Geode Crusher) ----------------
-        /// <summary>Allows Mystery Boxes, Golden Mystery Boxes, Artifact Troves, and Golden Coconuts in Geode Crushers.</summary>
-        public bool AllowSpecialGeodesInCrusher { get; set; } = true;
 
         /// <summary>Whether Geode Crusher machines process instantly (0 minutes).</summary>
         public bool InstantGeodeCrusher { get; set; } = false;
