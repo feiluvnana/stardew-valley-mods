@@ -524,12 +524,29 @@ namespace BetterQOL
                         }
 
                         int labelX = itemIconX + 42;
-                        Utility.drawTextWithShadow(b, result.Text, Game1.dialogueFont, new Vector2(labelX, currentY + 2), isHovered ? Color.DarkBlue : result.TextColor, 0.7f);
 
+                        // Right-aligned Subtitle
+                        int subX = contentX + contentWidth - 36;
                         if (!string.IsNullOrEmpty(result.Subtitle))
                         {
-                            Utility.drawTextWithShadow(b, result.Subtitle, Game1.smallFont, new Vector2(labelX + 220, currentY + 10), Color.DarkSlateGray);
+                            Vector2 subSize = Game1.smallFont.MeasureString(result.Subtitle);
+                            subX = contentX + contentWidth - 36 - (int)subSize.X;
+                            Utility.drawTextWithShadow(b, result.Subtitle, Game1.smallFont, new Vector2(subX, currentY + 10), Color.DarkSlateGray);
                         }
+
+                        // Title with safety truncation if too wide
+                        int maxLabelW = subX - labelX - 16;
+                        string titleText = result.Text;
+                        if (Game1.dialogueFont.MeasureString(titleText).X * 0.7f > maxLabelW && maxLabelW > 40)
+                        {
+                            while (titleText.Length > 3 && Game1.dialogueFont.MeasureString(titleText + "...").X * 0.7f > maxLabelW)
+                            {
+                                titleText = titleText.Substring(0, titleText.Length - 1);
+                            }
+                            titleText += "...";
+                        }
+
+                        Utility.drawTextWithShadow(b, titleText, Game1.dialogueFont, new Vector2(labelX, currentY + 2), isHovered ? Color.DarkBlue : result.TextColor, 0.7f);
 
                         Utility.drawTextWithShadow(b, ">", Game1.dialogueFont, new Vector2(contentX + contentWidth - 24, currentY + 4), Color.SaddleBrown * 0.5f, 0.7f);
                         b.Draw(Game1.staminaRect, new Rectangle(contentX, currentY + rowHeight - 2, contentWidth, 1), Color.SaddleBrown * 0.15f);

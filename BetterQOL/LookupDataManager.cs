@@ -374,7 +374,13 @@ namespace BetterQOL
             // Section 3: Crop / Seed Data (Growth Time, Regrow, Harvest Seasons)
             AddCropDataSection(subject, item);
 
-            // Section 4: Weapons & Equipment (Damage, Crit, Defense, Forges, Enchantments)
+            // Section 4: Wild Forage Details (Spawn Locations & Seasons)
+            AddForageDataSection(subject, item);
+
+            // Section 5: Mineral & Artifact Finding Sources
+            AddMineralAndArtifactLocationSection(subject, item);
+
+            // Section 6: Weapons & Equipment (Damage, Crit, Defense, Forges, Enchantments)
             AddWeaponAndCombatSection(subject, item);
 
             // Section 5: Tool Details (Upgrade level, Enchantments, Attached Bait/Tackles)
@@ -842,6 +848,231 @@ namespace BetterQOL
                 return $"{hours}:{(mins == 0 ? "00" : mins.ToString())} {period}";
             }
             return rawTime;
+        }
+
+        private static string GetFriendlyForageLocationName(string locKey)
+        {
+            return locKey switch
+            {
+                "Town" => "Pelican Town",
+                "Forest" => "Cindersap Forest",
+                "Mountain" => "The Mountain",
+                "BusStop" => "Bus Stop",
+                "Railroad" => "Railroad",
+                "Beach" => "The Beach",
+                "Woods" => "Secret Woods",
+                "Desert" => "Calico Desert",
+                "IslandWest" => "Ginger Island (West Farm)",
+                "IslandSouth" => "Ginger Island (South Beach)",
+                "IslandNorth" => "Ginger Island (North / Dig Site)",
+                "IslandSouthEast" => "Ginger Island (Pirate Cove)",
+                "UndergroundMine" => "The Mines",
+                "Backwoods" => "Backwoods",
+                _ => locKey
+            };
+        }
+
+        private static void AddForageDataSection(LookupSubject subject, Item item)
+        {
+            try
+            {
+                var locDict = DataLoader.Locations(Game1.content);
+                if (locDict == null) return;
+
+                string itemId = item.ItemId;
+                string qId = item.QualifiedItemId;
+                var foundLocations = new HashSet<string>();
+                var foundSeasons = new HashSet<string>();
+
+                foreach (var kvp in locDict)
+                {
+                    string locKey = kvp.Key;
+                    var locData = kvp.Value;
+                    if (locData.Forage == null) continue;
+
+                    foreach (var forage in locData.Forage)
+                    {
+                        if (forage.ItemId == itemId || forage.ItemId == qId || forage.Id == itemId || forage.Id == qId)
+                        {
+                            string friendlyLoc = GetFriendlyForageLocationName(locKey);
+                            if (!string.IsNullOrEmpty(friendlyLoc))
+                            {
+                                foundLocations.Add(friendlyLoc);
+                            }
+
+                            if (forage.Season.HasValue)
+                            {
+                                string sName = forage.Season.Value.ToString();
+                                foundSeasons.Add(char.ToUpper(sName[0]) + sName.Substring(1));
+                            }
+                        }
+                    }
+                }
+
+                // Special / Manual seasonal mapping for standard wild forage
+                switch (item.ItemId)
+                {
+                    case "16": // Wild Horseradish
+                    case "18": // Daffodil
+                    case "20": // Leek
+                    case "22": // Dandelion
+                        foundSeasons.Add("Spring");
+                        foundLocations.Add("Pelican Town");
+                        foundLocations.Add("Cindersap Forest");
+                        foundLocations.Add("The Mountain");
+                        foundLocations.Add("Bus Stop");
+                        break;
+                    case "399": // Spring Onion
+                        foundSeasons.Add("Spring");
+                        foundLocations.Add("Cindersap Forest (Southeast Island)");
+                        break;
+                    case "257": // Morel
+                        foundSeasons.Add("Spring");
+                        foundLocations.Add("Secret Woods");
+                        foundLocations.Add("Farm Cave (Mushroom)");
+                        break;
+                    case "396": // Spice Berry
+                    case "398": // Grape
+                    case "394": // Sweet Pea
+                        foundSeasons.Add("Summer");
+                        foundLocations.Add("Pelican Town");
+                        foundLocations.Add("Cindersap Forest");
+                        foundLocations.Add("The Mountain");
+                        foundLocations.Add("Bus Stop");
+                        break;
+                    case "259": // Fiddlehead Fern
+                        foundSeasons.Add("Summer");
+                        foundLocations.Add("Secret Woods");
+                        foundLocations.Add("Prehistoric Skull Cavern Floors");
+                        break;
+                    case "404": // Common Mushroom
+                    case "406": // Wild Plum
+                    case "408": // Hazelnut
+                    case "410": // Blackberry
+                        foundSeasons.Add("Fall");
+                        foundLocations.Add("Pelican Town");
+                        foundLocations.Add("Cindersap Forest");
+                        foundLocations.Add("The Mountain");
+                        foundLocations.Add("Bus Stop");
+                        break;
+                    case "281": // Chanterelle
+                        foundSeasons.Add("Fall");
+                        foundLocations.Add("Secret Woods");
+                        foundLocations.Add("Farm Cave (Mushroom)");
+                        break;
+                    case "420": // Red Mushroom
+                        foundSeasons.Add("Summer");
+                        foundSeasons.Add("Fall");
+                        foundLocations.Add("Secret Woods");
+                        foundLocations.Add("The Mines");
+                        break;
+                    case "422": // Purple Mushroom
+                        foundLocations.Add("The Mines (Floor 81+)");
+                        foundLocations.Add("Skull Cavern");
+                        break;
+                    case "78": // Cave Carrot
+                        foundLocations.Add("The Mines (Boxes, Barrels & Tilling Dirt)");
+                        foundLocations.Add("Skull Cavern");
+                        break;
+                    case "372": // Clam
+                    case "393": // Coral
+                    case "397": // Sea Urchin
+                    case "152": // Seaweed
+                        foundLocations.Add("The Beach");
+                        break;
+                    case "88": // Coconut
+                    case "90": // Cactus Fruit
+                        foundLocations.Add("Calico Desert");
+                        break;
+                    case "829": // Ginger
+                    case "830": // Taro Root
+                    case "832": // Pineapple
+                    case "834": // Mango
+                        foundLocations.Add("Ginger Island");
+                        break;
+                    case "412": // Winter Root
+                    case "414": // Crystal Fruit
+                    case "416": // Snow Yam
+                    case "418": // Crocus
+                    case "283": // Holly
+                        foundSeasons.Add("Winter");
+                        foundLocations.Add("Pelican Town");
+                        foundLocations.Add("Cindersap Forest");
+                        foundLocations.Add("The Mountain");
+                        foundLocations.Add("Bus Stop");
+                        break;
+                }
+
+                if (foundLocations.Count > 0 || foundSeasons.Count > 0)
+                {
+                    var section = new LookupSection("Wild Forage Details");
+                    if (foundSeasons.Count > 0)
+                    {
+                        section.Fields.Add(new LookupField("Seasons", string.Join(", ", foundSeasons), new Color(0, 140, 0)));
+                    }
+                    if (foundLocations.Count > 0)
+                    {
+                        section.Fields.Add(new LookupField("Spawn Locations", string.Join(", ", foundLocations), new Color(20, 110, 220)));
+                    }
+                    subject.Sections.Add(section);
+                }
+            }
+            catch { }
+        }
+
+        private static void AddMineralAndArtifactLocationSection(LookupSubject subject, Item item)
+        {
+            try
+            {
+                if (item is StardewValley.Object obj && (obj.Type == "Arch" || obj.Type == "Minerals" || item.Category == StardewValley.Object.mineralsCategory))
+                {
+                    var sources = new List<string>();
+
+                    if (obj.Type == "Arch")
+                    {
+                        sources.Add("Artifact Spots (Hoeing soil)");
+                        sources.Add("Fishing Treasure Chests");
+                        sources.Add("Artifact Troves (Opened at Clint's)");
+                        if (item.ItemId == "107")
+                        {
+                            sources.Add("Pepper Rex Monster Drops (Prehistoric Floors)");
+                        }
+                    }
+                    else if (obj.Type == "Minerals" || item.Category == StardewValley.Object.mineralsCategory)
+                    {
+                        if (item.ItemId == "74")
+                        {
+                            sources.Add("Iridium Nodes & Mystic Stones (Skull Cavern / Quarry / Volcano)");
+                            sources.Add("Omni Geodes (0.4% chance)");
+                            sources.Add("Monster Drops (Serpents, Mummies, Shadow Brutes)");
+                            sources.Add("Rainbow Trout Fish Pond (rare)");
+                        }
+                        else if (item.ItemId == "72")
+                        {
+                            sources.Add("Diamond Nodes & Gem Nodes (The Mines Floor 50+)");
+                            sources.Add("Monster Drops & Fishing Treasure Chests");
+                        }
+                        else if (item.ItemId == "60" || item.ItemId == "62" || item.ItemId == "64" || item.ItemId == "66" || item.ItemId == "68" || item.ItemId == "70")
+                        {
+                            sources.Add("Gem Nodes & Mining (The Mines, Skull Cavern, Volcano Dungeon)");
+                            sources.Add("Geodes & Fishing Treasure Chests");
+                        }
+                        else
+                        {
+                            sources.Add("Mining in The Mines & Skull Cavern");
+                            sources.Add("Cracking Geodes at Clint's Blacksmith");
+                        }
+                    }
+
+                    if (sources.Count > 0)
+                    {
+                        var section = new LookupSection("Finding & Gathering Sources");
+                        section.Fields.Add(new LookupField("Sources", string.Join(" | ", sources), new Color(20, 110, 220)));
+                        subject.Sections.Add(section);
+                    }
+                }
+            }
+            catch { }
         }
 
         private static void AddCropDataSection(LookupSubject subject, Item item)
