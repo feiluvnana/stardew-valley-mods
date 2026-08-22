@@ -5,7 +5,6 @@ using System.Reflection;
 using HarmonyLib;
 using StardewModdingAPI;
 using StardewValley;
-using StardewValley.Menus;
 using StardewValley.Objects;
 using StardewValley.Objects.Trinkets;
 using StardewValley.Tools;
@@ -16,61 +15,49 @@ namespace BetterQOL
     {
         public static void Apply(Harmony harmony, IMonitor monitor)
         {
-            try
+            var postfix = new HarmonyMethod(typeof(MenuTooltipPatch), nameof(DescriptionPostfix));
+
+            // Only patch concrete item classes (never abstract classes like Item or Tool)
+            Type[] concreteTypes = new[]
             {
-                var postfix = new HarmonyMethod(typeof(MenuTooltipPatch), nameof(DescriptionPostfix));
+                typeof(StardewValley.Object),
+                typeof(Ring),
+                typeof(Clothing),
+                typeof(Hat),
+                typeof(Boots),
+                typeof(Furniture),
+                typeof(Trinket),
+                typeof(MeleeWeapon),
+                typeof(Slingshot),
+                typeof(Pickaxe),
+                typeof(Axe),
+                typeof(Hoe),
+                typeof(WateringCan),
+                typeof(FishingRod),
+                typeof(Pan),
+                typeof(Shears),
+                typeof(MilkPail)
+            };
 
-                // Patch getDescription on all item types
-                Type[] itemTypes = new[]
-                {
-                    typeof(Item),
-                    typeof(StardewValley.Object),
-                    typeof(Ring),
-                    typeof(Clothing),
-                    typeof(Hat),
-                    typeof(Boots),
-                    typeof(Furniture),
-                    typeof(Trinket),
-                    typeof(Tool),
-                    typeof(MeleeWeapon),
-                    typeof(Slingshot)
-                };
-
-                foreach (var type in itemTypes)
+            int patchedCount = 0;
+            foreach (var type in concreteTypes)
+            {
+                try
                 {
                     MethodInfo? method = AccessTools.DeclaredMethod(type, "getDescription", Type.EmptyTypes);
-                    if (method != null)
+                    if (method != null && !method.IsAbstract)
                     {
                         harmony.Patch(method, postfix: postfix);
+                        patchedCount++;
                     }
                 }
-
-                // Also patch drawToolTip and drawHoverText on IClickableMenu
-                var prefix = new HarmonyMethod(typeof(MenuTooltipPatch), nameof(ToolTipPrefix));
-                foreach (var method in typeof(IClickableMenu).GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance))
+                catch (Exception ex)
                 {
-                    if (method.Name == "drawToolTip" || method.Name == "drawHoverText")
-                    {
-                        var parameters = method.GetParameters();
-                        bool hasItem = parameters.Any(p => typeof(Item).IsAssignableFrom(p.ParameterType));
-                        bool hasText = parameters.Any(p => p.ParameterType == typeof(string));
-                        if (hasItem && hasText)
-                        {
-                            try
-                            {
-                                harmony.Patch(method, prefix: prefix);
-                            }
-                            catch { }
-                        }
-                    }
+                    monitor.Log($"Could not patch getDescription on {type.Name}: {ex.Message}", LogLevel.Trace);
                 }
+            }
 
-                monitor.Log("Successfully applied Harmony patches for in-menu item tooltips.", LogLevel.Debug);
-            }
-            catch (Exception ex)
-            {
-                monitor.Log($"Failed to patch menu tooltips: {ex}", LogLevel.Error);
-            }
+            monitor.Log($"Successfully applied Harmony description patches to {patchedCount} item classes for native in-menu tooltips.", LogLevel.Debug);
         }
 
         public static void DescriptionPostfix(Item? __instance, ref string __result)
@@ -88,25 +75,6 @@ namespace BetterQOL
                 else if (!__result.Contains(extra))
                 {
                     __result = __result + "\n\n" + extra;
-                }
-            }
-        }
-
-        public static void ToolTipPrefix(ref string? hoverText, Item? hoveredItem)
-        {
-            if (hoveredItem == null)
-                return;
-
-            string extra = BuildItemExtraText(hoveredItem);
-            if (!string.IsNullOrEmpty(extra))
-            {
-                if (string.IsNullOrEmpty(hoverText))
-                {
-                    hoverText = extra;
-                }
-                else if (!hoverText.Contains(extra))
-                {
-                    hoverText = hoverText + "\n\n" + extra;
                 }
             }
         }
