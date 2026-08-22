@@ -14,7 +14,7 @@ namespace BetterIndustry
 
         public static void OnAssetRequested(object? sender, AssetRequestedEventArgs e)
         {
-            if (!Config.EnableCookingBalancing && !Config.EnableEnergyBuff && !Config.EnableBuffDurationBoost)
+            if (!Config.EnableCookingBalancing)
                 return;
 
             if (e.NameWithoutLocale.IsEquivalentTo("Data/Objects"))
@@ -22,12 +22,12 @@ namespace BetterIndustry
                 e.Edit(asset =>
                 {
                     var data = asset.AsDictionary<string, ObjectData>().Data;
-                    ApplyCookingBuffs(data);
+                    ApplyCookingBalancing(data);
                 }, AssetEditPriority.Late);
             }
         }
 
-        private static void ApplyCookingBuffs(IDictionary<string, ObjectData> objectData)
+        private static void ApplyCookingBalancing(IDictionary<string, ObjectData> objectData)
         {
             try
             {
@@ -68,30 +68,12 @@ namespace BetterIndustry
                     if (objectData.TryGetValue(yieldId, out var dish))
                     {
                         // Profit margin balancing
-                        if (Config.EnableCookingBalancing && totalIngredientCost > 0)
-                            {
+                        if (totalIngredientCost > 0)
+                        {
                             int targetPrice = (int)Math.Ceiling(totalIngredientCost * Config.CookingProfitMargin);
                             if (dish.Price < targetPrice)
                             {
                                 dish.Price = targetPrice;
-                            }
-                        }
-
-                        // Energy / Edibility buff
-                        if (Config.EnableEnergyBuff && dish.Edibility > 0)
-                        {
-                            dish.Edibility = Math.Max(dish.Edibility, (int)Math.Round(dish.Edibility * Config.EnergyMultiplier));
-                        }
-
-                        // Buff durations
-                        if (Config.EnableBuffDurationBoost && dish.Buffs != null)
-                        {
-                            foreach (var buff in dish.Buffs)
-                            {
-                                if (buff.Duration > 0)
-                                {
-                                    buff.Duration = (int)Math.Round(buff.Duration * Config.BuffDurationMultiplier);
-                                }
                             }
                         }
                     }
@@ -99,7 +81,7 @@ namespace BetterIndustry
             }
             catch (Exception ex)
             {
-                Monitor.Log($"Error applying cooking balance buffs: {ex}", LogLevel.Error);
+                Monitor.Log($"Error applying cooking balance: {ex}", LogLevel.Error);
             }
         }
     }

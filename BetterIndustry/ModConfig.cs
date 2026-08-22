@@ -9,45 +9,9 @@ namespace BetterIndustry
         /// <summary>Profit margin multiplier for cooked food over raw ingredients (e.g. 1.25 = +25% profit).</summary>
         public float CookingProfitMargin { get; set; } = 1.25f;
 
-        /// <summary>Whether to boost stamina and health restored by cooked food.</summary>
-        public bool EnableEnergyBuff { get; set; } = true;
-
-        /// <summary>Energy and health recovery multiplier for cooked dishes.</summary>
-        public float EnergyMultiplier { get; set; } = 1.25f;
-
-        /// <summary>Whether to extend the duration of stat buffs provided by cooked food.</summary>
-        public bool EnableBuffDurationBoost { get; set; } = true;
-
-        /// <summary>Buff duration multiplier for food buffs (1.5 = +50% duration).</summary>
-        public float BuffDurationMultiplier { get; set; } = 1.5f;
-
         // ---------------- Artisan Goods Balancing ----------------
         /// <summary>Whether mead retains the input flower honey type and price scaling.</summary>
         public bool EnableMeadFix { get; set; } = true;
-
-        /// <summary>Multiplier applied to flower honey price when brewed into mead.</summary>
-        public float MeadMultiplier { get; set; } = 1.5f;
-
-        /// <summary>Whether vegetable juice selling prices are buffed.</summary>
-        public bool EnableJuiceBuff { get; set; } = true;
-
-        /// <summary>Base vegetable multiplier for vegetable juice in kegs.</summary>
-        public float JuiceMultiplier { get; set; } = 3.0f;
-
-        /// <summary>Whether pickled vegetables in preserves jars are buffed.</summary>
-        public bool EnablePickleBuff { get; set; } = true;
-
-        /// <summary>Base multiplier for pickled goods in preserves jars.</summary>
-        public float PickleMultiplier { get; set; } = 2.5f;
-
-        /// <summary>Whether aged roe and caviar prices are buffed.</summary>
-        public bool EnableRoeBuff { get; set; } = true;
-
-        /// <summary>Base multiplier for aged roe in preserves jars.</summary>
-        public float AgedRoeMultiplier { get; set; } = 2.5f;
-
-        /// <summary>Flat base selling price for Caviar.</summary>
-        public int CaviarPrice { get; set; } = 750;
 
         // ---------------- Automation (Hopper & Machines) ----------------
         /// <summary>Whether hoppers automatically pull/harvest finished products from adjacent machines (North, South, West, East).</summary>
