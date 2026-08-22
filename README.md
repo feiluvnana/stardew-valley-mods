@@ -8,13 +8,13 @@ A suite of high-performance, modular quality-of-life, progression enhancement, a
 
 | Mod | Version | Description | Key Features |
 | :--- | :---: | :--- | :--- |
-| [**BetterIndustry**](./BetterIndustry) | `1.0.0` | Comprehensive artisan goods, cooking, and machine automation suite. | Flower mead value retention, profitable cooking (+25%), extended food buffs (+50%), 4-way omnidirectional auto-feed/harvest hoppers, and crab pot/cask support. |
-| [**BetterQOL**](./BetterQOL) | `1.0.0` | Essential quality-of-life suite for item stacking and geode processing. | Stacks tackles, trinkets, rings, furniture, boots, clothes, and hats up to 999; instant cracking, "Crack All" button bulk cracking at standard fee, and on-farm Geode Crusher speed/fuel options. |
-| [**BetterChest**](./BetterChest) | `1.2.0` | Dynamic loot overhaul for Skull Cavern & Fishing treasure chests. | 7 gameplay categories (54 items), decaying multi-rolls, critical stack multipliers (up to 5x), Floor 100 special buffs, and faithful fishing chest improvements with 1.6 Golden Chest rewards. |
-| [**BetterFurniture**](./BetterFurniture) | `1.0.0` | Interior decorating and luxury furniture expansion. | 4x4 spacious Princess King Bed with free placement anywhere, animated sconce flames, light sources, canopy layering, and farmhouse tile restorations. |
-| [**ExtendedDesertFestival**](./ExtendedDesertFestival) | `1.1.0` | Expands the Calico Desert Festival across all seasons. | Enables Desert Festival in Summer, Fall, and Winter (15th–17th), preserves Calico Eggs across seasons. |
-| [**BetterForge**](./BetterForge) | `1.0.0` | Volcano Forge, Mini-Forge, and Anvil overhauls. | 100% fair uniform weapon/tool enchantments, "Never Downgrade" trinket reforging, "Perfect" tier prefixes, and Prismatic Ascension powers. |
-| [**BetterMap**](./BetterMap) | `1.0.0` | Farmhouse doorway and Ginger Island farm clutter cleaner. | Widens all Farmhouse exit doorways to 3x1 tiles, removes Ginger Island Farm driftwood fence and bleached log piles. |
+| [**💎 BetterChest**](./BetterChest) | `1.2.0` | Dynamic loot overhaul for Skull Cavern & Fishing treasure chests. | 7 gameplay categories (54 items), decaying multi-rolls, critical stack multipliers (up to 5x), linear legendary depth scaling, milestone gatekeeping, and skill-scaled fishing floors with 1.6 Golden Chest rewards. |
+| [**🌋 BetterForge**](./BetterForge) | `1.0.0` | Volcano Forge, Mini-Forge, and Anvil overhauls. | 100% fair uniform weapon/tool enchantments ($1/N$), "Never Downgrade" trinket reforging, "Perfect" tier prefixes, and permanent Prismatic Ascension powers (+0.5 Luck, enhanced abilities). |
+| [**🏭 BetterIndustry**](./BetterIndustry) | `1.0.0` | Artisan goods, cooking, and machine automation suite. | Flower mead 2.0x value scaling, profitable cooking (+25%), 4-way omnidirectional auto-feed/harvest hoppers, and crab pot/cask automation. |
+| [**📦 BetterQOL**](./BetterQOL) | `1.2.0` | Quality-of-life suite for UI hover overlays, lookup, item stacking, and geodes. | UI Info Suite 2 style hover tooltips (crop timers, machine countdowns, tree stages, animal hearts), Lookup Anything (`F1`), unstackable item overrides up to 999, and instant "Crack All" geode processing. |
+| [**👑 BetterFurniture**](./BetterFurniture) | `1.0.0` | Interior decorating and luxury furniture expansion. | 4x4 spacious Princess King Bed with free placement anywhere, animated sconce flames, light sources, canopy layering, and farmhouse tile restorations. |
+| [**🗺️ BetterMap**](./BetterMap) | `1.0.0` | Farmhouse doorway and Ginger Island farm clutter cleaner. | Widens all Farmhouse exit doorways to 3x1 tiles, removes Ginger Island Farm driftwood fence and bleached log piles. |
+| [**🌵 ExtendedDesertFestival**](./ExtendedDesertFestival) | `1.1.0` | Expands the Calico Desert Festival across all seasons. | Enables Desert Festival in Summer, Fall, and Winter (15th–17th), preserves Calico Eggs across seasons. |
 
 ---
 
@@ -46,10 +46,10 @@ All mods in this collection feature native integration with [Generic Mod Config 
 
 ## 🛠️ Development & Building
 
-All mods are built targeting **.NET 6.0 / .NET 10.0** and the **Stardew Valley 1.6+** SMAPI environment.
+All mods are built targeting **.NET 6.0** and the **Stardew Valley 1.6+** SMAPI environment.
 
 ### Build All Mods
-Run the following commands from the root directory:
+Run the following commands from the workspace root:
 ```powershell
 dotnet build BetterChest/BetterChest.csproj
 dotnet build BetterForge/BetterForge.csproj
