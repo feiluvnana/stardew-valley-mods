@@ -1554,17 +1554,33 @@ namespace BetterQOL
             // 3. Weather Forecast (Today & Tomorrow)
             subject.Sections.Add(BuildWeatherSection(location));
 
-            // 4. TV & Special Events (Queen of Sauce & Traveling Merchant)
+            // 4. TV, Bookseller, Clint Upgrades & Quests
             var eventSec = BuildSpecialEventsSection();
             if (eventSec.Fields.Count > 0)
             {
                 subject.Sections.Add(eventSec);
             }
 
-            // 5. Farm & Chores Summary
+            // 5. Farm & Chores Summary (Crops, Animals, Machines, Silo, Greenhouse, Island)
             subject.Sections.Add(BuildFarmSummarySection());
 
-            // 6. Tile Specifics (if clicked on tile)
+            // 6. Current Season Plantable Crops & Seeds Guide
+            subject.Sections.Add(BuildSeasonalCropsSection());
+
+            // 7. Current Season Wild Forage Guide
+            subject.Sections.Add(BuildSeasonalForageSection());
+
+            // 8. Player Skills, Level & 1.6 Mastery
+            subject.Sections.Add(BuildSkillsAndMasterySection());
+
+            // 9. Ginger Island & Qi Progress (if unlocked)
+            var islandSec = BuildIslandProgressSection();
+            if (islandSec != null && islandSec.Fields.Count > 0)
+            {
+                subject.Sections.Add(islandSec);
+            }
+
+            // 10. Tile Specifics (if clicked on tile)
             if (location != null && tilePos.HasValue)
             {
                 subject.Sections.Add(BuildTileDetailsSection(location, tilePos.Value));
@@ -2082,6 +2098,169 @@ namespace BetterQOL
             section.Fields.Add(new LookupField("Tile Type", isWater ? "Water Tile" : (isPassable ? "Walkable Ground" : "Obstacle / Blocked"), isWater ? new Color(20, 110, 220) : (isPassable ? new Color(0, 140, 0) : new Color(200, 60, 20))));
 
             return section;
+        }
+
+        private static LookupSection BuildSeasonalCropsSection()
+        {
+            string seasonName = char.ToUpper(Game1.currentSeason[0]) + Game1.currentSeason.Substring(1);
+            var section = new LookupSection($"Seasonal Crops & Seeds ({seasonName})");
+            var cropLinks = new List<LookupLink>();
+
+            try
+            {
+                var cropDict = DataLoader.Crops(Game1.content);
+                if (cropDict != null)
+                {
+                    foreach (var kvp in cropDict)
+                    {
+                        var cropData = kvp.Value;
+                        if (cropData.Seasons != null && cropData.Seasons.Any(s => s.ToString().Equals(Game1.currentSeason, StringComparison.OrdinalIgnoreCase)))
+                        {
+                            var harvestItem = ItemRegistry.GetData(cropData.HarvestItemId);
+                            if (harvestItem != null && !cropLinks.Any(l => l.Text.StartsWith(harvestItem.DisplayName)))
+                            {
+                                int totalDays = cropData.DaysInPhase?.Sum() ?? 0;
+                                string regrow = cropData.RegrowDays > 0 ? $", regrows {cropData.RegrowDays}d" : "";
+                                string infoText = $"{harvestItem.DisplayName} ({totalDays}d{regrow})";
+
+                                var item = ItemRegistry.Create(harvestItem.QualifiedItemId);
+                                cropLinks.Add(new LookupLink(
+                                    text: infoText,
+                                    textColor: cropData.RegrowDays > 0 ? new Color(0, 140, 0) : Game1.textColor,
+                                    icon: harvestItem.GetTexture(),
+                                    iconSourceRect: harvestItem.GetSourceRect(),
+                                    onClick: () => item != null ? BuildItemSubject(item) : null
+                                ));
+                            }
+                        }
+                    }
+                }
+            }
+            catch { }
+
+            if (cropLinks.Count > 0)
+            {
+                section.Fields.Add(new LookupField("Plantable Crops", cropLinks));
+            }
+            else
+            {
+                section.Fields.Add(new LookupField("Plantable Crops", "No outdoor crops available to plant in Winter (Use Greenhouse / Pots / Fiber Seeds)", Color.DarkSlateGray));
+            }
+
+            return section;
+        }
+
+        private static LookupSection BuildSeasonalForageSection()
+        {
+            string seasonName = char.ToUpper(Game1.currentSeason[0]) + Game1.currentSeason.Substring(1);
+            var section = new LookupSection($"Seasonal Wild Forage ({seasonName})");
+            var forageLinks = new List<LookupLink>();
+
+            string[] forageIds = Game1.currentSeason.ToLower() switch
+            {
+                "spring" => new[] { "(O)16", "(O)18", "(O)20", "(O)22", "(O)399", "(O)257", "(O)296" },
+                "summer" => new[] { "(O)396", "(O)398", "(O)394", "(O)259", "(O)402", "(O)393" },
+                "fall" => new[] { "(O)404", "(O)406", "(O)408", "(O)410", "(O)281", "(O)420" },
+                "winter" => new[] { "(O)412", "(O)414", "(O)416", "(O)418", "(O)283" },
+                _ => Array.Empty<string>()
+            };
+
+            foreach (var id in forageIds)
+            {
+                var data = ItemRegistry.GetData(id);
+                if (data != null && !forageLinks.Any(l => l.Text == data.DisplayName))
+                {
+                    var item = ItemRegistry.Create(data.QualifiedItemId);
+                    forageLinks.Add(new LookupLink(
+                        text: data.DisplayName,
+                        textColor: Game1.textColor,
+                        icon: data.GetTexture(),
+                        iconSourceRect: data.GetSourceRect(),
+                        onClick: () => item != null ? BuildItemSubject(item) : null
+                    ));
+                }
+            }
+
+            // Beach Forage
+            var beachLinks = new List<LookupLink>();
+            foreach (var bId in new[] { "(O)372", "(O)393", "(O)397", "(O)152" })
+            {
+                var data = ItemRegistry.GetData(bId);
+                if (data != null)
+                {
+                    var item = ItemRegistry.Create(data.QualifiedItemId);
+                    beachLinks.Add(new LookupLink(
+                        text: data.DisplayName,
+                        textColor: new Color(20, 110, 220),
+                        icon: data.GetTexture(),
+                        iconSourceRect: data.GetSourceRect(),
+                        onClick: () => item != null ? BuildItemSubject(item) : null
+                    ));
+                }
+            }
+
+            if (forageLinks.Count > 0)
+            {
+                section.Fields.Add(new LookupField("Valley Forage", forageLinks));
+            }
+            if (beachLinks.Count > 0)
+            {
+                section.Fields.Add(new LookupField("Beach Forage", beachLinks));
+            }
+
+            return section;
+        }
+
+        private static LookupSection BuildSkillsAndMasterySection()
+        {
+            var section = new LookupSection("Skills, Level & Mastery");
+
+            int farmLvl = Game1.player.FarmingLevel;
+            int mineLvl = Game1.player.MiningLevel;
+            int forageLvl = Game1.player.ForagingLevel;
+            int fishLvl = Game1.player.FishingLevel;
+            int combatLvl = Game1.player.CombatLevel;
+
+            section.Fields.Add(new LookupField(
+                "Skill Levels",
+                $"Farming: {farmLvl} | Mining: {mineLvl} | Foraging: {forageLvl} | Fishing: {fishLvl} | Combat: {combatLvl}",
+                new Color(0, 140, 0)
+            ));
+
+            try
+            {
+                int totalLvl = farmLvl + mineLvl + forageLvl + fishLvl + combatLvl;
+                if (totalLvl >= 50)
+                {
+                    int masteryExp = (int)Game1.stats.Get("MasteryExp");
+                    section.Fields.Add(new LookupField("Mastery Progress", $"{masteryExp:N0} Mastery XP (Cave of Mastery)", new Color(180, 50, 180)));
+                }
+            }
+            catch { }
+
+            return section;
+        }
+
+        private static LookupSection? BuildIslandProgressSection()
+        {
+            try
+            {
+                if (Game1.netWorldState.Value.GoldenWalnutsFound > 0 || Game1.player.hasOrWillReceiveMail("Visited_Island"))
+                {
+                    var section = new LookupSection("Ginger Island Exploration");
+                    int walnuts = Game1.netWorldState.Value.GoldenWalnutsFound;
+                    section.Fields.Add(new LookupField("Golden Walnuts", $"{walnuts} / 130 Found", walnuts >= 130 ? new Color(0, 140, 0) : new Color(180, 100, 0)));
+
+                    if (Game1.player.hasOrWillReceiveMail("QiChallengeComplete") || Game1.player.QiGems > 0)
+                    {
+                        section.Fields.Add(new LookupField("Qi Gems", $"{Game1.player.QiGems} Qi Gems", new Color(180, 50, 180)));
+                    }
+
+                    return section;
+                }
+            }
+            catch { }
+            return null;
         }
 
         #endregion
