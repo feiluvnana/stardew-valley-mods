@@ -35,10 +35,10 @@ namespace BetterQOL
 
         public LookupMenu(LookupSubject? initialSubject = null)
             : base(
-                x: (Game1.uiViewport.Width - Math.Min(840, Game1.uiViewport.Width - 64)) / 2,
-                y: (Game1.uiViewport.Height - Math.Min(660, Game1.uiViewport.Height - 64)) / 2,
-                width: Math.Min(840, Game1.uiViewport.Width - 64),
-                height: Math.Min(660, Game1.uiViewport.Height - 64),
+                x: (Game1.uiViewport.Width - Math.Min(860, Game1.uiViewport.Width - 48)) / 2,
+                y: (Game1.uiViewport.Height - Math.Min(680, Game1.uiViewport.Height - 48)) / 2,
+                width: Math.Min(860, Game1.uiViewport.Width - 48),
+                height: Math.Min(680, Game1.uiViewport.Height - 48),
                 showUpperRightCloseButton: true
             )
         {
@@ -56,27 +56,28 @@ namespace BetterQOL
 
         private void InitializeComponents()
         {
-            // 1. Close Button (top-right, nicely tucked inside frame)
+            // 1. Close Button (top-right, outside inner content)
             CloseButton = new ClickableTextureComponent(
-                new Rectangle(xPositionOnScreen + width - 40, yPositionOnScreen - 6, 48, 48),
+                new Rectangle(xPositionOnScreen + width - 38, yPositionOnScreen - 6, 48, 48),
                 Game1.mouseCursors,
                 new Rectangle(337, 494, 12, 12),
                 4f
             );
 
             // 2. Back Button (top-left)
+            int headerTopY = yPositionOnScreen + 30;
             BackButton = new ClickableTextureComponent(
-                new Rectangle(xPositionOnScreen + 30, yPositionOnScreen + 28, 44, 44),
+                new Rectangle(xPositionOnScreen + 32, headerTopY + 4, 44, 44),
                 Game1.mouseCursors,
                 new Rectangle(352, 495, 12, 11),
                 3.5f
             );
 
             // 3. Search Box (top-right header)
-            int searchBoxW = 230;
-            int searchBoxH = 42;
-            int searchBoxX = xPositionOnScreen + width - searchBoxW - 58;
-            int searchBoxY = yPositionOnScreen + 26;
+            int searchBoxW = 210;
+            int searchBoxH = 40;
+            int searchBoxX = xPositionOnScreen + width - searchBoxW - 54;
+            int searchBoxY = headerTopY + 6;
 
             SearchBox = new TextBox(
                 Game1.content.Load<Texture2D>("LooseSprites\\textBox"),
@@ -92,9 +93,10 @@ namespace BetterQOL
             };
             SearchBoxComponent = new ClickableComponent(new Rectangle(searchBoxX, searchBoxY, searchBoxW, searchBoxH), "SearchBox");
 
-            // 4. Scroll Buttons (well inside right parchment margin)
-            int contentY = yPositionOnScreen + 104;
-            int contentHeight = height - 152;
+            // 4. Content Area Layout & Scroll Buttons
+            int dividerY = yPositionOnScreen + 104;
+            int contentY = dividerY + 18;
+            int contentHeight = height - 172;
             int contentBottom = contentY + contentHeight;
 
             int btnX = xPositionOnScreen + width - 64;
@@ -362,15 +364,15 @@ namespace BetterQOL
                 drawShadow: true
             );
 
-            // 3. Header Bar Layout
-            int headerX = xPositionOnScreen + 34;
-            int headerY = yPositionOnScreen + 24;
+            // 3. Spacious Header Bar Layout
+            int headerTopY = yPositionOnScreen + 30;
+            int headerLeftX = xPositionOnScreen + 34;
 
             bool canGoBack = History.Count > 0 || (CurrentSubject != null && !string.IsNullOrEmpty(LastSearchText));
             if (canGoBack && BackButton != null)
             {
                 BackButton.draw(b);
-                headerX += 48;
+                headerLeftX += 50;
             }
 
             if (CurrentSubject != null)
@@ -379,18 +381,18 @@ namespace BetterQOL
                 if (CurrentSubject.Portrait != null)
                 {
                     Rectangle src = CurrentSubject.PortraitSourceRect ?? new Rectangle(0, 0, 64, 64);
-                    b.Draw(CurrentSubject.Portrait, new Rectangle(headerX, headerY, 50, 50), src, Color.White);
-                    headerX += 62;
+                    b.Draw(CurrentSubject.Portrait, new Rectangle(headerLeftX, headerTopY, 56, 56), src, Color.White);
+                    headerLeftX += 68;
                 }
                 else if (CurrentSubject.MainIcon != null)
                 {
                     Rectangle src = CurrentSubject.MainIconSourceRect ?? new Rectangle(0, 0, CurrentSubject.MainIcon.Width, CurrentSubject.MainIcon.Height);
-                    b.Draw(CurrentSubject.MainIcon, new Rectangle(headerX, headerY + 2, 42, 42), src, Color.White);
-                    headerX += 52;
+                    b.Draw(CurrentSubject.MainIcon, new Rectangle(headerLeftX, headerTopY + 4, 48, 48), src, Color.White);
+                    headerLeftX += 58;
                 }
 
-                // Title & Subtitle (truncated before reaching search box)
-                int maxTitleWidth = (SearchBox != null ? SearchBox.X - 36 : xPositionOnScreen + width - 60) - headerX;
+                // Title & Subtitle with proper breathing room
+                int maxTitleWidth = (SearchBox != null ? SearchBox.X - 30 : xPositionOnScreen + width - 60) - headerLeftX;
                 string title = CurrentSubject.Title;
                 if (Game1.dialogueFont.MeasureString(title).X > maxTitleWidth && maxTitleWidth > 60)
                 {
@@ -401,28 +403,23 @@ namespace BetterQOL
                     title += "...";
                 }
 
-                Utility.drawTextWithShadow(b, title, Game1.dialogueFont, new Vector2(headerX, headerY - 4), Game1.textColor);
+                Utility.drawTextWithShadow(b, title, Game1.dialogueFont, new Vector2(headerLeftX, headerTopY - 2), Game1.textColor);
                 if (!string.IsNullOrEmpty(CurrentSubject.Subtitle))
                 {
-                    Utility.drawTextWithShadow(b, CurrentSubject.Subtitle, Game1.smallFont, new Vector2(headerX, headerY + 30), Color.DimGray);
+                    Utility.drawTextWithShadow(b, CurrentSubject.Subtitle, Game1.smallFont, new Vector2(headerLeftX, headerTopY + 36), Color.DimGray);
                 }
             }
             else
             {
                 // Search Mode Title
-                Utility.drawTextWithShadow(b, "Find Anything (F1)", Game1.dialogueFont, new Vector2(headerX, headerY - 2), Game1.textColor);
-                Utility.drawTextWithShadow(b, "Type to query any item, villager, monster, or recipe...", Game1.smallFont, new Vector2(headerX, headerY + 30), Color.DimGray);
+                Utility.drawTextWithShadow(b, "Find Anything (F1)", Game1.dialogueFont, new Vector2(headerLeftX, headerTopY - 2), Game1.textColor);
+                Utility.drawTextWithShadow(b, "Type to query any item, villager, monster, or recipe...", Game1.smallFont, new Vector2(headerLeftX, headerTopY + 36), Color.DimGray);
             }
 
-            // Search Box
+            // Search Box (Rendered cleanly with no broken emoji characters)
             if (SearchBox != null)
             {
                 SearchBox.Draw(b);
-
-                // Search icon
-                int iconX = SearchBox.X - 26;
-                int iconY = SearchBox.Y + 8;
-                Utility.drawTextWithShadow(b, "🔍", Game1.smallFont, new Vector2(iconX, iconY), Game1.textColor);
 
                 if (string.IsNullOrEmpty(SearchBox.Text) && !SearchBox.Selected)
                 {
@@ -430,15 +427,15 @@ namespace BetterQOL
                 }
             }
 
-            // Header Divider
-            int dividerY = yPositionOnScreen + 88;
+            // Header Divider with ample clearance
+            int dividerY = yPositionOnScreen + 104;
             b.Draw(Game1.staminaRect, new Rectangle(xPositionOnScreen + 32, dividerY, width - 64, 2), Color.SaddleBrown * 0.3f);
 
             // 4. Content Area Layout & GPU-Clipping Scissor Rect
             int contentX = xPositionOnScreen + 36;
-            int contentY = dividerY + 14;
-            int contentWidth = width - 116; // Leaves ample space for scrollbar on the right
-            int contentHeight = height - 152;
+            int contentY = dividerY + 18;
+            int contentWidth = width - 116; // Leaves dedicated space for scrollbar on the right
+            int contentHeight = height - 172;
             int contentBottom = contentY + contentHeight;
 
             int currentY = contentY - ScrollOffset;
@@ -523,8 +520,8 @@ namespace BetterQOL
                 {
                     // Section Header
                     Utility.drawTextWithShadow(b, section.Title, Game1.dialogueFont, new Vector2(contentX, currentY), new Color(115, 40, 10));
-                    currentY += 34;
-                    calculatedContentHeight += 34;
+                    currentY += 36;
+                    calculatedContentHeight += 36;
 
                     foreach (var field in section.Fields)
                     {
@@ -534,8 +531,8 @@ namespace BetterQOL
                         if (field.Links.Count > 0)
                         {
                             Utility.drawTextWithShadow(b, label, Game1.smallFont, new Vector2(contentX + 10, currentY), Game1.textColor);
-                            currentY += 26;
-                            calculatedContentHeight += 26;
+                            currentY += 28;
+                            calculatedContentHeight += 28;
 
                             int chipX = contentX + 16;
                             int chipSpacing = 8;
@@ -585,8 +582,8 @@ namespace BetterQOL
                                 chipX += chipWidth + chipSpacing;
                             }
 
-                            currentY += 34;
-                            calculatedContentHeight += 34;
+                            currentY += 36;
+                            calculatedContentHeight += 36;
                         }
                         else
                         {
@@ -603,8 +600,8 @@ namespace BetterQOL
                         }
                     }
 
-                    currentY += 12;
-                    calculatedContentHeight += 12;
+                    currentY += 14;
+                    calculatedContentHeight += 14;
                 }
             }
 
@@ -615,7 +612,7 @@ namespace BetterQOL
 
             MaxScrollOffset = Math.Max(0, calculatedContentHeight - contentHeight);
 
-            // 5. Draw Scrollbar Track & Up/Down Buttons (Nicely inset inside right parchment border)
+            // 5. Draw Scrollbar Track & Up/Down Buttons
             CloseButton?.draw(b);
 
             if (MaxScrollOffset > 0)

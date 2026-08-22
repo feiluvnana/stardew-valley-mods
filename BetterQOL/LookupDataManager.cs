@@ -11,6 +11,7 @@ using StardewValley.ItemTypeDefinitions;
 using StardewValley.Monsters;
 using StardewValley.Objects;
 using StardewValley.TerrainFeatures;
+using StardewValley.TokenizableStrings;
 
 namespace BetterQOL
 {
@@ -285,12 +286,27 @@ namespace BetterQOL
             string categoryName = item.getCategoryName();
             subject.Subtitle = !string.IsNullOrEmpty(categoryName) ? categoryName : ModEntry.I18n.Get("lookup.type.item").ToString();
 
-            // Section 1: Overview & Descriptions
+            // Section 1: Overview & Descriptions (Using unpatched raw description to prevent duplicates)
             var overviewSection = new LookupSection(ModEntry.I18n.Get("lookup.section.overview"));
-            string desc = item.getDescription();
+            string desc = itemData?.Description ?? string.Empty;
+            if (string.IsNullOrEmpty(desc) && item is not Tool)
+            {
+                desc = item.getDescription();
+                int extraIdx = desc.IndexOf("\nSell Price:", StringComparison.Ordinal);
+                if (extraIdx >= 0)
+                {
+                    desc = desc.Substring(0, extraIdx);
+                }
+                extraIdx = desc.IndexOf("\nNeeded for:", StringComparison.Ordinal);
+                if (extraIdx >= 0)
+                {
+                    desc = desc.Substring(0, extraIdx);
+                }
+            }
+
             if (!string.IsNullOrEmpty(desc))
             {
-                overviewSection.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.item.description"), desc, Color.DarkSlateGray));
+                overviewSection.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.item.description"), desc.Trim(), Color.DarkSlateGray));
             }
 
             // Edibility (Health / Energy & Food Buffs)
@@ -298,10 +314,13 @@ namespace BetterQOL
             {
                 int energy = sObj.staminaRecoveredOnConsumption();
                 int health = sObj.healthRecoveredOnConsumption();
+                string energyStr = energy >= 0 ? $"+{energy}" : $"{energy}";
+                string healthStr = health >= 0 ? $"+{health}" : $"{health}";
+
                 overviewSection.Fields.Add(new LookupField(
                     ModEntry.I18n.Get("lookup.item.edibility"),
-                    $"+{energy} {ModEntry.I18n.Get("lookup.item.energy")}, +{health} {ModEntry.I18n.Get("lookup.item.health")}",
-                    new Color(0, 140, 0)
+                    $"{energyStr} {ModEntry.I18n.Get("lookup.item.energy")}, {healthStr} {ModEntry.I18n.Get("lookup.item.health")}",
+                    energy >= 0 ? new Color(0, 140, 0) : new Color(200, 60, 20)
                 ));
 
                 // Food Buffs
@@ -312,7 +331,7 @@ namespace BetterQOL
                 }
             }
 
-            // Sell Prices by Quality
+            // Sell Prices by Quality (Using clean Silver/Gold/Iridium text instead of broken Unicode stars)
             int baseSellPrice = item.sellToStorePrice();
             if (baseSellPrice > 0)
             {
@@ -322,7 +341,7 @@ namespace BetterQOL
 
                 overviewSection.Fields.Add(new LookupField(
                     ModEntry.I18n.Get("lookup.item.sell-price"),
-                    $"{baseSellPrice}g (★ {silverPrice}g, ★★ {goldPrice}g, ★★★ {iridiumPrice}g)",
+                    $"{baseSellPrice}g (Silver: {silverPrice}g, Gold: {goldPrice}g, Iridium: {iridiumPrice}g)",
                     new Color(180, 100, 0)
                 ));
             }
@@ -437,51 +456,68 @@ namespace BetterQOL
                     return;
 
                 string[] parts = fishRaw.Split('/');
-                if (parts.Length < 6)
+                if (parts.Length < 7)
                     return;
 
                 var section = new LookupSection("Fishing Details");
 
-                // 1. Difficulty & Behavior
-                string[] diffParts = parts[1].Split(' ');
-                string difficulty = diffParts[0];
-                string behavior = diffParts.Length > 1 ? diffParts[1] : "Mixed";
-                section.Fields.Add(new LookupField("Difficulty", $"{difficulty} ({char.ToUpper(behavior[0]) + behavior.Substring(1)})", new Color(200, 60, 20)));
+                // 1. Difficulty & Behavior (parts[1] = difficulty, parts[2] = behavior)
+                string diff = parts[1];
+                string behavior = parts.Length > 2 && !string.IsNullOrEmpty(parts[2]) ? parts[2] : "mixed";
+                string behaviorName = char.ToUpper(behavior[0]) + behavior.Substring(1);
+                section.Fields.Add(new LookupField("Difficulty", $"{diff} ({behaviorName})", new Color(200, 60, 20)));
 
-                // 2. Spawn Seasons
-                string seasons = string.Join(", ", parts[4].Split(' ').Select(s => ModEntry.I18n.Get($"season.{s.ToLower()}").ToString()));
-                section.Fields.Add(new LookupField("Seasons", seasons, new Color(46, 125, 50)));
-
-                // 3. Spawn Time
-                string[] timeParts = parts[3].Split(' ');
-                var timeRanges = new List<string>();
-                for (int i = 0; i < timeParts.Length; i += 2)
+                // 2. Spawn Seasons (parts[6] in Data/Fish)
+                if (parts.Length > 6 && !string.IsNullOrWhiteSpace(parts[6]))
                 {
-                    if (i + 1 < timeParts.Length)
+                    var seasonList = parts[6].Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                    var seasonNames = seasonList.Select(s => {
+                        string key = $"season.{s.ToLower()}";
+                        var tr = ModEntry.I18n.Get(key);
+                        return tr.HasValue() ? tr.ToString() : (char.ToUpper(s[0]) + s.Substring(1));
+                    });
+                    section.Fields.Add(new LookupField("Seasons", string.Join(", ", seasonNames), new Color(46, 125, 50)));
+                }
+
+                // 3. Spawn Times (parts[5] in Data/Fish)
+                if (parts.Length > 5 && !string.IsNullOrWhiteSpace(parts[5]))
+                {
+                    string[] timeParts = parts[5].Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                    var timeRanges = new List<string>();
+                    for (int i = 0; i < timeParts.Length; i += 2)
                     {
-                        string start = FormatGameTime(timeParts[i]);
-                        string end = FormatGameTime(timeParts[i + 1]);
-                        timeRanges.Add($"{start} – {end}");
+                        if (i + 1 < timeParts.Length)
+                        {
+                            string start = FormatGameTime(timeParts[i]);
+                            string end = FormatGameTime(timeParts[i + 1]);
+                            timeRanges.Add($"{start} – {end}");
+                        }
+                    }
+                    if (timeRanges.Count > 0)
+                    {
+                        section.Fields.Add(new LookupField("Time of Day", string.Join(", ", timeRanges), new Color(180, 100, 0)));
                     }
                 }
-                section.Fields.Add(new LookupField("Time of Day", string.Join(", ", timeRanges), new Color(180, 100, 0)));
 
-                // 4. Weather
-                string weather = parts[5].ToLower() switch
+                // 4. Weather (parts[7] in Data/Fish)
+                if (parts.Length > 7)
                 {
-                    "sunny" => "Sunny (Nắng)",
-                    "rainy" => "Rainy (Mưa)",
-                    _ => "Any Weather (Bất kỳ)"
-                };
-                section.Fields.Add(new LookupField("Weather", weather, new Color(20, 110, 220)));
+                    string weather = parts[7].ToLower() switch
+                    {
+                        "sunny" => "Sunny",
+                        "rainy" => "Rainy",
+                        _ => "Any Weather"
+                    };
+                    section.Fields.Add(new LookupField("Weather", weather, new Color(20, 110, 220)));
+                }
 
                 // 5. Min Skill
-                if (parts.Length > 7 && int.TryParse(parts[7], out int minSkill) && minSkill > 0)
+                if (parts.Length > 9 && int.TryParse(parts[9], out int minSkill) && minSkill > 0)
                 {
                     section.Fields.Add(new LookupField("Min Fishing Skill", $"Level {minSkill}", Color.DarkSlateGray));
                 }
 
-                // 6. Spawn Locations (Extracted from Data/Locations)
+                // 6. Spawn Locations (Extracted from Data/Locations with TokenParser)
                 var spawnLocations = GetFishSpawnLocations(item.ItemId);
                 if (spawnLocations.Count > 0)
                 {
@@ -504,7 +540,7 @@ namespace BetterQOL
 
                 foreach (var kvp in locDict)
                 {
-                    string locName = kvp.Key;
+                    string locKey = kvp.Key;
                     var locData = kvp.Value;
                     if (locData.Fish == null)
                         continue;
@@ -513,10 +549,15 @@ namespace BetterQOL
                     {
                         if (fishEntry.ItemId == fishId || fishEntry.ItemId == $"(O){fishId}" || fishEntry.Id == fishId || fishEntry.Id == $"(O){fishId}")
                         {
-                            string displayName = !string.IsNullOrEmpty(locData.DisplayName) ? locData.DisplayName : locName;
-                            if (!results.Contains(displayName))
+                            string rawName = !string.IsNullOrEmpty(locData.DisplayName) ? locData.DisplayName : locKey;
+                            string cleanName = TokenParser.ParseText(rawName);
+                            if (string.IsNullOrEmpty(cleanName))
                             {
-                                results.Add(displayName);
+                                cleanName = rawName;
+                            }
+                            if (!results.Contains(cleanName))
+                            {
+                                results.Add(cleanName);
                             }
                         }
                     }
@@ -566,7 +607,11 @@ namespace BetterQOL
 
                         if (cropData.Seasons != null && cropData.Seasons.Count > 0)
                         {
-                            string seasons = string.Join(", ", cropData.Seasons.Select(s => ModEntry.I18n.Get($"season.{s.ToString().ToLower()}").ToString()));
+                            string seasons = string.Join(", ", cropData.Seasons.Select(s => {
+                                string key = $"season.{s.ToString().ToLower()}";
+                                var tr = ModEntry.I18n.Get(key);
+                                return tr.HasValue() ? tr.ToString() : s.ToString();
+                            }));
                             section.Fields.Add(new LookupField("Harvest Seasons", seasons, new Color(46, 125, 50)));
                         }
 
