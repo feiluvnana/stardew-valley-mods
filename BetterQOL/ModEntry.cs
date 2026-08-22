@@ -23,6 +23,7 @@ namespace BetterQOL
 
             var harmony = new Harmony(ModManifest.UniqueID);
             StackablePatches.Apply(harmony, Monitor);
+            MenuTooltipPatch.Apply(harmony, Monitor);
 
             GeodeMenuHandler.Initialize(helper, Monitor);
             HoverInfoOverlay.Initialize(helper, Monitor);

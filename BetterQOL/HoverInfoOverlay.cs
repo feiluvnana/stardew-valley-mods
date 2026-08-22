@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
@@ -46,7 +45,6 @@ namespace BetterQOL
             Monitor = monitor;
 
             helper.Events.Display.RenderedHud += OnRenderedHud;
-            helper.Events.Display.RenderedActiveMenu += OnRenderedActiveMenu;
         }
 
         #region 1. In-World Hover Overlay (UI Info Suite 2 Style)
@@ -175,148 +173,7 @@ namespace BetterQOL
 
         #endregion
 
-        #region 2. Menu Item Hover Overlay (UI Info Suite 2 Style)
-
-        private static void OnRenderedActiveMenu(object? sender, RenderedActiveMenuEventArgs e)
-        {
-            if (!Context.IsWorldReady || Game1.activeClickableMenu == null)
-                return;
-
-            Item? hoveredItem = GetHoveredItemFromActiveMenu(Game1.activeClickableMenu);
-            if (hoveredItem == null)
-                return;
-
-            var extraLines = new List<TooltipLine>();
-
-            // 1. Sell Price
-            if (Config.ShowItemSellPriceOnHover)
-            {
-                int singlePrice = hoveredItem.sellToStorePrice();
-                if (singlePrice > 0)
-                {
-                    string priceText;
-                    if (hoveredItem.Stack > 1)
-                    {
-                        int totalPrice = singlePrice * hoveredItem.Stack;
-                        priceText = ModEntry.I18n.Get("hover.item.sell-price-stack", new { price = singlePrice, total = totalPrice, count = hoveredItem.Stack });
-                    }
-                    else
-                    {
-                        priceText = ModEntry.I18n.Get("hover.item.sell-price", new { price = singlePrice });
-                    }
-
-                    extraLines.Add(new TooltipLine(priceText, new Color(180, 100, 0)));
-                }
-            }
-
-            // 2. Community Center Bundle Needs
-            if (Config.ShowBundleNeedOnHover)
-            {
-                var neededBundles = GetNeededBundlesForItem(hoveredItem);
-                if (neededBundles.Count > 0)
-                {
-                    string bundleText = ModEntry.I18n.Get("hover.item.bundle-needed", new { bundles = string.Join(", ", neededBundles) });
-                    extraLines.Add(new TooltipLine(bundleText, new Color(180, 50, 180)));
-                }
-            }
-
-            // 3. Museum Donation Status
-            if (Config.ShowMuseumNeedOnHover)
-            {
-                bool isMuseumItem = (hoveredItem is StardewValley.Object obj && (obj.Type == "Arch" || obj.Type == "Minerals"))
-                                 || hoveredItem.Category == StardewValley.Object.mineralsCategory;
-                if (isMuseumItem)
-                {
-                    bool isDonated = Game1.netWorldState.Value.MuseumPieces.Values.Contains(hoveredItem.ItemId)
-                                  || Game1.netWorldState.Value.MuseumPieces.Values.Contains(hoveredItem.QualifiedItemId);
-                    if (!isDonated)
-                    {
-                        extraLines.Add(new TooltipLine(ModEntry.I18n.Get("hover.item.museum-needed"), new Color(200, 60, 20)));
-                    }
-                    else
-                    {
-                        extraLines.Add(new TooltipLine(ModEntry.I18n.Get("hover.item.museum-donated"), new Color(0, 140, 0)));
-                    }
-                }
-            }
-
-            if (extraLines.Count > 0)
-            {
-                DrawMenuExtraTooltip(e.SpriteBatch, extraLines);
-            }
-        }
-
-        private static Item? GetHoveredItemFromActiveMenu(IClickableMenu menu)
-        {
-            if (menu is ItemGrabMenu itemGrabMenu && itemGrabMenu.hoveredItem != null)
-            {
-                return itemGrabMenu.hoveredItem;
-            }
-
-            if (menu is GameMenu gameMenu && gameMenu.pages != null && gameMenu.currentTab < gameMenu.pages.Count)
-            {
-                var activePage = gameMenu.pages[gameMenu.currentTab];
-                if (activePage is InventoryPage invPage && invPage.hoveredItem != null)
-                {
-                    return invPage.hoveredItem;
-                }
-                if (activePage is CraftingPage craftPage && craftPage.hoverItem != null)
-                {
-                    return craftPage.hoverItem;
-                }
-            }
-
-            if (menu is ShopMenu shopMenu && shopMenu.hoveredItem is Item shopItem)
-            {
-                return shopItem;
-            }
-
-            if (menu is InventoryMenu invMenu)
-            {
-                return invMenu.getItemAt(Game1.getMouseX(), Game1.getMouseY());
-            }
-
-            return null;
-        }
-
-        private static List<string> GetNeededBundlesForItem(Item item)
-        {
-            var results = new List<string>();
-            try
-            {
-                if (Game1.netWorldState.Value.Bundles == null || Game1.netWorldState.Value.BundleData == null)
-                    return results;
-
-                foreach (var kvp in Game1.netWorldState.Value.BundleData)
-                {
-                    string[] parts = kvp.Value.Split('/');
-                    if (parts.Length < 3)
-                        continue;
-
-                    string bundleName = parts[0];
-                    string[] reqs = parts[2].Split(' ');
-
-                    for (int i = 0; i < reqs.Length; i += 3)
-                    {
-                        if (i >= reqs.Length) break;
-                        string reqId = reqs[i];
-                        if (reqId == item.ItemId || reqId == item.QualifiedItemId)
-                        {
-                            if (!results.Contains(bundleName))
-                            {
-                                results.Add(bundleName);
-                            }
-                        }
-                    }
-                }
-            }
-            catch { }
-            return results;
-        }
-
-        #endregion
-
-        #region 3. Tooltip Builders
+        #region 2. Tooltip Builders
 
         private static TooltipModel BuildCropTooltip(HoeDirt hoeDirt, bool isGardenPot)
         {
@@ -645,7 +502,7 @@ namespace BetterQOL
 
         #endregion
 
-        #region 4. Native Compact UI Rendering
+        #region 3. Native Compact UI Rendering
 
         private static void DrawWorldTooltip(SpriteBatch spriteBatch, TooltipModel tooltip, Vector2 screenPos)
         {
@@ -732,65 +589,6 @@ namespace BetterQOL
 
             // Draw Content Lines
             foreach (var line in tooltip.Lines)
-            {
-                Utility.drawTextWithShadow(spriteBatch, line.Text, font, new Vector2(targetX + paddingX, currentY), line.Color);
-                currentY += lineSpacing;
-            }
-        }
-
-        private static void DrawMenuExtraTooltip(SpriteBatch spriteBatch, List<TooltipLine> lines)
-        {
-            SpriteFont font = Game1.smallFont;
-            int mouseX = Game1.getMouseX();
-            int mouseY = Game1.getMouseY();
-
-            const int paddingX = 12;
-            const int paddingY = 8;
-            const int lineSpacing = 20;
-
-            float maxLineWidth = 0;
-            foreach (var line in lines)
-            {
-                Vector2 lineSize = font.MeasureString(line.Text);
-                if (lineSize.X > maxLineWidth)
-                {
-                    maxLineWidth = lineSize.X;
-                }
-            }
-
-            int boxWidth = (int)Math.Max(140, maxLineWidth + (paddingX * 2));
-            int boxHeight = (lines.Count * lineSpacing) + (paddingY * 2);
-
-            int targetX = mouseX + 24;
-            int targetY = mouseY + 36;
-
-            if (targetX + boxWidth > Game1.uiViewport.Width)
-            {
-                targetX = mouseX - boxWidth - 12;
-            }
-            if (targetY + boxHeight > Game1.uiViewport.Height)
-            {
-                targetY = mouseY - boxHeight - 12;
-            }
-
-            targetX = Math.Max(8, Math.Min(targetX, Game1.uiViewport.Width - boxWidth - 8));
-            targetY = Math.Max(8, Math.Min(targetY, Game1.uiViewport.Height - boxHeight - 8));
-
-            IClickableMenu.drawTextureBox(
-                spriteBatch,
-                Game1.menuTexture,
-                new Rectangle(0, 256, 60, 60),
-                targetX,
-                targetY,
-                boxWidth,
-                boxHeight,
-                Color.White,
-                1f,
-                drawShadow: true
-            );
-
-            float currentY = targetY + paddingY;
-            foreach (var line in lines)
             {
                 Utility.drawTextWithShadow(spriteBatch, line.Text, font, new Vector2(targetX + paddingX, currentY), line.Color);
                 currentY += lineSpacing;
