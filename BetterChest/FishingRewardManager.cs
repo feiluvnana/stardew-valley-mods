@@ -19,7 +19,7 @@ namespace BetterChest
             "168", "169", "170", "171", "172"
         };
 
-        // Full / High-tier base minimum floors
+        // Full / High-tier base minimum floors (Fishing Level 9-10+)
         private static readonly Dictionary<string, (int StandardMin, int GoldenMin)> HighResourceMinimums = new(StringComparer.OrdinalIgnoreCase)
         {
             // Ores & Materials
@@ -180,8 +180,24 @@ namespace BetterChest
                     string qId = item.QualifiedItemId;
                     string id = item.ItemId;
 
+                    // Prismatic Shard: requires Mine Level >= 120 or Fishing Level >= 7
+                    if (qId == "(O)74" || id == "74")
+                    {
+                        if (deepestMine < 120 && fishingLevel < 7)
+                        {
+                            inventory[i] = ItemRegistry.Create(deepestMine >= 80 || fishingLevel >= 5 ? "(O)72" : "(O)749", item.Stack); // Downgrade to Diamond or Omni Geode
+                        }
+                    }
+                    // Iridium Bar: requires Mine Level >= 120 or Fishing Level >= 8
+                    else if (qId == "(O)337" || id == "337")
+                    {
+                        if (deepestMine < 120 && fishingLevel < 8)
+                        {
+                            inventory[i] = ItemRegistry.Create(deepestMine >= 80 || fishingLevel >= 5 ? "(O)336" : "(O)335", item.Stack); // Downgrade to Gold Bar or Iron Bar
+                        }
+                    }
                     // Iridium Ore: requires Mine Level >= 120 or Fishing Level >= 9
-                    if (qId == "(O)386" || id == "386")
+                    else if (qId == "(O)386" || id == "386")
                     {
                         if (deepestMine < 120 && fishingLevel < 9)
                         {
@@ -236,6 +252,14 @@ namespace BetterChest
                             inventory[i] = ItemRegistry.Create(ProgressionHelper.IsMysteryBoxUnlocked() ? "(O)MysteryBox" : "(O)749", item.Stack);
                         }
                     }
+                    // Golden Animal Cracker: requires Farming Mastery
+                    else if (qId == "(O)GoldenAnimalCracker" || id == "GoldenAnimalCracker")
+                    {
+                        if (!ProgressionHelper.IsMasteryUnlocked("Farming"))
+                        {
+                            inventory[i] = ItemRegistry.Create("(O)DeluxeBait", 20);
+                        }
+                    }
                     // Challenge Bait: requires Fishing Mastery
                     else if (qId == "(O)ChallengeBait" || id == "ChallengeBait")
                     {
@@ -251,6 +275,16 @@ namespace BetterChest
                         {
                             inventory[i] = ItemRegistry.Create("(O)DeluxeBait", item.Stack);
                         }
+                    }
+                    // Ginger Island items: Cinder Shard, Dragon Tooth, Golden Coconut
+                    else if ((qId == "(O)848" || id == "848" || qId == "(O)852" || id == "852" || qId == "(O)791" || id == "791") && !ProgressionHelper.IsIslandUnlocked())
+                    {
+                        inventory[i] = ItemRegistry.Create("(O)749", item.Stack); // Downgrade to Omni Geode
+                    }
+                    // Qi Room items: Galaxy Soul, Pressure Nozzle, Enricher
+                    else if ((qId == "(O)896" || id == "896" || qId == "(O)915" || id == "915" || qId == "(O)913" || id == "913") && !ProgressionHelper.IsQiRoomUnlocked())
+                    {
+                        inventory[i] = ItemRegistry.Create("(O)72", item.Stack); // Downgrade to Diamond
                     }
                 }
             }

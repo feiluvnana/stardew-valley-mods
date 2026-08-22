@@ -1,52 +1,185 @@
 # 💎 BetterChest
 
-**BetterChest** is a comprehensive, progression-balanced loot overhaul for **Stardew Valley 1.6+**, enhancing both **Skull Cavern Treasure Rooms** and **Fishing Treasure Chests** (Standard and 1.6 Golden Chests) with dynamic gameplay loot engines, decaying multi-rolls, critical stack multipliers, depth scaling, linear legendary scaling, and intelligent progression gatekeeping.
+**BetterChest** is a comprehensive, progression-balanced loot overhaul for **Stardew Valley 1.6+**, transforming both **Skull Cavern Treasure Rooms** and **Fishing Treasure Chests** (Standard and 1.6 Golden Chests) with dynamic gameplay loot engines, decaying multi-rolls, critical stack multipliers, depth scaling, linear legendary scaling, and intelligent progression gatekeeping.
 
 ---
 
-## ✨ Key Modules
-
-### 🏔️ Module 1: Skull Cavern Treasure Chests
-- **7 Usage-Based Gameplay Categories (54 Validated Items):** Legendary, Agriculture, Mining, Fishing, Combat, Foraging, and Lootboxes & Troves.
-- **Linear Legendary Depth Scaling:** Legendary category probability scales smoothly and linearly from a low baseline on shallow floors (10% base rate at Floor 1, ~1.5% drop chance per roll) up to full strength at Floor 100 (~14.3% per roll).
-- **Progression-Aware Gatekeeping:** Prevents endgame/post-island rewards (*Ginger Island materials, 1.6 Mastery items, Qi's Walnut Room attachments/deluxe fertilizers, and Mystery Boxes*) from appearing before you've reached those milestones in your save.
-- **Depth-Based Roll Scaling:**
-  - **Shallow Floors (1–49):** Max 3 item rolls with modest chances and 2x jackpot cap to balance early game diving.
-  - **Deep Floors (50–99):** Standard 6-roll decaying ceiling and up to 4x critical stack jackpots.
-  - **Supercharged Floor 100+ Special Chests:** 12-roll ceiling with boosted stack crits up to 5x Mega Jackpot and equal category distribution.
-- **Zero Cosmetic Junk:** Filters out hats, shirts, and decorative items.
-
-### 🎣 Module 2: Vanilla-Faithful Fishing Treasure Chests
-- **Authentic Vanilla Loot Pools:** Preserves all classic rewards (*Neptune's Glaive*, *Broken Trident*, *Dinosaur Egg*, *Ancient Seed*, *Lost Books*, *Gems*, *Tackle*, and *Power Books*).
-- **Skill-Scaled Resource Floors:** Dynamically scales minimum stacks according to Fishing level (Levels 1–4: modest starter stacks; Levels 5–8: mid-tier stacks; Levels 9–10: full boosted stacks).
-- **Mining Depth Gatekeeping:** Prevents skipping mine progression via fishing (Iron/Gold/Iridium ores & advanced geodes only appear after reaching corresponding mine levels or higher fishing skill).
-- **Trash & Dud Removal:** Automatically filters frustrating 1x stone, 1x wood, and broken trash items.
-- **1.6 Golden Chest Enhancements:** Boosted Pearl rates (15–25%), bonus marine jellies (*Sea/River/Cave Jelly*), skill books, and high-tier fishing food (*Seafoam Pudding*, *Dish O' The Sea*).
-- **Artifact Protection:** Fair bad-luck mitigation for museum completion (*Dinosaur Egg*, *Ancient Seed*).
+## 📖 Table of Contents
+1. [Core Philosophy](#-core-philosophy)
+2. [Module 1: Skull Cavern Loot Overhaul](#-module-1-skull-cavern-loot-overhaul)
+   - [7 Gameplay Categories & Item Pool](#7-gameplay-categories--item-pool)
+   - [Decaying Multi-Roll Engine](#decaying-multi-roll-engine)
+   - [Critical Stack Multipliers](#critical-stack-multipliers)
+   - [Linear Legendary Depth Scaling](#linear-legendary-depth-scaling)
+   - [Depth-Based Tier Scaling](#depth-based-tier-scaling)
+   - [Supercharged Floor 100+ Special Chests](#supercharged-floor-100-special-chests)
+3. [Module 2: Fishing Treasure Chest Overhaul](#-module-2-fishing-treasure-chest-overhaul)
+   - [Skill-Scaled Resource Minimum Floors](#skill-scaled-resource-minimum-floors)
+   - [Fishing Progression & Mine Depth Gatekeeping](#fishing-progression--mine-depth-gatekeeping)
+   - [1.6 Golden Fishing Chest Enhancements](#16-golden-fishing-chest-enhancements)
+   - [Artifact Bad-Luck Protection](#artifact-bad-luck-protection)
+   - [Trash & Dud Removal](#trash--dud-removal)
+4. [🛡️ Master Gatekeeping & Unlock Matrix](#️-master-gatekeeping--unlock-matrix)
+5. [📊 Complete Drop Rate & Probability Table](#-complete-drop-rate--probability-table)
+6. [⚙️ Configuration (`config.json`)](#️-configuration-configjson)
+7. [🛠️ Building & Installation](#️-building--installation)
 
 ---
 
-## 🛡️ Progression & Gatekeeping System
+## 🎯 Core Philosophy
 
-BetterChest includes intelligent gatekeepers enabled by default to prevent early-game power creep:
+Vanilla treasure chests often reward players with frustrating low-tier clutter (e.g. 1x Stone, 1x Wood, decorative clothing) or feel static. While buffing rewards makes dives rewarding, unrestrained loot can break early-game progression (e.g., obtaining Qi attachments, Ginger Island volcano materials, or 1.6 Masteries in Spring Year 1).
 
-| Gatekeeper Setting | Gated Items / Scaling | Requirement / Formula |
+**BetterChest** solves this with a two-part approach:
+1. **Meaningful Rewards:** Generous multi-rolls, critical jackpot procs, and high-utility items.
+2. **Context-Aware Progression:** Gatekeeping late-game materials, scaling rolls by mine depth, and scaling fishing resource floors by your Fishing skill level.
+
+---
+
+## 🏔️ Module 1: Skull Cavern Loot Overhaul
+
+### 7 Gameplay Categories & Item Pool
+Every treasure chest in Skull Cavern selects items across 7 dedicated utility pools (54 validated vanilla items):
+
+1. **Legendary:** Prismatic Shard, Magic Rock Candy, Golden Animal Cracker, Auto-Petter, Galaxy Soul, Stardrop Tea, Prize Ticket.
+2. **Agriculture:** Hyper Speed-Gro, Deluxe Fertilizer, Deluxe Retaining Soil, Rare Seed, Starfruit Seeds, Iridium Sprinkler, Tree Fertilizer, Pressure Nozzle, Enricher.
+3. **Mining:** Iridium Ore, Mega Bomb, Radioactive Ore, Iridium Bar, Radioactive Bar, Cinder Shard, Jade, Diamond.
+4. **Fishing:** Challenge Bait, Deluxe Bait, Magic Bait, Trap Bobber, Curiosity Lure, Sea Jelly, River Jelly, Cave Jelly, Seafoam Pudding, Dish O' The Sea.
+5. **Combat:** Life Elixir, Triple Shot Espresso, Dragon Tooth, Fairy Dust, Monster Musk, Tiger Slime Egg, Purple Slime Egg.
+6. **Foraging:** Hardwood, Mystic Tree Seed, Golden Coconut, Magma Cap, Purple Mushroom, Warp Totem: Desert, Warp Totem: Farm.
+7. **Lootboxes:** Omni Geode, Mystery Box, Golden Mystery Box, Artifact Trove, Calico Egg, Treasure Totem.
+
+### Decaying Multi-Roll Engine
+Instead of giving a flat single item, chests attempt multiple sequential rolls with decreasing probability:
+- **Roll 1:** 100% (Guaranteed)
+- **Roll 2:** 80% chance
+- **Roll 3:** 58% chance
+- **Roll 4:** 40% chance
+- **Roll 5:** 25% chance
+- **Roll 6:** 10% chance
+- *Expected yield on normal floors:* **~2.5 items per chest**.
+
+### Critical Stack Multipliers
+When a stackable item (ores, bombs, seeds, fertilizers, geodes) rolls, it has a chance to proc a critical jackpot stack multiplier:
+- **2x Double Stack:** 15% chance
+- **3x Triple Stack:** 10% chance
+- **4x Quadruple Stack:** 5% chance
+- **5x Quintuple Stack (Floor 100 Special):** 5% chance
+
+### Linear Legendary Depth Scaling
+To prevent players from finding endgame legendary items on shallow floors, the Legendary category weight scales **linearly with floor depth**:
+
+$$\text{DepthFactor} = \operatorname{clamp}\left(0.10 + 0.90 \times \frac{\text{Floor} - 1}{99},\, 0.10,\, 1.00\right)$$
+
+$$\text{Active Legendary Weight} = \text{Base Legendary Weight} \times \text{DepthFactor}$$
+
+| Skull Cavern Floor | Depth Factor | Legendary Weight | Legendary Per-Roll Chance |
+| :---: | :---: | :---: | :---: |
+| **Floor 1** | **0.10 (10%)** | **1.5** | **~1.6%** |
+| **Floor 25** | **0.32 (32%)** | **4.8** | **~5.0%** |
+| **Floor 50** | **0.55 (55%)** | **8.2** | **~8.3%** |
+| **Floor 75** | **0.77 (77%)** | **11.6** | **~11.4%** |
+| **Floor 100+** | **1.00 (100%)** | **15.0** | **~14.3%** |
+
+### Depth-Based Tier Scaling
+- **Shallow Floors (1–49):**
+  - Maximum rolls capped at **3 items** (Roll 2: 60%, Roll 3: 30%).
+  - Stack jackpot multiplier capped at **2x max**.
+  - Legendary weight reduced according to linear depth scaling.
+- **Deep Floors (50–99):**
+  - Standard **6-roll decaying pool** and full **4x jackpot multipliers**.
+- **Floor 100+ Special Chests:**
+  - Supercharged ceiling up to **12 rolls** and **5x Mega Jackpots**.
+
+### Supercharged Floor 100+ Special Chests
+- Guaranteed chest generation on Floors 100, 200, 300, and 400 (even on repeated runs).
+- **12 Max Rolls:** Decaying chances from 94% down to 5%.
+- **Equal Category Distribution:** All 7 categories share equal ~14.28% weight.
+- **5x Mega Jackpot:** 20% 2x, 25% 3x, 10% 4x, 5% 5x multiplier chances.
+
+---
+
+## 🎣 Module 2: Fishing Treasure Chest Overhaul
+
+### Skill-Scaled Resource Minimum Floors
+Resource stacks in fishing chests dynamically scale with the player's `FishingLevel`:
+
+| Resource / Item | Fishing Lv 0–4 (Standard / Golden) | Fishing Lv 5–8 (Standard / Golden) | Fishing Lv 9–10+ (Standard / Golden) |
+| :--- | :---: | :---: | :---: |
+| **Coal** | 3 / 10 | 5 / 15 | 8 / 20 |
+| **Copper Ore** | 4 / 12 | 7 / 18 | 10 / 25 |
+| **Iron Ore** | 3 / 10 | 6 / 16 | 10 / 25 |
+| **Gold Ore** | 2 / 8 | 5 / 14 | 8 / 20 |
+| **Iridium Ore** | 1 / 3 | 2 / 5 | 3 / 8 |
+| **Bait** | 5 / 18 | 10 / 25 | 15 / 35 |
+| **Deluxe Bait** | 4 / 10 | 7 / 15 | 10 / 20 |
+| **Wild Bait** | 2 / 6 | 4 / 8 | 5 / 12 |
+| **Challenge Bait** | 4 / 8 | 6 / 14 | 10 / 20 |
+| **Magic Bait** | 2 / 5 | 3 / 8 | 5 / 12 |
+| **Magnet** | 2 / 5 | 3 / 7 | 5 / 10 |
+| **Geode / Frozen / Magma** | 1 / 3 | 2 / 4 | 3 / 6 |
+| **Omni Geode** | 1 / 3 | 2 / 5 | 3 / 8 |
+| **Mystery Box** | 1 / 2 | 1 / 3 | 2 / 4 |
+| **Golden Mystery Box** | 1 / 2 | 1 / 2 | 2 / 3 |
+
+### Fishing Progression & Mine Depth Gatekeeping
+To maintain natural game balance, high-tier loot found in fishing chests is validated against the player's world and mining progression:
+
+| Dropped Item | Gatekeeping Requirement | Fallback / Downgrade when Locked |
 | :--- | :--- | :--- |
-| **`ScaleLegendaryByDepth`** | Legendary Category Probability | Scales linearly from **10%** at Floor 1 up to **100%** at Floor 100 |
-| **`EnableDepthScaling`** | Skull Cavern Roll / Multiplier Caps | Scales across Floors 1–49 (max 3 rolls, 2x stack limit) vs 50–99 vs 100+ |
-| **`GatekeepMasteryItems`** | Golden Animal Cracker, Golden Mystery Box, Mystic Tree Seed, Treasure Totem, Challenge Bait | Respective 1.6 Mastery Claimed (Farming / Combat / Foraging / Fishing) |
-| **`GatekeepIslandItems`** | Cinder Shard, Dragon Tooth, Golden Coconut, Magma Cap, Fairy Dust, Tiger Slime Egg | Visited Ginger Island / Golden Walnuts > 0 |
-| **`GatekeepQiItems`** | Galaxy Soul, Pressure Nozzle, Enricher, Magic Bait, Hyper Speed-Gro, Deluxe Fertilizer, Deluxe Retaining Soil | Qi's Walnut Room (100 Golden Walnuts) |
-| **`GatekeepRadioactiveItems`** | Radioactive Ore, Radioactive Bar | Qi's Walnut Room unlocked or Dangerous Mines active |
-| **`GatekeepMysteryBoxes`** | Mystery Box, Golden Mystery Box | Mr. Qi Mystery Box intro event triggered |
-| **`GatekeepCalicoEggs`** | Calico Egg | Desert Festival Active (Spring 15–17) or Year 2+ |
-| **`GatekeepAutoPetter`** | Auto-Petter | Community Center / Joja completion |
-| **`ScaleFishingResourcesByLevel`** | Fishing Stack Floors | Scales with player Fishing Skill (1–4, 5–8, 9–10) |
-| **`GatekeepFishingHighTierLoot`** | Iron/Gold/Iridium Ores, Advanced Geodes | Mine Floors 40 / 80 / 120 or Fishing Levels 4 / 7 / 9 |
+| **Prismatic Shard** | Mine Floor $\ge 120$ OR Fishing Level $\ge 7$ | Downgrades to Diamond or Omni Geode |
+| **Iridium Bar** | Mine Floor $\ge 120$ OR Fishing Level $\ge 8$ | Downgrades to Gold Bar or Iron Bar |
+| **Iridium Ore** | Mine Floor $\ge 120$ OR Fishing Level $\ge 9$ | Downgrades to Gold Ore or Iron Ore |
+| **Gold Ore** | Mine Floor $\ge 80$ OR Fishing Level $\ge 7$ | Downgrades to Iron Ore or Copper Ore |
+| **Iron Ore** | Mine Floor $\ge 40$ OR Fishing Level $\ge 4$ | Downgrades to Copper Ore |
+| **Magma Geode** | Mine Floor $\ge 80$ OR Fishing Level $\ge 7$ | Downgrades to Frozen or Basic Geode |
+| **Frozen Geode** | Mine Floor $\ge 40$ OR Fishing Level $\ge 4$ | Downgrades to Basic Geode |
+| **Mystery Box** | Mr. Qi Mystery Box cutscene triggered | Downgrades to Omni Geode |
+| **Golden Mystery Box** | Combat Mastery claimed OR 30+ boxes opened | Downgrades to Mystery Box / Omni Geode |
+| **Golden Animal Cracker** | Farming Mastery claimed | Replaces with Deluxe Bait (20x) |
+| **Challenge Bait** | Fishing Mastery claimed | Downgrades to Deluxe Bait |
+| **Magic Bait** | Qi's Walnut Room unlocked (100 Walnuts) | Downgrades to Deluxe Bait |
+| **Ginger Island Items** | Visited Ginger Island | Downgrades to Omni Geode |
+| **Qi Room Items** | Qi's Walnut Room unlocked | Downgrades to Diamond |
+
+### 1.6 Golden Fishing Chest Enhancements
+- **Pearl Bonus:** 20% bonus chance to roll a Pearl (`(O)797`).
+- **1.6 Marine Jellies:** 25% chance to roll 1–2 Sea Jelly, River Jelly, or Cave Jelly.
+- **Skill Food:** 20% chance to roll 1–2 Seafoam Pudding or Dish O' The Sea.
+- **Stack Multiplier:** Default 2.0x multiplier on stackable items.
+
+### Artifact Bad-Luck Protection
+- **Dinosaur Egg:** 5% bonus check if uncollected, requiring `FishingLevel >= 5` and `DeepestMineLevel >= 40` (or `FishingLevel >= 7`).
+- **Ancient Seed:** 5% bonus check if uncollected, requiring `FishingLevel >= 3` (preventing instant Day 1 seeds).
+
+### Trash & Dud Removal
+- Filters useless trash: Trash, Driftwood, Broken Glasses, Broken CD, Soggy Newspaper.
+- Filters dud clutter: 1x–3x Stone or 1x–3x Wood drops.
+- **Guaranteed Safety Fallback:** Ensures no chest ever opens empty.
 
 ---
 
-## 📊 Complete Drop Rate & Probability Table (Regular Chests at Depth >= 100)
+## 🛡️ Master Gatekeeping & Unlock Matrix
+
+| Feature / Setting | Description | Default |
+| :--- | :--- | :---: |
+| `ScaleLegendaryByDepth` | Linearly scales Legendary drop rate from Floor 1 (10%) to Floor 100 (100%) | `true` |
+| `EnableDepthScaling` | Caps shallow floors (1–49) to 3 rolls and 2x stack limit | `true` |
+| `GatekeepMasteryItems` | Gated until respective 1.6 Mastery is claimed | `true` |
+| `GatekeepIslandItems` | Gated until Ginger Island is visited | `true` |
+| `GatekeepQiItems` | Gated until Qi's Walnut Room is unlocked (100 Walnuts) | `true` |
+| `GatekeepRadioactiveItems` | Gated until Qi's Room unlocked or Dangerous Mines active | `true` |
+| `GatekeepMysteryBoxes` | Gated until Mr. Qi Mystery Box event occurs | `true` |
+| `GatekeepCalicoEggs` | Gated to Desert Festival season (Spring 15–17) or Year 2+ | `true` |
+| `GatekeepAutoPetter` | Gated until Community Center / Joja completion | `false` |
+| `ScaleFishingResourcesByLevel`| Scales fishing chest resource stack minimums by Fishing Level | `true` |
+| `GatekeepFishingHighTierLoot` | Downgrades over-leveled ores and items in fishing chests | `true` |
+
+---
+
+## 📊 Complete Drop Rate & Probability Table
+
+### Regular Chests (Floor $\ge 100$ Baseline)
 
 | Category | Item Name | Qualified ID | Base Stack | Item Weight | Category Share | Per-Roll Chance |
 | :--- | :--- | :--- | :---: | :---: | :---: | :---: |
@@ -197,12 +330,22 @@ BetterChest includes intelligent gatekeepers enabled by default to prevent early
 }
 ```
 
-Configurable in-game via **Generic Mod Config Menu**.
+Configurable in-game via **Generic Mod Config Menu (GMCM)**.
 
 ---
 
-## 🛠️ Building from Source
+## 🛠️ Building & Installation
 
+### Requirements
+- **Stardew Valley 1.6+**
+- **SMAPI 4.0+**
+- *(Optional)* **Generic Mod Config Menu**
+
+### Installation
+1. Place the `BetterChest` folder into your `Stardew Valley/Mods/` directory.
+2. Launch the game using SMAPI.
+
+### Building from Source
 ```powershell
 dotnet build BetterChest.csproj
 ```
