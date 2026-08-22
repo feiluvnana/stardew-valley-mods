@@ -24,11 +24,12 @@ namespace BetterQOL
             StackablePatches.Apply(harmony, Monitor);
 
             GeodeMenuHandler.Initialize(helper, Monitor);
+            HoverInfoOverlay.Initialize(helper, Monitor);
 
             helper.Events.Content.AssetRequested += OnAssetRequested;
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
 
-            Monitor.Log("BetterQOL initialized successfully: Extended Stackable limits and Geode Cracking overhaul are active.", LogLevel.Debug);
+            Monitor.Log("BetterQOL initialized successfully: Extended Stackable limits, Geode Cracking overhaul, and Hover Information/Timers are active.", LogLevel.Debug);
         }
 
         private void OnAssetRequested(object? sender, AssetRequestedEventArgs e)
@@ -222,6 +223,76 @@ namespace BetterQOL
                 tooltip: () => I18n.Get("config.enable-boots-stacking.tooltip"),
                 getValue: () => Config.EnableBootsStacking,
                 setValue: value => Config.EnableBootsStacking = value
+            );
+
+            // ---------------- Section 4: Hover Information & Timers ----------------
+            configMenu.AddSectionTitle(
+                mod: ModManifest,
+                text: () => I18n.Get("config.section.hover-info")
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.enable-crop-hover.name"),
+                tooltip: () => I18n.Get("config.enable-crop-hover.tooltip"),
+                getValue: () => Config.EnableCropHover,
+                setValue: value => Config.EnableCropHover = value
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.enable-machine-hover.name"),
+                tooltip: () => I18n.Get("config.enable-machine-hover.tooltip"),
+                getValue: () => Config.EnableMachineHover,
+                setValue: value => Config.EnableMachineHover = value
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.enable-tree-hover.name"),
+                tooltip: () => I18n.Get("config.enable-tree-hover.tooltip"),
+                getValue: () => Config.EnableTreeHover,
+                setValue: value => Config.EnableTreeHover = value
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.enable-animal-hover.name"),
+                tooltip: () => I18n.Get("config.enable-animal-hover.tooltip"),
+                getValue: () => Config.EnableAnimalHover,
+                setValue: value => Config.EnableAnimalHover = value
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.show-water-and-fertilizer.name"),
+                tooltip: () => I18n.Get("config.show-water-and-fertilizer.tooltip"),
+                getValue: () => Config.ShowWaterAndFertilizer,
+                setValue: value => Config.ShowWaterAndFertilizer = value
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.show-item-icon-in-tooltip.name"),
+                tooltip: () => I18n.Get("config.show-item-icon-in-tooltip.tooltip"),
+                getValue: () => Config.ShowItemIconInTooltip,
+                setValue: value => Config.ShowItemIconInTooltip = value
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.show-exact-finish-time.name"),
+                tooltip: () => I18n.Get("config.show-exact-finish-time.tooltip"),
+                getValue: () => Config.ShowExactFinishTime,
+                setValue: value => Config.ShowExactFinishTime = value
+            );
+
+            configMenu.AddKeybind(
+                mod: ModManifest,
+                name: () => I18n.Get("config.hover-hotkey.name"),
+                tooltip: () => I18n.Get("config.hover-hotkey.tooltip"),
+                getValue: () => Config.HoverHotkey,
+                setValue: value => Config.HoverHotkey = value
             );
         }
 

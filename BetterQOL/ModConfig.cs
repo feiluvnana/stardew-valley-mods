@@ -1,3 +1,5 @@
+using StardewModdingAPI;
+
 namespace BetterQOL
 {
     public class ModConfig
@@ -16,7 +18,6 @@ namespace BetterQOL
         public bool ShowSummaryToast { get; set; } = true;
 
         // ---------------- Farm Machine Options (Geode Crusher) ----------------
-
         /// <summary>Whether Geode Crusher machines process instantly (0 minutes).</summary>
         public bool InstantGeodeCrusher { get; set; } = false;
 
@@ -44,5 +45,30 @@ namespace BetterQOL
 
         /// <summary>Allow identical boots to stack.</summary>
         public bool EnableBootsStacking { get; set; } = true;
+
+        // ---------------- Hover Information & Timers ----------------
+        /// <summary>Whether to show crop growth time, harvest readiness, and soil info when hovering.</summary>
+        public bool EnableCropHover { get; set; } = true;
+
+        /// <summary>Whether to show machine processing time remaining, finish times, and outputs when hovering.</summary>
+        public bool EnableMachineHover { get; set; } = true;
+
+        /// <summary>Whether to show fruit tree maturation/yield and wild tree stages when hovering.</summary>
+        public bool EnableTreeHover { get; set; } = true;
+
+        /// <summary>Whether to show animal/pet friendship, daily petting, and produce info when hovering.</summary>
+        public bool EnableAnimalHover { get; set; } = true;
+
+        /// <summary>Whether to display water and fertilizer status in crop tooltips.</summary>
+        public bool ShowWaterAndFertilizer { get; set; } = true;
+
+        /// <summary>Whether to render produce/item icons in hover tooltips.</summary>
+        public bool ShowItemIconInTooltip { get; set; } = true;
+
+        /// <summary>Whether to display the exact clock time when machines will finish.</summary>
+        public bool ShowExactFinishTime { get; set; } = true;
+
+        /// <summary>Optional key to hold to show hover tooltips (default None: always shows on hover).</summary>
+        public SButton HoverHotkey { get; set; } = SButton.None;
     }
 }

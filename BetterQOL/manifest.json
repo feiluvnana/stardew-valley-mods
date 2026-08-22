@@ -1,8 +1,8 @@
 {
   "Name": "BetterQOL",
   "Author": "feiluvnana",
-  "Version": "1.0.0",
-  "Description": "Essential quality-of-life suite for Stardew Valley 1.6+. Combines bulk and instant geode/mystery box cracking with unstackable item stack size overrides (tackle, trinkets, rings, furniture, boots, clothing, hats).",
+  "Version": "1.1.0",
+  "Description": "Essential quality-of-life suite for Stardew Valley 1.6+. Combines real-time crop grow times, machine processing timers, tree maturation, bulk and instant geode cracking, and unstackable item stack size overrides.",
   "UniqueID": "feiluvnana.BetterQOL",
   "EntryDll": "BetterQOL.dll",
   "MinimumApiVersion": "4.0.0",

@@ -1,0 +1,23 @@
+{
+  "InstantCracking": false,
+  "ShowCrackAllButton": true,
+  "BulkBatchSize": 999,
+  "ShowSummaryToast": true,
+  "InstantGeodeCrusher": false,
+  "GeodeCrusherRequiresCoal": true,
+  "MaxStackSize": 999,
+  "EnableTackleStacking": true,
+  "EnableTrinketStacking": true,
+  "EnableFurnitureStacking": true,
+  "EnableRingStacking": true,
+  "EnableClothingAndHatStacking": true,
+  "EnableBootsStacking": true,
+  "EnableCropHover": true,
+  "EnableMachineHover": true,
+  "EnableTreeHover": true,
+  "EnableAnimalHover": true,
+  "ShowWaterAndFertilizer": true,
+  "ShowItemIconInTooltip": true,
+  "ShowExactFinishTime": true,
+  "HoverHotkey": "None"
+}
