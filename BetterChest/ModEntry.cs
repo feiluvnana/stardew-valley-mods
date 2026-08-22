@@ -141,7 +141,7 @@ namespace BetterChest
 
                 if (Config.EnableCustomRewards)
                 {
-                    var rewards = RewardGenerator.GenerateRewards(Config, Game1.random, isSpecialChest: isSpecial);
+                    var rewards = RewardGenerator.GenerateRewards(Config, Game1.random, isSpecialChest: isSpecial, mineLevel: shaft.mineLevel);
                     if (rewards.Count > 0)
                     {
                         chest.Items.Clear();
@@ -163,7 +163,7 @@ namespace BetterChest
 
                     if (chest.Items.Count == 0)
                     {
-                        var fallback = RewardGenerator.GenerateRewards(Config, Game1.random, isSpecialChest: isSpecial);
+                        var fallback = RewardGenerator.GenerateRewards(Config, Game1.random, isSpecialChest: isSpecial, mineLevel: shaft.mineLevel);
                         foreach (var item in fallback)
                         {
                             chest.Items.Add(item);
@@ -200,6 +200,72 @@ namespace BetterChest
                 tooltip: () => I18n.Get("config.exclude-cosmetics.tooltip"),
                 getValue: () => Config.ExcludeCosmetics,
                 setValue: value => Config.ExcludeCosmetics = value
+            );
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.enable-depth-scaling.name"),
+                tooltip: () => I18n.Get("config.enable-depth-scaling.tooltip"),
+                getValue: () => Config.EnableDepthScaling,
+                setValue: value => Config.EnableDepthScaling = value
+            );
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.scale-legendary-by-depth.name"),
+                tooltip: () => I18n.Get("config.scale-legendary-by-depth.tooltip"),
+                getValue: () => Config.ScaleLegendaryByDepth,
+                setValue: value => Config.ScaleLegendaryByDepth = value
+            );
+
+            // Progression & Gatekeeping Section
+            configMenu.AddSectionTitle(mod: ModManifest, text: () => I18n.Get("config.section.progression-gatekeeping"));
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.gatekeep-mastery-items.name"),
+                tooltip: () => I18n.Get("config.gatekeep-mastery-items.tooltip"),
+                getValue: () => Config.GatekeepMasteryItems,
+                setValue: value => Config.GatekeepMasteryItems = value
+            );
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.gatekeep-island-items.name"),
+                tooltip: () => I18n.Get("config.gatekeep-island-items.tooltip"),
+                getValue: () => Config.GatekeepIslandItems,
+                setValue: value => Config.GatekeepIslandItems = value
+            );
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.gatekeep-qi-items.name"),
+                tooltip: () => I18n.Get("config.gatekeep-qi-items.tooltip"),
+                getValue: () => Config.GatekeepQiItems,
+                setValue: value => Config.GatekeepQiItems = value
+            );
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.gatekeep-mystery-boxes.name"),
+                tooltip: () => I18n.Get("config.gatekeep-mystery-boxes.tooltip"),
+                getValue: () => Config.GatekeepMysteryBoxes,
+                setValue: value => Config.GatekeepMysteryBoxes = value
+            );
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.gatekeep-calico-eggs.name"),
+                tooltip: () => I18n.Get("config.gatekeep-calico-eggs.tooltip"),
+                getValue: () => Config.GatekeepCalicoEggs,
+                setValue: value => Config.GatekeepCalicoEggs = value
+            );
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.gatekeep-radioactive-items.name"),
+                tooltip: () => I18n.Get("config.gatekeep-radioactive-items.tooltip"),
+                getValue: () => Config.GatekeepRadioactiveItems,
+                setValue: value => Config.GatekeepRadioactiveItems = value
+            );
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.gatekeep-auto-petter.name"),
+                tooltip: () => I18n.Get("config.gatekeep-auto-petter.tooltip"),
+                getValue: () => Config.GatekeepAutoPetter,
+                setValue: value => Config.GatekeepAutoPetter = value
             );
 
             // Decaying Multi-Roll Section (Regular Chests)
@@ -633,13 +699,6 @@ namespace BetterChest
             );
             configMenu.AddBoolOption(
                 mod: ModManifest,
-                name: () => I18n.Get("config.gatekeep-radioactive-items.name"),
-                tooltip: () => I18n.Get("config.gatekeep-radioactive-items.tooltip"),
-                getValue: () => Config.GatekeepRadioactiveItems,
-                setValue: value => Config.GatekeepRadioactiveItems = value
-            );
-            configMenu.AddBoolOption(
-                mod: ModManifest,
                 name: () => I18n.Get("config.enable-iridium-items.name"),
                 tooltip: () => I18n.Get("config.enable-iridium-items.tooltip"),
                 getValue: () => Config.EnableIridiumItems,
@@ -736,6 +795,20 @@ namespace BetterChest
                 tooltip: () => I18n.Get("config.boost-fishing-resource-stacks.tooltip"),
                 getValue: () => Config.BoostFishingResourceStacks,
                 setValue: value => Config.BoostFishingResourceStacks = value
+            );
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.scale-fishing-resources-by-level.name"),
+                tooltip: () => I18n.Get("config.scale-fishing-resources-by-level.tooltip"),
+                getValue: () => Config.ScaleFishingResourcesByLevel,
+                setValue: value => Config.ScaleFishingResourcesByLevel = value
+            );
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.gatekeep-fishing-high-tier-loot.name"),
+                tooltip: () => I18n.Get("config.gatekeep-fishing-high-tier-loot.tooltip"),
+                getValue: () => Config.GatekeepFishingHighTierLoot,
+                setValue: value => Config.GatekeepFishingHighTierLoot = value
             );
             configMenu.AddNumberOption(
                 mod: ModManifest,

@@ -7,6 +7,8 @@ namespace BetterChest
         // =========================================================================
         public bool EnableCustomRewards { get; set; } = true;
         public bool ExcludeCosmetics { get; set; } = true;
+        public bool EnableDepthScaling { get; set; } = true;
+        public bool ScaleLegendaryByDepth { get; set; } = true;
 
         // Decaying Multi-Rolls (1st roll 100%, each next roll has decreasing chance - Expected ~2.5 items)
         public int MaxRolls { get; set; } = 6;
@@ -72,7 +74,6 @@ namespace BetterChest
         public bool EnableSprinklers { get; set; } = true;
         public bool EnableRareSeeds { get; set; } = true;
         public bool EnableRadioactiveItems { get; set; } = true;
-        public bool GatekeepRadioactiveItems { get; set; } = true;
         public bool EnableIridiumItems { get; set; } = true;
         public bool EnableBombs { get; set; } = true;
         public bool EnableFishingTackle { get; set; } = true;
@@ -85,11 +86,24 @@ namespace BetterChest
         public bool EnableCalicoEggs { get; set; } = true;
 
         // =========================================================================
-        // === 2. FISHING TREASURE CHEST BUFF SETTINGS                            ===
+        // === 2. PROGRESSION & GATEKEEPING SETTINGS                             ===
+        // =========================================================================
+        public bool GatekeepMasteryItems { get; set; } = true;
+        public bool GatekeepIslandItems { get; set; } = true;
+        public bool GatekeepQiItems { get; set; } = true;
+        public bool GatekeepMysteryBoxes { get; set; } = true;
+        public bool GatekeepCalicoEggs { get; set; } = true;
+        public bool GatekeepRadioactiveItems { get; set; } = true;
+        public bool GatekeepAutoPetter { get; set; } = false;
+
+        // =========================================================================
+        // === 3. FISHING TREASURE CHEST SETTINGS                                ===
         // =========================================================================
         public bool EnableFishingChestBuff { get; set; } = true;
         public bool FilterFishingChestJunk { get; set; } = true;
         public bool BoostFishingResourceStacks { get; set; } = true;
+        public bool ScaleFishingResourcesByLevel { get; set; } = true;
+        public bool GatekeepFishingHighTierLoot { get; set; } = true;
         public float FishingResourceStackMultiplier { get; set; } = 1.5f;
 
         // 1.6 Golden Fishing Treasure Chest Enhancements

@@ -50,47 +50,47 @@ namespace BetterChest
         private static readonly List<RewardEntry> RewardPool = new()
         {
             // =========================================================================
-            // === 1. LEGENDARY CATEGORY (10% Category Weight)                       ===
+            // === 1. LEGENDARY CATEGORY (15% Category Weight)                       ===
             // =========================================================================
             new("(O)74", LootCategory.Legendary, 1, 2, 25.0, c => c.EnableLegendaryCategory && c.EnablePrismaticShard),
             new("(O)279", LootCategory.Legendary, 1, 2, 20.0, c => c.EnableLegendaryCategory && c.EnableMagicRockCandy),
-            new("(O)GoldenAnimalCracker", LootCategory.Legendary, 1, 2, 20.0, c => c.EnableLegendaryCategory && c.EnableGoldenAnimalCracker, false),
-            new("(BC)272", LootCategory.Legendary, 1, 1, 20.0, c => c.EnableLegendaryCategory && c.EnableAutoPetter, false), // Auto-Petter
-            new("(O)896", LootCategory.Legendary, 1, 2, 15.0, c => c.EnableLegendaryCategory && c.EnableGalaxySoul, false),  // Galaxy Soul
+            new("(O)GoldenAnimalCracker", LootCategory.Legendary, 1, 2, 20.0, c => c.EnableLegendaryCategory && c.EnableGoldenAnimalCracker && (!c.GatekeepMasteryItems || ProgressionHelper.IsMasteryUnlocked("Farming")), false),
+            new("(BC)272", LootCategory.Legendary, 1, 1, 20.0, c => c.EnableLegendaryCategory && c.EnableAutoPetter && (!c.GatekeepAutoPetter || ProgressionHelper.IsCommunityCenterCompleted()), false), // Auto-Petter
+            new("(O)896", LootCategory.Legendary, 1, 2, 15.0, c => c.EnableLegendaryCategory && c.EnableGalaxySoul && (!c.GatekeepQiItems || ProgressionHelper.IsQiRoomUnlocked()), false),  // Galaxy Soul
             new("(O)StardropTea", LootCategory.Legendary, 1, 3, 15.0, c => c.EnableLegendaryCategory && c.EnableStardropTea),
             new("(O)PrizeTicket", LootCategory.Legendary, 2, 5, 15.0, c => c.EnableLegendaryCategory && c.EnablePrizeTicket),
 
             // =========================================================================
             // === 2. AGRICULTURE CATEGORY (15% Category Weight)                     ===
             // =========================================================================
-            new("(O)918", LootCategory.Agriculture, 10, 25, 20.0, c => c.EnableAgricultureCategory && c.EnableFertilizers),     // Hyper Speed-Gro
-            new("(O)919", LootCategory.Agriculture, 10, 25, 20.0, c => c.EnableAgricultureCategory && c.EnableFertilizers),     // Deluxe Fertilizer
+            new("(O)918", LootCategory.Agriculture, 10, 25, 20.0, c => c.EnableAgricultureCategory && c.EnableFertilizers && (!c.GatekeepQiItems || ProgressionHelper.IsQiRoomUnlocked())),     // Hyper Speed-Gro
+            new("(O)919", LootCategory.Agriculture, 10, 25, 20.0, c => c.EnableAgricultureCategory && c.EnableFertilizers && (!c.GatekeepQiItems || ProgressionHelper.IsQiRoomUnlocked())),     // Deluxe Fertilizer
             new("(O)347", LootCategory.Agriculture, 2, 6, 20.0, c => c.EnableAgricultureCategory && c.EnableRareSeeds),         // Rare Seed
             new("(O)486", LootCategory.Agriculture, 5, 15, 18.0, c => c.EnableAgricultureCategory && c.EnableRareSeeds),        // Starfruit Seeds
-            new("(O)920", LootCategory.Agriculture, 10, 25, 18.0, c => c.EnableAgricultureCategory && c.EnableFertilizers),     // Deluxe Retaining Soil
+            new("(O)920", LootCategory.Agriculture, 10, 25, 18.0, c => c.EnableAgricultureCategory && c.EnableFertilizers && (!c.GatekeepQiItems || ProgressionHelper.IsQiRoomUnlocked())),     // Deluxe Retaining Soil
             new("(O)645", LootCategory.Agriculture, 1, 3, 18.0, c => c.EnableAgricultureCategory && c.EnableSprinklers),        // Iridium Sprinkler
             new("(O)805", LootCategory.Agriculture, 10, 20, 15.0, c => c.EnableAgricultureCategory && c.EnableFertilizers),     // Tree Fertilizer
-            new("(O)915", LootCategory.Agriculture, 1, 2, 12.0, c => c.EnableAgricultureCategory && c.EnableSprinklers),        // Pressure Nozzle
-            new("(O)913", LootCategory.Agriculture, 1, 2, 12.0, c => c.EnableAgricultureCategory && c.EnableSprinklers),        // Enricher
+            new("(O)915", LootCategory.Agriculture, 1, 2, 12.0, c => c.EnableAgricultureCategory && c.EnableSprinklers && (!c.GatekeepQiItems || ProgressionHelper.IsQiRoomUnlocked())),        // Pressure Nozzle
+            new("(O)913", LootCategory.Agriculture, 1, 2, 12.0, c => c.EnableAgricultureCategory && c.EnableSprinklers && (!c.GatekeepQiItems || ProgressionHelper.IsQiRoomUnlocked())),        // Enricher
 
             // =========================================================================
             // === 3. MINING CATEGORY (15% Category Weight)                          ===
             // =========================================================================
             new("(O)386", LootCategory.Mining, 10, 25, 25.0, c => c.EnableMiningCategory && c.EnableIridiumItems),       // Iridium Ore
             new("(O)288", LootCategory.Mining, 5, 15, 25.0, c => c.EnableMiningCategory && c.EnableBombs),               // Mega Bomb
-            new("(O)909", LootCategory.Mining, 5, 15, 22.0, c => c.EnableMiningCategory && c.EnableRadioactiveItems && (!c.GatekeepRadioactiveItems || IsRadioactiveUnlocked())),    // Radioactive Ore
+            new("(O)909", LootCategory.Mining, 5, 15, 22.0, c => c.EnableMiningCategory && c.EnableRadioactiveItems && (!c.GatekeepRadioactiveItems || ProgressionHelper.IsQiRoomUnlocked())),    // Radioactive Ore
             new("(O)337", LootCategory.Mining, 3, 10, 22.0, c => c.EnableMiningCategory && c.EnableIridiumItems),       // Iridium Bar
-            new("(O)910", LootCategory.Mining, 2, 6, 20.0, c => c.EnableMiningCategory && c.EnableRadioactiveItems && (!c.GatekeepRadioactiveItems || IsRadioactiveUnlocked())),     // Radioactive Bar
-            new("(O)848", LootCategory.Mining, 6, 16, 20.0, c => c.EnableMiningCategory),                                // Cinder Shard
+            new("(O)910", LootCategory.Mining, 2, 6, 20.0, c => c.EnableMiningCategory && c.EnableRadioactiveItems && (!c.GatekeepRadioactiveItems || ProgressionHelper.IsQiRoomUnlocked())),     // Radioactive Bar
+            new("(O)848", LootCategory.Mining, 6, 16, 20.0, c => c.EnableMiningCategory && (!c.GatekeepIslandItems || ProgressionHelper.IsIslandUnlocked())),                                // Cinder Shard
             new("(O)70", LootCategory.Mining, 3, 8, 20.0, c => c.EnableMiningCategory),                                  // Jade (Staircases)
             new("(O)72", LootCategory.Mining, 3, 8, 18.0, c => c.EnableMiningCategory),                                  // Diamond
 
             // =========================================================================
             // === 4. FISHING CATEGORY (15% Category Weight)                         ===
             // =========================================================================
-            new("(O)ChallengeBait", LootCategory.Fishing, 15, 35, 22.0, c => c.EnableFishingCategory && c.EnableFishingTackle),
+            new("(O)ChallengeBait", LootCategory.Fishing, 15, 35, 22.0, c => c.EnableFishingCategory && c.EnableFishingTackle && (!c.GatekeepMasteryItems || ProgressionHelper.IsMasteryUnlocked("Fishing"))),
             new("(O)DeluxeBait", LootCategory.Fishing, 20, 40, 22.0, c => c.EnableFishingCategory && c.EnableFishingTackle),
-            new("(O)908", LootCategory.Fishing, 10, 25, 20.0, c => c.EnableFishingCategory && c.EnableFishingTackle),  // Magic Bait
+            new("(O)908", LootCategory.Fishing, 10, 25, 20.0, c => c.EnableFishingCategory && c.EnableFishingTackle && (!c.GatekeepQiItems || ProgressionHelper.IsQiRoomUnlocked())),  // Magic Bait
             new("(O)694", LootCategory.Fishing, 1, 3, 18.0, c => c.EnableFishingCategory && c.EnableFishingTackle),  // Trap Bobber
             new("(O)856", LootCategory.Fishing, 1, 2, 16.0, c => c.EnableFishingCategory && c.EnableFishingTackle),  // Curiosity Lure
             new("(O)SeaJelly", LootCategory.Fishing, 1, 3, 16.0, c => c.EnableFishingCategory),                      // Sea Jelly
@@ -104,19 +104,19 @@ namespace BetterChest
             // =========================================================================
             new("(O)773", LootCategory.Combat, 3, 8, 22.0, c => c.EnableCombatCategory && c.EnableCombatConsumables),   // Life Elixir
             new("(O)253", LootCategory.Combat, 3, 10, 22.0, c => c.EnableCombatCategory && c.EnableCombatConsumables),   // Triple Shot Espresso
-            new("(O)852", LootCategory.Combat, 2, 5, 20.0, c => c.EnableCombatCategory),                                // Dragon Tooth
-            new("(O)872", LootCategory.Combat, 2, 5, 20.0, c => c.EnableCombatCategory),                                // Fairy Dust
+            new("(O)852", LootCategory.Combat, 2, 5, 20.0, c => c.EnableCombatCategory && (!c.GatekeepIslandItems || ProgressionHelper.IsIslandUnlocked())),                                // Dragon Tooth
+            new("(O)872", LootCategory.Combat, 2, 5, 20.0, c => c.EnableCombatCategory && (!c.GatekeepIslandItems || ProgressionHelper.IsIslandUnlocked())),                                // Fairy Dust
             new("(O)879", LootCategory.Combat, 2, 5, 18.0, c => c.EnableCombatCategory),                                // Monster Musk
-            new("(O)857", LootCategory.Combat, 1, 2, 15.0, c => c.EnableCombatCategory && c.EnableSlimeEggs, false),    // Tiger Slime Egg
+            new("(O)857", LootCategory.Combat, 1, 2, 15.0, c => c.EnableCombatCategory && c.EnableSlimeEggs && (!c.GatekeepIslandItems || ProgressionHelper.IsIslandUnlocked()), false),    // Tiger Slime Egg
             new("(O)439", LootCategory.Combat, 1, 2, 15.0, c => c.EnableCombatCategory && c.EnableSlimeEggs, false),    // Purple Slime Egg
 
             // =========================================================================
             // === 6. FORAGING CATEGORY (15% Category Weight)                        ===
             // =========================================================================
             new("(O)709", LootCategory.Foraging, 15, 40, 22.0, c => c.EnableForagingCategory),                        // Hardwood
-            new("(O)MysticTreeSeed", LootCategory.Foraging, 2, 6, 22.0, c => c.EnableForagingCategory),                  // Mystic Tree Seed
-            new("(O)791", LootCategory.Foraging, 2, 6, 22.0, c => c.EnableForagingCategory),                            // Golden Coconut
-            new("(O)851", LootCategory.Foraging, 3, 8, 20.0, c => c.EnableForagingCategory),                            // Magma Cap
+            new("(O)MysticTreeSeed", LootCategory.Foraging, 2, 6, 22.0, c => c.EnableForagingCategory && (!c.GatekeepMasteryItems || ProgressionHelper.IsMasteryUnlocked("Foraging"))), // Mystic Tree Seed
+            new("(O)791", LootCategory.Foraging, 2, 6, 22.0, c => c.EnableForagingCategory && (!c.GatekeepIslandItems || ProgressionHelper.IsIslandUnlocked())),                            // Golden Coconut
+            new("(O)851", LootCategory.Foraging, 3, 8, 20.0, c => c.EnableForagingCategory && (!c.GatekeepIslandItems || ProgressionHelper.IsIslandUnlocked())),                            // Magma Cap
             new("(O)422", LootCategory.Foraging, 5, 12, 20.0, c => c.EnableForagingCategory),                           // Purple Mushroom
             new("(O)261", LootCategory.Foraging, 3, 8, 20.0, c => c.EnableForagingCategory && c.EnableWarpTotems),     // Warp Totem: Desert
             new("(O)688", LootCategory.Foraging, 3, 8, 20.0, c => c.EnableForagingCategory && c.EnableWarpTotems),     // Warp Totem: Farm
@@ -125,17 +125,19 @@ namespace BetterChest
             // === 7. LOOTBOXES CATEGORY (15% Category Weight)                       ===
             // =========================================================================
             new("(O)749", LootCategory.Lootboxes, 10, 25, 28.0, c => c.EnableLootboxCategory && c.EnableOmniGeodes),    // Omni Geode
-            new("(O)MysteryBox", LootCategory.Lootboxes, 3, 10, 25.0, c => c.EnableLootboxCategory && c.EnableMysteryBoxes),
+            new("(O)MysteryBox", LootCategory.Lootboxes, 3, 10, 25.0, c => c.EnableLootboxCategory && c.EnableMysteryBoxes && (!c.GatekeepMysteryBoxes || ProgressionHelper.IsMysteryBoxUnlocked())),
             new("(O)275", LootCategory.Lootboxes, 3, 10, 25.0, c => c.EnableLootboxCategory && c.EnableArtifactTroves), // Artifact Trove
-            new("(O)GoldenMysteryBox", LootCategory.Lootboxes, 2, 5, 22.0, c => c.EnableLootboxCategory && c.EnableMysteryBoxes),
-            new("(O)CalicoEgg", LootCategory.Lootboxes, 15, 40, 22.0, c => c.EnableLootboxCategory && c.EnableCalicoEggs),
-            new("(O)TreasureTotem", LootCategory.Lootboxes, 1, 3, 18.0, c => c.EnableLootboxCategory),
+            new("(O)GoldenMysteryBox", LootCategory.Lootboxes, 2, 5, 22.0, c => c.EnableLootboxCategory && c.EnableMysteryBoxes && (!c.GatekeepMasteryItems || ProgressionHelper.IsMasteryUnlocked("Combat")) && (!c.GatekeepMysteryBoxes || ProgressionHelper.IsMysteryBoxUnlocked())),
+            new("(O)CalicoEgg", LootCategory.Lootboxes, 15, 40, 22.0, c => c.EnableLootboxCategory && c.EnableCalicoEggs && (!c.GatekeepCalicoEggs || ProgressionHelper.IsDesertFestivalActive())),
+            new("(O)TreasureTotem", LootCategory.Lootboxes, 1, 3, 18.0, c => c.EnableLootboxCategory && (!c.GatekeepMasteryItems || ProgressionHelper.IsMasteryUnlocked("Foraging"))),
         };
 
-        public static List<Item> GenerateRewards(ModConfig config, Random random, bool isSpecialChest = false)
+        public static List<Item> GenerateRewards(ModConfig config, Random random, bool isSpecialChest = false, int mineLevel = 121)
         {
             var results = new List<Item>();
             bool applySpecialBuff = isSpecialChest && config.EnableFloor100Buff;
+            int relativeDepth = Math.Max(1, mineLevel > 120 ? mineLevel - 120 : mineLevel);
+            bool isShallowFloor = config.EnableDepthScaling && !applySpecialBuff && relativeDepth < 50;
 
             // Organize eligible items into category buckets
             var categoryPools = new Dictionary<LootCategory, (List<RewardEntry> Entries, double TotalWeight)>();
@@ -165,6 +167,14 @@ namespace BetterChest
             double forWeight = equalCategories ? 15.0 : config.ForagingWeight;
             double looWeight = equalCategories ? 15.0 : config.LootboxWeight;
 
+            // Scale Legendary weight linearly with depth if enabled (low at lower floors, full at floor 100)
+            if (!applySpecialBuff && (config.ScaleLegendaryByDepth || config.EnableDepthScaling))
+            {
+                // Linear scaling from floor 1 (10% of base weight) to floor 100 (100% of base weight)
+                double depthFactor = Math.Clamp(0.10 + 0.90 * ((relativeDepth - 1.0) / 99.0), 0.10, 1.0);
+                legWeight *= depthFactor;
+            }
+
             // Build active category list
             var activeCategories = new List<(LootCategory Category, double Weight)>();
             if (categoryPools[LootCategory.Legendary].Entries.Count > 0 && legWeight > 0)
@@ -190,10 +200,52 @@ namespace BetterChest
                 return results;
 
             // Determine number of rolls using diminishing probabilities
-            int maxRolls = applySpecialBuff ? config.Floor100MaxRolls : config.MaxRolls;
-            float[] decayChances = applySpecialBuff
-                ? new[] { 1.0f, config.Floor100Roll2Chance, config.Floor100Roll3Chance, config.Floor100Roll4Chance, config.Floor100Roll5Chance, config.Floor100Roll6Chance, config.Floor100Roll7Chance, config.Floor100Roll8Chance, config.Floor100Roll9Chance, config.Floor100Roll10Chance, config.Floor100Roll11Chance, config.Floor100Roll12Chance }
-                : new[] { 1.0f, config.Roll2Chance, config.Roll3Chance, config.Roll4Chance, config.Roll5Chance, config.Roll6Chance };
+            int maxRolls;
+            float[] decayChances;
+
+            if (applySpecialBuff)
+            {
+                maxRolls = config.Floor100MaxRolls;
+                decayChances = new[]
+                {
+                    1.0f,
+                    config.Floor100Roll2Chance,
+                    config.Floor100Roll3Chance,
+                    config.Floor100Roll4Chance,
+                    config.Floor100Roll5Chance,
+                    config.Floor100Roll6Chance,
+                    config.Floor100Roll7Chance,
+                    config.Floor100Roll8Chance,
+                    config.Floor100Roll9Chance,
+                    config.Floor100Roll10Chance,
+                    config.Floor100Roll11Chance,
+                    config.Floor100Roll12Chance
+                };
+            }
+            else if (isShallowFloor)
+            {
+                // Shallow floor depth scaling (Floors 1-49: capped at 3 rolls with scaled chances)
+                maxRolls = Math.Min(config.MaxRolls, 3);
+                decayChances = new[]
+                {
+                    1.0f,
+                    config.Roll2Chance * 0.75f,
+                    config.Roll3Chance * 0.50f
+                };
+            }
+            else
+            {
+                maxRolls = config.MaxRolls;
+                decayChances = new[]
+                {
+                    1.0f,
+                    config.Roll2Chance,
+                    config.Roll3Chance,
+                    config.Roll4Chance,
+                    config.Roll5Chance,
+                    config.Roll6Chance
+                };
+            }
 
             int rolls = 1; // 1st roll is 100% guaranteed
             for (int r = 1; r < maxRolls; r++)
@@ -209,10 +261,33 @@ namespace BetterChest
             }
 
             // Stack multiplier rates
-            float x5Chance = applySpecialBuff ? config.Floor100QuintupleStackChance : config.QuintupleStackChance;
-            float x4Chance = applySpecialBuff ? config.Floor100QuadrupleStackChance : config.QuadrupleStackChance;
-            float x3Chance = applySpecialBuff ? config.Floor100TripleStackChance : config.TripleStackChance;
-            float x2Chance = applySpecialBuff ? config.Floor100DoubleStackChance : config.DoubleStackChance;
+            float x5Chance;
+            float x4Chance;
+            float x3Chance;
+            float x2Chance;
+
+            if (applySpecialBuff)
+            {
+                x5Chance = config.Floor100QuintupleStackChance;
+                x4Chance = config.Floor100QuadrupleStackChance;
+                x3Chance = config.Floor100TripleStackChance;
+                x2Chance = config.Floor100DoubleStackChance;
+            }
+            else if (isShallowFloor)
+            {
+                // Shallow floors limit stack multiplier jackpot up to 2x
+                x5Chance = 0f;
+                x4Chance = 0f;
+                x3Chance = 0f;
+                x2Chance = config.DoubleStackChance;
+            }
+            else
+            {
+                x5Chance = config.QuintupleStackChance;
+                x4Chance = config.QuadrupleStackChance;
+                x3Chance = config.TripleStackChance;
+                x2Chance = config.DoubleStackChance;
+            }
 
             // Roll each item
             for (int i = 0; i < rolls; i++)
@@ -288,24 +363,6 @@ namespace BetterChest
             }
 
             return results;
-        }
-
-        public static bool IsRadioactiveUnlocked()
-        {
-            if (Game1.netWorldState?.Value != null && Game1.netWorldState.Value.GoldenWalnuts >= 100)
-                return true;
-
-            if (Game1.player != null)
-            {
-                if (Game1.player.hasOrWillReceiveMail("QiNutDoor") ||
-                    (Game1.player.team != null && Game1.player.team.SpecialOrderRuleActive("MineConditionsLocked")) ||
-                    Game1.player.stats.Get("WalnutsCollected") >= 100)
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
 
         public static bool IsCosmeticItem(Item item)
