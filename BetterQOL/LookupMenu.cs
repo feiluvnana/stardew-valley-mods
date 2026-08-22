@@ -68,22 +68,22 @@ namespace BetterQOL
             );
 
             // 3. Search Box (top-right header)
-            int searchBoxW = 210;
-            int searchBoxH = 40;
+            int searchBoxW = 220;
+            int searchBoxH = 38;
             int searchBoxX = xPositionOnScreen + width - searchBoxW - 54;
-            int searchBoxY = headerTopY + 6;
+            int searchBoxY = headerTopY + 8;
 
             SearchBox = new TextBox(
-                Game1.content.Load<Texture2D>("LooseSprites\\textBox"),
+                null,
                 null,
                 Game1.smallFont,
                 Game1.textColor
             )
             {
-                X = searchBoxX,
-                Y = searchBoxY,
-                Width = searchBoxW,
-                Height = searchBoxH
+                X = searchBoxX + 10,
+                Y = searchBoxY + 7,
+                Width = searchBoxW - 20,
+                Height = searchBoxH - 14
             };
             SearchBoxComponent = new ClickableComponent(new Rectangle(searchBoxX, searchBoxY, searchBoxW, searchBoxH), "SearchBox");
 
@@ -410,14 +410,24 @@ namespace BetterQOL
                 Utility.drawTextWithShadow(b, "Type to query any item, villager, monster, or recipe...", Game1.smallFont, new Vector2(headerLeftX, headerTopY + 36), Color.DimGray);
             }
 
-            // Search Box (Rendered cleanly with no broken emoji characters)
-            if (SearchBox != null)
+            // Search Box (Rendered cleanly with crisp parchment styling and no cropping)
+            if (SearchBox != null && SearchBoxComponent != null)
             {
-                SearchBox.Draw(b);
+                Rectangle boxBounds = SearchBoxComponent.bounds;
+                Color boxBg = SearchBox.Selected ? new Color(255, 245, 215) : new Color(248, 230, 192);
+                Color boxBorder = SearchBox.Selected ? new Color(110, 35, 10) : new Color(185, 135, 90);
+
+                b.Draw(Game1.staminaRect, boxBounds, boxBg);
+                b.Draw(Game1.staminaRect, new Rectangle(boxBounds.X, boxBounds.Y, boxBounds.Width, 1), boxBorder);
+                b.Draw(Game1.staminaRect, new Rectangle(boxBounds.X, boxBounds.Bottom - 1, boxBounds.Width, 1), boxBorder);
+                b.Draw(Game1.staminaRect, new Rectangle(boxBounds.X, boxBounds.Y, 1, boxBounds.Height), boxBorder);
+                b.Draw(Game1.staminaRect, new Rectangle(boxBounds.Right - 1, boxBounds.Y, 1, boxBounds.Height), boxBorder);
+
+                SearchBox.Draw(b, drawShadow: false);
 
                 if (string.IsNullOrEmpty(SearchBox.Text) && !SearchBox.Selected)
                 {
-                    Utility.drawTextWithShadow(b, "Type to search...", Game1.smallFont, new Vector2(SearchBox.X + 12, SearchBox.Y + 10), Color.Gray * 0.8f);
+                    Utility.drawTextWithShadow(b, "Type to search...", Game1.smallFont, new Vector2(SearchBox.X, SearchBox.Y), Color.Gray * 0.8f);
                 }
             }
 
