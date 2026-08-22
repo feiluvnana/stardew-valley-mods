@@ -229,5 +229,22 @@
   "lookup.building.fish-pond-title": "Fish Pond ({{fish}})",
   "lookup.building.population": "Fish Population",
   "lookup.building.next-spawn": "Next Spawn",
-  "lookup.building.quest-item": "Quest Required Item"
+  "lookup.building.quest-item": "Quest Required Item",
+
+  "lookup.section.tailoring": "Tailoring & Dyeing",
+  "lookup.tailoring.sewing-product": "Sewing Machine Product",
+  "lookup.tailoring.dye-color": "Dye Pot Color",
+
+  "lookup.section.animal-processing": "Animal Processing & Incubation",
+  "lookup.animal-processing.incubation": "Incubator",
+  "lookup.animal-processing.mayo": "Mayonnaise Machine",
+  "lookup.animal-processing.cheese": "Cheese Press",
+  "lookup.animal-processing.loom": "Loom",
+  "lookup.animal-processing.oil": "Oil Maker",
+
+  "lookup.section.recycling": "Recycling Machine",
+  "lookup.recycling.yields": "Recycling Yields",
+
+  "lookup.section.geode-info": "Geode & Cracking Details",
+  "lookup.section.fertilizer-info": "Fertilizer Effects"
 }

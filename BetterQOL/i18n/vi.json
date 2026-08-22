@@ -229,5 +229,22 @@
   "lookup.building.fish-pond-title": "Ao Cá ({{fish}})",
   "lookup.building.population": "Số Lượng Cá",
   "lookup.building.next-spawn": "Sinh Sản Tiếp Theo",
-  "lookup.building.quest-item": "Vật Phẩm Cần Cho Nhiệm Vụ"
+  "lookup.building.quest-item": "Vật Phẩm Cần Cho Nhiệm Vụ",
+
+  "lookup.section.tailoring": "May Mặc & Nhuộm Màu",
+  "lookup.tailoring.sewing-product": "Sản Phẩm Máy May",
+  "lookup.tailoring.dye-color": "Màu Nhuộm",
+
+  "lookup.section.animal-processing": "Chế Biến & Ấp Trứng Động Vật",
+  "lookup.animal-processing.incubation": "Máy Ấp Trứng",
+  "lookup.animal-processing.mayo": "Máy Làm Sốt Mayonnaise",
+  "lookup.animal-processing.cheese": "Máy Ép Phô Mai",
+  "lookup.animal-processing.loom": "Khung Cửi Dệt Vải",
+  "lookup.animal-processing.oil": "Máy Ép Dầu",
+
+  "lookup.section.recycling": "Máy Tái Chế",
+  "lookup.recycling.yields": "Sản Phẩm Tái Chế",
+
+  "lookup.section.geode-info": "Thông Tin Đập Trứng Địa Chất",
+  "lookup.section.fertilizer-info": "Tác Dụng Phân Bón"
 }

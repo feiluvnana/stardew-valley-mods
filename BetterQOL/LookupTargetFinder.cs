@@ -47,7 +47,15 @@ namespace BetterQOL
                 }
             }
 
-            // 3. If in world, inspect hovered entities, characters, objects, or terrain
+            // 3. Check Equipped Trinkets
+            if (Game1.player != null && Game1.player.trinketItems.Count > 0)
+            {
+                int mouseX = Game1.getMouseX();
+                int mouseY = Game1.getMouseY();
+                // Check if hovering equipment area or if triggered on farmer
+            }
+
+            // 4. If in world, inspect hovered entities, characters, objects, or terrain
             if (Context.IsWorldReady && Game1.currentLocation != null)
             {
                 return FindTargetInWorld(Game1.currentLocation);
@@ -71,6 +79,20 @@ namespace BetterQOL
                     if (item != null)
                     {
                         return LookupDataManager.BuildItemSubject(item);
+                    }
+
+                    // Check equipment icons (boots, rings, hats, trinkets)
+                    if (invPage.equipmentIcons != null)
+                    {
+                        foreach (var icon in invPage.equipmentIcons)
+                        {
+                            if (icon != null && icon.containsPoint(mouseX, mouseY))
+                            {
+                                var equipItem = invPage.hoveredItem;
+                                if (equipItem != null)
+                                    return LookupDataManager.BuildItemSubject(equipItem);
+                            }
+                        }
                     }
                 }
 
@@ -144,7 +166,20 @@ namespace BetterQOL
             int absX = (int)absPixels.X;
             int absY = (int)absPixels.Y;
 
-            // 1. Characters / NPCs / Monsters / Pets
+            // 1. Check Player Character / Farmers
+            foreach (var farmer in location.farmers)
+            {
+                if (farmer != null)
+                {
+                    Rectangle farmerBox = new Rectangle((int)farmer.Position.X - 16, (int)farmer.Position.Y - 80, 96, 128);
+                    if (farmerBox.Contains(absX, absY) || farmer.GetBoundingBox().Contains(absX, absY) || farmer.TilePoint == tilePos.ToPoint())
+                    {
+                        return LookupDataManager.BuildFarmerSubject(farmer);
+                    }
+                }
+            }
+
+            // 2. Characters / NPCs / Monsters / Pets
             foreach (var character in location.characters)
             {
                 if (character == null)
@@ -173,7 +208,7 @@ namespace BetterQOL
                 }
             }
 
-            // 2. Farm Animals
+            // 3. Farm Animals
             foreach (var animal in location.animals.Values)
             {
                 if (animal == null)
@@ -186,18 +221,38 @@ namespace BetterQOL
                 }
             }
 
-            // 3. Buildings (e.g. Fish Pond)
-            foreach (var building in location.buildings)
+            // 4. Resource Clumps (Hardwood Stumps, Logs, Boulders, Meteorites, Fossil Rock)
+            if (location.resourceClumps.Count > 0)
             {
-                if (building is FishPond fishPond && building.occupiesTile(tilePos))
+                foreach (var clump in location.resourceClumps)
                 {
-                    return LookupDataManager.BuildFishPondSubject(fishPond);
+                    if (clump != null && clump.getBoundingBox().Contains(absX, absY))
+                    {
+                        return LookupDataManager.BuildResourceClumpSubject(clump);
+                    }
                 }
             }
 
-            // 4. Objects (Machines, IndoorPots, Items placed in world)
+            // 5. Buildings (Fish Pond, Barn, Coop, Junimo Hut, Silo, Mill, Slime Hutch, Stable, Pet Bowl)
+            foreach (var building in location.buildings)
+            {
+                if (building != null && building.occupiesTile(tilePos))
+                {
+                    if (building is FishPond fishPond)
+                    {
+                        return LookupDataManager.BuildFishPondSubject(fishPond);
+                    }
+                    return LookupDataManager.BuildBuildingSubject(building);
+                }
+            }
+
+            // 6. Objects (Chests, Machines, IndoorPots, Items placed in world)
             if (location.Objects.TryGetValue(tilePos, out var obj))
             {
+                if (obj is Chest chest)
+                {
+                    return LookupDataManager.BuildChestSubject(chest);
+                }
                 if (obj is IndoorPot pot && pot.hoeDirt.Value?.crop != null)
                 {
                     string harvestId = pot.hoeDirt.Value.crop.indexOfHarvest.Value;
@@ -214,9 +269,13 @@ namespace BetterQOL
                 return LookupDataManager.BuildItemSubject(obj);
             }
 
-            // 5. Terrain Features (Crops in HoeDirt, Fruit Trees, Wild Trees, Bushes)
+            // 7. Terrain Features (Crops in HoeDirt, Giant Crops, Fruit Trees, Wild Trees, Bushes)
             if (location.terrainFeatures.TryGetValue(tilePos, out var feature))
             {
+                if (feature is GiantCrop giantCrop)
+                {
+                    return LookupDataManager.BuildGiantCropSubject(giantCrop);
+                }
                 if (feature is HoeDirt hoeDirt && hoeDirt.crop != null)
                 {
                     string harvestId = hoeDirt.crop.indexOfHarvest.Value;
@@ -240,7 +299,7 @@ namespace BetterQOL
                 }
             }
 
-            // 6. Large Terrain Features (Bushes spanning larger areas)
+            // 8. Large Terrain Features (Bushes spanning larger areas)
             foreach (var largeFeature in location.largeTerrainFeatures)
             {
                 if (largeFeature is Bush largeBush && largeBush.getBoundingBox().Contains(absX, absY))
@@ -249,7 +308,7 @@ namespace BetterQOL
                 }
             }
 
-            // 7. Fallback: Tile Location Info
+            // 9. Fallback: Tile Location Info
             return LookupDataManager.BuildTileSubject(location, tilePos);
         }
 

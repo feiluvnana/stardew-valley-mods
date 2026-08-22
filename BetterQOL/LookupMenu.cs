@@ -13,9 +13,11 @@ namespace BetterQOL
     {
         private LookupSubject? CurrentSubject;
         private readonly Stack<LookupSubject> History = new();
+        private readonly Stack<LookupSubject> ForwardHistory = new();
 
         private ClickableTextureComponent? CloseButton;
         private ClickableTextureComponent? BackButton;
+        private ClickableTextureComponent? ForwardButton;
         private ClickableTextureComponent? UpButton;
         private ClickableTextureComponent? DownButton;
 
@@ -23,6 +25,9 @@ namespace BetterQOL
         private ClickableComponent? SearchBoxComponent;
         private string LastSearchText = string.Empty;
         private List<LookupLink> SearchResults = new();
+        private string CurrentCategory = "All";
+        private static readonly string[] SearchCategories = new[] { "All", "Items", "Villagers", "Fish", "Crops", "Monsters", "Buildings" };
+        private readonly List<ClickableComponent> CategoryButtons = new();
 
         private int ScrollOffset = 0;
         private int MaxScrollOffset = 0;
@@ -58,12 +63,19 @@ namespace BetterQOL
                 4f
             );
 
-            // 2. Back Button (top-left)
+            // 2. Back and Forward Buttons (top-left)
             int headerTopY = yPositionOnScreen + 30;
             BackButton = new ClickableTextureComponent(
                 new Rectangle(xPositionOnScreen + 32, headerTopY + 4, 44, 44),
                 Game1.mouseCursors,
                 new Rectangle(352, 495, 12, 11),
+                3.5f
+            );
+
+            ForwardButton = new ClickableTextureComponent(
+                new Rectangle(xPositionOnScreen + 80, headerTopY + 4, 44, 44),
+                Game1.mouseCursors,
+                new Rectangle(365, 495, 12, 11),
                 3.5f
             );
 
@@ -116,6 +128,7 @@ namespace BetterQOL
             {
                 History.Push(CurrentSubject);
             }
+            ForwardHistory.Clear();
             CurrentSubject = subject;
             ScrollOffset = 0;
             if (SearchBox != null)
@@ -132,12 +145,17 @@ namespace BetterQOL
         {
             if (History.Count > 0)
             {
+                if (CurrentSubject != null)
+                {
+                    ForwardHistory.Push(CurrentSubject);
+                }
                 CurrentSubject = History.Pop();
                 ScrollOffset = 0;
                 Game1.playSound("smallSelect");
             }
             else if (CurrentSubject != null)
             {
+                ForwardHistory.Push(CurrentSubject);
                 CurrentSubject = null;
                 ScrollOffset = 0;
                 if (SearchBox != null)
@@ -145,6 +163,20 @@ namespace BetterQOL
                     SearchBox.Selected = true;
                     Game1.keyboardDispatcher.Subscriber = SearchBox;
                 }
+                Game1.playSound("smallSelect");
+            }
+        }
+
+        public void NavigateForward()
+        {
+            if (ForwardHistory.Count > 0)
+            {
+                if (CurrentSubject != null)
+                {
+                    History.Push(CurrentSubject);
+                }
+                CurrentSubject = ForwardHistory.Pop();
+                ScrollOffset = 0;
                 Game1.playSound("smallSelect");
             }
         }
@@ -162,7 +194,7 @@ namespace BetterQOL
                     ScrollOffset = 0;
                     if (!string.IsNullOrWhiteSpace(LastSearchText))
                     {
-                        SearchResults = LookupDataManager.SearchAll(LastSearchText);
+                        SearchResults = LookupDataManager.SearchAll(LastSearchText, CurrentCategory);
                     }
                     else
                     {
@@ -178,6 +210,7 @@ namespace BetterQOL
 
             CloseButton?.tryHover(x, y, 0.2f);
             BackButton?.tryHover(x, y, 0.2f);
+            ForwardButton?.tryHover(x, y, 0.2f);
             UpButton?.tryHover(x, y, 0.2f);
             DownButton?.tryHover(x, y, 0.2f);
 
@@ -204,6 +237,25 @@ namespace BetterQOL
             {
                 NavigateBack();
                 return;
+            }
+
+            if (ForwardHistory.Count > 0 && ForwardButton != null && ForwardButton.containsPoint(x, y))
+            {
+                NavigateForward();
+                return;
+            }
+
+            // Category Tab Buttons
+            foreach (var catBtn in CategoryButtons)
+            {
+                if (catBtn.containsPoint(x, y))
+                {
+                    CurrentCategory = catBtn.name;
+                    SearchResults = LookupDataManager.SearchAll(LastSearchText, CurrentCategory);
+                    ScrollOffset = 0;
+                    Game1.playSound("smallSelect");
+                    return;
+                }
             }
 
             if (UpButton != null && UpButton.containsPoint(x, y))
@@ -398,7 +450,14 @@ namespace BetterQOL
             if (canGoBack && BackButton != null)
             {
                 BackButton.draw(b);
-                headerLeftX += 50;
+                headerLeftX += 46;
+            }
+
+            bool canGoForward = ForwardHistory.Count > 0;
+            if (canGoForward && ForwardButton != null)
+            {
+                ForwardButton.draw(b);
+                headerLeftX += 46;
             }
 
             if (CurrentSubject != null)
@@ -492,10 +551,44 @@ namespace BetterQOL
             // DRAW CONTENT INSIDE SCISSOR VIEWPORT
             if (!string.IsNullOrWhiteSpace(LastSearchText))
             {
+                // Search Category Filter Tabs
+                CategoryButtons.Clear();
+                int catX = contentX + 4;
+                int catY = currentY;
+                int catHeight = 30;
+                foreach (var catName in SearchCategories)
+                {
+                    Vector2 catSize = Game1.smallFont.MeasureString(catName);
+                    int catW = (int)catSize.X + 16;
+                    Rectangle catBounds = new Rectangle(catX, catY, catW, catHeight);
+                    CategoryButtons.Add(new ClickableComponent(catBounds, catName));
+
+                    bool isSelected = CurrentCategory.Equals(catName, StringComparison.OrdinalIgnoreCase);
+                    bool isHovered = catBounds.Contains(Game1.getMouseX(), Game1.getMouseY());
+
+                    Color bg = isSelected ? new Color(180, 100, 30) : (isHovered ? new Color(245, 230, 200) : new Color(230, 210, 175));
+                    Color border = isSelected ? new Color(110, 40, 10) : new Color(170, 130, 90);
+                    Color txtColor = isSelected ? Color.White : (isHovered ? Color.DarkBlue : Game1.textColor);
+
+                    b.Draw(Game1.staminaRect, catBounds, bg);
+                    b.Draw(Game1.staminaRect, new Rectangle(catBounds.X, catBounds.Y, catBounds.Width, 1), border);
+                    b.Draw(Game1.staminaRect, new Rectangle(catBounds.X, catBounds.Bottom - 1, catBounds.Width, 1), border);
+                    b.Draw(Game1.staminaRect, new Rectangle(catBounds.X, catBounds.Y, 1, catBounds.Height), border);
+                    b.Draw(Game1.staminaRect, new Rectangle(catBounds.Right - 1, catBounds.Y, 1, catBounds.Height), border);
+
+                    int textX = catBounds.X + (catW - (int)catSize.X) / 2;
+                    int textY = catBounds.Y + (catHeight - (int)catSize.Y) / 2;
+                    Utility.drawTextWithShadow(b, catName, Game1.smallFont, new Vector2(textX, textY), txtColor);
+
+                    catX += catW + 6;
+                }
+                currentY += catHeight + 12;
+                calculatedContentHeight += catHeight + 12;
+
                 // Search Results Mode
                 if (SearchResults.Count == 0)
                 {
-                    Utility.drawTextWithShadow(b, $"No results found for '{LastSearchText}'", Game1.smallFont, new Vector2(contentX, currentY + 16), Color.DarkSlateGray);
+                    Utility.drawTextWithShadow(b, $"No results found for '{LastSearchText}' in [{CurrentCategory}]", Game1.smallFont, new Vector2(contentX, currentY + 16), Color.DarkSlateGray);
                     calculatedContentHeight += 50;
                 }
                 else
