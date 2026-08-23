@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
-using StardewValley;
 using StardewValley.GameData.Objects;
 
 namespace BetterIndustry

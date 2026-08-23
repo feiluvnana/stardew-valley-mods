@@ -1,4 +1,3 @@
-using System;
 using HarmonyLib;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;

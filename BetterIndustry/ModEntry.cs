@@ -1,7 +1,5 @@
-using System;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
-using StardewValley;
 
 namespace BetterIndustry
 {

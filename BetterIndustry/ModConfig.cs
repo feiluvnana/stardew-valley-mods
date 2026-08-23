@@ -1,7 +1,23 @@
+// ModConfig defines every user-facing setting for this mod. SMAPI automatically saves
+// this object to the mod folder's config.json when the game closes and reloads it on
+// startup - you never write serialization code yourself; plain public properties with a
+// default value are all that's required. The SAME object is handed to Generic Mod Config
+// Menu (see IGenericModConfigMenuApi.cs) so players can edit these values in-game.
 namespace BetterIndustry
 {
+    /// <summary>
+    /// All configurable options for BetterIndustry, persisted to config.json by SMAPI
+    /// and exposed to the in-game settings menu via Generic Mod Config Menu.
+    /// </summary>
     public class ModConfig
     {
+        // Property cheat-sheet for beginners:
+        //   { get; set; }        -> auto-property: the compiler generates the hidden backing field.
+        //   "= true"/"= 1.25f"   -> the DEFAULT written to config.json on first launch;
+        //                           after that, your edited config.json wins until reset via GMCM.
+        //   float literals need an "f" suffix (1.25f): without it, 1.25 is a double,
+        //   which won't implicitly fit inside a float property.
+
         // ---------------- Cooking Balancing ----------------
         /// <summary>Whether cooking dishes are rebalanced to be profitable over raw ingredients.</summary>
         public bool EnableCookingBalancing { get; set; } = true;

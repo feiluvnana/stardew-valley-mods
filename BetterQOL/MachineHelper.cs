@@ -6,7 +6,6 @@ using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
 using StardewValley.Buildings;
 using StardewValley.GameData.Machines;
-using StardewValley.ItemTypeDefinitions;
 using StardewValley.Objects;
 using StardewValley.TokenizableStrings;
 

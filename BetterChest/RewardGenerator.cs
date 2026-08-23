@@ -3,29 +3,78 @@ using System.Collections.Generic;
 using StardewValley;
 using StardewValley.Objects;
 
+// ============================================================================
+// RewardGenerator is the BRAIN of the Skull Cavern overhaul: it owns the full
+// loot table (RewardPool) and turns one chest opening into concrete items via
+// a two-stage weighted lottery — first pick a CATEGORY (Legendary, Mining...),
+// then pick an ITEM inside that category, then roll the stack size and any
+// jackpot multipliers (x2..x5). ChestPatches calls GenerateRewards once per
+// player per chest; config toggles and ProgressionHelper gates filter the
+// table down to eligible entries first.
+// Key concepts demonstrated: enums, Func<T,TResult> predicate delegates,
+// value tuples inside a Dictionary, and cumulative-weight probability rolls.
+// ============================================================================
 namespace BetterChest
 {
+    /// <summary>
+    /// The loot families a chest roll can draw from. Category choice and item choice
+    /// are separate dice rolls, each weighted independently.
+    /// </summary>
     public enum LootCategory
     {
+        /// <summary>Ultra-rare endgame items (Prismatic Shard, Auto-Petter...).</summary>
         Legendary,
+        /// <summary>Farming gear: fertilizers, rare seeds, sprinklers.</summary>
         Agriculture,
+        /// <summary>Ores, bars, bombs and mining resources.</summary>
         Mining,
+        /// <summary>Baits, tackle and fish-related foods.</summary>
         Fishing,
+        /// <summary>Combat consumables and monster drops.</summary>
         Combat,
+        /// <summary>Hardwood, mushrooms and foraged goods.</summary>
         Foraging,
+        /// <summary>Geodes, mystery boxes and other "loot box" items.</summary>
         Lootboxes
     }
 
+    /// <summary>
+    /// One possible loot drop: which item, which category, stack range, weight,
+    /// a predicate deciding whether it is currently allowed, and whether jackpot
+    /// multipliers may apply to it.
+    /// </summary>
     public class RewardEntry
     {
+        /// <summary>The item's qualified game id, e.g. "(O)74" (Prismatic Shard) or "(BC)272" (Auto-Petter).</summary>
         public string QualifiedItemId { get; set; }
+        /// <summary>Which category bucket this entry belongs to for the two-stage roll.</summary>
         public LootCategory Category { get; set; }
+        /// <summary>Smallest base stack this entry can produce.</summary>
         public int MinCount { get; set; }
+        /// <summary>Largest base stack this entry can produce.</summary>
         public int MaxCount { get; set; }
+        /// <summary>Relative probability within its category — higher = more common.</summary>
         public double Weight { get; set; }
+        /// <summary>
+        /// A Func&lt;ModConfig, bool&gt; is a DELEGATE: a method stored in a variable.
+        /// It takes the config and answers "is this entry allowed right now?"
+        /// (checks toggles plus progression gates).
+        /// </summary>
         public Func<ModConfig, bool> IsEnabled { get; set; }
+        /// <summary>Whether x2..x5 stack multipliers are allowed to proc on this item.</summary>
         public bool AllowMultiplier { get; set; }
 
+        /// <summary>
+        /// Creates a loot table row. Called with positional arguments like
+        /// <c>new("(O)74", LootCategory.Legendary, 1, 2, 25.0, c => ..., false)</c>.
+        /// </summary>
+        /// <param name="qualifiedItemId">Qualified item id to create.</param>
+        /// <param name="category">Loot category bucket.</param>
+        /// <param name="minCount">Minimum stack size.</param>
+        /// <param name="maxCount">Maximum stack size.</param>
+        /// <param name="weight">Relative selection weight.</param>
+        /// <param name="isEnabled">Config/progression predicate controlling availability.</param>
+        /// <param name="allowMultiplier">True to permit stack multiplier jackpots (default true).</param>
         public RewardEntry(
             string qualifiedItemId,
             LootCategory category,
@@ -41,12 +90,22 @@ namespace BetterChest
             MaxCount = maxCount;
             Weight = weight;
             IsEnabled = isEnabled;
+            // Multipliers only make sense on entries that already vary in stack size.
             AllowMultiplier = allowMultiplier && maxCount > 1;
         }
     }
 
+    /// <summary>
+    /// Static class holding the Skull Cavern loot table and the roll algorithm that
+    /// converts config + progression state into a list of <see cref="Item"/> rewards.
+    /// </summary>
     public static class RewardGenerator
     {
+        /// <summary>
+        /// The master loot table. Each row's lambda ("c => c.EnableX") is a predicate
+        /// evaluated at roll time against the live config, so toggles/gates apply
+        /// instantly without rebuilding the table.
+        /// </summary>
         private static readonly List<RewardEntry> RewardPool = new()
         {
             // =========================================================================
@@ -131,14 +190,27 @@ namespace BetterChest
             new("(O)TreasureTotem", LootCategory.Lootboxes, 2, 5, 18.0, c => c.EnableLootboxCategory && (!c.GatekeepMasteryItems || ProgressionHelper.IsMasteryUnlocked("Foraging")), false), // Treasure Totem (Buffed base stack, No Mult)
         };
 
+        /// <summary>
+        /// Rolls a full chest's worth of rewards using the two-stage weighted lottery.
+        /// </summary>
+        /// <param name="config">Live mod settings (toggles, weights, chances).</param>
+        /// <param name="random">Random number generator to use (usually Game1.random).</param>
+        /// <param name="isSpecialChest">True for the milestone-floor special chests (220/320/420/520).</param>
+        /// <param name="mineLevel">The floor the chest sits on; used for depth scaling.</param>
+        /// <returns>The rolled items (may be empty if everything is gated off).</returns>
         public static List<Item> GenerateRewards(ModConfig config, Random random, bool isSpecialChest = false, int mineLevel = 121)
         {
             var results = new List<Item>();
+            // Special chests only get their buff when the user hasn't disabled it.
             bool applySpecialBuff = isSpecialChest && config.EnableFloor100Buff;
+            // "Relative depth": Skull Cavern floors count up from 1 above level 120.
             int relativeDepth = Math.Max(1, mineLevel > 120 ? mineLevel - 120 : mineLevel);
             bool isShallowFloor = config.EnableDepthScaling && !applySpecialBuff && relativeDepth < 50;
 
             // Organize eligible items into category buckets
+            // Dictionary key = category; value = a TUPLE bundling the entry list with
+            // its summed weight. Tuples are copies when read from a dictionary, so the
+            // code below must write the tuple BACK after changing it.
             var categoryPools = new Dictionary<LootCategory, (List<RewardEntry> Entries, double TotalWeight)>();
             foreach (LootCategory cat in Enum.GetValues(typeof(LootCategory)))
             {
@@ -147,16 +219,18 @@ namespace BetterChest
 
             foreach (var entry in RewardPool)
             {
+                // Invoke the stored predicate delegate — runs the config/progression checks.
                 if (entry.IsEnabled(config))
                 {
                     var pool = categoryPools[entry.Category];
                     pool.Entries.Add(entry);
                     pool.TotalWeight += entry.Weight;
-                    categoryPools[entry.Category] = pool;
+                    categoryPools[entry.Category] = pool; // write the modified copy back
                 }
             }
 
             // Determine category weights (equal weights if floor 100 buff with AllCategoriesEqual enabled)
+            // Each line is a ternary: special buff + equal mode ? fixed 15 : config value.
             bool equalCategories = applySpecialBuff && config.Floor100AllCategoriesEqual;
             double legWeight = equalCategories ? 15.0 : config.LegendaryWeight;
             double agrWeight = equalCategories ? 15.0 : config.AgricultureWeight;
@@ -170,11 +244,14 @@ namespace BetterChest
             if (!applySpecialBuff && (config.ScaleLegendaryByDepth || config.EnableDepthScaling))
             {
                 // Linear scaling from floor 1 (10% of base weight) to floor 100 (100% of base weight)
+                // Math.Clamp keeps the factor inside [0.10, 1.0] no matter the depth.
                 double depthFactor = Math.Clamp(0.10 + 0.90 * ((relativeDepth - 1.0) / 99.0), 0.10, 1.0);
                 legWeight *= depthFactor;
             }
 
             // Build active category list
+            // A list of (enum, weight) tuples — only categories that still have eligible
+            // items AND a positive weight make it in.
             var activeCategories = new List<(LootCategory Category, double Weight)>();
             if (categoryPools[LootCategory.Legendary].Entries.Count > 0 && legWeight > 0)
                 activeCategories.Add((LootCategory.Legendary, legWeight));
@@ -191,16 +268,20 @@ namespace BetterChest
             if (categoryPools[LootCategory.Lootboxes].Entries.Count > 0 && looWeight > 0)
                 activeCategories.Add((LootCategory.Lootboxes, looWeight));
 
+            // Sum every active category's weight — the "size of the whole pie".
             double totalCatWeight = 0;
             foreach (var c in activeCategories)
                 totalCatWeight += c.Weight;
 
+            // All categories empty or weightless: nothing can roll.
             if (activeCategories.Count == 0 || totalCatWeight <= 0)
                 return results;
 
             // Determine number of rolls using diminishing probabilities & guaranteed minimums
             int minRolls;
             int maxRolls;
+            // decayChances[r] = chance the (r+1)th roll is granted once r rolls exist;
+            // the chain STOPS at the first failure ("break" below).
             float[] decayChances;
 
             if (applySpecialBuff)
@@ -255,6 +336,8 @@ namespace BetterChest
                 };
             }
 
+            // Start with the guaranteed minimum, then gamble for extra rolls one at a
+            // time; the first failed chance check ends the chain entirely.
             int rolls = minRolls;
             for (int r = minRolls; r < maxRolls; r++)
             {
@@ -301,6 +384,8 @@ namespace BetterChest
             for (int i = 0; i < rolls; i++)
             {
                 // 1. Select Category
+                // Same weighted-dart technique as everywhere else: uniform number across
+                // the total weight, then walk until the running total catches up.
                 double catRoll = random.NextDouble() * totalCatWeight;
                 double cumCat = 0;
                 LootCategory selectedCategory = activeCategories[0].Category;
@@ -317,6 +402,7 @@ namespace BetterChest
 
                 // 2. Select Item from chosen Category
                 var catData = categoryPools[selectedCategory];
+                // Category somehow empty (shouldn't happen) — skip to the next roll.
                 if (catData.Entries.Count == 0 || catData.TotalWeight <= 0)
                     continue;
 
@@ -338,11 +424,14 @@ namespace BetterChest
                 int stack = selectedItem.MinCount;
                 if (selectedItem.MaxCount > selectedItem.MinCount)
                 {
+                    // Next(n) returns 0..n-1, so "+1" includes MaxCount itself.
                     stack += random.Next(selectedItem.MaxCount - selectedItem.MinCount + 1);
                 }
 
                 if (selectedItem.AllowMultiplier)
                 {
+                    // One roll tested against CUMULATIVE bands, so exactly one outcome wins:
+                    // [0..x5) -> x5, [x5..x5+x4) -> x4, and so on down to the x2 band.
                     double multRoll = random.NextDouble();
                     if (multRoll < x5Chance)
                     {
@@ -364,6 +453,7 @@ namespace BetterChest
 
                 // 4. Create and validate item
                 Item? item = ItemRegistry.Create(selectedItem.QualifiedItemId, stack, allowNull: true);
+                // Reject nulls AND the game's placeholder "Error" items for unknown ids.
                 if (item != null && item.ItemId != "Error" && item.QualifiedItemId != "(O)Error")
                 {
                     results.Add(item);
@@ -373,11 +463,20 @@ namespace BetterChest
             return results;
         }
 
+        /// <summary>
+        /// Detects "cosmetic" items (clothing, hats, decorative furniture) that the
+        /// ExcludeCosmetics option strips from vanilla chests.
+        /// </summary>
+        /// <param name="item">The item to classify.</param>
+        /// <returns>True if the item is clothing, a hat, or decor-type furniture.</returns>
         public static bool IsCosmeticItem(Item item)
         {
+            // "is" type checks work on the object's actual runtime class.
             if (item is Clothing || item is Hat)
                 return true;
 
+            // Furniture needs a deeper check: only the "decor" furniture type counts.
+            // furniture_type is a NetInt (synced value), so read it through ".Value".
             if (item is Furniture furniture && furniture.furniture_type.Value == Furniture.decor)
                 return true;
 

@@ -1,7 +1,16 @@
 using StardewModdingAPI;
 
+// ModConfig holds every user-facing setting for BetterQOL.
+// SMAPI serializes this plain class to/from the mod's config.json automatically,
+// and the Generic Mod Config Menu mod displays each property as an in-game row.
 namespace BetterQOL
 {
+    /// <summary>
+    /// Container of all configurable options. Each property is an "auto-property":
+    /// the compiler secretly creates a hidden backing field, with "{ get; set; }"
+    /// acting as the getter/setter pair. The "= value" after each property is the
+    /// default used the first time the mod runs (before config.json exists).
+    /// </summary>
     public class ModConfig
     {
         // ---------------- Blacksmith Geode Cracking ----------------
@@ -77,6 +86,8 @@ namespace BetterQOL
         /// <summary>Whether to show Museum donation status in inventory/menu tooltips.</summary>
         public bool ShowMuseumNeedOnHover { get; set; } = true;
 
+        // SButton is SMAPI's cross-device enum: one type covers keyboard keys, mouse
+        // buttons, and controller buttons (so a single setting can serve all inputs).
         /// <summary>Optional key to hold to show hover tooltips (default None: always shows on hover).</summary>
         public SButton HoverHotkey { get; set; } = SButton.None;
 

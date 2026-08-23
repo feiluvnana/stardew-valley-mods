@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using StardewModdingAPI;
 using xTile;
-using xTile.Layers;
 using xTile.Tiles;
 
 namespace BetterMap

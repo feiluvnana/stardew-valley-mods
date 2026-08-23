@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text.Json;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
-using StardewValley;
 using StardewValley.GameData;
 using StardewValley.GameData.Machines;
 
