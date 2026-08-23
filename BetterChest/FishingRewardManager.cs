@@ -126,8 +126,10 @@ namespace BetterChest
                 return;
 
             // 4. Generate supplementary items until reaching desired roll count
+            int initialCount = inventory.Count;
+            int itemsAdded = 0;
             int safetyLimit = 30;
-            while (inventory.Count < finalDesiredCount && safetyLimit-- > 0)
+            while (itemsAdded < finalDesiredCount && (inventory.Count < 12) && safetyLimit-- > 0)
             {
                 double roll = random.NextDouble() * totalWeight;
                 double cumulative = 0;
@@ -153,6 +155,7 @@ namespace BetterChest
                 if (item != null && item.ItemId != "Error" && item.QualifiedItemId != "(O)Error")
                 {
                     inventory.Add(item);
+                    itemsAdded++;
                 }
             }
 

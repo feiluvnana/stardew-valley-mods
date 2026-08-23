@@ -13,11 +13,9 @@ namespace BetterQOL
     {
         private LookupSubject? CurrentSubject;
         private readonly Stack<LookupSubject> History = new();
-        private readonly Stack<LookupSubject> ForwardHistory = new();
 
         private ClickableTextureComponent? CloseButton;
         private ClickableTextureComponent? BackButton;
-        private ClickableTextureComponent? ForwardButton;
         private ClickableTextureComponent? UpButton;
         private ClickableTextureComponent? DownButton;
 
@@ -72,19 +70,12 @@ namespace BetterQOL
                 4f
             );
 
-            // 2. Back and Forward Buttons (top-left)
+            // 2. Back Button (top-left)
             int headerTopY = yPositionOnScreen + 30;
             BackButton = new ClickableTextureComponent(
                 new Rectangle(xPositionOnScreen + 32, headerTopY + 4, 44, 44),
                 Game1.mouseCursors,
                 new Rectangle(352, 495, 12, 11),
-                3.5f
-            );
-
-            ForwardButton = new ClickableTextureComponent(
-                new Rectangle(xPositionOnScreen + 80, headerTopY + 4, 44, 44),
-                Game1.mouseCursors,
-                new Rectangle(365, 495, 12, 11),
                 3.5f
             );
 
@@ -137,7 +128,6 @@ namespace BetterQOL
             {
                 History.Push(CurrentSubject);
             }
-            ForwardHistory.Clear();
             CurrentSubject = subject;
             ScrollOffset = 0;
             if (SearchBox != null)
@@ -154,17 +144,12 @@ namespace BetterQOL
         {
             if (History.Count > 0)
             {
-                if (CurrentSubject != null)
-                {
-                    ForwardHistory.Push(CurrentSubject);
-                }
                 CurrentSubject = History.Pop();
                 ScrollOffset = 0;
                 Game1.playSound("smallSelect");
             }
             else if (CurrentSubject != null)
             {
-                ForwardHistory.Push(CurrentSubject);
                 CurrentSubject = null;
                 ScrollOffset = 0;
                 if (SearchBox != null)
@@ -172,20 +157,6 @@ namespace BetterQOL
                     SearchBox.Selected = true;
                     Game1.keyboardDispatcher.Subscriber = SearchBox;
                 }
-                Game1.playSound("smallSelect");
-            }
-        }
-
-        public void NavigateForward()
-        {
-            if (ForwardHistory.Count > 0)
-            {
-                if (CurrentSubject != null)
-                {
-                    History.Push(CurrentSubject);
-                }
-                CurrentSubject = ForwardHistory.Pop();
-                ScrollOffset = 0;
                 Game1.playSound("smallSelect");
             }
         }
@@ -219,7 +190,6 @@ namespace BetterQOL
 
             CloseButton?.tryHover(x, y, 0.2f);
             BackButton?.tryHover(x, y, 0.2f);
-            ForwardButton?.tryHover(x, y, 0.2f);
             UpButton?.tryHover(x, y, 0.2f);
             DownButton?.tryHover(x, y, 0.2f);
 
@@ -255,12 +225,6 @@ namespace BetterQOL
             if ((History.Count > 0 || (CurrentSubject != null && !string.IsNullOrEmpty(LastSearchText))) && BackButton != null && BackButton.containsPoint(x, y))
             {
                 NavigateBack();
-                return;
-            }
-
-            if (ForwardHistory.Count > 0 && ForwardButton != null && ForwardButton.containsPoint(x, y))
-            {
-                NavigateForward();
                 return;
             }
 
@@ -731,13 +695,6 @@ namespace BetterQOL
             if (canGoBack && BackButton != null)
             {
                 BackButton.draw(b);
-                headerLeftX += 46;
-            }
-
-            bool canGoForward = ForwardHistory.Count > 0;
-            if (canGoForward && ForwardButton != null)
-            {
-                ForwardButton.draw(b);
                 headerLeftX += 46;
             }
 

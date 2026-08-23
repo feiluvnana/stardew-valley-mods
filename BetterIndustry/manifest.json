@@ -1,8 +1,9 @@
 {
   "Name": "BetterIndustry",
   "Author": "feiluvnana",
-  "Version": "1.0.0",
-  "Description": "Comprehensive artisan goods and cooking rebalance suite for Stardew Valley 1.6+. Combines flower honey mead retention and balanced food margins.",
+  "Version": "2.0.2",
+  "Description": "Comprehensive artisan goods and cooking rebalance suite for Stardew Valley 1.6+. Quality-preserving machines, flower mead fix, profitable cooking, Truffle Oil scaling, juice buffs, and expanded cask aging.",
+
   "UniqueID": "feiluvnana.BetterIndustry",
   "EntryDll": "BetterIndustry.dll",
   "MinimumApiVersion": "4.0.0",

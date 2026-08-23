@@ -31,7 +31,7 @@ namespace BetterIndustry
         {
             try
             {
-                var cookingRecipes = DataLoader.CookingRecipes(Game1.content);
+                var cookingRecipes = ModEntry.ModHelper.GameContent.Load<Dictionary<string, string>>("Data/CookingRecipes");
                 if (cookingRecipes == null)
                     return;
 
@@ -57,9 +57,9 @@ namespace BetterIndustry
                         {
                             totalIngredientCost += ingData.Price * ingredientCount;
                         }
-                        else if (ingredientId.StartsWith("-"))
+                        else if (ingredientId.StartsWith("-") || ingredientId.StartsWith("category_", StringComparison.OrdinalIgnoreCase) || ingredientId.StartsWith("tag_", StringComparison.OrdinalIgnoreCase))
                         {
-                            // Category ingredient, estimate 100g base
+                            // Category or context tag ingredient (e.g. category_fish, category_egg), estimate 100g base
                             totalIngredientCost += 100 * ingredientCount;
                         }
                     }

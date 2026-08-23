@@ -164,7 +164,7 @@ namespace BetterQOL
                 else
                 {
                     info.IsReadyToHarvest = false;
-                    info.DaysRemaining = crop.dayOfCurrentPhase.Value;
+                    info.DaysRemaining = Math.Max(0, crop.dayOfCurrentPhase.Value);
                 }
             }
             else
@@ -184,7 +184,7 @@ namespace BetterQOL
                         remainingPhasesSum += crop.phaseDays[i];
                     }
 
-                    info.DaysRemaining = currentPhaseRemaining + remainingPhasesSum;
+                    info.DaysRemaining = Math.Max(0, currentPhaseRemaining + remainingPhasesSum);
                     info.IsReadyToHarvest = info.DaysRemaining <= 0;
                 }
             }

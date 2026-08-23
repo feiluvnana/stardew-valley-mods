@@ -1,5 +1,11 @@
 {
   "EnableCookingBalancing": true,
   "CookingProfitMargin": 1.25,
-  "EnableMeadFix": true
+  "EnableMeadFix": true,
+  "EnableQualityPreserving": true,
+  "EnableTruffleOilFix": true,
+  "TruffleOilMultiplier": 1.5,
+  "EnableJuiceBuff": true,
+  "JuiceMultiplier": 2.75,
+  "EnableExpandedAging": true
 }

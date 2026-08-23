@@ -22,7 +22,7 @@ namespace BetterChest
 
     public class ModEntry : Mod
     {
-        private const string GeneratedModDataKey = "feiluvnana.BetterChest/Generated";
+        public const string GeneratedModDataKey = "feiluvnana.BetterChest/Generated";
 
         public static ModConfig Config { get; private set; } = null!;
         public static IMonitor ModMonitor { get; private set; } = null!;
@@ -38,6 +38,7 @@ namespace BetterChest
 
             var harmony = new Harmony(ModManifest.UniqueID);
             FishingPatches.Apply(harmony);
+            ChestPatches.Apply(harmony);
 
             helper.Events.Player.Warped += OnWarped;
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
@@ -45,6 +46,9 @@ namespace BetterChest
 
         private void OnWarped(object? sender, WarpedEventArgs e)
         {
+            if (!Game1.IsMasterGame)
+                return;
+
             if (e.NewLocation is MineShaft shaft && shaft.mineLevel > 120)
             {
                 ProcessMineShaftChests(shaft);
@@ -167,15 +171,9 @@ namespace BetterChest
 
                     if (chest.Items.Count == 0)
                     {
-                        var fallback = RewardGenerator.GenerateRewards(Config, Game1.random, isSpecialChest: isSpecial, mineLevel: shaft.mineLevel);
-                        foreach (var item in fallback)
-                        {
-                            var leftover = chest.addItem(item);
-                            if (leftover != null && leftover.Stack > 0)
-                            {
-                                chest.Items.Add(leftover);
-                            }
-                        }
+                        // Generate a single vanilla-equivalent fallback item instead of full custom pool
+                        Item fallback = ItemRegistry.Create("(O)337", Game1.random.Next(3, 8)); // 3-7x Iridium Bar
+                        chest.addItem(fallback);
                     }
                 }
             }

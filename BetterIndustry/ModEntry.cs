@@ -88,6 +88,61 @@ namespace BetterIndustry
                 getValue: () => Config.EnableMeadFix,
                 setValue: value => Config.EnableMeadFix = value
             );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.quality-preserving.name"),
+                tooltip: () => I18n.Get("config.quality-preserving.tooltip"),
+                getValue: () => Config.EnableQualityPreserving,
+                setValue: value => Config.EnableQualityPreserving = value
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.truffle-oil-fix.name"),
+                tooltip: () => I18n.Get("config.truffle-oil-fix.tooltip"),
+                getValue: () => Config.EnableTruffleOilFix,
+                setValue: value => Config.EnableTruffleOilFix = value
+            );
+
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.truffle-oil-multiplier.name"),
+                tooltip: () => I18n.Get("config.truffle-oil-multiplier.tooltip"),
+                getValue: () => Config.TruffleOilMultiplier,
+                setValue: value => Config.TruffleOilMultiplier = value,
+                min: 1.0f,
+                max: 3.0f,
+                interval: 0.05f
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.juice-buff.name"),
+                tooltip: () => I18n.Get("config.juice-buff.tooltip"),
+                getValue: () => Config.EnableJuiceBuff,
+                setValue: value => Config.EnableJuiceBuff = value
+            );
+
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.juice-multiplier.name"),
+                tooltip: () => I18n.Get("config.juice-multiplier.tooltip"),
+                getValue: () => Config.JuiceMultiplier,
+                setValue: value => Config.JuiceMultiplier = value,
+                min: 1.0f,
+                max: 5.0f,
+                interval: 0.05f
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.expanded-aging.name"),
+                tooltip: () => I18n.Get("config.expanded-aging.tooltip"),
+                getValue: () => Config.EnableExpandedAging,
+                setValue: value => Config.EnableExpandedAging = value
+            );
+
         }
 
         private void InvalidateAssetCaches()

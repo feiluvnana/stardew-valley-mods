@@ -307,16 +307,42 @@ namespace BetterQOL
                         new Color(0, 140, 0)
                     ));
                 }
+                else if (fishPond.neededItem.Value != null)
+                {
+                    string neededItemName = ModEntry.I18n.Get("hover.fishpond.default-item").ToString();
+                    var neededItem = fishPond.neededItem.Value;
+                    if (neededItem != null)
+                    {
+                        var itmData = ItemRegistry.GetData(neededItem.QualifiedItemId);
+                        neededItemName = itmData?.DisplayName ?? neededItem.DisplayName;
+                        int neededCount = fishPond.neededItemCount.Value;
+                        if (neededCount > 1) neededItemName = $"{neededItemName} x{neededCount}";
+                    }
+                    info.Lines.Add(new TooltipLine(
+                        ModEntry.I18n.Get("hover.fishpond.needs-quest-item", new { item = neededItemName }),
+                        new Color(220, 20, 60)
+                    ));
+                }
                 else
                 {
                     if (fishPond.daysSinceSpawn.Value >= 0 && fishPond.FishCount < fishPond.maxOccupants.Value)
                     {
                         int spawnRate = fishPond.GetFishPondData()?.SpawnTime ?? 3;
                         int daysLeft = Math.Max(0, spawnRate - fishPond.daysSinceSpawn.Value);
-                        info.Lines.Add(new TooltipLine(
-                            ModEntry.I18n.Get("hover.fishpond.spawning-in", new { days = daysLeft }),
-                            new Color(180, 100, 0)
-                        ));
+                        if (daysLeft <= 1)
+                        {
+                            info.Lines.Add(new TooltipLine(
+                                ModEntry.I18n.Get("hover.fishpond.spawning-tomorrow"),
+                                new Color(0, 140, 0)
+                            ));
+                        }
+                        else
+                        {
+                            info.Lines.Add(new TooltipLine(
+                                ModEntry.I18n.Get("hover.fishpond.spawning-in", new { days = daysLeft }),
+                                new Color(180, 100, 0)
+                            ));
+                        }
                     }
                     else
                     {
@@ -397,7 +423,7 @@ namespace BetterQOL
             // 4. Silo
             if (building.buildingType.Value?.Equals("Silo", StringComparison.OrdinalIgnoreCase) == true)
             {
-                int hay = Game1.getFarm()?.piecesOfHay.Value ?? 0;
+                int hay = Game1.getFarm()?.piecesOfHay?.Value ?? 0;
                 int siloCount = 0;
                 if (Game1.getFarm() != null)
                 {
@@ -428,13 +454,143 @@ namespace BetterQOL
                 return info;
             }
 
-            // 6. Generic Animals Housing / Occupants
-            if (building.maxOccupants.Value > 0)
+            // 6. Pet Bowl (SDV 1.6)
+            if (building is PetBowl petBowl || building.buildingType.Value?.Equals("Pet Bowl", StringComparison.OrdinalIgnoreCase) == true)
             {
+                bool isWatered = false;
+                if (building is PetBowl pb) isWatered = pb.watered.Value;
                 info.Lines.Add(new TooltipLine(
-                    ModEntry.I18n.Get("hover.building.occupants", new { current = building.currentOccupants.Value, max = building.maxOccupants.Value }),
+                    isWatered ? ModEntry.I18n.Get("hover.petbowl.watered").ToString() : ModEntry.I18n.Get("hover.petbowl.unwatered").ToString(),
+                    isWatered ? new Color(20, 110, 220) : new Color(200, 60, 20)
+                ));
+                return info;
+            }
+
+            // 7. Slime Hutch
+            if (building.GetIndoors() is SlimeHutch || building.buildingType.Value?.Equals("Slime Hutch", StringComparison.OrdinalIgnoreCase) == true)
+            {
+                if (building.GetIndoors() is SlimeHutch sh)
+                {
+                    int slimeCount = sh.characters.Count(c => c is StardewValley.Monsters.GreenSlime);
+                    int troughsWatered = sh.waterSpots.Count(w => w);
+                    int slimeBalls = sh.Objects.Pairs.Count(o => o.Value.QualifiedItemId == "(BC)56" || o.Value.Name == "Slime Ball");
+
+                    info.Lines.Add(new TooltipLine(
+                        ModEntry.I18n.Get("hover.slimehutch.slimes-format", new { current = slimeCount, max = 20 }).ToString(),
+                        slimeCount >= 20 ? new Color(0, 140, 0) : new Color(20, 110, 220)
+                    ));
+                    info.Lines.Add(new TooltipLine(
+                        ModEntry.I18n.Get("hover.slimehutch.troughs-format", new { watered = troughsWatered, total = 4 }).ToString(),
+                        troughsWatered == 4 ? new Color(0, 140, 0) : new Color(200, 60, 20)
+                    ));
+                    if (slimeBalls > 0)
+                    {
+                        info.Lines.Add(new TooltipLine(
+                            ModEntry.I18n.Get("hover.slimehutch.slimeballs-format", new { count = slimeBalls }).ToString(),
+                            new Color(0, 140, 0)
+                        ));
+                    }
+                }
+                return info;
+            }
+
+            // 8. Stable
+            if (building is Stable || building.buildingType.Value?.Equals("Stable", StringComparison.OrdinalIgnoreCase) == true)
+            {
+                string hName = Game1.player.horseName.Value ?? ModEntry.I18n.Get("hover.stable.horse").ToString();
+                info.Lines.Add(new TooltipLine(
+                    ModEntry.I18n.Get("hover.stable.horse-info", new { name = hName }).ToString(),
+                    new Color(180, 100, 0)
+                ));
+                return info;
+            }
+
+            // 9. Animal Housing (Barn, Coop) - Only for actual AnimalHouse locations
+            if (building.GetIndoors() is AnimalHouse animalHouse)
+            {
+                int current = animalHouse.animalsThatLiveHere.Count;
+                int max = building.maxOccupants.Value > 0 ? building.maxOccupants.Value : animalHouse.animalLimit.Value;
+                bool doorOpen = building.animalDoorOpen.Value;
+
+                info.Lines.Add(new TooltipLine(
+                    ModEntry.I18n.Get("hover.building.occupants", new { current = current, max = max }),
                     new Color(20, 110, 220)
                 ));
+                info.Lines.Add(new TooltipLine(
+                    doorOpen ? ModEntry.I18n.Get("hover.animalhouse.door-open").ToString() : ModEntry.I18n.Get("hover.animalhouse.door-closed").ToString(),
+                    doorOpen ? new Color(0, 140, 0) : Color.DarkSlateGray
+                ));
+                return info;
+            }
+
+            // 10. Shed / Big Shed
+            if (building.GetIndoors() is Shed || building.buildingType.Value?.Contains("Shed", StringComparison.OrdinalIgnoreCase) == true)
+            {
+                if (building.GetIndoors() is Shed shed)
+                {
+                    int objCount = shed.Objects.Pairs.Count();
+                    info.Lines.Add(new TooltipLine(
+                        ModEntry.I18n.Get("hover.shed.objects-count", new { count = objCount }).ToString(),
+                        Color.DarkSlateGray
+                    ));
+                }
+                return info;
+            }
+
+            // 11. Greenhouse
+            if (building.buildingType.Value?.Equals("Greenhouse", StringComparison.OrdinalIgnoreCase) == true)
+            {
+                bool isRepaired = Game1.player.hasCompletedCommunityCenter()
+                               || Game1.MasterPlayer.mailReceived.Contains("jojaPantry")
+                               || Game1.MasterPlayer.mailReceived.Contains("ccPantry");
+                info.Lines.Add(new TooltipLine(
+                    isRepaired ? ModEntry.I18n.Get("hover.greenhouse.repaired").ToString() : ModEntry.I18n.Get("hover.greenhouse.needs-repair").ToString(),
+                    isRepaired ? new Color(0, 140, 0) : new Color(200, 60, 20)
+                ));
+                return info;
+            }
+
+            // 12. FarmHouse / Cabin
+            if (building.buildingType.Value?.Equals("FarmHouse", StringComparison.OrdinalIgnoreCase) == true || building.buildingType.Value?.Equals("Cabin", StringComparison.OrdinalIgnoreCase) == true)
+            {
+                int lvl = Game1.player.HouseUpgradeLevel;
+                string lvlText = lvl switch
+                {
+                    0 => ModEntry.I18n.Get("hover.farmhouse.level-0").ToString(),
+                    1 => ModEntry.I18n.Get("hover.farmhouse.level-1").ToString(),
+                    2 => ModEntry.I18n.Get("hover.farmhouse.level-2").ToString(),
+                    3 => ModEntry.I18n.Get("hover.farmhouse.level-3").ToString(),
+                    _ => ModEntry.I18n.Get("hover.farmhouse.level-default", new { level = lvl }).ToString()
+                };
+                info.Lines.Add(new TooltipLine(lvlText, new Color(180, 100, 0)));
+                return info;
+            }
+
+            // 13. Obelisks & Special Towers
+            if (building.buildingType.Value?.Contains("Obelisk", StringComparison.OrdinalIgnoreCase) == true)
+            {
+                string bType = building.buildingType.Value.ToLower();
+                string dest = bType switch
+                {
+                    var s when s.Contains("earth") => ModEntry.I18n.Get("hover.obelisk.destination-mountains").ToString(),
+                    var s when s.Contains("water") => ModEntry.I18n.Get("hover.obelisk.destination-beach").ToString(),
+                    var s when s.Contains("desert") => ModEntry.I18n.Get("hover.obelisk.destination-desert").ToString(),
+                    var s when s.Contains("island") => ModEntry.I18n.Get("hover.obelisk.destination-island").ToString(),
+                    _ => ModEntry.I18n.Get("hover.obelisk.warp-destination").ToString()
+                };
+                info.Lines.Add(new TooltipLine(dest, new Color(180, 50, 180)));
+                return info;
+            }
+
+            if (building.buildingType.Value?.Equals("Gold Clock", StringComparison.OrdinalIgnoreCase) == true)
+            {
+                info.Lines.Add(new TooltipLine(ModEntry.I18n.Get("hover.goldclock.effect").ToString(), new Color(180, 100, 0)));
+                return info;
+            }
+
+            if (building.buildingType.Value?.Equals("Well", StringComparison.OrdinalIgnoreCase) == true)
+            {
+                info.Lines.Add(new TooltipLine(ModEntry.I18n.Get("hover.well.water-source").ToString(), new Color(20, 110, 220)));
                 return info;
             }
 
@@ -487,33 +643,33 @@ namespace BetterQOL
             }
 
             info.IsProcessing = true;
-            float daysRemaining = cask.daysToMature.Value;
-            float totalAgingDays = 56f / Math.Max(0.1f, cask.agingRate.Value);
+            float rawDaysRemaining = cask.daysToMature.Value;
+            float rate = Math.Max(0.1f, cask.agingRate.Value);
 
-            // In SDV Cask math:
-            // Normal -> Silver: 25% of totalAgingDays
-            // Silver -> Gold: 25% of totalAgingDays
-            // Gold -> Iridium: 50% of totalAgingDays
-            float silverThreshold = totalAgingDays * 0.75f;
-            float goldThreshold = totalAgingDays * 0.50f;
-
-            if (held.Quality == 0) // Normal
+            // In SDV Cask aging thresholds (raw units):
+            // Normal (56..42) -> Silver at 42
+            // Silver (42..28) -> Gold at 28
+            // Gold (28..0) -> Iridium at 0
+            if (held.Quality == 0) // Normal -> Silver
             {
                 info.CaskNextQuality = 1; // Silver
-                info.CaskDaysToNextQuality = Math.Max(1, (int)Math.Ceiling(daysRemaining - silverThreshold));
+                float days = Math.Max(0f, rawDaysRemaining - 42f) / rate;
+                info.CaskDaysToNextQuality = Math.Max(1, (int)Math.Ceiling(days - 0.001f));
             }
-            else if (held.Quality == 1) // Silver
+            else if (held.Quality == 1) // Silver -> Gold
             {
                 info.CaskNextQuality = 2; // Gold
-                info.CaskDaysToNextQuality = Math.Max(1, (int)Math.Ceiling(daysRemaining - goldThreshold));
+                float days = Math.Max(0f, rawDaysRemaining - 28f) / rate;
+                info.CaskDaysToNextQuality = Math.Max(1, (int)Math.Ceiling(days - 0.001f));
             }
-            else // Gold (2)
+            else // Gold (2) -> Iridium
             {
                 info.CaskNextQuality = 4; // Iridium
-                info.CaskDaysToNextQuality = Math.Max(1, (int)Math.Ceiling(daysRemaining));
+                float days = Math.Max(0f, rawDaysRemaining) / rate;
+                info.CaskDaysToNextQuality = Math.Max(1, (int)Math.Ceiling(days - 0.001f));
             }
 
-            info.CaskDaysToIridium = Math.Max(1, (int)Math.Ceiling(daysRemaining));
+            info.CaskDaysToIridium = Math.Max(1, (int)Math.Ceiling((Math.Max(0f, rawDaysRemaining) / rate) - 0.001f));
 
             return info;
         }

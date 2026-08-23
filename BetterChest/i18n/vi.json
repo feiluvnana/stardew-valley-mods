@@ -4,6 +4,26 @@
   "config.enable-custom-rewards.tooltip": "Thay thế phần thưởng rương Hang Đầu Lâu bằng hệ thống chiến lợi phẩm 7 nhóm nâng cao.",
   "config.exclude-cosmetics.name": "Loại Bỏ Vật Phẩm Làm Đẹp",
   "config.exclude-cosmetics.tooltip": "Loại bỏ mũ, quần áo và vật phẩm trang trí khi tắt phần thưởng tùy chỉnh.",
+  "config.enable-depth-scaling.name": "Kích Hoạt Tăng Theo Độ Sâu",
+  "config.enable-depth-scaling.tooltip": "Tỉ lệ mở rương và hệ số nhân số lượng tăng dần theo độ sâu Hang Đầu Lâu (Tầng 1-49: tối đa 3 lần mở, giới hạn nhân đôi; Tầng 50-99: chuẩn; Tầng 100+: bùng nổ siêu cấp).",
+  "config.scale-legendary-by-depth.name": "Tăng Tỉ Lệ Huyền Thoại Theo Độ Sâu",
+  "config.scale-legendary-by-depth.tooltip": "Tỉ lệ xuất hiện vật phẩm Huyền Thoại tăng tuyến tính từ 10% ở Tầng 1 lên 100% mức chuẩn ở Tầng 100.",
+
+  "config.section.progression-gatekeeping": "Kiểm Soát Tiến Trình Mở Khóa",
+  "config.gatekeep-mastery-items.name": "Khóa Vật Phẩm Tinh Hoa 1.6",
+  "config.gatekeep-mastery-items.tooltip": "Chỉ cho phép Bánh Quy Động Vật Vàng, Hộp Kỳ Bí Vàng, Hạt Cây Thần Bí, Tượng Kho Báu và Mồi Thử Thách rơi khi đã mở khóa Tinh hoa tương ứng.",
+  "config.gatekeep-island-items.name": "Khóa Vật Phẩm Đảo Gừng",
+  "config.gatekeep-island-items.tooltip": "Chỉ cho phép Mảnh Tàn Tro, Răng Rồng, Dừa Vàng, Nấm Dung Nham, Bụi Tiên và Trứng Slime Hổ rơi sau khi đã đặt chân tới Đảo Gừng.",
+  "config.gatekeep-qi-items.name": "Khóa Vật Phẩm Phòng Quả Óc Chó Của Qi",
+  "config.gatekeep-qi-items.tooltip": "Chỉ cho phép Linh Hồn Thiên Hà, Vòi Tăng Áp, Bộ Bón Phân, Mồi Ma Thuật và Siêu Phân Bón rơi khi đã mở khóa Phòng Quả Óc Chó (100 Quả Óc Chó Vàng).",
+  "config.gatekeep-mystery-boxes.name": "Khóa Hộp Kỳ Bí",
+  "config.gatekeep-mystery-boxes.tooltip": "Chỉ cho phép Hộp kỳ bí rơi sau khi kích hoạt đoạn phim giới thiệu của Mr. Qi.",
+  "config.gatekeep-calico-eggs.name": "Khóa Trứng Calico",
+  "config.gatekeep-calico-eggs.tooltip": "Chỉ cho phép Trứng Calico rơi trong Lễ hội Sa mạc (15-17 Xuân) hoặc từ Năm 2 trở đi.",
+  "config.gatekeep-radioactive-items.name": "Khóa Vật Phẩm Phóng Xạ",
+  "config.gatekeep-radioactive-items.tooltip": "Chỉ cho phép Quặng và Thỏi phóng xạ xuất hiện sau khi mở khóa Phòng Quả Óc Chó của Qi hoặc kích hoạt Mỏ Nguy Hiểm.",
+  "config.gatekeep-auto-petter.name": "Khóa Máy Vuốt Ve Tự Động",
+  "config.gatekeep-auto-petter.tooltip": "Chỉ cho phép Máy vuốt ve tự động (Auto-Petter) rơi trong Hang Đầu Lâu sau khi đã hoàn thành Nhà Văn Hóa hoặc tuyến Joja.",
 
   "config.section.decaying-rolls": "Quay Thưởng Nhiều Lần (Rương Thường)",
   "config.max-rolls.name": "Số Lần Mở Tối Đa Mỗi Rương",
@@ -110,8 +130,6 @@
   "config.enable-auto-petter.tooltip": "Cho phép Máy vuốt ve tự động (Auto-Petter) xuất hiện trong nhóm phần thưởng Huyền Thoại.",
   "config.enable-radioactive-items.name": "Bật Quặng & Thỏi Phóng Xạ",
   "config.enable-radioactive-items.tooltip": "Cho phép Quặng phóng xạ và Thỏi phóng xạ xuất hiện.",
-  "config.gatekeep-radioactive-items.name": "Kiểm Soát Tiến Trình Quặng Phóng Xạ",
-  "config.gatekeep-radioactive-items.tooltip": "Chỉ cho phép Quặng và Thỏi phóng xạ xuất hiện sau khi mở khóa Phòng Quả Óc Chó của Qi hoặc kích hoạt Mỏ Nguy Hiểm.",
   "config.enable-iridium-items.name": "Bật Quặng & Thỏi Iridium",
   "config.enable-iridium-items.tooltip": "Cho phép Quặng Iridium và Thỏi Iridium xuất hiện.",
   "config.enable-coal.name": "Bật Than Đá",
@@ -147,5 +165,8 @@
   "config.golden-chest-max-rolls.name": "Số Lượt Mở Tối Đa (Rương Vàng)",
   "config.golden-chest-max-rolls.tooltip": "Số lượt mở tối đa của rương câu cá vàng 1.6 (mặc định 8).",
   "config.enable-fishing-trash-reroll-bonus.name": "Bật Lượt Mở Bù Khi Trúng Rác",
-  "config.enable-fishing-trash-reroll-bonus.tooltip": "Tự động cộng thêm +1 lượt mở phần thưởng chất lượng cho mỗi món rác hoặc vật phẩm vụn trong rương."
+  "config.enable-fishing-trash-reroll-bonus.tooltip": "Tự động cộng thêm +1 lượt mở phần thưởng chất lượng cho mỗi món rác hoặc vật phẩm vụn trong rương.",
+
+  "hud.chest-reward-summary": "♦ {{items}}",
+  "hud.chest-reward-more": "(+{{count}} phần thưởng khác)"
 }

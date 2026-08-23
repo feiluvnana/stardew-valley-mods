@@ -168,8 +168,10 @@ namespace BetterChest
         /// </summary>
         public static bool IsDesertFestivalActive()
         {
-            // Desert Festival occurs on Spring 15, 16, and 17
-            return Game1.season == Season.Spring && Game1.dayOfMonth >= 15 && Game1.dayOfMonth <= 17;
+            if (Utility.IsPassiveFestivalDay("DesertFestival"))
+                return true;
+
+            return Game1.dayOfMonth >= 15 && Game1.dayOfMonth <= 17;
         }
 
         /// <summary>

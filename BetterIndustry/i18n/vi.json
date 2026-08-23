@@ -7,5 +7,18 @@
 
   "config.section.artisan": "Tùy Chọn Hàng Thủ Công Nghệ Nhân",
   "config.mead-fix.name": "Rượu Mật Ong Theo Loại Hoa",
-  "config.mead-fix.tooltip": "Rượu mật ong sẽ tính giá bán dựa trên loại mật ong hoa đưa vào thùng ủ."
+  "config.mead-fix.tooltip": "Rượu mật ong giữ nguyên loại hoa và nhân đôi (2.0x) giá trị của loại mật ong hoa đưa vào.",
+  "config.quality-preserving.name": "Giữ Sao Chất Lượng Cho Máy",
+  "config.quality-preserving.tooltip": "Các máy thủ công (Thùng ủ Keg, Hũ mứt, Máy ép phô mai, Máy làm sốt mayonnaise, Khung cửi, Máy ép dầu) sẽ giữ nguyên cấp chất lượng (sao) của nguyên liệu đầu vào.",
+  "config.truffle-oil-fix.name": "Sửa Giá Dầu Nấm",
+  "config.truffle-oil-fix.tooltip": "Dầu Nấm sẽ tính giá và giữ sao chất lượng theo củ Nấm Cục đầu vào, tránh tình trạng bị lỗ khi ép Nấm Cục chất lượng cao.",
+  "config.truffle-oil-multiplier.name": "Hệ Số Giá Dầu Nấm",
+  "config.truffle-oil-multiplier.tooltip": "Hệ số nhân giá bán Dầu Nấm so với giá củ Nấm Cục nguyên liệu (ví dụ 1.5 = 150%).",
+  "config.juice-buff.name": "Tăng Giá Nước Ép Rau Củ",
+  "config.juice-buff.tooltip": "Tăng hệ số nhân giá bán cho nước ép rau củ khi ủ trong Thùng ủ (Keg).",
+  "config.juice-multiplier.name": "Hệ Số Giá Nước Ép",
+  "config.juice-multiplier.tooltip": "Hệ số nhân giá nước ép rau củ so với giá rau củ thô (mặc định 2.75x, gốc 2.25x).",
+  "config.expanded-aging.name": "Mở Rộng Thùng Ủ Hầm (Cask)",
+  "config.expanded-aging.tooltip": "Cho phép Thùng ủ hầm (Cask) ủ già thêm các mặt hàng thủ công như Nước ép rau củ."
 }
+

@@ -1,14 +1,18 @@
 # 🏭 BetterIndustry
 
-**BetterIndustry** is a high-efficiency artisan goods and cooking rebalance suite for **Stardew Valley 1.6+**, featuring flower mead value retention and profitable cooking price scaling.
+**BetterIndustry** is a high-efficiency artisan goods and cooking rebalance suite for **Stardew Valley 1.6+**, eliminating the most frustrating pain points of the artisan and culinary systems.
 
 ---
 
 ## 📖 Table of Contents
 1. [Module 1: Flower Honey Mead Fix](#-module-1-flower-honey-mead-fix)
 2. [Module 2: Cooking Profit Balancing](#-module-2-cooking-profit-balancing)
-3. [⚙️ Configuration (GMCM & config.json)](#️-configuration-gmcm--configjson)
-4. [🛠️ Building & Installation](#️-building--installation)
+3. [Module 3: Quality-Preserving Machines](#-module-3-quality-preserving-machines)
+4. [Module 4: Truffle Oil Scaling Fix](#-module-4-truffle-oil-scaling-fix)
+5. [Module 5: Vegetable Juice Buff](#-module-5-vegetable-juice-buff)
+6. [Module 6: Expanded Cask Aging](#-module-6-expanded-cask-aging)
+7. [⚙️ Configuration (GMCM & config.json)](#️-configuration-gmcm--configjson)
+8. [🛠️ Building & Installation](#️-building--installation)
 
 ---
 
@@ -37,21 +41,87 @@ In vanilla, many cooked recipes sell for less than the raw ingredients required 
 
 ---
 
+## ⭐ Module 3: Quality-Preserving Machines
+
+In vanilla, artisan machines strip all star quality (Silver, Gold, Iridium) from input items, penalizing players for using high-quality crops and animal products.
+
+### Features
+* **Full Quality Inheritance:** Kegs, Preserves Jars, Cheese Presses, Mayonnaise Machines, Looms, Dehydrators, and Fish Smokers preserve the input item's star quality on finished goods.
+* **Examples:**
+  * *Iridium Starfruit* in Keg $\rightarrow$ **Iridium Starfruit Wine**.
+  * *Iridium Large Milk* in Cheese Press $\rightarrow$ **Iridium Cheese**.
+  * *Iridium Egg* in Mayo Machine $\rightarrow$ **Iridium Mayonnaise**.
+  * *Iridium Wool* in Loom $\rightarrow$ **Iridium Cloth** (2.0x base sell value).
+
+---
+
+## 🍄 Module 4: Truffle Oil Scaling Fix
+
+In vanilla, an Iridium Truffle sells for **1,250g raw**, but Truffle Oil sells for only **1,065g base**—a net **loss of 185g** without the Artisan profession.
+
+### BetterIndustry Formula
+* **Proportional Scaling:** Truffle Oil price is dynamically computed from input Truffle value using `TruffleOilMultiplier` (default **1.5x**) and retains the Truffle's quality star:
+  $$\text{Truffle Oil Price} = \text{Input Truffle Value} \times \text{TruffleOilMultiplier}$$
+
+| Truffle Quality | Raw Sale Value | Vanilla Oil Sale | BetterIndustry Oil (Base) | BetterIndustry Oil (Artisan) |
+| :--- | :---: | :---: | :---: | :---: |
+| **Regular** | 625g | 1,065g | **937g** | **1,311g** |
+| **Silver** | 781g | 1,065g | **1,171g** | **1,639g** |
+| **Gold** | 937g | 1,065g | **1,405g** | **1,967g** |
+| **Iridium** | 1,250g | 1,065g | **1,875g** | **2,625g** |
+
+---
+
+## 🥕 Module 5: Vegetable Juice Buff
+
+In vanilla, fruit wines receive a 3.0x multiplier and can be aged in casks, while vegetable juices receive only a 2.25x multiplier and cannot be aged, heavily disincentivizing vegetable farming.
+
+### BetterIndustry Formula
+* **Enhanced Multiplier:** Boosts Vegetable Juice price scaling from 2.25x to `JuiceMultiplier` (default **2.75x**):
+  $$\text{Juice Price} = \text{Base Vegetable Price} \times \text{JuiceMultiplier}$$
+* **Example (Pumpkin, 320g base):**
+  * Vanilla Juice: 720g base (1,008g Artisan).
+  * BetterIndustry Juice: **880g base** (**1,232g Artisan**).
+
+---
+
+## 🍷 Module 6: Expanded Cask Aging
+
+In vanilla, Casks in the Farmhouse Cellar can only age Wine, Cheese, Goat Cheese, Beer, Mead, and Pale Ale.
+
+### Features
+* **Juice Aging:** Vegetable Juice can now be placed into Casks to age from normal to Silver, Gold, and Iridium quality (Aging rate: 4.0, matching Wine).
+* Reaches Iridium quality in 56 days for a 2.0x value bonus!
+
+---
+
 ## ⚙️ Configuration (GMCM & config.json)
 
 ```json
 {
   "EnableCookingBalancing": true,
   "CookingProfitMargin": 1.25,
-  "EnableMeadFix": true
+  "EnableMeadFix": true,
+  "EnableQualityPreserving": true,
+  "EnableTruffleOilFix": true,
+  "TruffleOilMultiplier": 1.5,
+  "EnableJuiceBuff": true,
+  "JuiceMultiplier": 2.75,
+  "EnableExpandedAging": true
 }
 ```
 
-| Category | Setting | Default | Description |
-| :--- | :--- | :---: | :--- |
-| **Cooking** | `EnableCookingBalancing` | `true` | Enables ingredient-based cooking price scaling. |
-| **Cooking** | `CookingProfitMargin` | `1.25` | Minimum profit multiplier over raw ingredients (1.25 = +25%). |
-| **Artisan** | `EnableMeadFix` | `true` | Retains flower honey flavor and 2.0x value scaling when brewed into mead. |
+| Category | Setting | Default | Range / Step | Description |
+| :--- | :--- | :---: | :---: | :--- |
+| **Cooking** | `EnableCookingBalancing` | `true` | bool | Enables ingredient-based cooking price scaling. |
+| **Cooking** | `CookingProfitMargin` | `1.25` | `1.0` – `5.0` (`0.05`) | Minimum profit multiplier over raw ingredients (+25%). |
+| **Artisan** | `EnableMeadFix` | `true` | bool | Retains flower honey flavor and 2.0x value scaling when brewed into mead. |
+| **Artisan** | `EnableQualityPreserving` | `true` | bool | Preserves input star quality across all artisan machines. |
+| **Artisan** | `EnableTruffleOilFix` | `true` | bool | Truffle Oil scales value and quality based on the input Truffle. |
+| **Artisan** | `TruffleOilMultiplier` | `1.5` | `1.0` – `3.0` (`0.05`) | Multiplier for Truffle Oil relative to input truffle price. |
+| **Artisan** | `EnableJuiceBuff` | `true` | bool | Buffs the price multiplier for Vegetable Juice brewed in Kegs. |
+| **Artisan** | `JuiceMultiplier` | `2.75` | `1.0` – `5.0` (`0.05`) | Multiplier for Vegetable Juice relative to raw vegetable price. |
+| **Artisan** | `EnableExpandedAging` | `true` | bool | Allows Casks to age additional artisan goods (Vegetable Juice). |
 
 ---
 
@@ -64,10 +134,12 @@ In vanilla, many cooked recipes sell for less than the raw ingredients required 
 
 ### Building from Source
 ```powershell
-dotnet build BetterIndustry.csproj
+Set-Location -LiteralPath "d:\dev\winget\Valve.Steam\steamapps\common\Stardew Valley\Mods\`[feiluvnana Mods`]"
+dotnet build "BetterIndustry/BetterIndustry.csproj"
 ```
 
 ---
 
 ## 📄 License
 Created by **feiluvnana** for Stardew Valley 1.6+. Built with SMAPI.
+

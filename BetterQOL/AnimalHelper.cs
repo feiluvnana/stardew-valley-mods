@@ -1,6 +1,4 @@
 using System;
-using System.Reflection;
-using Netcode;
 using StardewValley;
 using StardewValley.Characters;
 
@@ -25,19 +23,19 @@ namespace BetterQOL
             if (animal == null)
                 return null;
 
-            int friendship = GetAnimalFriendship(animal);
+            int friendship = animal.friendshipTowardFarmer.Value;
 
             var info = new AnimalInfo
             {
-                Name = animal.Name,
+                Name = !string.IsNullOrEmpty(animal.displayName) ? animal.displayName : animal.Name,
                 TypeName = animal.displayType,
                 WasPetToday = animal.wasPet.Value,
-                FriendshipPoints = friendship,
-                Hearts = Math.Min(5f, friendship / 200f),
+                FriendshipPoints = Math.Max(0, friendship),
+                Hearts = Math.Clamp(friendship / 200f, 0f, 5f),
                 IsPet = false
             };
 
-            if (animal.currentProduce.Value != null && CanAnimalBeHarvested(animal))
+            if (!string.IsNullOrEmpty(animal.currentProduce.Value) && animal.currentProduce.Value != "0")
             {
                 info.HasProduceReady = true;
                 var produceData = ItemRegistry.GetData(animal.currentProduce.Value) ?? ItemRegistry.GetData($"(O){animal.currentProduce.Value}");
@@ -52,81 +50,18 @@ namespace BetterQOL
             if (pet == null)
                 return null;
 
-            int friendship = GetPetFriendship(pet);
+            int friendship = pet.friendshipTowardFarmer.Value;
             bool wasPet = WasPetToday(pet);
 
             return new AnimalInfo
             {
-                Name = pet.Name,
+                Name = !string.IsNullOrEmpty(pet.displayName) ? pet.displayName : pet.Name,
                 TypeName = pet.petType.Value ?? ModEntry.I18n.Get("hover.type.pet"),
                 WasPetToday = wasPet,
-                FriendshipPoints = friendship,
-                Hearts = Math.Min(5f, friendship / 200f),
+                FriendshipPoints = Math.Max(0, friendship),
+                Hearts = Math.Clamp(friendship / 200f, 0f, 5f),
                 IsPet = true
             };
-        }
-
-        private static int GetAnimalFriendship(FarmAnimal animal)
-        {
-            var field = typeof(FarmAnimal).GetField("friendshipData", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-                     ?? typeof(FarmAnimal).GetField("friendshipPoints", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-                     ?? typeof(FarmAnimal).GetField("friendship", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-
-            if (field?.GetValue(animal) is NetInt netInt)
-                return netInt.Value;
-            if (field?.GetValue(animal) is int val)
-                return val;
-
-            var prop = typeof(FarmAnimal).GetProperty("friendshipData", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-                    ?? typeof(FarmAnimal).GetProperty("friendshipPoints", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-                    ?? typeof(FarmAnimal).GetProperty("friendship", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-                    ?? typeof(FarmAnimal).GetProperty("Friendship", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-
-            if (prop?.GetValue(animal) is NetInt netIntProp)
-                return netIntProp.Value;
-            if (prop?.GetValue(animal) is int propVal)
-                return propVal;
-
-            return 0;
-        }
-
-        private static bool CanAnimalBeHarvested(FarmAnimal animal)
-        {
-            var readyObj = typeof(FarmAnimal).GetField("readyForHarvest", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(animal)
-                        ?? typeof(FarmAnimal).GetProperty("readyForHarvest", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(animal);
-            if (readyObj is NetBool readyNetBool)
-                return readyNetBool.Value;
-
-            var method = typeof(FarmAnimal).GetMethod("isHarvestable", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-                      ?? typeof(FarmAnimal).GetMethod("canBeHarvested", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-            if (method != null && method.Invoke(animal, null) is bool res)
-                return res;
-
-            return animal.currentProduce.Value != null;
-        }
-
-        private static int GetPetFriendship(Pet pet)
-        {
-            var field = typeof(Pet).GetField("friendshipPoints", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-                     ?? typeof(Pet).GetField("friendship", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-                     ?? typeof(Pet).GetField("friendshipData", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-
-            if (field?.GetValue(pet) is NetInt netInt)
-                return netInt.Value;
-            if (field?.GetValue(pet) is int val)
-                return val;
-
-            var prop = typeof(Pet).GetProperty("friendshipPoints", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-                    ?? typeof(Pet).GetProperty("friendship", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-                    ?? typeof(Pet).GetProperty("friendshipData", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-                    ?? typeof(Pet).GetProperty("Friendship", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-
-            if (prop?.GetValue(pet) is NetInt netIntProp)
-                return netIntProp.Value;
-            if (prop?.GetValue(pet) is int propVal)
-                return propVal;
-
-            return 0;
         }
 
         private static bool WasPetToday(Pet pet)
@@ -138,10 +73,6 @@ namespace BetterQOL
             {
                 return lastDay == Game1.Date.TotalDays;
             }
-
-            var wasPetField = typeof(Pet).GetField("wasPet", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-            if (wasPetField?.GetValue(pet) is NetBool wasPetNet)
-                return wasPetNet.Value;
 
             return false;
         }

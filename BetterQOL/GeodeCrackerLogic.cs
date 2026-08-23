@@ -134,7 +134,7 @@ namespace BetterQOL
         }
 
         /// <summary>
-        /// Consolidates duplicate items into single stacks where possible.
+        /// Consolidates duplicate items into single stacks where possible without exceeding max stack size.
         /// </summary>
         public static List<Item> ConsolidateTreasures(List<Item> items)
         {
@@ -143,21 +143,30 @@ namespace BetterQOL
             {
                 if (item == null) continue;
 
-                bool merged = false;
                 if (item.maximumStackSize() > 1)
                 {
                     foreach (var existing in consolidated)
                     {
                         if (existing.canStackWith(item))
                         {
-                            existing.Stack += item.Stack;
-                            merged = true;
-                            break;
+                            int maxStack = existing.maximumStackSize();
+                            int space = maxStack - existing.Stack;
+                            if (space >= item.Stack)
+                            {
+                                existing.Stack += item.Stack;
+                                item.Stack = 0;
+                                break;
+                            }
+                            else if (space > 0)
+                            {
+                                existing.Stack = maxStack;
+                                item.Stack -= space;
+                            }
                         }
                     }
                 }
 
-                if (!merged)
+                if (item.Stack > 0)
                 {
                     consolidated.Add(item);
                 }

@@ -2,7 +2,7 @@
   <PropertyGroup>
     <AssemblyName>ExtendedDesertFestival</AssemblyName>
     <RootNamespace>ExtendedDesertFestival</RootNamespace>
-    <Version>1.1.0</Version>
+    <Version>1.1.1</Version>
     <TargetFramework>net6.0</TargetFramework>
     <Platforms>AnyCPU</Platforms>
     <EnableModDeploy>false</EnableModDeploy>

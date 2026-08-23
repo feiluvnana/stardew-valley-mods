@@ -6,7 +6,7 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v6.0": {
-      "BetterIndustry/1.0.0": {
+      "BetterIndustry/2.0.2": {
         "runtime": {
           "BetterIndustry.dll": {}
         }
@@ -14,7 +14,7 @@
     }
   },
   "libraries": {
-    "BetterIndustry/1.0.0": {
+    "BetterIndustry/2.0.2": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

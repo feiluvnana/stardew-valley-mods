@@ -137,15 +137,16 @@ namespace BetterQOL
                 info.Name = ModEntry.I18n.Get("hover.bush.tea");
                 info.Subtitle = ModEntry.I18n.Get("hover.type.tea-bush");
 
-                int age = bush.getAge();
+                int age = Math.Max(0, bush.getAge());
                 if (age < 20)
                 {
                     info.IsMature = false;
-                    info.DaysUntilMature = 20 - age;
+                    info.DaysUntilMature = Math.Max(1, 20 - age);
                 }
                 else
                 {
                     info.IsMature = true;
+                    info.DaysUntilMature = 0;
                     info.IsInBloom = bush.inBloom();
                 }
                 return info;
@@ -155,6 +156,7 @@ namespace BetterQOL
                 info.Name = ModEntry.I18n.Get("hover.bush.berry");
                 info.Subtitle = ModEntry.I18n.Get("hover.type.berry-bush");
                 info.IsMature = true;
+                info.DaysUntilMature = 0;
                 info.IsInBloom = bush.inBloom();
                 return info;
             }

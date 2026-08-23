@@ -7,5 +7,18 @@
 
   "config.section.artisan": "Artisan Goods Options",
   "config.mead-fix.name": "Mead Flavor & Value Fix",
-  "config.mead-fix.tooltip": "Mead scales price based on the input honey flower type."
+  "config.mead-fix.tooltip": "Mead preserves the underlying flower type and scales to 2.0x of the flower honey value.",
+  "config.quality-preserving.name": "Quality-Preserving Machines",
+  "config.quality-preserving.tooltip": "Artisan machines (Keg, Preserves Jar, Cheese Press, Mayo Machine, Loom, Oil Maker) preserve the input item's star quality.",
+  "config.truffle-oil-fix.name": "Truffle Oil Scaling Fix",
+  "config.truffle-oil-fix.tooltip": "Truffle Oil price and quality scale with the input Truffle, preventing losses on high-quality truffles.",
+  "config.truffle-oil-multiplier.name": "Truffle Oil Multiplier",
+  "config.truffle-oil-multiplier.tooltip": "Price multiplier for Truffle Oil relative to the input Truffle value (e.g. 1.5 = 150%).",
+  "config.juice-buff.name": "Vegetable Juice Buff",
+  "config.juice-buff.tooltip": "Increases the selling price multiplier for Vegetable Juice brewed in Kegs.",
+  "config.juice-multiplier.name": "Juice Multiplier",
+  "config.juice-multiplier.tooltip": "Price multiplier for Vegetable Juice relative to raw vegetable price (default 2.75x, vanilla 2.25x).",
+  "config.expanded-aging.name": "Expanded Cask Aging",
+  "config.expanded-aging.tooltip": "Allows Casks to age additional artisan goods such as Vegetable Juice."
 }
+

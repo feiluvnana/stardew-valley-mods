@@ -324,9 +324,9 @@ namespace BetterQOL
                 {
                     string qualityStar = info.HeldItemQuality switch
                     {
-                        1 => " (Silver)",
-                        2 => " (Gold)",
-                        4 => " (Iridium)",
+                        1 => $" ({ModEntry.I18n.Get("hover.quality.silver")})",
+                        2 => $" ({ModEntry.I18n.Get("hover.quality.gold")})",
+                        4 => $" ({ModEntry.I18n.Get("hover.quality.iridium")})",
                         _ => string.Empty
                     };
                     heldLabel += qualityStar;
@@ -373,7 +373,8 @@ namespace BetterQOL
             {
                 if (info.CrabPotHasBait)
                 {
-                    tooltip.Lines.Add(new TooltipLine(ModEntry.I18n.Get("hover.crabpot.baited", new { bait = info.CrabPotBaitName ?? "Bait" }), new Color(20, 110, 220)));
+                    string baitName = info.CrabPotBaitName ?? ModEntry.I18n.Get("hover.crabpot.default-bait").ToString();
+                    tooltip.Lines.Add(new TooltipLine(ModEntry.I18n.Get("hover.crabpot.baited", new { bait = baitName }), new Color(20, 110, 220)));
                     tooltip.Lines.Add(new TooltipLine(ModEntry.I18n.Get("hover.crabpot.catching"), Color.DarkSlateGray));
                 }
                 else

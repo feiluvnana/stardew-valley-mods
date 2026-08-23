@@ -29,6 +29,7 @@ namespace ExtendedDesertFestival
 
             helper.Events.Content.AssetRequested += OnAssetRequested;
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
+            helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
             helper.Events.GameLoop.DayStarted += OnDayStarted;
             helper.Events.GameLoop.DayEnding += OnDayEnding;
         }
@@ -45,18 +46,6 @@ namespace ExtendedDesertFestival
             };
         }
 
-        public static bool IsDesertFestivalDay(int dayOfMonth, Season season)
-        {
-            if (season == Season.Spring)
-            {
-                return dayOfMonth >= 15 && dayOfMonth <= 17;
-            }
-
-            int start = Math.Clamp(Config.FestivalStartDay, 1, 28);
-            int end = Math.Clamp(Config.FestivalEndDay, start, 28);
-            return dayOfMonth >= start && dayOfMonth <= end && IsSeasonEnabled(season);
-        }
-
         private void OnAssetRequested(object? sender, AssetRequestedEventArgs e)
         {
             if (e.NameWithoutLocale.IsEquivalentTo("Data/PassiveFestivals"))
@@ -66,17 +55,18 @@ namespace ExtendedDesertFestival
                     var data = asset.AsDictionary<string, PassiveFestivalData>().Data;
                     if (data.TryGetValue("DesertFestival", out var festival))
                     {
-                        if (Game1.season == Season.Spring)
+                        Season currentSeason = Context.IsWorldReady ? Game1.season : Season.Spring;
+                        if (currentSeason == Season.Spring)
                         {
                             // Never alter vanilla Spring Desert Festival (always Spring 15-17)
                             festival.Season = Season.Spring;
                             festival.StartDay = 15;
                             festival.EndDay = 17;
                         }
-                        else if (IsSeasonEnabled(Game1.season))
+                        else if (IsSeasonEnabled(currentSeason))
                         {
                             // Extended Desert Festival for Summer, Fall, Winter
-                            festival.Season = Game1.season;
+                            festival.Season = currentSeason;
                             int start = Math.Clamp(Config.FestivalStartDay, 1, 28);
                             int end = Math.Clamp(Config.FestivalEndDay, start, 28);
                             festival.StartDay = start;
@@ -85,6 +75,12 @@ namespace ExtendedDesertFestival
                     }
                 });
             }
+        }
+
+        private void OnSaveLoaded(object? sender, SaveLoadedEventArgs e)
+        {
+            // Invalidate cache upon loading save to ensure correct season config for mid-season loads
+            Helper.GameContent.InvalidateCache("Data/PassiveFestivals");
         }
 
         private void OnDayStarted(object? sender, DayStartedEventArgs e)
