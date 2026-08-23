@@ -38,6 +38,7 @@ namespace BetterChest
 
             var harmony = new Harmony(ModManifest.UniqueID);
             FishingPatches.Apply(harmony);
+            ChestPatches.Apply(harmony);
 
             helper.Events.Player.Warped += OnWarped;
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
@@ -133,45 +134,10 @@ namespace BetterChest
 
             foreach (var chest in allChests)
             {
-                if (chest.modData.ContainsKey(GeneratedModDataKey))
-                    continue;
-
-                chest.modData[GeneratedModDataKey] = "true";
-                bool isSpecial = isForcedSpecialChest;
-
-                if (Config.EnableCustomRewards)
-                {
-                    var rewards = RewardGenerator.GenerateRewards(Config, Game1.random, isSpecialChest: isSpecial, mineLevel: shaft.mineLevel);
-                    if (rewards.Count > 0)
-                    {
-                        chest.Items.Clear();
-                        foreach (var reward in rewards)
-                        {
-                            var leftover = chest.addItem(reward);
-                            if (leftover != null && leftover.Stack > 0)
-                            {
-                                chest.Items.Add(leftover);
-                            }
-                        }
-                    }
-                }
-                else if (Config.ExcludeCosmetics)
-                {
-                    for (int i = chest.Items.Count - 1; i >= 0; i--)
-                    {
-                        if (chest.Items[i] != null && RewardGenerator.IsCosmeticItem(chest.Items[i]))
-                        {
-                            chest.Items.RemoveAt(i);
-                        }
-                    }
-
-                    if (chest.Items.Count == 0)
-                    {
-                        // Generate a single vanilla-equivalent fallback item instead of full custom pool
-                        Item fallback = ItemRegistry.Create("(O)337", Game1.random.Next(3, 8)); // 3-7x Iridium Bar
-                        chest.addItem(fallback);
-                    }
-                }
+                // Loot is NOT rolled here: rewards are rolled per-player at open time (see ChestPatches)
+                // so that every player gets their own independent roll from the same chest.
+                if (!chest.modData.ContainsKey(GeneratedModDataKey))
+                    chest.modData[GeneratedModDataKey] = "true";
             }
         }
 
