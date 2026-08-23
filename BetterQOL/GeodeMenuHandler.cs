@@ -240,6 +240,13 @@ namespace BetterQOL
             }
         }
 
+        private static void ResetGeodeAnimation(GeodeMenu menu)
+        {
+            menu.geodeAnimationTimer = 0;
+            menu.geodeDestructionAnimation = null;
+            menu.geodeTreasure = null;
+        }
+
         private static void OnButtonPressed(object? sender, ButtonPressedEventArgs e)
         {
             if (Game1.activeClickableMenu is not GeodeMenu menu || menu.waitingForServerResponse)
@@ -250,8 +257,8 @@ namespace BetterQOL
 
             UpdateCrackAllButton(menu);
 
-            int mouseX = (int)e.Cursor.ScreenPixels.X;
-            int mouseY = (int)e.Cursor.ScreenPixels.Y;
+            int mouseX = Game1.getMouseX(true);
+            int mouseY = Game1.getMouseY(true);
 
             bool isCrackAllClicked = Config.ShowCrackAllButton && CrackAllButton != null && (CrackAllButton.containsPoint(mouseX, mouseY) || (Game1.options.SnappyMenus && menu.currentlySnappedComponent == CrackAllButton));
             bool isAnvilClicked = menu.geodeSpot != null && menu.geodeSpot.containsPoint(mouseX, mouseY);
@@ -261,11 +268,23 @@ namespace BetterQOL
             {
                 Helper.Input.Suppress(e.Button);
 
-                Item? targetItem = menu.heldItem;
-                if (targetItem == null || !GeodeCrackerLogic.IsCrackable(targetItem))
+                // Priority: 1) Held item on cursor, 2) Item on anvil, 3) First crackable geode stack found in inventory
+                Item? targetItem = null;
+                bool isHeld = false;
+                bool isAnvil = false;
+
+                if (menu.heldItem != null && GeodeCrackerLogic.IsCrackable(menu.heldItem))
                 {
-                    targetItem = null;
-                    // If Crack All is clicked without holding an item, crack first geode stack found in inventory
+                    targetItem = menu.heldItem;
+                    isHeld = true;
+                }
+                else if (menu.geodeSpot?.item != null && GeodeCrackerLogic.IsCrackable(menu.geodeSpot.item))
+                {
+                    targetItem = menu.geodeSpot.item;
+                    isAnvil = true;
+                }
+                else
+                {
                     foreach (var invItem in Game1.player.Items)
                     {
                         if (invItem != null && GeodeCrackerLogic.IsCrackable(invItem))
@@ -289,10 +308,17 @@ namespace BetterQOL
                     var result = GeodeCrackerLogic.ProcessBatch(Game1.player, targetItem, countToCrack, Config);
                     if (result.CountCracked > 0)
                     {
-                        if (targetItem == menu.heldItem && targetItem.Stack <= 0)
+                        if (isHeld && targetItem.Stack <= 0)
                         {
                             menu.heldItem = null;
                         }
+                        else if (isAnvil && targetItem.Stack <= 0 && menu.geodeSpot != null)
+                        {
+                            menu.geodeSpot.item = null;
+                        }
+
+                        // Reset any pending single-geode animations
+                        ResetGeodeAnimation(menu);
 
                         // Sparkle animation on anvil
                         int sparkX = (menu.geodeSpot?.bounds.X ?? menu.xPositionOnScreen) + 392 - 32;
@@ -317,18 +343,28 @@ namespace BetterQOL
             }
             else if (isAnvilClicked)
             {
-                Item? targetItem = menu.heldItem;
-                if (targetItem == null || !GeodeCrackerLogic.IsCrackable(targetItem))
+                Item? targetItem = null;
+                bool isHeld = false;
+                bool isAnvil = false;
+
+                if (menu.heldItem != null && GeodeCrackerLogic.IsCrackable(menu.heldItem))
                 {
-                    if (isShiftDown)
+                    targetItem = menu.heldItem;
+                    isHeld = true;
+                }
+                else if (menu.geodeSpot?.item != null && GeodeCrackerLogic.IsCrackable(menu.geodeSpot.item))
+                {
+                    targetItem = menu.geodeSpot.item;
+                    isAnvil = true;
+                }
+                else if (isShiftDown)
+                {
+                    foreach (var invItem in Game1.player.Items)
                     {
-                        foreach (var invItem in Game1.player.Items)
+                        if (invItem != null && GeodeCrackerLogic.IsCrackable(invItem))
                         {
-                            if (invItem != null && GeodeCrackerLogic.IsCrackable(invItem))
-                            {
-                                targetItem = invItem;
-                                break;
-                            }
+                            targetItem = invItem;
+                            break;
                         }
                     }
                 }
@@ -351,10 +387,17 @@ namespace BetterQOL
                         var result = GeodeCrackerLogic.ProcessBatch(Game1.player, targetItem, countToCrack, Config);
                         if (result.CountCracked > 0)
                         {
-                            if (targetItem == menu.heldItem && targetItem.Stack <= 0)
+                            if (isHeld && targetItem.Stack <= 0)
                             {
                                 menu.heldItem = null;
                             }
+                            else if (isAnvil && targetItem.Stack <= 0 && menu.geodeSpot != null)
+                            {
+                                menu.geodeSpot.item = null;
+                            }
+
+                            // Reset single geode animation
+                            ResetGeodeAnimation(menu);
 
                             int sparkX = (menu.geodeSpot?.bounds.X ?? menu.xPositionOnScreen) + 392 - 32;
                             int sparkY = (menu.geodeSpot?.bounds.Y ?? menu.yPositionOnScreen) + 192 - 32;
@@ -370,7 +413,7 @@ namespace BetterQOL
                             );
                         }
                     }
-                    else if (Config.InstantCracking && targetItem == menu.heldItem)
+                    else if (Config.InstantCracking && (isHeld || isAnvil))
                     {
                         // Single crack instant mode
                         Helper.Input.Suppress(e.Button);
@@ -382,13 +425,20 @@ namespace BetterQOL
                             return;
                         }
 
-                        var result = GeodeCrackerLogic.ProcessBatch(Game1.player, menu.heldItem, 1, Config);
+                        var result = GeodeCrackerLogic.ProcessBatch(Game1.player, targetItem, 1, Config);
                         if (result.CountCracked > 0)
                         {
-                            if (menu.heldItem.Stack <= 0)
+                            if (isHeld && targetItem.Stack <= 0)
                             {
                                 menu.heldItem = null;
                             }
+                            else if (isAnvil && targetItem.Stack <= 0 && menu.geodeSpot != null)
+                            {
+                                menu.geodeSpot.item = null;
+                            }
+
+                            // Reset single geode animation
+                            ResetGeodeAnimation(menu);
 
                             int sparkX = (menu.geodeSpot?.bounds.X ?? menu.xPositionOnScreen) + 392 - 32;
                             int sparkY = (menu.geodeSpot?.bounds.Y ?? menu.yPositionOnScreen) + 192 - 32;

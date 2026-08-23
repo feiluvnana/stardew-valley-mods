@@ -285,7 +285,7 @@ namespace BetterChest
                 getValue: () => Config.MaxRolls,
                 setValue: value => Config.MaxRolls = value,
                 min: 1,
-                max: 6
+                max: 8
             );
             configMenu.AddNumberOption(
                 mod: ModManifest,
@@ -333,6 +333,26 @@ namespace BetterChest
                 tooltip: () => I18n.Get("config.roll-6-chance.tooltip"),
                 getValue: () => Config.Roll6Chance,
                 setValue: value => Config.Roll6Chance = value,
+                min: 0.0f,
+                max: 1.0f,
+                interval: 0.01f
+            );
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.roll-7-chance.name"),
+                tooltip: () => I18n.Get("config.roll-7-chance.tooltip"),
+                getValue: () => Config.Roll7Chance,
+                setValue: value => Config.Roll7Chance = value,
+                min: 0.0f,
+                max: 1.0f,
+                interval: 0.01f
+            );
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.roll-8-chance.name"),
+                tooltip: () => I18n.Get("config.roll-8-chance.tooltip"),
+                getValue: () => Config.Roll8Chance,
+                setValue: value => Config.Roll8Chance = value,
                 min: 0.0f,
                 max: 1.0f,
                 interval: 0.01f
@@ -749,10 +769,17 @@ namespace BetterChest
             );
             configMenu.AddBoolOption(
                 mod: ModManifest,
-                name: () => I18n.Get("config.enable-warp-totems.name"),
-                tooltip: () => I18n.Get("config.enable-warp-totems.tooltip"),
-                getValue: () => Config.EnableWarpTotems,
-                setValue: value => Config.EnableWarpTotems = value
+                name: () => I18n.Get("config.enable-coal.name"),
+                tooltip: () => I18n.Get("config.enable-coal.tooltip"),
+                getValue: () => Config.EnableCoal,
+                setValue: value => Config.EnableCoal = value
+            );
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.enable-hardwood.name"),
+                tooltip: () => I18n.Get("config.enable-hardwood.tooltip"),
+                getValue: () => Config.EnableHardwood,
+                setValue: value => Config.EnableHardwood = value
             );
             configMenu.AddBoolOption(
                 mod: ModManifest,
@@ -790,82 +817,48 @@ namespace BetterChest
                 getValue: () => Config.EnableFishingChestBuff,
                 setValue: value => Config.EnableFishingChestBuff = value
             );
-            configMenu.AddBoolOption(
+            configMenu.AddNumberOption(
                 mod: ModManifest,
-                name: () => I18n.Get("config.filter-fishing-chest-junk.name"),
-                tooltip: () => I18n.Get("config.filter-fishing-chest-junk.tooltip"),
-                getValue: () => Config.FilterFishingChestJunk,
-                setValue: value => Config.FilterFishingChestJunk = value
-            );
-            configMenu.AddBoolOption(
-                mod: ModManifest,
-                name: () => I18n.Get("config.boost-fishing-resource-stacks.name"),
-                tooltip: () => I18n.Get("config.boost-fishing-resource-stacks.tooltip"),
-                getValue: () => Config.BoostFishingResourceStacks,
-                setValue: value => Config.BoostFishingResourceStacks = value
-            );
-            configMenu.AddBoolOption(
-                mod: ModManifest,
-                name: () => I18n.Get("config.scale-fishing-resources-by-level.name"),
-                tooltip: () => I18n.Get("config.scale-fishing-resources-by-level.tooltip"),
-                getValue: () => Config.ScaleFishingResourcesByLevel,
-                setValue: value => Config.ScaleFishingResourcesByLevel = value
-            );
-            configMenu.AddBoolOption(
-                mod: ModManifest,
-                name: () => I18n.Get("config.gatekeep-fishing-high-tier-loot.name"),
-                tooltip: () => I18n.Get("config.gatekeep-fishing-high-tier-loot.tooltip"),
-                getValue: () => Config.GatekeepFishingHighTierLoot,
-                setValue: value => Config.GatekeepFishingHighTierLoot = value
+                name: () => I18n.Get("config.fishing-chest-min-rolls.name"),
+                tooltip: () => I18n.Get("config.fishing-chest-min-rolls.tooltip"),
+                getValue: () => Config.FishingChestMinRolls,
+                setValue: value => Config.FishingChestMinRolls = value,
+                min: 1,
+                max: 10
             );
             configMenu.AddNumberOption(
                 mod: ModManifest,
-                name: () => I18n.Get("config.fishing-resource-stack-multiplier.name"),
-                tooltip: () => I18n.Get("config.fishing-resource-stack-multiplier.tooltip"),
-                getValue: () => Config.FishingResourceStackMultiplier,
-                setValue: value => Config.FishingResourceStackMultiplier = value,
-                min: 1.0f,
-                max: 3.0f,
-                interval: 0.1f
-            );
-            configMenu.AddBoolOption(
-                mod: ModManifest,
-                name: () => I18n.Get("config.enable-fishing-artifact-protection.name"),
-                tooltip: () => I18n.Get("config.enable-fishing-artifact-protection.tooltip"),
-                getValue: () => Config.EnableFishingArtifactProtection,
-                setValue: value => Config.EnableFishingArtifactProtection = value
-            );
-
-            // =========================================================================
-            // === 1.6 GOLDEN FISHING CHESTS GMCM SECTION                            ===
-            // =========================================================================
-            configMenu.AddSectionTitle(
-                mod: ModManifest,
-                text: () => I18n.Get("config.section.golden-fishing-chests")
-            );
-            configMenu.AddBoolOption(
-                mod: ModManifest,
-                name: () => I18n.Get("config.enable-golden-chest-buff.name"),
-                tooltip: () => I18n.Get("config.enable-golden-chest-buff.tooltip"),
-                getValue: () => Config.EnableGoldenChestBuff,
-                setValue: value => Config.EnableGoldenChestBuff = value
+                name: () => I18n.Get("config.fishing-chest-max-rolls.name"),
+                tooltip: () => I18n.Get("config.fishing-chest-max-rolls.tooltip"),
+                getValue: () => Config.FishingChestMaxRolls,
+                setValue: value => Config.FishingChestMaxRolls = value,
+                min: 1,
+                max: 12
             );
             configMenu.AddNumberOption(
                 mod: ModManifest,
-                name: () => I18n.Get("config.golden-chest-stack-multiplier.name"),
-                tooltip: () => I18n.Get("config.golden-chest-stack-multiplier.tooltip"),
-                getValue: () => Config.GoldenChestStackMultiplier,
-                setValue: value => Config.GoldenChestStackMultiplier = value,
-                min: 1.0f,
-                max: 5.0f,
-                interval: 0.1f
+                name: () => I18n.Get("config.golden-chest-min-rolls.name"),
+                tooltip: () => I18n.Get("config.golden-chest-min-rolls.tooltip"),
+                getValue: () => Config.GoldenChestMinRolls,
+                setValue: value => Config.GoldenChestMinRolls = value,
+                min: 1,
+                max: 10
+            );
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.golden-chest-max-rolls.name"),
+                tooltip: () => I18n.Get("config.golden-chest-max-rolls.tooltip"),
+                getValue: () => Config.GoldenChestMaxRolls,
+                setValue: value => Config.GoldenChestMaxRolls = value,
+                min: 1,
+                max: 12
             );
             configMenu.AddBoolOption(
                 mod: ModManifest,
-                name: () => I18n.Get("config.golden-chest-pearl-bonus.name"),
-                tooltip: () => I18n.Get("config.golden-chest-pearl-bonus.tooltip"),
-                getValue: () => Config.GoldenChestPearlBonus,
-                setValue: value => Config.GoldenChestPearlBonus = value
+                name: () => I18n.Get("config.enable-fishing-trash-reroll-bonus.name"),
+                tooltip: () => I18n.Get("config.enable-fishing-trash-reroll-bonus.tooltip"),
+                getValue: () => Config.EnableFishingTrashRerollBonus,
+                setValue: value => Config.EnableFishingTrashRerollBonus = value
             );
         }
     }

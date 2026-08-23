@@ -112,14 +112,14 @@ namespace BetterQOL
 
                 relSection.Fields.Add(new LookupField(
                     ModEntry.I18n.Get("lookup.npc.friendship"),
-                    $"{hearts}/{maxHearts} Hearts ({points} pts, {ptsInHeart}/250 to next)",
+                    ModEntry.I18n.Get("lookup.npc.friendship-format", new { hearts, maxHearts, points, ptsInHeart }).ToString(),
                     new Color(220, 20, 60)
                 ));
 
                 if (npc.currentLocation != null)
                 {
                     string locName = npc.currentLocation.DisplayName ?? npc.currentLocation.Name;
-                    relSection.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.npc.current-location"), $"{locName} (Tile: {(int)npc.Tile.X}, {(int)npc.Tile.Y})", new Color(20, 110, 220)));
+                    relSection.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.npc.current-location"), ModEntry.I18n.Get("lookup.npc.current-location-format", new { location = locName, x = (int)npc.Tile.X, y = (int)npc.Tile.Y }).ToString(), new Color(20, 110, 220)));
                 }
 
                 bool talkedToday = Game1.player.hasPlayerTalkedToNPC(npc.Name);
@@ -131,7 +131,7 @@ namespace BetterQOL
 
                 relSection.Fields.Add(new LookupField(
                     ModEntry.I18n.Get("lookup.npc.gifts-this-week"),
-                    $"{friendship.GiftsThisWeek}/2 (Today: {(friendship.GiftsToday > 0 ? ModEntry.I18n.Get("lookup.common.yes") : ModEntry.I18n.Get("lookup.common.no"))})",
+                    ModEntry.I18n.Get("lookup.npc.gifts-this-week-format", new { count = friendship.GiftsThisWeek, today = (friendship.GiftsToday > 0 ? ModEntry.I18n.Get("lookup.common.yes") : ModEntry.I18n.Get("lookup.common.no")) }).ToString(),
                     friendship.GiftsThisWeek >= 2 ? new Color(0, 140, 0) : Game1.textColor
                 ));
 
@@ -194,7 +194,7 @@ namespace BetterQOL
                 bool isVisitingIsland = Game1.netWorldState.Value.IslandVisitors != null && Game1.netWorldState.Value.IslandVisitors.Contains(npc.Name);
                 if (isVisitingIsland)
                 {
-                    schedSection.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.npc.today-schedule"), "Visiting Ginger Island Resort today! (11:45 AM – 6:00 PM)", new Color(20, 110, 220)));
+                    schedSection.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.npc.today-schedule"), ModEntry.I18n.Get("lookup.npc.schedule-island").ToString(), new Color(20, 110, 220)));
                 }
                 else if (npc.Schedule != null && npc.Schedule.Count > 0)
                 {
@@ -653,7 +653,7 @@ namespace BetterQOL
                     section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.weapon.damage"), $"{weapon.minDamage.Value} - {weapon.maxDamage.Value}", new Color(200, 60, 20)));
 
                     double critChance = weapon.critChance.Value * 100;
-                    section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.weapon.crit-strike"), $"{critChance:0.#}% (x{weapon.critMultiplier.Value:0.#} dmg)", new Color(180, 50, 180)));
+                    section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.weapon.crit-strike"), ModEntry.I18n.Get("lookup.weapon.crit-multiplier", new { chance = $"{critChance:0.#}", mult = $"{weapon.critMultiplier.Value:0.#}" }).ToString(), new Color(180, 50, 180)));
 
                     if (weapon.speed.Value != 0)
                         section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.weapon.speed"), $"{(weapon.speed.Value > 0 ? "+" : "")}{weapon.speed.Value}", weapon.speed.Value > 0 ? new Color(0, 140, 0) : new Color(200, 60, 20)));
@@ -669,7 +669,7 @@ namespace BetterQOL
 
                     int forges = weapon.GetTotalForgeLevels();
                     if (forges > 0)
-                        section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.weapon.volcano-forges"), $"Level {forges} / 3", new Color(180, 100, 0)));
+                        section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.weapon.volcano-forges"), ModEntry.I18n.Get("lookup.weapon.volcano-forges-level", new { level = forges }).ToString(), new Color(180, 100, 0)));
 
                     if (weapon.enchantments.Count > 0)
                     {
@@ -688,8 +688,8 @@ namespace BetterQOL
                 {
                     var section = new LookupSection(ModEntry.I18n.Get("lookup.section.slingshot"));
                     bool isMaster = slingshot.ItemId == "33" || slingshot.Name.Contains("Master");
-                    section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.slingshot.type"), isMaster ? "Master Slingshot (2x Damage Multiplier)" : "Standard Slingshot (1x Multiplier)", new Color(180, 100, 0)));
-                    section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.slingshot.compatible-ammo"), "Stone (1x), Copper Ore (1.5x), Iron Ore (2x), Gold Ore (2.5x), Iridium Ore (3.5x), Explosive Ammo (AoE)", new Color(0, 140, 0)));
+                    section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.slingshot.type"), isMaster ? ModEntry.I18n.Get("lookup.slingshot.type.master").ToString() : ModEntry.I18n.Get("lookup.slingshot.type.standard").ToString(), new Color(180, 100, 0)));
+                    section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.slingshot.compatible-ammo"), ModEntry.I18n.Get("lookup.slingshot.compatible-ammo-desc").ToString(), new Color(0, 140, 0)));
                     subject.Sections.Add(section);
                 }
                 else if (item is Boots boots)
@@ -760,7 +760,7 @@ namespace BetterQOL
                     if (tool is FishingRod rod)
                     {
                         var bait = rod.GetBait();
-                        section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.tool.bait-attached"), bait != null ? $"{bait.DisplayName} (x{bait.Stack})" : "None", bait != null ? new Color(0, 140, 0) : Color.DarkSlateGray));
+                        section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.tool.bait-attached"), bait != null ? $"{bait.DisplayName} (x{bait.Stack})" : ModEntry.I18n.Get("lookup.common.none").ToString(), bait != null ? new Color(0, 140, 0) : Color.DarkSlateGray));
 
                         var tackles = rod.GetTackle();
                         if (tackles != null && tackles.Count > 0)
@@ -779,49 +779,48 @@ namespace BetterQOL
         private static string GetEnchantmentDescription(string enchantmentName)
         {
             string e = enchantmentName.ToLower();
-            if (e.Contains("crusader")) return "Deals 50% more damage to undead/shadow beasts & allows permanently slaying Mummies without bombs.";
-            if (e.Contains("vampiric")) return "Chance to regain health on hit (9% chance to heal 9% of damage).";
-            if (e.Contains("haymaker")) return "Cutting weeds yields more fiber and has a 33% chance to harvest hay.";
-            if (e.Contains("artful")) return "Special weapon move cooldown is cut in half (50% faster).";
-            if (e.Contains("bug killer")) return "Doubles damage to insects & allows killing Armored Bugs.";
-            if (e.Contains("auto-hook")) return "Automatically hooks fish when they bite.";
-            if (e.Contains("master")) return "Increases fishing skill level by +1 while holding.";
-            if (e.Contains("preserving")) return "50% chance for bait and tackle to not be consumed upon use.";
-            if (e.Contains("swift")) return "Increases tool swing speed by 33%.";
-            if (e.Contains("reaching")) return "Increases charged area of effect to 5x5 grid.";
-            if (e.Contains("bottomless")) return "Watering can never runs out of water.";
-            if (e.Contains("efficient")) return "Tool requires 0 stamina to use.";
-            if (e.Contains("generous")) return "Increases chance of finding double items when digging/panning.";
-            if (e.Contains("archaeologist")) return "Doubles chance of finding artifacts and bone fragments from artifact spots.";
+            if (e.Contains("crusader")) return ModEntry.I18n.Get("lookup.enchantment.crusader").ToString();
+            if (e.Contains("vampiric")) return ModEntry.I18n.Get("lookup.enchantment.vampiric").ToString();
+            if (e.Contains("haymaker")) return ModEntry.I18n.Get("lookup.enchantment.haymaker").ToString();
+            if (e.Contains("artful")) return ModEntry.I18n.Get("lookup.enchantment.artful").ToString();
+            if (e.Contains("bug killer")) return ModEntry.I18n.Get("lookup.enchantment.bug-killer").ToString();
+            if (e.Contains("auto-hook")) return ModEntry.I18n.Get("lookup.enchantment.auto-hook").ToString();
+            if (e.Contains("master")) return ModEntry.I18n.Get("lookup.enchantment.master").ToString();
+            if (e.Contains("preserving")) return ModEntry.I18n.Get("lookup.enchantment.preserving").ToString();
+            if (e.Contains("reaching")) return ModEntry.I18n.Get("lookup.enchantment.reaching").ToString();
+            if (e.Contains("bottomless")) return ModEntry.I18n.Get("lookup.enchantment.bottomless").ToString();
+            if (e.Contains("efficient")) return ModEntry.I18n.Get("lookup.enchantment.efficient").ToString();
+            if (e.Contains("generous")) return ModEntry.I18n.Get("lookup.enchantment.generous").ToString();
+            if (e.Contains("archaeologist")) return ModEntry.I18n.Get("lookup.enchantment.archaeologist").ToString();
             return string.Empty;
         }
 
         private static string GetRingEffectDescription(string ringId, string ringName)
         {
             string r = ringName.ToLower();
-            if (r.Contains("glow")) return "Emits a constant radius of light around the player.";
-            if (r.Contains("magnet")) return "Increases magnetic collection radius for items.";
-            if (r.Contains("iridium band")) return "Glows, attracts items, and increases attack damage by 10%.";
-            if (r.Contains("burglar")) return "Monsters have double chance to drop loot items.";
-            if (r.Contains("slime charmer")) return "Grants complete immunity to Slime damage and the Slimed debuff.";
-            if (r.Contains("savage")) return "Gain a +2 speed boost for 3 seconds after slaying a monster.";
-            if (r.Contains("vampire")) return "Restores 2 HP upon defeating an enemy.";
-            if (r.Contains("crabshell")) return "Increases Defense by +5.";
-            if (r.Contains("napalm")) return "Defeated monsters explode, destroying nearby rocks and damaging enemies.";
-            if (r.Contains("hot java")) return "Greatly increases chance of finding Coffee and Triple Shot Espresso from monsters.";
-            if (r.Contains("lucky")) return "Increases daily luck by +1.";
-            if (r.Contains("phoenix")) return "Revives the player with 50% HP once per day upon fainting in combat.";
-            if (r.Contains("ruby")) return "Increases attack damage by 10%.";
-            if (r.Contains("aquamarine")) return "Increases critical strike chance by 10%.";
-            if (r.Contains("emerald")) return "Increases weapon speed.";
-            if (r.Contains("jade")) return "Increases critical strike power by 10%.";
-            if (r.Contains("amethyst")) return "Increases knockback by 10%.";
-            if (r.Contains("topaz")) return "Increases defense by +1.";
-            if (r.Contains("warrior")) return "Chance to gain Warrior Energy (+10 attack) after slaying a monster.";
-            if (r.Contains("yoba")) return "Chance to gain Yoba's Blessing (invincibility shield) after taking damage.";
-            if (r.Contains("thorns")) return "Reflects damage back to attackers.";
-            if (r.Contains("immunity")) return "Increases Immunity by +4.";
-            if (r.Contains("sturdy")) return "Cuts the duration of negative status effects in half.";
+            if (r.Contains("glow")) return ModEntry.I18n.Get("lookup.ring.effect.glow").ToString();
+            if (r.Contains("magnet")) return ModEntry.I18n.Get("lookup.ring.effect.magnet").ToString();
+            if (r.Contains("iridium band")) return ModEntry.I18n.Get("lookup.ring.effect.iridium-band").ToString();
+            if (r.Contains("burglar")) return ModEntry.I18n.Get("lookup.ring.effect.burglar").ToString();
+            if (r.Contains("slime charmer")) return ModEntry.I18n.Get("lookup.ring.effect.slime-charmer").ToString();
+            if (r.Contains("savage")) return ModEntry.I18n.Get("lookup.ring.effect.savage").ToString();
+            if (r.Contains("vampire")) return ModEntry.I18n.Get("lookup.ring.effect.vampire").ToString();
+            if (r.Contains("crabshell")) return ModEntry.I18n.Get("lookup.ring.effect.crabshell").ToString();
+            if (r.Contains("napalm")) return ModEntry.I18n.Get("lookup.ring.effect.napalm").ToString();
+            if (r.Contains("hot java")) return ModEntry.I18n.Get("lookup.ring.effect.hot-java").ToString();
+            if (r.Contains("lucky")) return ModEntry.I18n.Get("lookup.ring.effect.lucky").ToString();
+            if (r.Contains("phoenix")) return ModEntry.I18n.Get("lookup.ring.effect.phoenix").ToString();
+            if (r.Contains("ruby")) return ModEntry.I18n.Get("lookup.ring.effect.ruby").ToString();
+            if (r.Contains("aquamarine")) return ModEntry.I18n.Get("lookup.ring.effect.aquamarine").ToString();
+            if (r.Contains("emerald")) return ModEntry.I18n.Get("lookup.ring.effect.emerald").ToString();
+            if (r.Contains("jade")) return ModEntry.I18n.Get("lookup.ring.effect.jade").ToString();
+            if (r.Contains("amethyst")) return ModEntry.I18n.Get("lookup.ring.effect.amethyst").ToString();
+            if (r.Contains("topaz")) return ModEntry.I18n.Get("lookup.ring.effect.topaz").ToString();
+            if (r.Contains("warrior")) return ModEntry.I18n.Get("lookup.ring.effect.warrior").ToString();
+            if (r.Contains("yoba")) return ModEntry.I18n.Get("lookup.ring.effect.yoba").ToString();
+            if (r.Contains("thorns")) return ModEntry.I18n.Get("lookup.ring.effect.thorns").ToString();
+            if (r.Contains("immunity")) return ModEntry.I18n.Get("lookup.ring.effect.immunity").ToString();
+            if (r.Contains("sturdy")) return ModEntry.I18n.Get("lookup.ring.effect.sturdy").ToString();
             return string.Empty;
         }
 
@@ -1003,7 +1002,7 @@ namespace BetterQOL
                     section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.trinket.possible-ranges"), possibleRangeSummary, Color.DarkSlateGray));
                 }
 
-                section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.trinket.anvil-reforging"), "Reroll stats at the Anvil using 3 Iridium Bars", new Color(180, 100, 0)));
+                section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.trinket.anvil-reforging"), ModEntry.I18n.Get("lookup.trinket.reforge-desc").ToString(), new Color(180, 100, 0)));
 
                 // 2. BetterForge Mod Integration & Prismatic Ascension
                 bool isAscended = trinket != null && (trinket.modData.ContainsKey("feiluvnana.BetterForge/IsAscended") || trinket.modData.ContainsKey("feiluvnana.BetterTrinket/IsAscended"));
@@ -1011,31 +1010,31 @@ namespace BetterQOL
 
                 string ascensionPowerDesc = cleanId switch
                 {
-                    var s when s.Contains("frog") => "Swallowing monsters drops their full loot table with a 45% chance to immediately reset swallow cooldown.",
-                    var s when s.Contains("fairy") => "Provides continuous passive pulse healing (even out of combat), heals nearby allies, and grants +1 Defense for 15s (Fairy Blessing).",
-                    var s when s.Contains("parrot") => "Doubles gold coin value and grants a +35% chance for defeated monsters to drop bonus monster loot.",
-                    var s when s.Contains("spur") || s.Contains("golden") || s.Contains("iridium") => "Increases Critical Strike Chance by +10%, and the critical speed boost provides +3 Attack (Spur Fury).",
-                    var s when s.Contains("quiver") => "Spectral arrows pierce through all enemies and grant +15% Critical Strike Chance.",
-                    var s when s.Contains("ice") || s.Contains("rod") => "Striking frozen enemies shatters the ice into a frost blast dealing 30% Attack damage and slowing nearby foes.",
-                    var s when s.Contains("basilisk") || s.Contains("paw") => "Reflects 50% incoming damage back to attackers, and melee attacks have a 20% chance to lifesteal (heals 3–8 HP).",
-                    _ => "Grants permanent +0.5 Luck and special enhanced combat abilities."
+                    var s when s.Contains("frog") => ModEntry.I18n.Get("lookup.ascension.desc.frog").ToString(),
+                    var s when s.Contains("fairy") => ModEntry.I18n.Get("lookup.ascension.desc.fairy").ToString(),
+                    var s when s.Contains("parrot") => ModEntry.I18n.Get("lookup.ascension.desc.parrot").ToString(),
+                    var s when s.Contains("spur") || s.Contains("golden") || s.Contains("iridium") => ModEntry.I18n.Get("lookup.ascension.desc.spur").ToString(),
+                    var s when s.Contains("quiver") => ModEntry.I18n.Get("lookup.ascension.desc.quiver").ToString(),
+                    var s when s.Contains("ice") || s.Contains("rod") => ModEntry.I18n.Get("lookup.ascension.desc.ice").ToString(),
+                    var s when s.Contains("basilisk") || s.Contains("paw") => ModEntry.I18n.Get("lookup.ascension.desc.basilisk").ToString(),
+                    _ => ModEntry.I18n.Get("lookup.ascension.desc.default").ToString()
                 };
 
                 if (isAscended)
                 {
-                    section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.ascension.status-label"), "ACTIVE (Ascended at Anvil with 1 Prismatic Shard)", new Color(180, 50, 180)));
-                    section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.ascension.luck-label"), "+0.5 Permanent Luck (Endless Buff)", new Color(0, 140, 0)));
+                    section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.ascension.status-label"), ModEntry.I18n.Get("lookup.ascension.active-desc").ToString(), new Color(180, 50, 180)));
+                    section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.ascension.luck-label"), ModEntry.I18n.Get("lookup.ascension.luck-desc").ToString(), new Color(0, 140, 0)));
                     section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.ascension.enhanced-power"), ascensionPowerDesc, new Color(180, 50, 180)));
-                    section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.ascension.source-mod"), "BetterForge Mod (Permanent Ascension)", Color.DarkSlateGray));
+                    section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.ascension.source-mod"), ModEntry.I18n.Get("lookup.ascension.source-desc").ToString(), Color.DarkSlateGray));
                 }
                 else
                 {
                     string notice = hasBetterForge
-                        ? "Not Ascended — (Forge with 1 Prismatic Shard at the Anvil to permanently unlock this power!)"
-                        : "Not Ascended — (If using BetterForge mod: Forge with 1 Prismatic Shard at the Anvil to unlock this enhanced power + 0.5 Luck!)";
+                        ? ModEntry.I18n.Get("lookup.ascension.notice-forge").ToString()
+                        : ModEntry.I18n.Get("lookup.ascension.notice-info").ToString();
 
                     section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.ascension.section-label"), notice, new Color(180, 100, 0)));
-                    section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.ascension.power-label"), $"{ascensionPowerDesc} (Includes +0.5 Permanent Luck)", Color.DarkSlateGray));
+                    section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.ascension.power-label"), ModEntry.I18n.Get("lookup.ascension.power-format", new { desc = ascensionPowerDesc }).ToString(), Color.DarkSlateGray));
                 }
 
                 subject.Sections.Add(section);
@@ -1304,8 +1303,9 @@ namespace BetterQOL
                 // 1. Difficulty & Behavior (parts[1] = difficulty, parts[2] = behavior)
                 string diff = parts[1];
                 string behavior = parts.Length > 2 && !string.IsNullOrEmpty(parts[2]) ? parts[2] : "mixed";
-                string behaviorName = char.ToUpper(behavior[0]) + behavior.Substring(1);
-                section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.fish.difficulty"), $"{diff} ({behaviorName})", new Color(200, 60, 20)));
+                string behaviorKey = behavior.ToLowerInvariant();
+                string behaviorName = ModEntry.I18n.Get($"lookup.fish.behavior.{behaviorKey}").ToString();
+                section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.fish.difficulty"), ModEntry.I18n.Get("lookup.fish.difficulty-format", new { diff, behavior = behaviorName }).ToString(), new Color(200, 60, 20)));
 
                 // 2. Spawn Seasons (parts[6] in Data/Fish)
                 if (parts.Length > 6 && !string.IsNullOrWhiteSpace(parts[6]))
@@ -1344,9 +1344,9 @@ namespace BetterQOL
                 {
                     string weather = parts[7].ToLower() switch
                     {
-                        "sunny" => "Sunny",
-                        "rainy" => "Rainy",
-                        _ => "Any Weather"
+                        "sunny" => ModEntry.I18n.Get("lookup.weather.sunny").ToString(),
+                        "rainy" => ModEntry.I18n.Get("lookup.weather.rainy").ToString(),
+                        _ => ModEntry.I18n.Get("lookup.common.all-weather", "Any Weather").ToString()
                     };
                     section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.fish.weather"), weather, new Color(20, 110, 220)));
                 }
@@ -1354,7 +1354,7 @@ namespace BetterQOL
                 // 5. Min Skill
                 if (parts.Length > 9 && int.TryParse(parts[9], out int minSkill) && minSkill > 0)
                 {
-                    section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.fish.min-skill"), $"Level {minSkill}", Color.DarkSlateGray));
+                    section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.fish.min-skill"), ModEntry.I18n.Get("lookup.fish.min-skill-level", new { level = minSkill }).ToString(), Color.DarkSlateGray));
                 }
 
                 // 6. Spawn Locations (Extracted and mapped to friendly location names)
@@ -1365,7 +1365,7 @@ namespace BetterQOL
                 }
 
                 // 7. 1.6 Targeted Bait Maker
-                section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.fish.bait-maker"), $"Yields 5–10 {item.DisplayName} Bait (targets this fish!)", new Color(0, 140, 0)));
+                section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.fish.bait-maker"), ModEntry.I18n.Get("lookup.fish.bait-maker-yield", new { name = item.DisplayName }).ToString(), new Color(0, 140, 0)));
 
                 // 8. Fish Pond Produce Highlights
                 string fishName = item.Name.ToLowerInvariant();
@@ -1741,11 +1741,11 @@ namespace BetterQOL
                         var section = new LookupSection(ModEntry.I18n.Get("lookup.section.crop-info"));
 
                         int totalDays = cropData.DaysInPhase != null ? cropData.DaysInPhase.Sum() : 0;
-                        section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.crop.growth-time"), $"{totalDays} days", new Color(0, 140, 0)));
+                        section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.crop.growth-time"), ModEntry.I18n.Get("lookup.crop.growth-days", new { days = totalDays }).ToString(), new Color(0, 140, 0)));
 
                         if (cropData.RegrowDays > 0)
                         {
-                            section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.crop.regrowth"), $"Every {cropData.RegrowDays} days after first harvest", new Color(180, 100, 0)));
+                            section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.crop.regrowth"), ModEntry.I18n.Get("lookup.crop.regrowth-days", new { days = cropData.RegrowDays }).ToString(), new Color(180, 100, 0)));
                         }
 
                         if (cropData.Seasons != null && cropData.Seasons.Count > 0)
@@ -1760,7 +1760,7 @@ namespace BetterQOL
 
                         if (cropData.IsRaised)
                         {
-                            section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.crop.trellis"), "Yes (Cần Giàn - Không thể đi xuyên qua)", new Color(200, 60, 20)));
+                            section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.crop.trellis"), ModEntry.I18n.Get("lookup.crop.trellis-yes").ToString(), new Color(200, 60, 20)));
                         }
 
                         if (cropData.ExtraHarvestChance > 0)
@@ -2136,9 +2136,9 @@ namespace BetterQOL
 
                 var section = new LookupSection(ModEntry.I18n.Get("lookup.section.sapling-info"));
                 section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.sapling.harvest-season"), season, new Color(46, 125, 50)));
-                section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.sapling.maturation-time"), "28 full days to grow into a mature fruit tree.", new Color(180, 100, 0)));
-                section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.sapling.spacing"), "All 8 adjacent tiles must remain completely clear of paths, weeds, objects, and other trees.", new Color(200, 60, 20)));
-                section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.sapling.quality-aging"), "Produces Normal quality year 1, Silver quality year 2, Gold quality year 3, and Iridium quality year 4+!", new Color(180, 50, 180)));
+                section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.sapling.maturation-time"), ModEntry.I18n.Get("lookup.sapling.maturation-desc").ToString(), new Color(180, 100, 0)));
+                section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.sapling.spacing"), ModEntry.I18n.Get("lookup.sapling.spacing-desc").ToString(), new Color(200, 60, 20)));
+                section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.sapling.quality-aging"), ModEntry.I18n.Get("lookup.sapling.quality-desc").ToString(), new Color(180, 50, 180)));
                 subject.Sections.Add(section);
             }
             catch { }
@@ -2304,7 +2304,7 @@ namespace BetterQOL
                 {
                     if (name.Contains("dinosaur"))
                     {
-                        fields.Add(new LookupField(ModEntry.I18n.Get("lookup.animal-processing.incubation"), "Coop Incubator: Hatches a Dinosaur in 12.5 days (6.25 days with Coopmaster)", new Color(46, 125, 50)));
+                        fields.Add(new LookupField(ModEntry.I18n.Get("lookup.animal-processing.incubation"), ModEntry.I18n.Get("lookup.animal-processing.dino-egg").ToString(), new Color(46, 125, 50)));
                         var mayo = ItemRegistry.GetData("(O)807");
                         fields.Add(new LookupField(ModEntry.I18n.Get("lookup.animal-processing.mayo"), new List<LookupLink> {
                             new LookupLink("Dinosaur Mayonnaise (800g)", "Mayonnaise Machine (3h)", new Color(46, 125, 50), mayo?.GetTexture(), mayo?.GetSourceRect())
@@ -2312,7 +2312,7 @@ namespace BetterQOL
                     }
                     else if (name.Contains("ostrich"))
                     {
-                        fields.Add(new LookupField(ModEntry.I18n.Get("lookup.animal-processing.incubation"), "Ostrich Incubator (Barn): Hatches an Ostrich in 9.5 days (4.75 days with Coopmaster)", new Color(46, 125, 50)));
+                        fields.Add(new LookupField(ModEntry.I18n.Get("lookup.animal-processing.incubation"), ModEntry.I18n.Get("lookup.animal-processing.ostrich-egg").ToString(), new Color(46, 125, 50)));
                         var mayo = ItemRegistry.GetData("(O)306");
                         fields.Add(new LookupField(ModEntry.I18n.Get("lookup.animal-processing.mayo"), new List<LookupLink> {
                             new LookupLink("10x Mayonnaise (Matching quality, up to 10x 380g)", "Mayonnaise Machine (3h)", new Color(180, 100, 0), mayo?.GetTexture(), mayo?.GetSourceRect())
@@ -2320,7 +2320,7 @@ namespace BetterQOL
                     }
                     else if (name.Contains("void"))
                     {
-                        fields.Add(new LookupField(ModEntry.I18n.Get("lookup.animal-processing.incubation"), "Coop Incubator: Hatches a Void Chicken in ~5.5 days (2.75 days with Coopmaster)", new Color(180, 50, 180)));
+                        fields.Add(new LookupField(ModEntry.I18n.Get("lookup.animal-processing.incubation"), ModEntry.I18n.Get("lookup.animal-processing.void-egg").ToString(), new Color(180, 50, 180)));
                         var mayo = ItemRegistry.GetData("(O)308");
                         fields.Add(new LookupField(ModEntry.I18n.Get("lookup.animal-processing.mayo"), new List<LookupLink> {
                             new LookupLink("Void Mayonnaise (275g)", "Mayonnaise Machine (3h)", new Color(180, 50, 180), mayo?.GetTexture(), mayo?.GetSourceRect())
@@ -2328,7 +2328,7 @@ namespace BetterQOL
                     }
                     else if (name.Contains("duck"))
                     {
-                        fields.Add(new LookupField(ModEntry.I18n.Get("lookup.animal-processing.incubation"), "Coop Incubator: Hatches a Duck in ~5.5 days (2.75 days with Coopmaster)", new Color(20, 110, 220)));
+                        fields.Add(new LookupField(ModEntry.I18n.Get("lookup.animal-processing.incubation"), ModEntry.I18n.Get("lookup.animal-processing.duck-egg").ToString(), new Color(20, 110, 220)));
                         var mayo = ItemRegistry.GetData("(O)307");
                         fields.Add(new LookupField(ModEntry.I18n.Get("lookup.animal-processing.mayo"), new List<LookupLink> {
                             new LookupLink("Duck Mayonnaise (375g)", "Mayonnaise Machine (3h)", new Color(20, 110, 220), mayo?.GetTexture(), mayo?.GetSourceRect())
@@ -2336,7 +2336,7 @@ namespace BetterQOL
                     }
                     else if (name.Contains("golden"))
                     {
-                        fields.Add(new LookupField(ModEntry.I18n.Get("lookup.animal-processing.incubation"), "Coop Incubator: Hatches a Golden Chicken in ~5.5 days (2.75 days with Coopmaster)", new Color(180, 100, 0)));
+                        fields.Add(new LookupField(ModEntry.I18n.Get("lookup.animal-processing.incubation"), ModEntry.I18n.Get("lookup.animal-processing.golden-egg").ToString(), new Color(180, 100, 0)));
                         var mayo = ItemRegistry.GetData("(O)306");
                         fields.Add(new LookupField(ModEntry.I18n.Get("lookup.animal-processing.mayo"), new List<LookupLink> {
                             new LookupLink("3x Gold Quality Mayonnaise (3x 285g = 855g)", "Mayonnaise Machine (3h)", new Color(180, 100, 0), mayo?.GetTexture(), mayo?.GetSourceRect())
@@ -2344,7 +2344,7 @@ namespace BetterQOL
                     }
                     else if (name.Contains("large"))
                     {
-                        fields.Add(new LookupField(ModEntry.I18n.Get("lookup.animal-processing.incubation"), "Coop Incubator: Hatches a Chicken in ~5.5 days (2.75 days with Coopmaster)", new Color(0, 140, 0)));
+                        fields.Add(new LookupField(ModEntry.I18n.Get("lookup.animal-processing.incubation"), ModEntry.I18n.Get("lookup.animal-processing.chicken-egg").ToString(), new Color(0, 140, 0)));
                         var mayo = ItemRegistry.GetData("(O)306");
                         fields.Add(new LookupField(ModEntry.I18n.Get("lookup.animal-processing.mayo"), new List<LookupLink> {
                             new LookupLink("Gold Quality Mayonnaise (285g)", "Mayonnaise Machine (3h)", new Color(180, 100, 0), mayo?.GetTexture(), mayo?.GetSourceRect())
@@ -2352,7 +2352,7 @@ namespace BetterQOL
                     }
                     else
                     {
-                        fields.Add(new LookupField(ModEntry.I18n.Get("lookup.animal-processing.incubation"), "Coop Incubator: Hatches a Chicken in ~5.5 days (2.75 days with Coopmaster)", new Color(0, 140, 0)));
+                        fields.Add(new LookupField(ModEntry.I18n.Get("lookup.animal-processing.incubation"), ModEntry.I18n.Get("lookup.animal-processing.chicken-egg").ToString(), new Color(0, 140, 0)));
                         var mayo = ItemRegistry.GetData("(O)306");
                         fields.Add(new LookupField(ModEntry.I18n.Get("lookup.animal-processing.mayo"), new List<LookupLink> {
                             new LookupLink("Normal Mayonnaise (190g)", "Mayonnaise Machine (3h)", Game1.textColor, mayo?.GetTexture(), mayo?.GetSourceRect())
@@ -3462,7 +3462,7 @@ namespace BetterQOL
 
             var section = new LookupSection(ModEntry.I18n.Get("lookup.section.debris-clearing"));
             section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.clump.tool-required"), toolReq, new Color(200, 60, 20)));
-            section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.clump.hits-remaining"), $"{clump.health.Value} hits remaining", new Color(180, 100, 0)));
+            section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.clump.hits-remaining"), ModEntry.I18n.Get("lookup.clump.hits-remaining-format", new { health = clump.health.Value }).ToString(), new Color(180, 100, 0)));
             section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.clump.resource-drops"), drops, new Color(0, 140, 0)));
             subject.Sections.Add(section);
 
@@ -3488,9 +3488,9 @@ namespace BetterQOL
             };
 
             var section = new LookupSection(ModEntry.I18n.Get("lookup.section.giant-crop-details"));
-            section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.clump.tool-required"), "Axe (Any quality)", new Color(20, 110, 220)));
-            section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.clump.hits-remaining"), $"{giantCrop.health.Value} axe hits remaining", new Color(180, 100, 0)));
-            section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.giant-crop.harvest-yield"), "Yields 15–21 normal crops upon harvest", new Color(0, 140, 0)));
+            section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.clump.tool-required"), ModEntry.I18n.Get("lookup.giant-crop.tool-desc").ToString(), new Color(20, 110, 220)));
+            section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.clump.hits-remaining"), ModEntry.I18n.Get("lookup.clump.axe-hits-format", new { health = giantCrop.health.Value }).ToString(), new Color(180, 100, 0)));
+            section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.giant-crop.harvest-yield"), ModEntry.I18n.Get("lookup.giant-crop.yield-desc").ToString(), new Color(0, 140, 0)));
             subject.Sections.Add(section);
 
             return subject;
@@ -3525,7 +3525,7 @@ namespace BetterQOL
                     raisinDays > 0 ? new Color(180, 50, 180) : Color.DarkSlateGray
                 ));
 
-                section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.junimo.harvest-range"), "17 x 17 tile radius around hut", new Color(20, 110, 220)));
+                section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.junimo.harvest-range"), ModEntry.I18n.Get("lookup.junimo.radius-desc").ToString(), new Color(20, 110, 220)));
 
                 var hutChest = hut.GetOutputChest();
                 if (hutChest != null && hutChest.Items.Any(i => i != null))
@@ -3655,8 +3655,8 @@ namespace BetterQOL
                     int count = shippedItems?.Count ?? 0;
                     int estTotal = shippedItems != null ? shippedItems.Sum(i => i.sellToStorePrice() * i.Stack) : 0;
 
-                    section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.shipping.pending-items"), $"{count} items placed for shipment", new Color(20, 110, 220)));
-                    section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.shipping.revenue"), $"{estTotal:N0}g (processed overnight)", new Color(0, 140, 0)));
+                    section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.shipping.pending-items"), ModEntry.I18n.Get("lookup.shipping.pending-format", new { count }).ToString(), new Color(20, 110, 220)));
+                    section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.shipping.revenue"), ModEntry.I18n.Get("lookup.shipping.revenue-format", new { revenue = $"{estTotal:N0}" }).ToString(), new Color(0, 140, 0)));
 
                     if (shippedItems != null && shippedItems.Count > 0)
                     {
@@ -3682,7 +3682,7 @@ namespace BetterQOL
                 var farm = Game1.getFarm();
                 int hay = farm?.piecesOfHay.Value ?? 0;
                 int maxHay = (farm?.buildings.Count(b => b.buildingType.Value.Contains("Silo")) ?? 1) * 240;
-                section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.silo.capacity"), $"{hay} / {maxHay} Total Hay Stored", hay < maxHay / 4 ? new Color(200, 60, 20) : new Color(0, 140, 0)));
+                section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.silo.capacity"), ModEntry.I18n.Get("lookup.silo.hay-format", new { current = hay, max = maxHay }).ToString(), hay < maxHay / 4 ? new Color(200, 60, 20) : new Color(0, 140, 0)));
             }
             // 6. Slime Hutch
             else if (building.indoors.Value is SlimeHutch slimeHutch)
@@ -3733,7 +3733,7 @@ namespace BetterQOL
                 $"{usedSlots} / {totalSlots} Slots Used ({totalSlots - usedSlots} slots free)",
                 usedSlots >= totalSlots ? new Color(200, 60, 20) : new Color(0, 140, 0)
             ));
-            section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.chest.total-items"), $"{totalItemCount:N0} items stored total", new Color(20, 110, 220)));
+            section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.chest.total-items"), ModEntry.I18n.Get("lookup.chest.total-items-format", new { count = $"{totalItemCount:N0}" }).ToString(), new Color(20, 110, 220)));
 
             if (usedSlots > 0)
             {
@@ -3820,7 +3820,7 @@ namespace BetterQOL
             }
             else
             {
-                buffSection.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.buff.active-label"), "No buffs currently active", Color.DarkSlateGray));
+                buffSection.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.buff.active-label"), ModEntry.I18n.Get("lookup.buff.none-active").ToString(), Color.DarkSlateGray));
             }
             subject.Sections.Add(buffSection);
 
@@ -3898,7 +3898,7 @@ namespace BetterQOL
             }
             else
             {
-                profSection.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.farmer.professions-label"), "No professions chosen yet (Reach Skill Level 5 & 10)", Color.DarkSlateGray));
+                profSection.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.farmer.professions-label"), ModEntry.I18n.Get("lookup.farmer.no-professions").ToString(), Color.DarkSlateGray));
             }
             subject.Sections.Add(profSection);
 
@@ -3921,7 +3921,7 @@ namespace BetterQOL
             statsSection.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.farmer.current-gold"), $"{farmer.Money:N0}g", new Color(180, 100, 0)));
             statsSection.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.farmer.total-earnings"), $"{farmer.totalMoneyEarned:N0}g", new Color(0, 140, 0)));
             statsSection.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.farmer.qi-gems"), $"{farmer.QiGems}", new Color(180, 50, 180)));
-            statsSection.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.island.walnuts"), $"{Game1.netWorldState.Value.GoldenWalnutsFound} / 130 Found", new Color(180, 100, 0)));
+            statsSection.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.island.walnuts"), ModEntry.I18n.Get("lookup.island.walnuts-format", new { count = Game1.netWorldState.Value.GoldenWalnutsFound }).ToString(), new Color(180, 100, 0)));
             statsSection.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.farmer.daily-luck"), $"{farmer.DailyLuck:F3}", farmer.DailyLuck >= 0 ? new Color(0, 140, 0) : new Color(200, 60, 20)));
             subject.Sections.Add(statsSection);
 
@@ -4073,11 +4073,11 @@ namespace BetterQOL
             int agedRoePrice = roeBase * 2;
             if (fishName.Contains("Sturgeon") || fishId == "698" || fishId == "(O)698")
             {
-                dropSection.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.fish-pond.caviar-label"), "500g (Sturgeon Roe in Preserves Jar, 4 days)", new Color(180, 50, 180)));
+                dropSection.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.fish-pond.caviar-label"), ModEntry.I18n.Get("lookup.fish-pond.caviar-desc").ToString(), new Color(180, 50, 180)));
             }
             else
             {
-                dropSection.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.fish-pond.roe-value"), $"Fresh Roe: {roeBase}g | Aged Roe: {agedRoePrice}g (Preserves Jar)", new Color(180, 100, 0)));
+                dropSection.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.fish-pond.roe-value"), ModEntry.I18n.Get("lookup.fish-pond.roe-format", new { roe = roeBase, aged = agedRoePrice }).ToString(), new Color(180, 100, 0)));
             }
 
             // Pond Reward Items from FishPondData
@@ -4128,19 +4128,19 @@ namespace BetterQOL
 
         public static LookupSubject BuildWorldOverviewSubject(GameLocation? location = null, Vector2? tilePos = null)
         {
-            string locName = location != null ? (location.DisplayName ?? location.Name) : $"{Game1.player.farmName.Value} Farm";
-            string title = tilePos.HasValue ? $"{locName} ({tilePos.Value.X}, {tilePos.Value.Y})" : $"{locName} - Daily Almanac";
+            string farmWord = ModEntry.I18n.Get("lookup.world.farm").ToString();
+            string locName = location != null ? (location.DisplayName ?? location.Name) : $"{Game1.player.farmName.Value} {farmWord}";
+            string almanacWord = ModEntry.I18n.Get("lookup.world.daily-almanac").ToString();
+            string title = tilePos.HasValue ? $"{locName} ({tilePos.Value.X}, {tilePos.Value.Y})" : $"{locName} - {almanacWord}";
 
             string timeStr = Game1.getTimeOfDayString(Game1.timeOfDay);
             int daysLeftInSeason = 28 - Game1.dayOfMonth;
-            string seasonKey = $"season.{Game1.currentSeason.ToLower()}";
-            var tr = ModEntry.I18n.Get(seasonKey);
-            string seasonName = tr.HasValue() ? tr.ToString() : (char.ToUpper(Game1.currentSeason[0]) + Game1.currentSeason.Substring(1));
+            string daysLeftStr = ModEntry.I18n.Get("lookup.world.days-left", new { days = daysLeftInSeason }).ToString();
 
             var subject = new LookupSubject
             {
                 Title = title,
-                Subtitle = $"{GetFullDateString()} — {timeStr} ({daysLeftInSeason} days left)"
+                Subtitle = $"{GetFullDateString()} — {timeStr} ({daysLeftStr})"
             };
 
             // 1. Daily Overview Highlights
@@ -4247,17 +4247,20 @@ namespace BetterQOL
             try
             {
                 // 1. Weather & Luck
-                string weatherToday = Game1.isRaining ? (Game1.isLightning ? "Stormy" : (Game1.isSnowing ? "Snowy" : "Rainy")) : "Sunny";
+                string weatherKey = Game1.isRaining ? (Game1.isLightning ? "stormy" : (Game1.isSnowing ? "snowy" : "rainy")) : (Game1.isGreenRain ? "green-rain" : (Game1.isDebrisWeather ? "debris" : "sunny"));
+                string weatherToday = ModEntry.I18n.Get($"lookup.weather.{weatherKey}").ToString();
                 double luck = Game1.player.DailyLuck;
-                string luckBrief = luck switch
+                string luckKey = luck switch
                 {
-                    > 0.07 => "Very Lucky ★",
-                    > 0.02 => "Good Luck",
-                    >= -0.02 => "Neutral Luck",
-                    >= -0.07 => "Somewhat Bad Luck",
-                    _ => "Very Bad Luck ✗"
+                    > 0.07 => "very-lucky",
+                    > 0.02 => "good-luck",
+                    >= -0.02 => "neutral",
+                    >= -0.07 => "bad-luck",
+                    _ => "very-bad-luck"
                 };
-                section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.world.outlook"), $"{weatherToday} | Daily Luck: {luckBrief}", luck >= 0.02 ? new Color(0, 140, 0) : (luck <= -0.02 ? new Color(200, 60, 20) : Color.DarkSlateGray)));
+                string luckBrief = ModEntry.I18n.Get($"lookup.luck.{luckKey}").ToString();
+                string outlookText = ModEntry.I18n.Get("lookup.world.outlook-format", new { weather = weatherToday, luck = luckBrief }).ToString();
+                section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.world.outlook"), outlookText, luck >= 0.02 ? new Color(0, 140, 0) : (luck <= -0.02 ? new Color(200, 60, 20) : Color.DarkSlateGray)));
 
                 // 2. Chores Highlights
                 var farm = Game1.getFarm();
@@ -4283,16 +4286,22 @@ namespace BetterQOL
                             readyMach++;
                     }
 
+                    string choresText = (readyCrops > 0 || unwatered > 0 || unpet > 0 || readyProduce > 0 || readyMach > 0)
+                        ? ModEntry.I18n.Get("lookup.world.chores-summary", new { readyCrops, unwatered, unpet, readyProduce, readyMach }).ToString()
+                        : ModEntry.I18n.Get("lookup.world.chores-all-done").ToString();
+
                     section.Fields.Add(new LookupField(
-                        "Farm Chores",
-                        $"{readyCrops} crops harvestable, {unwatered} unwatered | {unpet} animals need pets, {readyProduce} produce | {readyMach} machines ready",
+                        ModEntry.I18n.Get("lookup.section.farm-chores"),
+                        choresText,
                         (readyCrops > 0 || unwatered > 0 || unpet > 0 || readyMach > 0) ? new Color(180, 100, 0) : new Color(0, 140, 0)
                     ));
                 }
 
                 // 3. Social / Events Highlights
                 var bdayNPCs = Utility.getAllCharacters().Where(c => c != null && c.IsVillager && string.Equals(c.Birthday_Season, Game1.currentSeason, StringComparison.OrdinalIgnoreCase) && c.Birthday_Day == Game1.dayOfMonth).ToList();
-                string bdayStr = bdayNPCs.Count > 0 ? string.Join(", ", bdayNPCs.Select(n => $"{n.displayName ?? n.Name}'s Birthday")) : "No birthdays today";
+                string bdayStr = bdayNPCs.Count > 0 
+                    ? string.Join(", ", bdayNPCs.Select(n => ModEntry.I18n.Get("lookup.calendar.npc-birthday", new { name = n.displayName ?? n.Name }).ToString())) 
+                    : ModEntry.I18n.Get("lookup.calendar.no-birthdays").ToString();
 
                 bool isBookseller = Game1.getLocationFromName("Town")?.characters.Any(c => c.Name.Equals("Bookseller", StringComparison.OrdinalIgnoreCase)) == true;
                 int day = Game1.dayOfMonth;
@@ -4301,8 +4310,8 @@ namespace BetterQOL
 
                 var highlights = new List<string>();
                 if (bdayNPCs.Count > 0) highlights.Add(bdayStr);
-                if (isBookseller) highlights.Add("Bookseller in Town");
-                if (isCart) highlights.Add("Traveling Cart open in Forest");
+                if (isBookseller) highlights.Add(ModEntry.I18n.Get("lookup.events.bookseller-in-town").ToString());
+                if (isCart) highlights.Add(ModEntry.I18n.Get("lookup.events.cart-in-forest").ToString());
 
                 string? fest = GetFestivalName(Game1.currentSeason, Game1.dayOfMonth);
                 if (!string.IsNullOrEmpty(fest)) highlights.Add(fest);
@@ -4316,11 +4325,11 @@ namespace BetterQOL
                 bool isJoja = Game1.MasterPlayer.mailReceived.Contains("JojaMember");
                 if (isJoja)
                 {
-                    section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.world.progress-label"), "Joja Route Active", new Color(20, 110, 220)));
+                    section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.world.progress-label"), ModEntry.I18n.Get("lookup.world.joja-active").ToString(), new Color(20, 110, 220)));
                 }
                 else if (Game1.player.hasCompletedCommunityCenter())
                 {
-                    section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.world.progress-label"), "Community Center Restored ✓", new Color(0, 140, 0)));
+                    section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.world.progress-label"), ModEntry.I18n.Get("lookup.world.cc-restored").ToString(), new Color(0, 140, 0)));
                 }
                 else
                 {
@@ -4331,7 +4340,7 @@ namespace BetterQOL
                     if (Game1.MasterPlayer.mailReceived.Contains("ccVault")) doneRooms++;
                     if (Game1.MasterPlayer.mailReceived.Contains("ccFishTank")) doneRooms++;
                     if (Game1.MasterPlayer.mailReceived.Contains("ccBulletin")) doneRooms++;
-                    section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.world.progress-label"), $"Community Center: {doneRooms} / 6 Rooms Completed", new Color(180, 100, 0)));
+                    section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.world.progress-label"), ModEntry.I18n.Get("lookup.world.cc-rooms-done", new { count = doneRooms }).ToString(), new Color(180, 100, 0)));
                 }
             }
             catch { }
@@ -4342,21 +4351,22 @@ namespace BetterQOL
         private static string GetFullDateString()
         {
             int day = Game1.dayOfMonth;
-            string dayOfWeek = ((day - 1) % 7) switch
+            string dayKey = ((day - 1) % 7) switch
             {
-                0 => "Monday",
-                1 => "Tuesday",
-                2 => "Wednesday",
-                3 => "Thursday",
-                4 => "Friday",
-                5 => "Saturday",
-                6 => "Sunday",
-                _ => string.Empty
+                0 => "monday",
+                1 => "tuesday",
+                2 => "wednesday",
+                3 => "thursday",
+                4 => "friday",
+                5 => "saturday",
+                6 => "sunday",
+                _ => "monday"
             };
+            string dayOfWeek = ModEntry.I18n.Get($"day.{dayKey}").ToString();
             string seasonKey = $"season.{Game1.currentSeason.ToLower()}";
             var tr = ModEntry.I18n.Get(seasonKey);
             string season = tr.HasValue() ? tr.ToString() : (char.ToUpper(Game1.currentSeason[0]) + Game1.currentSeason.Substring(1));
-            return $"{dayOfWeek}, {season} {day}, Year {Game1.year}";
+            return ModEntry.I18n.Get("lookup.world.full-date", new { dayOfWeek, season, day, year = Game1.year }).ToString();
         }
 
         private static LookupSection BuildCalendarSection()
@@ -4403,7 +4413,7 @@ namespace BetterQOL
             }
             else
             {
-                section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.calendar.todays-birthday"), "None", Color.DarkSlateGray));
+                section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.calendar.todays-birthday"), ModEntry.I18n.Get("lookup.common.none").ToString(), Color.DarkSlateGray));
             }
 
             if (upcomingBirthdays.Count > 0)
@@ -4438,7 +4448,7 @@ namespace BetterQOL
                 if (!string.IsNullOrEmpty(fest))
                 {
                     int daysAway = d - Game1.dayOfMonth;
-                    section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.calendar.upcoming-festival"), $"{fest} (in {daysAway} days)", new Color(180, 100, 0)));
+                    section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.calendar.upcoming-festival"), ModEntry.I18n.Get("lookup.calendar.in-days", new { festival = fest, days = daysAway }).ToString(), new Color(180, 100, 0)));
                     break;
                 }
             }
@@ -4517,7 +4527,7 @@ namespace BetterQOL
 
             if (Game1.player.hasSpecialCharm)
             {
-                section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.wallet.special-charm"), "Active (+0.025 permanent luck bonus)", new Color(180, 50, 180)));
+                section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.wallet.special-charm"), ModEntry.I18n.Get("lookup.wallet.special-charm-active").ToString(), new Color(180, 50, 180)));
             }
 
             return section;
@@ -4576,14 +4586,14 @@ namespace BetterQOL
 
             // Bookseller (1.6 Feature)
             bool isBookseller = Game1.getLocationFromName("Town")?.characters.Any(c => c.Name.Equals("Bookseller", StringComparison.OrdinalIgnoreCase)) == true;
-            section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.events.bookseller"), isBookseller ? "Visiting Town today! (Behind JojaMart)" : "Not visiting today", isBookseller ? new Color(180, 50, 180) : Color.DarkSlateGray));
+            section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.events.bookseller"), isBookseller ? ModEntry.I18n.Get("lookup.events.bookseller-visiting").ToString() : ModEntry.I18n.Get("lookup.events.bookseller-not-today").ToString(), isBookseller ? new Color(180, 50, 180) : Color.DarkSlateGray));
 
             // Tool Upgrade at Clint's
             if (Game1.player.daysLeftForToolUpgrade.Value > 0)
             {
                 int days = Game1.player.daysLeftForToolUpgrade.Value;
-                string readyText = days == 1 ? "Ready tomorrow!" : $"Ready in {days} days";
-                section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.events.tool-upgrade"), $"Clint is upgrading a tool ({readyText})", new Color(180, 100, 0)));
+                string readyText = days == 1 ? ModEntry.I18n.Get("lookup.events.tool-ready-tomorrow").ToString() : ModEntry.I18n.Get("lookup.events.tool-ready-in-days", new { days }).ToString();
+                section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.events.tool-upgrade"), ModEntry.I18n.Get("lookup.events.tool-upgrading", new { ready = readyText }).ToString(), new Color(180, 100, 0)));
             }
 
             // Active Quests & Special Orders
@@ -4591,7 +4601,7 @@ namespace BetterQOL
             int specialOrders = Game1.player.team.specialOrders.Count;
             if (billboardQuests > 0 || specialOrders > 0)
             {
-                section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.events.active-quests"), $"{billboardQuests} billboard quest(s), {specialOrders} special order(s) active", new Color(20, 110, 220)));
+                section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.events.active-quests"), ModEntry.I18n.Get("lookup.events.quests-active-format", new { billboard = billboardQuests, special = specialOrders }).ToString(), new Color(20, 110, 220)));
             }
 
             // Queen of Sauce
@@ -4602,7 +4612,7 @@ namespace BetterQOL
                 var qos = GetQueenOfSauceRecipe(isSunday: true);
                 if (qos.HasValue)
                 {
-                    string status = qos.Value.Known ? "Already Known" : "New Recipe! (Watch TV to Learn)";
+                    string status = qos.Value.Known ? ModEntry.I18n.Get("lookup.tv.recipe-known").ToString() : ModEntry.I18n.Get("lookup.tv.recipe-new").ToString();
                     Color statusColor = qos.Value.Known ? Color.DarkSlateGray : new Color(0, 140, 0);
                     section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.tv.qos-sunday"), $"{qos.Value.RecipeName} - {status}", statusColor));
                 }
@@ -4612,7 +4622,7 @@ namespace BetterQOL
                 var qos = GetQueenOfSauceRecipe(isSunday: false);
                 if (qos.HasValue)
                 {
-                    string status = qos.Value.Known ? "Already Known" : "New Recipe! (Watch TV to Learn)";
+                    string status = qos.Value.Known ? ModEntry.I18n.Get("lookup.tv.recipe-known").ToString() : ModEntry.I18n.Get("lookup.tv.recipe-new").ToString();
                     Color statusColor = qos.Value.Known ? Color.DarkSlateGray : new Color(0, 140, 0);
                     section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.tv.qos-rerun"), $"{qos.Value.RecipeName} - {status}", statusColor));
                 }
@@ -4622,13 +4632,13 @@ namespace BetterQOL
             bool isCartDay = (dayOfWeek == 4 || dayOfWeek == 6) || (Game1.currentSeason == "winter" && day >= 15 && day <= 17);
             if (isCartDay)
             {
-                section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.events.cart"), "Visiting Cindersap Forest today (Open 6:00 AM - 8:00 PM)", new Color(180, 50, 180)));
+                section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.events.cart"), ModEntry.I18n.Get("lookup.events.cart-schedule").ToString(), new Color(180, 50, 180)));
             }
             else
             {
                 int daysToFri = ((4 - dayOfWeek) + 7) % 7;
                 if (daysToFri == 0) daysToFri = 7;
-                section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.events.cart"), $"Next visit in {daysToFri} days (Friday)", Color.DarkSlateGray));
+                section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.events.cart"), ModEntry.I18n.Get("lookup.events.cart-next", new { days = daysToFri, dayOfWeek = ModEntry.I18n.Get("day.friday") }).ToString(), Color.DarkSlateGray));
             }
 
             return section;
@@ -4735,7 +4745,7 @@ namespace BetterQOL
             // Crops Field
             if (unwateredCrops == 0 && readyCrops == 0 && deadCrops == 0)
             {
-                section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.chores.crops"), "All crops watered & taken care of!", new Color(0, 140, 0)));
+                section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.chores.crops"), ModEntry.I18n.Get("lookup.chores.crops-done").ToString(), new Color(0, 140, 0)));
             }
             else
             {
@@ -4749,24 +4759,24 @@ namespace BetterQOL
             // Animals Field
             if (unpettedAnimals == 0 && readyProduce == 0)
             {
-                section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.chores.animals"), "All animals loved & petted today!", new Color(0, 140, 0)));
+                section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.chores.animals"), ModEntry.I18n.Get("lookup.chores.animals-done").ToString(), new Color(0, 140, 0)));
             }
             else
             {
                 var animalParts = new List<string>();
-                if (unpettedAnimals > 0) animalParts.Add($"{unpettedAnimals} need petting");
-                if (readyProduce > 0) animalParts.Add($"{readyProduce} produce ready");
+                if (unpettedAnimals > 0) animalParts.Add(ModEntry.I18n.Get("lookup.chores.animal-unpetted-part", new { count = unpettedAnimals }).ToString());
+                if (readyProduce > 0) animalParts.Add(ModEntry.I18n.Get("lookup.chores.animal-produce-part", new { count = readyProduce }).ToString());
                 section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.chores.animals"), string.Join(", ", animalParts), unpettedAnimals > 0 ? new Color(200, 60, 20) : new Color(0, 140, 0)));
             }
 
             // Machines Field
             if (readyMachines > 0)
             {
-                section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.chores.machines"), $"{readyMachines} machines ready to collect", new Color(0, 140, 0)));
+                section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.chores.machines"), ModEntry.I18n.Get("lookup.chores.machines-ready-format", new { count = readyMachines }).ToString(), new Color(0, 140, 0)));
             }
             else
             {
-                section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.chores.machines"), "No machines ready to collect", Color.DarkSlateGray));
+                section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.chores.machines"), ModEntry.I18n.Get("lookup.chores.no-machines").ToString(), Color.DarkSlateGray));
             }
 
             // Silo Hay
@@ -4779,7 +4789,7 @@ namespace BetterQOL
                     int maxHay = farm.buildings.Count(b => b.buildingType.Value.Contains("Silo")) * 240;
                     if (maxHay > 0)
                     {
-                        section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.chores.silo-hay"), $"{hay} / {maxHay} Hay", hay < maxHay / 4 ? new Color(200, 60, 20) : Game1.textColor));
+                        section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.chores.silo-hay"), ModEntry.I18n.Get("lookup.chores.silo-hay-format", new { current = hay, max = maxHay }).ToString(), hay < maxHay / 4 ? new Color(200, 60, 20) : Game1.textColor));
                     }
                 }
             }
@@ -4803,7 +4813,7 @@ namespace BetterQOL
                     }
                     if (ghUnwatered > 0 || ghReady > 0)
                     {
-                        section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.chores.greenhouse"), $"{ghUnwatered} unwatered, {ghReady} ready to harvest", ghUnwatered > 0 ? new Color(200, 60, 20) : new Color(0, 140, 0)));
+                        section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.chores.greenhouse"), ModEntry.I18n.Get("lookup.chores.greenhouse-format", new { unwatered = ghUnwatered, ready = ghReady }).ToString(), ghUnwatered > 0 ? new Color(200, 60, 20) : new Color(0, 140, 0)));
                     }
                 }
             }
@@ -4827,7 +4837,7 @@ namespace BetterQOL
                     }
                     if (islUnwatered > 0 || islReady > 0)
                     {
-                        section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.chores.island-farm"), $"{islUnwatered} unwatered, {islReady} ready to harvest", islUnwatered > 0 ? new Color(200, 60, 20) : new Color(0, 140, 0)));
+                        section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.chores.island-farm"), ModEntry.I18n.Get("lookup.chores.island-farm-format", new { unwatered = islUnwatered, ready = islReady }).ToString(), islUnwatered > 0 ? new Color(200, 60, 20) : new Color(0, 140, 0)));
                     }
                 }
             }
@@ -4894,7 +4904,7 @@ namespace BetterQOL
             }
             else
             {
-                section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.crop.plantable"), "No outdoor crops available to plant in Winter (Use Greenhouse / Pots / Fiber Seeds)", Color.DarkSlateGray));
+                section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.crop.plantable"), ModEntry.I18n.Get("lookup.crop.winter-none").ToString(), Color.DarkSlateGray));
             }
 
             return section;
@@ -4983,7 +4993,7 @@ namespace BetterQOL
                 if (totalLvl >= 50)
                 {
                     int masteryExp = (int)Game1.stats.Get("MasteryExp");
-                    section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.mastery.progress"), $"{masteryExp:N0} Mastery XP (Cave of Mastery)", new Color(180, 50, 180)));
+                    section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.mastery.progress"), ModEntry.I18n.Get("lookup.mastery.exp-format", new { exp = $"{masteryExp:N0}" }).ToString(), new Color(180, 50, 180)));
 
                     bool combatM = Game1.player.stats.Get("Mastery_0") > 0;
                     bool forageM = Game1.player.stats.Get("Mastery_1") > 0;
@@ -5011,11 +5021,11 @@ namespace BetterQOL
                 {
                     var section = new LookupSection(ModEntry.I18n.Get("lookup.section.ginger-island"));
                     int walnuts = Game1.netWorldState.Value.GoldenWalnutsFound;
-                    section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.island.walnuts"), $"{walnuts} / 130 Found", walnuts >= 130 ? new Color(0, 140, 0) : new Color(180, 100, 0)));
+                    section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.island.walnuts"), ModEntry.I18n.Get("lookup.island.walnuts-format", new { count = walnuts }).ToString(), walnuts >= 130 ? new Color(0, 140, 0) : new Color(180, 100, 0)));
 
                     if (Game1.player.hasOrWillReceiveMail("QiChallengeComplete") || Game1.player.QiGems > 0)
                     {
-                        section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.farmer.qi-gems"), $"{Game1.player.QiGems} Qi Gems", new Color(180, 50, 180)));
+                        section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.farmer.qi-gems"), ModEntry.I18n.Get("lookup.farmer.qi-gems-format", new { count = Game1.player.QiGems }).ToString(), new Color(180, 50, 180)));
                     }
 
                     return section;
@@ -5034,7 +5044,7 @@ namespace BetterQOL
                 bool isJoja = Game1.MasterPlayer.mailReceived.Contains("JojaMember");
                 if (isJoja)
                 {
-                    section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.section.status"), "Joja Community Development (Joja Route Selected)", new Color(20, 110, 220)));
+                    section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.section.status"), ModEntry.I18n.Get("lookup.joja.active-desc").ToString(), new Color(20, 110, 220)));
                     section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.joja.minecarts"), Game1.MasterPlayer.mailReceived.Contains("jojaBoilerRoom") ? "Completed ✓" : "5,000g at JojaMart", Game1.MasterPlayer.mailReceived.Contains("jojaBoilerRoom") ? new Color(0, 140, 0) : Color.DarkSlateGray));
                     section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.joja.bridge-repair"), Game1.MasterPlayer.mailReceived.Contains("jojaCraftsRoom") ? "Completed ✓" : "25,000g at JojaMart", Game1.MasterPlayer.mailReceived.Contains("jojaCraftsRoom") ? new Color(0, 140, 0) : Color.DarkSlateGray));
                     section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.chores.greenhouse"), Game1.MasterPlayer.mailReceived.Contains("jojaPantry") ? "Completed ✓" : "35,000g at JojaMart", Game1.MasterPlayer.mailReceived.Contains("jojaPantry") ? new Color(0, 140, 0) : Color.DarkSlateGray));
@@ -5056,7 +5066,7 @@ namespace BetterQOL
 
                 if (bundlesDict == null)
                 {
-                    section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.section.status"), "Community Center In Progress", new Color(0, 140, 0)));
+                    section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.section.status"), ModEntry.I18n.Get("lookup.world.cc-in-progress").ToString(), new Color(0, 140, 0)));
                     return section;
                 }
 
@@ -5153,7 +5163,7 @@ namespace BetterQOL
 
                     if (roomCompleted == bList.Count)
                     {
-                        section.Fields.Add(new LookupField(roomTitle, "Room Completed ✓", new Color(0, 140, 0)));
+                        section.Fields.Add(new LookupField(roomTitle, ModEntry.I18n.Get("lookup.world.room-completed").ToString(), new Color(0, 140, 0)));
                     }
                     else
                     {
@@ -5239,7 +5249,7 @@ namespace BetterQOL
                 }
                 else
                 {
-                    section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.npc.talked-today"), "Talked to all villagers today! ✓", new Color(0, 140, 0)));
+                    section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.npc.talked-today"), ModEntry.I18n.Get("lookup.npc.talked-all").ToString(), new Color(0, 140, 0)));
                 }
 
                 if (giftLinks.Count > 0)
@@ -5454,7 +5464,7 @@ namespace BetterQOL
                 }
                 else
                 {
-                    section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.perfection.artifacts"), "All 42 Artifacts Donated! ✓", new Color(0, 140, 0)));
+                    section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.perfection.artifacts"), ModEntry.I18n.Get("lookup.perfection.artifacts-all").ToString(), new Color(0, 140, 0)));
                 }
 
                 if (missingMinerals.Count > 0)
@@ -5466,7 +5476,7 @@ namespace BetterQOL
                 }
                 else
                 {
-                    section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.perfection.minerals"), "All 53 Minerals Donated! ✓", new Color(0, 140, 0)));
+                    section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.perfection.minerals"), ModEntry.I18n.Get("lookup.perfection.minerals-all").ToString(), new Color(0, 140, 0)));
                 }
 
                 int[] milestones = { 5, 10, 15, 20, 25, 30, 35, 40, 50, 60, 70, 80, 90, 95 };
@@ -5477,7 +5487,7 @@ namespace BetterQOL
                 }
                 else
                 {
-                    section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.perfection.museum-pct"), "Stardrop Reward & Complete Collection achieved! ★", new Color(180, 50, 180)));
+                    section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.perfection.museum-pct"), ModEntry.I18n.Get("lookup.perfection.museum-all").ToString(), new Color(180, 50, 180)));
                 }
             }
             catch { }
@@ -5505,7 +5515,7 @@ namespace BetterQOL
                 }
                 else
                 {
-                    section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.farmer.skull-record"), "Not yet explored (Reach Floor 120 in Mines to obtain Skull Key)", Color.DarkSlateGray));
+                    section.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.farmer.skull-record"), ModEntry.I18n.Get("lookup.farmer.skull-unexplored").ToString(), Color.DarkSlateGray));
                 }
 
                 (string cat, int k, int g, bool c)[] goals =
@@ -5755,7 +5765,7 @@ namespace BetterQOL
                                         Subtitle = ModEntry.I18n.Get("lookup.type.crafting-recipe").ToString()
                                     };
                                     var rSec = new LookupSection(ModEntry.I18n.Get("lookup.section.recipe-requirements"));
-                                    rSec.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.recipe.crafting-station"), "Inventory Crafting Menu", new Color(20, 110, 220)));
+                                    rSec.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.recipe.crafting-station"), ModEntry.I18n.Get("lookup.recipe.station-inventory").ToString(), new Color(20, 110, 220)));
                                     rSec.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.recipe.unlocked"), Game1.player.craftingRecipes.ContainsKey(recipeKey) ? "Known ✓" : "Not yet learned ✗", Game1.player.craftingRecipes.ContainsKey(recipeKey) ? new Color(0, 140, 0) : Color.DarkSlateGray));
                                     rSec.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.recycling.yields"), $"{recipe.numberProducedPerCraft}x {rName}", new Color(0, 140, 0)));
 
@@ -5809,7 +5819,7 @@ namespace BetterQOL
                                         Subtitle = ModEntry.I18n.Get("lookup.type.cooking-recipe").ToString()
                                     };
                                     var rSec = new LookupSection(ModEntry.I18n.Get("lookup.section.recipe-requirements"));
-                                    rSec.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.recipe.station"), "Kitchen / Cookout Kit", new Color(20, 110, 220)));
+                                    rSec.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.recipe.station"), ModEntry.I18n.Get("lookup.recipe.station-kitchen").ToString(), new Color(20, 110, 220)));
                                     rSec.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.recipe.unlocked"), Game1.player.cookingRecipes.ContainsKey(recipeKey) ? "Known ✓" : "Not yet learned ✗", Game1.player.cookingRecipes.ContainsKey(recipeKey) ? new Color(0, 140, 0) : Color.DarkSlateGray));
                                     rSec.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.recipe.times-cooked"), $"{Game1.player.recipesCooked.GetValueOrDefault(recipe.createItem()?.ItemId ?? recipeKey, 0)} times", new Color(0, 140, 0)));
 

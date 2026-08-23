@@ -16,10 +16,15 @@ namespace BetterQOL
     {
         public static LookupSubject? FindTargetSubject()
         {
+            var cursor = ModEntry.ModHelper.Input.GetCursorPosition();
+            Vector2 uiPixels = cursor.GetScaledScreenPixels();
+            int mouseX = (int)uiPixels.X;
+            int mouseY = (int)uiPixels.Y;
+
             // 1. If a menu is open, inspect hovered items or elements in menu
             if (Game1.activeClickableMenu != null)
             {
-                var menuSubject = FindTargetInMenu(Game1.activeClickableMenu);
+                var menuSubject = FindTargetInMenu(Game1.activeClickableMenu, mouseX, mouseY);
                 if (menuSubject != null)
                     return menuSubject;
             }
@@ -27,8 +32,6 @@ namespace BetterQOL
             // 2. Check OnScreenMenus (e.g. Toolbar / Hotbar)
             if (Game1.onScreenMenus != null)
             {
-                int mouseX = Game1.getMouseX();
-                int mouseY = Game1.getMouseY();
                 foreach (var onScreenMenu in Game1.onScreenMenus)
                 {
                     if (onScreenMenu is Toolbar toolbar && toolbar.buttons != null)
@@ -56,10 +59,8 @@ namespace BetterQOL
             return null;
         }
 
-        private static LookupSubject? FindTargetInMenu(IClickableMenu menu)
+        private static LookupSubject? FindTargetInMenu(IClickableMenu menu, int mouseX, int mouseY)
         {
-            int mouseX = Game1.getMouseX();
-            int mouseY = Game1.getMouseY();
 
             // GameMenu (Inventory, Crafting, Social)
             if (menu is GameMenu gameMenu && gameMenu.pages != null && gameMenu.currentTab < gameMenu.pages.Count)
@@ -128,7 +129,7 @@ namespace BetterQOL
 
                 if (activePage is SocialPage socialPage)
                 {
-                    var npc = GetHoveredSocialNPC(socialPage);
+                    var npc = GetHoveredSocialNPC(socialPage, mouseX, mouseY);
                     if (npc != null)
                     {
                         return LookupDataManager.BuildNPCSubject(npc);
@@ -383,12 +384,10 @@ namespace BetterQOL
             return LookupDataManager.BuildTileSubject(location, tilePos);
         }
 
-        private static NPC? GetHoveredSocialNPC(SocialPage socialPage)
+        private static NPC? GetHoveredSocialNPC(SocialPage socialPage, int mouseX, int mouseY)
         {
             try
             {
-                int mouseX = Game1.getMouseX();
-                int mouseY = Game1.getMouseY();
 
                 var slotField = typeof(SocialPage).GetField("characterSlots", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
                 if (slotField?.GetValue(socialPage) is System.Collections.IList slots)

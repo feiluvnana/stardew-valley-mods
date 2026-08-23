@@ -10,13 +10,15 @@ namespace BetterChest
         public bool EnableDepthScaling { get; set; } = true;
         public bool ScaleLegendaryByDepth { get; set; } = true;
 
-        // Decaying Multi-Rolls (1st roll 100%, each next roll has decreasing chance - Expected ~2.5 items)
-        public int MaxRolls { get; set; } = 6;
-        public float Roll2Chance { get; set; } = 0.80f;
-        public float Roll3Chance { get; set; } = 0.58f;
-        public float Roll4Chance { get; set; } = 0.40f;
-        public float Roll5Chance { get; set; } = 0.25f;
-        public float Roll6Chance { get; set; } = 0.10f;
+        // Decaying Multi-Rolls (1st and 2nd roll guaranteed 100%, each next roll has decreasing chance - Max 8 rolls)
+        public int MaxRolls { get; set; } = 8;
+        public float Roll2Chance { get; set; } = 1.00f;
+        public float Roll3Chance { get; set; } = 0.80f;
+        public float Roll4Chance { get; set; } = 0.65f;
+        public float Roll5Chance { get; set; } = 0.50f;
+        public float Roll6Chance { get; set; } = 0.35f;
+        public float Roll7Chance { get; set; } = 0.20f;
+        public float Roll8Chance { get; set; } = 0.10f;
 
         // Stack Multipliers (Jackpot critical procs on stackable items - Regular Chests, Expected 1.5x Multiplier)
         public float DoubleStackChance { get; set; } = 0.15f;
@@ -75,11 +77,12 @@ namespace BetterChest
         public bool EnableRareSeeds { get; set; } = true;
         public bool EnableRadioactiveItems { get; set; } = true;
         public bool EnableIridiumItems { get; set; } = true;
+        public bool EnableCoal { get; set; } = true;
+        public bool EnableHardwood { get; set; } = true;
         public bool EnableBombs { get; set; } = true;
         public bool EnableFishingTackle { get; set; } = true;
         public bool EnableSlimeEggs { get; set; } = true;
         public bool EnableCombatConsumables { get; set; } = true;
-        public bool EnableWarpTotems { get; set; } = true;
         public bool EnableMysteryBoxes { get; set; } = true;
         public bool EnableArtifactTroves { get; set; } = true;
         public bool EnableOmniGeodes { get; set; } = true;
@@ -100,16 +103,10 @@ namespace BetterChest
         // === 3. FISHING TREASURE CHEST SETTINGS                                ===
         // =========================================================================
         public bool EnableFishingChestBuff { get; set; } = true;
-        public bool FilterFishingChestJunk { get; set; } = true;
-        public bool BoostFishingResourceStacks { get; set; } = true;
-        public bool ScaleFishingResourcesByLevel { get; set; } = true;
-        public bool GatekeepFishingHighTierLoot { get; set; } = true;
-        public float FishingResourceStackMultiplier { get; set; } = 1.5f;
-
-        // 1.6 Golden Fishing Treasure Chest Enhancements
-        public bool EnableGoldenChestBuff { get; set; } = true;
-        public float GoldenChestStackMultiplier { get; set; } = 2.0f;
-        public bool GoldenChestPearlBonus { get; set; } = true;
-        public bool EnableFishingArtifactProtection { get; set; } = true;
+        public int FishingChestMinRolls { get; set; } = 3;
+        public int FishingChestMaxRolls { get; set; } = 5;
+        public int GoldenChestMinRolls { get; set; } = 5;
+        public int GoldenChestMaxRolls { get; set; } = 8;
+        public bool EnableFishingTrashRerollBonus { get; set; } = true;
     }
 }

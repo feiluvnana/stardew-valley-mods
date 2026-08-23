@@ -89,6 +89,8 @@ namespace BetterQOL
                 }
             }
 
+            string geodeDisplayName = geodeStack.DisplayName;
+
             // Consolidate identical items into stacks
             var consolidatedTreasures = ConsolidateTreasures(rawTreasures);
 
@@ -125,8 +127,7 @@ namespace BetterQOL
             // Optional HUD notification for bulk actions
             if (config.ShowSummaryToast && countToCrack > 1)
             {
-                string name = geodeStack.DisplayName;
-                Game1.addHUDMessage(new HUDMessage(ModEntry.I18n.Get("toast.cracked-summary", new { count = countToCrack, name = name })));
+                Game1.addHUDMessage(new HUDMessage(ModEntry.I18n.Get("toast.cracked-summary", new { count = countToCrack, name = geodeDisplayName })));
             }
 
             return result;

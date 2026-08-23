@@ -1,7 +1,7 @@
 {
   "Name": "BetterQOL",
   "Author": "feiluvnana",
-  "Version": "1.2.0",
+  "Version": "1.3.0",
   "Description": "Essential quality-of-life suite for Stardew Valley 1.6+. Combines Lookup Anything (F1), real-time crop grow times, machine processing timers, tree maturation, bulk and instant geode cracking, and unstackable item stack size overrides.",
   "UniqueID": "feiluvnana.BetterQOL",
   "EntryDll": "BetterQOL.dll",

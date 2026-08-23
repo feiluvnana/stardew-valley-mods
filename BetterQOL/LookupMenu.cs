@@ -35,8 +35,7 @@ namespace BetterQOL
 
         private readonly List<LookupLink> ActiveClickableLinks = new();
         private LookupLink? HoveredLink = null;
-
-        private static readonly RasterizerState ScissorRasterizer = new() { ScissorTestEnable = true };
+        private string? HoveredCategory = null;
 
         public LookupMenu(LookupSubject? initialSubject = null)
             : base(
@@ -50,6 +49,16 @@ namespace BetterQOL
             CurrentSubject = initialSubject ?? LookupDataManager.BuildWorldOverviewSubject();
             Game1.playSound("bigSelect");
 
+            InitializeComponents();
+        }
+
+        public override void gameWindowSizeChanged(Rectangle oldBounds, Rectangle newBounds)
+        {
+            base.gameWindowSizeChanged(oldBounds, newBounds);
+            width = Math.Min(860, Game1.uiViewport.Width - 48);
+            height = Math.Min(680, Game1.uiViewport.Height - 48);
+            xPositionOnScreen = (Game1.uiViewport.Width - width) / 2;
+            yPositionOnScreen = (Game1.uiViewport.Height - height) / 2;
             InitializeComponents();
         }
 
@@ -220,6 +229,16 @@ namespace BetterQOL
                 if (link.Bounds.Contains(x, y))
                 {
                     HoveredLink = link;
+                    break;
+                }
+            }
+
+            HoveredCategory = null;
+            foreach (var catBtn in CategoryButtons)
+            {
+                if (catBtn.containsPoint(x, y))
+                {
+                    HoveredCategory = catBtn.name;
                     break;
                 }
             }
@@ -447,7 +466,264 @@ namespace BetterQOL
                 drawShadow: true
             );
 
-            // 3. Spacious Header Bar Layout
+            // Layout metrics
+            int dividerY = yPositionOnScreen + 104;
+            int contentX = xPositionOnScreen + 36;
+            int contentY = dividerY + 18;
+            int contentWidth = width - 116; // Leaves dedicated space for scrollbar on the right
+            int contentHeight = height - 172;
+            int contentBottom = contentY + contentHeight;
+
+            int currentY = contentY - ScrollOffset;
+            int calculatedContentHeight = 0;
+
+            // 3. DRAW CONTENT VIEWPORT WITH BOUNDS CULLING (NO b.End() or ScissorRasterizer needed)
+            if (!string.IsNullOrWhiteSpace(LastSearchText))
+            {
+                // Search Category Filter Tabs
+                CategoryButtons.Clear();
+                int catX = contentX + 4;
+                int catY = currentY;
+                int catHeight = 30;
+                int startY = currentY;
+                foreach (var catName in SearchCategories)
+                {
+                    string catDisplayName = GetCategoryDisplayName(catName);
+                    Vector2 catSize = Game1.smallFont.MeasureString(catDisplayName);
+                    int catW = (int)catSize.X + 16;
+                    if (catX + catW > contentX + contentWidth && catX > contentX + 4)
+                    {
+                        catX = contentX + 4;
+                        catY += catHeight + 6;
+                    }
+
+                    Rectangle catBounds = new Rectangle(catX, catY, catW, catHeight);
+
+                    // Only draw and register clickable if visible in viewport
+                    if (catY + catHeight >= contentY && catY <= contentBottom)
+                    {
+                        CategoryButtons.Add(new ClickableComponent(catBounds, catName));
+
+                        bool isSelected = CurrentCategory.Equals(catName, StringComparison.OrdinalIgnoreCase);
+                        bool isHovered = HoveredCategory != null && string.Equals(HoveredCategory, catName, StringComparison.OrdinalIgnoreCase);
+
+                        Color bg = isSelected ? new Color(180, 100, 30) : (isHovered ? new Color(245, 230, 200) : new Color(230, 210, 175));
+                        Color border = isSelected ? new Color(110, 40, 10) : new Color(170, 130, 90);
+                        Color txtColor = isSelected ? Color.White : (isHovered ? Color.DarkBlue : Game1.textColor);
+
+                        b.Draw(Game1.staminaRect, catBounds, bg);
+                        b.Draw(Game1.staminaRect, new Rectangle(catBounds.X, catBounds.Y, catBounds.Width, 1), border);
+                        b.Draw(Game1.staminaRect, new Rectangle(catBounds.X, catBounds.Bottom - 1, catBounds.Width, 1), border);
+                        b.Draw(Game1.staminaRect, new Rectangle(catBounds.X, catBounds.Y, 1, catBounds.Height), border);
+                        b.Draw(Game1.staminaRect, new Rectangle(catBounds.Right - 1, catBounds.Y, 1, catBounds.Height), border);
+
+                        int textX = catBounds.X + (catW - (int)catSize.X) / 2;
+                        int textY = catBounds.Y + (catHeight - (int)catSize.Y) / 2;
+                        Utility.drawTextWithShadow(b, catDisplayName, Game1.smallFont, new Vector2(textX, textY), txtColor);
+                    }
+
+                    catX += catW + 6;
+                }
+                int totalCatHeaderHeight = (catY - startY) + catHeight + 12;
+                currentY += totalCatHeaderHeight;
+                calculatedContentHeight += totalCatHeaderHeight;
+
+                // Search Results Mode
+                if (SearchResults.Count == 0)
+                {
+                    if (currentY + 40 >= contentY && currentY <= contentBottom)
+                    {
+                        Utility.drawTextWithShadow(b, ModEntry.I18n.Get("lookup.menu.no-results", new { query = LastSearchText, category = GetCategoryDisplayName(CurrentCategory) }).ToString(), Game1.smallFont, new Vector2(contentX, currentY + 16), Color.DarkSlateGray);
+                    }
+                    calculatedContentHeight += 50;
+                }
+                else
+                {
+                    foreach (var result in SearchResults)
+                    {
+                        int rowHeight = 44;
+                        Rectangle rowBounds = new Rectangle(contentX, currentY, contentWidth, rowHeight);
+
+                        if (currentY + rowHeight >= contentY && currentY <= contentBottom)
+                        {
+                            result.Bounds = rowBounds;
+                            ActiveClickableLinks.Add(result);
+
+                            bool isHovered = HoveredLink == result;
+
+                            if (isHovered)
+                            {
+                                b.Draw(Game1.staminaRect, rowBounds, Color.SaddleBrown * 0.15f);
+                            }
+
+                            int itemIconX = contentX + 6;
+                            if (result.Icon != null)
+                            {
+                                Rectangle src = result.IconSourceRect ?? new Rectangle(0, 0, result.Icon.Width, result.Icon.Height);
+                                b.Draw(result.Icon, new Rectangle(itemIconX, currentY + 6, 32, 32), src, Color.White);
+                            }
+
+                            int labelX = itemIconX + 42;
+
+                            // Right-aligned Subtitle
+                            int subX = contentX + contentWidth - 36;
+                            if (!string.IsNullOrEmpty(result.Subtitle))
+                            {
+                                Vector2 subSize = Game1.smallFont.MeasureString(result.Subtitle);
+                                subX = contentX + contentWidth - 36 - (int)subSize.X;
+                                Utility.drawTextWithShadow(b, result.Subtitle, Game1.smallFont, new Vector2(subX, currentY + 10), Color.DarkSlateGray);
+                            }
+
+                            // Title with safety truncation if too wide
+                            int maxLabelW = subX - labelX - 16;
+                            string titleText = result.Text;
+                            if (Game1.dialogueFont.MeasureString(titleText).X * 0.7f > maxLabelW && maxLabelW > 40)
+                            {
+                                while (titleText.Length > 3 && Game1.dialogueFont.MeasureString(titleText + "...").X * 0.7f > maxLabelW)
+                                {
+                                    titleText = titleText.Substring(0, titleText.Length - 1);
+                                }
+                                titleText += "...";
+                            }
+
+                            Utility.drawTextWithShadow(b, titleText, Game1.dialogueFont, new Vector2(labelX, currentY + 2), isHovered ? Color.DarkBlue : result.TextColor, 0.7f);
+
+                            Utility.drawTextWithShadow(b, ">", Game1.dialogueFont, new Vector2(contentX + contentWidth - 24, currentY + 4), Color.SaddleBrown * 0.5f, 0.7f);
+                            b.Draw(Game1.staminaRect, new Rectangle(contentX, currentY + rowHeight - 2, contentWidth, 1), Color.SaddleBrown * 0.15f);
+                        }
+
+                        currentY += rowHeight;
+                        calculatedContentHeight += rowHeight;
+                    }
+                }
+            }
+            else if (CurrentSubject != null)
+            {
+                // Full Subject Details
+                foreach (var section in CurrentSubject.Sections)
+                {
+                    // Section Header
+                    if (currentY + 40 >= contentY && currentY <= contentBottom)
+                    {
+                        Utility.drawTextWithShadow(b, section.Title, Game1.dialogueFont, new Vector2(contentX + 4, currentY), new Color(115, 40, 10));
+                    }
+                    currentY += 46;
+                    calculatedContentHeight += 46;
+
+                    foreach (var field in section.Fields)
+                    {
+                        string label = !string.IsNullOrEmpty(field.Label) ? $"{field.Label}: " : string.Empty;
+                        Vector2 labelSize = Game1.smallFont.MeasureString(label);
+
+                        if (field.Links.Count > 0)
+                        {
+                            if (currentY + 28 >= contentY && currentY <= contentBottom)
+                            {
+                                Utility.drawTextWithShadow(b, label, Game1.smallFont, new Vector2(contentX + 12, currentY), Game1.textColor);
+                            }
+                            currentY += 34;
+                            calculatedContentHeight += 34;
+
+                            int chipX = contentX + 16;
+                            int chipSpacing = 10;
+                            int chipHeight = 36;
+                            int chipIconSize = 24;
+
+                            foreach (var link in field.Links)
+                            {
+                                Vector2 textSize = Game1.smallFont.MeasureString(link.Text);
+                                int chipWidth = (int)textSize.X + (link.Icon != null ? chipIconSize + 16 : 14) + 12;
+
+                                if (chipX + chipWidth > contentX + contentWidth - 8)
+                                {
+                                    chipX = contentX + 16;
+                                    currentY += chipHeight + 8;
+                                    calculatedContentHeight += chipHeight + 8;
+                                }
+
+                                Rectangle chipBounds = new Rectangle(chipX, currentY, chipWidth, chipHeight);
+
+                                if (currentY + chipHeight >= contentY && currentY <= contentBottom)
+                                {
+                                    link.Bounds = chipBounds;
+                                    ActiveClickableLinks.Add(link);
+
+                                    bool isHovered = HoveredLink == link;
+
+                                    Color bgColor = isHovered ? new Color(255, 245, 215) : new Color(248, 230, 192);
+                                    Color borderColor = isHovered ? new Color(110, 35, 10) : new Color(185, 135, 90);
+
+                                    b.Draw(Game1.staminaRect, chipBounds, bgColor);
+
+                                    b.Draw(Game1.staminaRect, new Rectangle(chipBounds.X, chipBounds.Y, chipBounds.Width, 1), borderColor);
+                                    b.Draw(Game1.staminaRect, new Rectangle(chipBounds.X, chipBounds.Bottom - 1, chipBounds.Width, 1), borderColor);
+                                    b.Draw(Game1.staminaRect, new Rectangle(chipBounds.X, chipBounds.Y, 1, chipBounds.Height), borderColor);
+                                    b.Draw(Game1.staminaRect, new Rectangle(chipBounds.Right - 1, chipBounds.Y, 1, chipBounds.Height), borderColor);
+
+                                    int drawIconX = chipBounds.X + 8;
+                                    int drawTextX = drawIconX;
+
+                                    if (link.Icon != null)
+                                    {
+                                        int iconY = chipBounds.Y + (chipHeight - chipIconSize) / 2;
+                                        Rectangle src = link.IconSourceRect ?? new Rectangle(0, 0, link.Icon.Width, link.Icon.Height);
+                                        b.Draw(link.Icon, new Rectangle(drawIconX, iconY, chipIconSize, chipIconSize), src, Color.White);
+                                        drawTextX += chipIconSize + 8;
+                                    }
+                                    else
+                                    {
+                                        drawTextX += 2;
+                                    }
+
+                                    int textY = chipBounds.Y + (chipHeight - (int)textSize.Y) / 2 + 1;
+                                    Utility.drawTextWithShadow(b, link.Text, Game1.smallFont, new Vector2(drawTextX, textY), isHovered ? Color.DarkBlue : link.TextColor);
+                                }
+
+                                chipX += chipWidth + chipSpacing;
+                            }
+
+                            currentY += chipHeight + 14;
+                            calculatedContentHeight += chipHeight + 14;
+                        }
+                        else
+                        {
+                            int valWidth = contentWidth - (int)labelSize.X - 32;
+                            string wrappedValue = Game1.parseText(field.Value ?? string.Empty, Game1.smallFont, Math.Max(140, valWidth));
+                            Vector2 valSize = Game1.smallFont.MeasureString(wrappedValue);
+                            int lineH = (int)Math.Max(30, valSize.Y + 8);
+
+                            if (currentY + lineH >= contentY && currentY <= contentBottom)
+                            {
+                                Utility.drawTextWithShadow(b, label, Game1.smallFont, new Vector2(contentX + 12, currentY), Game1.textColor);
+                                Utility.drawTextWithShadow(b, wrappedValue, Game1.smallFont, new Vector2(contentX + 12 + labelSize.X, currentY), field.ValueColor);
+                            }
+
+                            currentY += lineH;
+                            calculatedContentHeight += lineH;
+                        }
+                    }
+
+                    if (currentY + 20 >= contentY && currentY <= contentBottom)
+                    {
+                        b.Draw(Game1.staminaRect, new Rectangle(contentX + 6, currentY + 6, contentWidth - 12, 1), Color.SaddleBrown * 0.15f);
+                    }
+                    currentY += 24;
+                    calculatedContentHeight += 24;
+                }
+            }
+
+            MaxScrollOffset = Math.Max(0, calculatedContentHeight - contentHeight);
+
+            // 4. HEADER BACKGROUND & OVERLAYS (Draw on top of scrolled content for clean visual cutoff)
+            // Solid parchment top mask
+            b.Draw(Game1.staminaRect, new Rectangle(xPositionOnScreen + 16, yPositionOnScreen + 16, width - 32, 92), new Color(248, 230, 192));
+            // Solid parchment bottom mask
+            b.Draw(Game1.staminaRect, new Rectangle(xPositionOnScreen + 16, contentBottom + 2, width - 32, yPositionOnScreen + height - contentBottom - 18), new Color(248, 230, 192));
+
+            // Header Divider
+            b.Draw(Game1.staminaRect, new Rectangle(xPositionOnScreen + 32, dividerY, width - 64, 2), Color.SaddleBrown * 0.3f);
+
+            // Header Bar Layout
             int headerTopY = yPositionOnScreen + 30;
             int headerLeftX = xPositionOnScreen + 34;
 
@@ -539,261 +815,7 @@ namespace BetterQOL
                 }
             }
 
-            // Header Divider with ample clearance
-            int dividerY = yPositionOnScreen + 104;
-            b.Draw(Game1.staminaRect, new Rectangle(xPositionOnScreen + 32, dividerY, width - 64, 2), Color.SaddleBrown * 0.3f);
-
-            // 4. Content Area Layout & GPU-Clipping Scissor Rect
-            int contentX = xPositionOnScreen + 36;
-            int contentY = dividerY + 18;
-            int contentWidth = width - 116; // Leaves dedicated space for scrollbar on the right
-            int contentHeight = height - 172;
-            int contentBottom = contentY + contentHeight;
-
-            int currentY = contentY - ScrollOffset;
-            int calculatedContentHeight = 0;
-
-            // Start Scissor-Clipped Drawing for Content Viewport
-            b.End();
-
-            float scale = Game1.options.uiScale;
-            Rectangle clipRect = new Rectangle(
-                (int)(contentX * scale),
-                (int)(contentY * scale),
-                (int)(contentWidth * scale),
-                (int)(contentHeight * scale)
-            );
-
-            // Clamp clip rect to screen bounds
-            clipRect.X = Math.Max(0, Math.Min(clipRect.X, b.GraphicsDevice.Viewport.Width));
-            clipRect.Y = Math.Max(0, Math.Min(clipRect.Y, b.GraphicsDevice.Viewport.Height));
-            clipRect.Width = Math.Max(0, Math.Min(clipRect.Width, b.GraphicsDevice.Viewport.Width - clipRect.X));
-            clipRect.Height = Math.Max(0, Math.Min(clipRect.Height, b.GraphicsDevice.Viewport.Height - clipRect.Y));
-
-            Rectangle oldScissor = b.GraphicsDevice.ScissorRectangle;
-            b.GraphicsDevice.ScissorRectangle = clipRect;
-
-            b.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, ScissorRasterizer);
-
-            // DRAW CONTENT INSIDE SCISSOR VIEWPORT
-            if (!string.IsNullOrWhiteSpace(LastSearchText))
-            {
-                // Search Category Filter Tabs
-                CategoryButtons.Clear();
-                int catX = contentX + 4;
-                int catY = currentY;
-                int catHeight = 30;
-                int startY = currentY;
-                foreach (var catName in SearchCategories)
-                {
-                    string catDisplayName = GetCategoryDisplayName(catName);
-                    Vector2 catSize = Game1.smallFont.MeasureString(catDisplayName);
-                    int catW = (int)catSize.X + 16;
-                    if (catX + catW > contentX + contentWidth && catX > contentX + 4)
-                    {
-                        catX = contentX + 4;
-                        catY += catHeight + 6;
-                    }
-
-                    Rectangle catBounds = new Rectangle(catX, catY, catW, catHeight);
-                    CategoryButtons.Add(new ClickableComponent(catBounds, catName));
-
-                    bool isSelected = CurrentCategory.Equals(catName, StringComparison.OrdinalIgnoreCase);
-                    bool isHovered = catBounds.Contains(Game1.getMouseX(), Game1.getMouseY());
-
-                    Color bg = isSelected ? new Color(180, 100, 30) : (isHovered ? new Color(245, 230, 200) : new Color(230, 210, 175));
-                    Color border = isSelected ? new Color(110, 40, 10) : new Color(170, 130, 90);
-                    Color txtColor = isSelected ? Color.White : (isHovered ? Color.DarkBlue : Game1.textColor);
-
-                    b.Draw(Game1.staminaRect, catBounds, bg);
-                    b.Draw(Game1.staminaRect, new Rectangle(catBounds.X, catBounds.Y, catBounds.Width, 1), border);
-                    b.Draw(Game1.staminaRect, new Rectangle(catBounds.X, catBounds.Bottom - 1, catBounds.Width, 1), border);
-                    b.Draw(Game1.staminaRect, new Rectangle(catBounds.X, catBounds.Y, 1, catBounds.Height), border);
-                    b.Draw(Game1.staminaRect, new Rectangle(catBounds.Right - 1, catBounds.Y, 1, catBounds.Height), border);
-
-                    int textX = catBounds.X + (catW - (int)catSize.X) / 2;
-                    int textY = catBounds.Y + (catHeight - (int)catSize.Y) / 2;
-                    Utility.drawTextWithShadow(b, catDisplayName, Game1.smallFont, new Vector2(textX, textY), txtColor);
-
-                    catX += catW + 6;
-                }
-                int totalCatHeaderHeight = (catY - startY) + catHeight + 12;
-                currentY += totalCatHeaderHeight;
-                calculatedContentHeight += totalCatHeaderHeight;
-
-                // Search Results Mode
-                if (SearchResults.Count == 0)
-                {
-                    Utility.drawTextWithShadow(b, ModEntry.I18n.Get("lookup.menu.no-results", new { query = LastSearchText, category = GetCategoryDisplayName(CurrentCategory) }).ToString(), Game1.smallFont, new Vector2(contentX, currentY + 16), Color.DarkSlateGray);
-                    calculatedContentHeight += 50;
-                }
-                else
-                {
-                    foreach (var result in SearchResults)
-                    {
-                        int rowHeight = 44;
-                        Rectangle rowBounds = new Rectangle(contentX, currentY, contentWidth, rowHeight);
-
-                        // Track active clickable link
-                        result.Bounds = rowBounds;
-                        ActiveClickableLinks.Add(result);
-
-                        bool isHovered = HoveredLink == result;
-
-                        if (isHovered)
-                        {
-                            b.Draw(Game1.staminaRect, rowBounds, Color.SaddleBrown * 0.15f);
-                        }
-
-                        int itemIconX = contentX + 6;
-                        if (result.Icon != null)
-                        {
-                            Rectangle src = result.IconSourceRect ?? new Rectangle(0, 0, result.Icon.Width, result.Icon.Height);
-                            b.Draw(result.Icon, new Rectangle(itemIconX, currentY + 6, 32, 32), src, Color.White);
-                        }
-
-                        int labelX = itemIconX + 42;
-
-                        // Right-aligned Subtitle
-                        int subX = contentX + contentWidth - 36;
-                        if (!string.IsNullOrEmpty(result.Subtitle))
-                        {
-                            Vector2 subSize = Game1.smallFont.MeasureString(result.Subtitle);
-                            subX = contentX + contentWidth - 36 - (int)subSize.X;
-                            Utility.drawTextWithShadow(b, result.Subtitle, Game1.smallFont, new Vector2(subX, currentY + 10), Color.DarkSlateGray);
-                        }
-
-                        // Title with safety truncation if too wide
-                        int maxLabelW = subX - labelX - 16;
-                        string titleText = result.Text;
-                        if (Game1.dialogueFont.MeasureString(titleText).X * 0.7f > maxLabelW && maxLabelW > 40)
-                        {
-                            while (titleText.Length > 3 && Game1.dialogueFont.MeasureString(titleText + "...").X * 0.7f > maxLabelW)
-                            {
-                                titleText = titleText.Substring(0, titleText.Length - 1);
-                            }
-                            titleText += "...";
-                        }
-
-                        Utility.drawTextWithShadow(b, titleText, Game1.dialogueFont, new Vector2(labelX, currentY + 2), isHovered ? Color.DarkBlue : result.TextColor, 0.7f);
-
-                        Utility.drawTextWithShadow(b, ">", Game1.dialogueFont, new Vector2(contentX + contentWidth - 24, currentY + 4), Color.SaddleBrown * 0.5f, 0.7f);
-                        b.Draw(Game1.staminaRect, new Rectangle(contentX, currentY + rowHeight - 2, contentWidth, 1), Color.SaddleBrown * 0.15f);
-
-                        currentY += rowHeight;
-                        calculatedContentHeight += rowHeight;
-                    }
-                }
-            }
-            else if (CurrentSubject != null)
-            {
-                // Full Subject Details
-                foreach (var section in CurrentSubject.Sections)
-                {
-                    // Section Header
-                    Utility.drawTextWithShadow(b, section.Title, Game1.dialogueFont, new Vector2(contentX + 4, currentY), new Color(115, 40, 10));
-                    currentY += 46;
-                    calculatedContentHeight += 46;
-
-                    foreach (var field in section.Fields)
-                    {
-                        string label = !string.IsNullOrEmpty(field.Label) ? $"{field.Label}: " : string.Empty;
-                        Vector2 labelSize = Game1.smallFont.MeasureString(label);
-
-                        if (field.Links.Count > 0)
-                        {
-                            Utility.drawTextWithShadow(b, label, Game1.smallFont, new Vector2(contentX + 12, currentY), Game1.textColor);
-                            currentY += 34;
-                            calculatedContentHeight += 34;
-
-                            int chipX = contentX + 16;
-                            int chipSpacing = 10;
-                            int chipHeight = 36;
-                            int chipIconSize = 24;
-
-                            foreach (var link in field.Links)
-                            {
-                                Vector2 textSize = Game1.smallFont.MeasureString(link.Text);
-                                int chipWidth = (int)textSize.X + (link.Icon != null ? chipIconSize + 16 : 14) + 12;
-
-                                if (chipX + chipWidth > contentX + contentWidth - 8)
-                                {
-                                    chipX = contentX + 16;
-                                    currentY += chipHeight + 8;
-                                    calculatedContentHeight += chipHeight + 8;
-                                }
-
-                                Rectangle chipBounds = new Rectangle(chipX, currentY, chipWidth, chipHeight);
-                                link.Bounds = chipBounds;
-                                ActiveClickableLinks.Add(link);
-
-                                bool isHovered = HoveredLink == link;
-
-                                // Clean smooth chip background
-                                Color bgColor = isHovered ? new Color(255, 245, 215) : new Color(248, 230, 192);
-                                Color borderColor = isHovered ? new Color(110, 35, 10) : new Color(185, 135, 90);
-
-                                b.Draw(Game1.staminaRect, chipBounds, bgColor);
-
-                                // 1px Crisp Outline
-                                b.Draw(Game1.staminaRect, new Rectangle(chipBounds.X, chipBounds.Y, chipBounds.Width, 1), borderColor);
-                                b.Draw(Game1.staminaRect, new Rectangle(chipBounds.X, chipBounds.Bottom - 1, chipBounds.Width, 1), borderColor);
-                                b.Draw(Game1.staminaRect, new Rectangle(chipBounds.X, chipBounds.Y, 1, chipBounds.Height), borderColor);
-                                b.Draw(Game1.staminaRect, new Rectangle(chipBounds.Right - 1, chipBounds.Y, 1, chipBounds.Height), borderColor);
-
-                                int drawIconX = chipBounds.X + 8;
-                                int drawTextX = drawIconX;
-
-                                if (link.Icon != null)
-                                {
-                                    int iconY = chipBounds.Y + (chipHeight - chipIconSize) / 2;
-                                    Rectangle src = link.IconSourceRect ?? new Rectangle(0, 0, link.Icon.Width, link.Icon.Height);
-                                    b.Draw(link.Icon, new Rectangle(drawIconX, iconY, chipIconSize, chipIconSize), src, Color.White);
-                                    drawTextX += chipIconSize + 8;
-                                }
-                                else
-                                {
-                                    drawTextX += 2;
-                                }
-
-                                int textY = chipBounds.Y + (chipHeight - (int)textSize.Y) / 2 + 1;
-                                Utility.drawTextWithShadow(b, link.Text, Game1.smallFont, new Vector2(drawTextX, textY), isHovered ? Color.DarkBlue : link.TextColor);
-
-                                chipX += chipWidth + chipSpacing;
-                            }
-
-                            currentY += chipHeight + 14;
-                            calculatedContentHeight += chipHeight + 14;
-                        }
-                        else
-                        {
-                            int valWidth = contentWidth - (int)labelSize.X - 32;
-                            string wrappedValue = Game1.parseText(field.Value ?? string.Empty, Game1.smallFont, Math.Max(140, valWidth));
-                            Vector2 valSize = Game1.smallFont.MeasureString(wrappedValue);
-                            int lineH = (int)Math.Max(30, valSize.Y + 8);
-
-                            Utility.drawTextWithShadow(b, label, Game1.smallFont, new Vector2(contentX + 12, currentY), Game1.textColor);
-                            Utility.drawTextWithShadow(b, wrappedValue, Game1.smallFont, new Vector2(contentX + 12 + labelSize.X, currentY), field.ValueColor);
-
-                            currentY += lineH;
-                            calculatedContentHeight += lineH;
-                        }
-                    }
-
-                    b.Draw(Game1.staminaRect, new Rectangle(contentX + 6, currentY + 6, contentWidth - 12, 1), Color.SaddleBrown * 0.15f);
-                    currentY += 24;
-                    calculatedContentHeight += 24;
-                }
-            }
-
-            // End Scissor Drawing & Restore Sprite Batch
-            b.End();
-            b.GraphicsDevice.ScissorRectangle = oldScissor;
-            b.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null);
-
-            MaxScrollOffset = Math.Max(0, calculatedContentHeight - contentHeight);
-
-            // 5. Draw Scrollbar Track & Up/Down Buttons
+            // 5. Scrollbar Track & Up/Down Buttons
             CloseButton?.draw(b);
 
             if (MaxScrollOffset > 0)
