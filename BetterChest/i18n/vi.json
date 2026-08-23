@@ -165,8 +165,5 @@
   "config.golden-chest-max-rolls.name": "Số Lượt Mở Tối Đa (Rương Vàng)",
   "config.golden-chest-max-rolls.tooltip": "Số lượt mở tối đa của rương câu cá vàng 1.6 (mặc định 8).",
   "config.enable-fishing-trash-reroll-bonus.name": "Bật Lượt Mở Bù Khi Trúng Rác",
-  "config.enable-fishing-trash-reroll-bonus.tooltip": "Tự động cộng thêm +1 lượt mở phần thưởng chất lượng cho mỗi món rác hoặc vật phẩm vụn trong rương.",
-
-  "hud.chest-reward-summary": "♦ {{items}}",
-  "hud.chest-reward-more": "(+{{count}} phần thưởng khác)"
+  "config.enable-fishing-trash-reroll-bonus.tooltip": "Tự động cộng thêm +1 lượt mở phần thưởng chất lượng cho mỗi món rác hoặc vật phẩm vụn trong rương."
 }

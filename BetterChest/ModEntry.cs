@@ -38,7 +38,6 @@ namespace BetterChest
 
             var harmony = new Harmony(ModManifest.UniqueID);
             FishingPatches.Apply(harmony);
-            ChestPatches.Apply(harmony);
 
             helper.Events.Player.Warped += OnWarped;
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
@@ -46,9 +45,6 @@ namespace BetterChest
 
         private void OnWarped(object? sender, WarpedEventArgs e)
         {
-            if (!Game1.IsMasterGame)
-                return;
-
             if (e.NewLocation is MineShaft shaft && shaft.mineLevel > 120)
             {
                 ProcessMineShaftChests(shaft);

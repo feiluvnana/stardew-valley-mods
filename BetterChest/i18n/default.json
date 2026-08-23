@@ -165,8 +165,5 @@
   "config.golden-chest-max-rolls.name": "Golden Chest Max Rolls",
   "config.golden-chest-max-rolls.tooltip": "Maximum number of item rolls in 1.6 Golden Fishing Chests (default 8).",
   "config.enable-fishing-trash-reroll-bonus.name": "Enable Trash Bonus Rerolls",
-  "config.enable-fishing-trash-reroll-bonus.tooltip": "Guarantees a +1 bonus roll of quality fishing loot for every trash or trivial item found in the chest.",
-
-  "hud.chest-reward-summary": "♦ {{items}}",
-  "hud.chest-reward-more": "(+{{count}} more)"
+  "config.enable-fishing-trash-reroll-bonus.tooltip": "Guarantees a +1 bonus roll of quality fishing loot for every trash or trivial item found in the chest."
 }
