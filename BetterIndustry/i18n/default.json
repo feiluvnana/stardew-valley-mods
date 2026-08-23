@@ -19,6 +19,12 @@
   "config.juice-multiplier.name": "Juice Multiplier",
   "config.juice-multiplier.tooltip": "Price multiplier for Vegetable Juice relative to raw vegetable price (default 2.75x, vanilla 2.25x).",
   "config.expanded-aging.name": "Expanded Cask Aging",
-  "config.expanded-aging.tooltip": "Allows Casks to age additional artisan goods such as Vegetable Juice."
+  "config.expanded-aging.tooltip": "Allows Casks to age additional artisan goods such as Vegetable Juice.",
+
+  "config.section.fruittree": "Fruit Tree Options",
+  "config.auto-fruit-drop.name": "Auto-Falling Fruit",
+  "config.auto-fruit-drop.tooltip": "When a mature fruit tree holds the configured number of fruit, all of its fruit automatically falls to the ground overnight.",
+  "config.fruit-drop-threshold.name": "Fruit Drop Threshold",
+  "config.fruit-drop-threshold.tooltip": "Number of fruit on a tree that triggers the auto-drop (default 3, the vanilla maximum)."
 }
 

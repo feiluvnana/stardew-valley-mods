@@ -30,6 +30,13 @@ namespace BetterIndustry
 
         /// <summary>Whether Casks can age additional artisan goods such as Vegetable Juice.</summary>
         public bool EnableExpandedAging { get; set; } = true;
+
+        // ---------------- Fruit Tree Automation ----------------
+        /// <summary>Whether fruit automatically falls to the ground when a mature fruit tree reaches the configured fruit count.</summary>
+        public bool EnableAutoFruitDrop { get; set; } = true;
+
+        /// <summary>Number of fruit on a tree that triggers the auto-drop (default 3, the vanilla maximum).</summary>
+        public int MaxFruitsBeforeDrop { get; set; } = 3;
     }
 }
 

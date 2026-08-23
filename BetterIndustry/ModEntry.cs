@@ -25,6 +25,7 @@ namespace BetterIndustry
 
             // Game Loop Events
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
+            helper.Events.GameLoop.DayStarted += FruitTreeDropper.OnDayStarted;
 
             Monitor.Log("BetterIndustry loaded successfully: Artisan Goods and Cooking Balance are active.", LogLevel.Debug);
         }
@@ -143,6 +144,30 @@ namespace BetterIndustry
                 setValue: value => Config.EnableExpandedAging = value
             );
 
+            // ---------------- Section 3: Fruit Tree Automation ----------------
+            configMenu.AddSectionTitle(
+                mod: ModManifest,
+                text: () => I18n.Get("config.section.fruittree")
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.auto-fruit-drop.name"),
+                tooltip: () => I18n.Get("config.auto-fruit-drop.tooltip"),
+                getValue: () => Config.EnableAutoFruitDrop,
+                setValue: value => Config.EnableAutoFruitDrop = value
+            );
+
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.fruit-drop-threshold.name"),
+                tooltip: () => I18n.Get("config.fruit-drop-threshold.tooltip"),
+                getValue: () => Config.MaxFruitsBeforeDrop,
+                setValue: value => Config.MaxFruitsBeforeDrop = value,
+                min: 1,
+                max: 10,
+                interval: 1
+            );
         }
 
         private void InvalidateAssetCaches()

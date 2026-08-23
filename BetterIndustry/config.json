@@ -7,5 +7,7 @@
   "TruffleOilMultiplier": 1.5,
   "EnableJuiceBuff": true,
   "JuiceMultiplier": 2.75,
-  "EnableExpandedAging": true
+  "EnableExpandedAging": true,
+  "EnableAutoFruitDrop": true,
+  "MaxFruitsBeforeDrop": 3
 }

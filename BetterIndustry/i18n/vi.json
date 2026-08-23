@@ -19,6 +19,12 @@
   "config.juice-multiplier.name": "Hệ Số Giá Nước Ép",
   "config.juice-multiplier.tooltip": "Hệ số nhân giá nước ép rau củ so với giá rau củ thô (mặc định 2.75x, gốc 2.25x).",
   "config.expanded-aging.name": "Mở Rộng Thùng Ủ Hầm (Cask)",
-  "config.expanded-aging.tooltip": "Cho phép Thùng ủ hầm (Cask) ủ già thêm các mặt hàng thủ công như Nước ép rau củ."
+  "config.expanded-aging.tooltip": "Cho phép Thùng ủ hầm (Cask) ủ già thêm các mặt hàng thủ công như Nước ép rau củ.",
+
+  "config.section.fruittree": "Tùy Chọn Cây Ăn Trái",
+  "config.auto-fruit-drop.name": "Trái Tự Động Rơi Xuống",
+  "config.auto-fruit-drop.tooltip": "Khi cây ăn trái trưởng thành đạt đủ số quả theo ngưỡng, toàn bộ quả sẽ tự động rơi xuống đất qua đêm.",
+  "config.fruit-drop-threshold.name": "Ngưỡng Số Quả Rơi",
+  "config.fruit-drop-threshold.tooltip": "Số quả trên cây để kích hoạt rơi tự động (mặc định 3, mức tối đa gốc của trò chơi)."
 }
 
