@@ -3,16 +3,6 @@
     <AssemblyName>BetterQOL</AssemblyName>
     <RootNamespace>BetterQOL</RootNamespace>
     <Version>1.4.3</Version>
-    <TargetFramework>net6.0</TargetFramework>
     <EnableHarmony>true</EnableHarmony>
-    <Platforms>AnyCPU</Platforms>
-    <EnableModDeploy>false</EnableModDeploy>
-    <OutputPath>.</OutputPath>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <Nullable>enable</Nullable>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="4.1.1" />
-  </ItemGroup>
 </Project>

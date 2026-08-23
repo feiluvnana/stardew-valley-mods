@@ -1,8 +1,8 @@
-// ModConfig holds every user-adjustable setting for ExtendedDesertFestival.
+// ModConfig holds every user-adjustable setting for BetterEvent.
 // SMAPI serializes these public properties to the mod's config.json on exit
 // and reloads them at launch, and Generic Mod Config Menu can bind each one
 // to a checkbox/slider so players never have to hand-edit JSON.
-namespace ExtendedDesertFestival
+namespace BetterEvent
 {
     /// <summary>
     /// Settings controlling which extra seasons host the Calico Desert Festival,

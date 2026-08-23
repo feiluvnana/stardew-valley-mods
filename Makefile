@@ -1,4 +1,4 @@
-MODS := BetterChest BetterForge BetterFurniture BetterIndustry BetterMap BetterQOL ExtendedDesertFestival
+MODS := BetterChest BetterForge BetterFurniture BetterIndustry BetterMap BetterQOL BetterEvent
 
 VERBS := all help build rebuild clean
 

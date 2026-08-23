@@ -6,15 +6,15 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v6.0": {
-      "ExtendedDesertFestival/1.1.1": {
+      "BetterEvent/1.1.1": {
         "runtime": {
-          "ExtendedDesertFestival.dll": {}
+          "BetterEvent.dll": {}
         }
       }
     }
   },
   "libraries": {
-    "ExtendedDesertFestival/1.1.1": {
+    "BetterEvent/1.1.1": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

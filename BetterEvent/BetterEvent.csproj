@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>BetterEvent</AssemblyName>
+    <RootNamespace>BetterEvent</RootNamespace>
+    <Version>1.1.1</Version>
+  </PropertyGroup>
+</Project>

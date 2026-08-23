@@ -30,7 +30,7 @@ This document serves as the persistent knowledge base and rule set for AI coding
 | `BetterQOL` | **📦 BetterQOL** | Live hover overlays (crop/machine timers, tree maturation, animal hearts), rich Lookup Anything (`F1` key with search & almanac), bulk/instant geode cracking, and unstackable item stack size overrides up to 999. |
 | `BetterFurniture` | **👑 BetterFurniture** | 4x4 Princess King Bed with free placement anywhere, animated sconce flames, light sources, canopy layering, and farmhouse tile restorations. |
 | `BetterMap` | **🗺️ BetterMap** | Widens all Farmhouse exit doorways to 3x1 tiles, removes Ginger Island Farm driftwood fence and bleached log piles. |
-| `ExtendedDesertFestival` | **🌵 ExtendedDesertFestival** | Calico Desert Festival in Summer, Fall, and Winter (15th–17th), preserves Calico Eggs across seasons. |
+| `BetterEvent` | **🌵 BetterEvent** | Calico Desert Festival in Summer, Fall, and Winter (15th–17th), preserves Calico Eggs across seasons. |
 
 ---
 

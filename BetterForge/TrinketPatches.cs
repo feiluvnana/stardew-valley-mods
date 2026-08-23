@@ -23,333 +23,86 @@ namespace BetterForge
 
         public static void Apply(Harmony harmony)
         {
-            // 1. Patch Anvil check for action (right-click / activate)
+            // 1. Anvil check for action & drop-in
+            PatchMethod(harmony, typeof(StardewValley.Object), nameof(StardewValley.Object.checkForAction),
+                new[] { typeof(Farmer), typeof(bool) }, prefixMethodName: nameof(Object_checkForAction_Prefix), description: "Anvil");
+            PatchMethod(harmony, typeof(StardewValley.Object), nameof(StardewValley.Object.performObjectDropInAction),
+                new[] { typeof(Item), typeof(bool), typeof(Farmer), typeof(bool) }, prefixMethodName: nameof(Object_performObjectDropInAction_Prefix), description: "Anvil");
+
+            // 2. Trinket display & damage
+            PatchMethod(harmony, typeof(Trinket), nameof(Trinket.getDescription),
+                postfixMethodName: nameof(Trinket_getDescription_Postfix));
+            PatchMethod(harmony, typeof(Trinket), "loadDisplayName",
+                postfixMethodName: nameof(Trinket_loadDisplayName_Postfix));
+            PatchMethod(harmony, typeof(Trinket), nameof(Trinket.OnDamageMonster),
+                new[] { typeof(Farmer), typeof(Monster), typeof(int), typeof(bool), typeof(bool) }, postfixMethodName: nameof(Trinket_OnDamageMonster_Postfix));
+
+            // 3. Farmer damage reflection
+            PatchMethod(harmony, typeof(Farmer), nameof(Farmer.takeDamage),
+                new[] { typeof(int), typeof(bool), typeof(Monster) },
+                prefixMethodName: nameof(Farmer_takeDamage_Prefix), postfixMethodName: nameof(Farmer_takeDamage_Postfix), description: "Damage Reflection");
+
+            // 4. Quiver, Ice Orb, & Projectile updates
+            PatchMethod(harmony, typeof(MagicQuiverTrinketEffect), nameof(MagicQuiverTrinketEffect.Update),
+                new[] { typeof(Farmer), typeof(GameTime), typeof(GameLocation) }, postfixMethodName: nameof(MagicQuiverTrinketEffect_Update_Postfix));
+            PatchMethod(harmony, typeof(IceOrbTrinketEffect), nameof(IceOrbTrinketEffect.Update),
+                new[] { typeof(Farmer), typeof(GameTime), typeof(GameLocation) }, postfixMethodName: nameof(IceOrbTrinketEffect_Update_Postfix));
+            PatchMethod(harmony, typeof(Projectile), nameof(Projectile.update),
+                new[] { typeof(GameTime), typeof(GameLocation) }, postfixMethodName: nameof(Projectile_update_Postfix), description: "Magic Quiver Piercing");
+
+            // 5. Frog Companion
+            PatchMethod(harmony, typeof(HungryFrogCompanion), nameof(HungryFrogCompanion.tongueReachedMonster),
+                new[] { typeof(Monster) }, postfixMethodName: nameof(HungryFrogCompanion_tongueReachedMonster_Postfix));
+            PatchMethod(harmony, typeof(HungryFrogCompanion), "triggerFullnessTimer",
+                prefixMethodName: nameof(HungryFrogCompanion_triggerFullnessTimer_Prefix), postfixMethodName: nameof(HungryFrogCompanion_triggerFullnessTimer_Postfix));
+
+            // 6. Fairy Box
+            PatchMethod(harmony, typeof(FairyBoxTrinketEffect), nameof(FairyBoxTrinketEffect.Update),
+                new[] { typeof(Farmer), typeof(GameTime), typeof(GameLocation) },
+                prefixMethodName: nameof(FairyBoxTrinketEffect_Update_Prefix), postfixMethodName: nameof(FairyBoxTrinketEffect_Update_Postfix));
+
+            // 7. Item stacking & getOne
+            PatchMethod(harmony, typeof(Item), nameof(Item.canStackWith),
+                new[] { typeof(ISalable) }, postfixMethodName: nameof(Item_canStackWith_Postfix));
+            PatchMethod(harmony, typeof(Item), nameof(Item.getOne),
+                postfixMethodName: nameof(Item_getOne_Postfix));
+
+            // 8. GameLocation damage monster for Spur Crit Chance
+            PatchMethod(harmony, typeof(GameLocation), nameof(GameLocation.damageMonster),
+                new[] {
+                    typeof(Rectangle), typeof(int), typeof(int), typeof(bool), typeof(float),
+                    typeof(int), typeof(float), typeof(float), typeof(bool), typeof(Farmer), typeof(bool)
+                },
+                prefixMethodName: nameof(GameLocation_damageMonster_Prefix), description: "Spur Crit Chance");
+        }
+
+        private static void PatchMethod(
+            Harmony harmony,
+            Type type,
+            string methodName,
+            Type[]? parameters = null,
+            string? prefixMethodName = null,
+            string? postfixMethodName = null,
+            string? description = null)
+        {
             try
             {
-                var checkForActionMethod = AccessTools.Method(
-                    typeof(StardewValley.Object),
-                    nameof(StardewValley.Object.checkForAction),
-                    new[] { typeof(Farmer), typeof(bool) }
-                );
+                var method = parameters != null
+                    ? AccessTools.Method(type, methodName, parameters)
+                    : AccessTools.Method(type, methodName);
 
-                if (checkForActionMethod != null)
+                if (method != null)
                 {
-                    harmony.Patch(
-                        original: checkForActionMethod,
-                        prefix: new HarmonyMethod(typeof(TrinketPatches), nameof(Object_checkForAction_Prefix))
-                    );
-                    Monitor.Log("Hooked Object.checkForAction for Anvil successfully.", LogLevel.Trace);
+                    var prefix = prefixMethodName != null ? new HarmonyMethod(typeof(TrinketPatches), prefixMethodName) : null;
+                    var postfix = postfixMethodName != null ? new HarmonyMethod(typeof(TrinketPatches), postfixMethodName) : null;
+
+                    harmony.Patch(original: method, prefix: prefix, postfix: postfix);
+                    Monitor.Log($"Hooked {type.Name}.{methodName}{(description != null ? $" for {description}" : "")} successfully.", LogLevel.Trace);
                 }
             }
             catch (Exception ex)
             {
-                Monitor.Log($"Error patching Object.checkForAction: {ex}", LogLevel.Error);
-            }
-
-            // 2. Patch Anvil drop-in action
-            try
-            {
-                var dropInMethod = AccessTools.Method(
-                    typeof(StardewValley.Object),
-                    nameof(StardewValley.Object.performObjectDropInAction),
-                    new[] { typeof(Item), typeof(bool), typeof(Farmer), typeof(bool) }
-                );
-
-                if (dropInMethod != null)
-                {
-                    harmony.Patch(
-                        original: dropInMethod,
-                        prefix: new HarmonyMethod(typeof(TrinketPatches), nameof(Object_performObjectDropInAction_Prefix))
-                    );
-                    Monitor.Log("Hooked Object.performObjectDropInAction for Anvil successfully.", LogLevel.Trace);
-                }
-            }
-            catch (Exception ex)
-            {
-                Monitor.Log($"Error patching Object.performObjectDropInAction: {ex}", LogLevel.Error);
-            }
-
-            // 3. Patch Trinket.getDescription
-            try
-            {
-                var descMethod = AccessTools.Method(typeof(Trinket), nameof(Trinket.getDescription));
-                if (descMethod != null)
-                {
-                    harmony.Patch(
-                        original: descMethod,
-                        postfix: new HarmonyMethod(typeof(TrinketPatches), nameof(Trinket_getDescription_Postfix))
-                    );
-                    Monitor.Log("Hooked Trinket.getDescription successfully.", LogLevel.Trace);
-                }
-            }
-            catch (Exception ex)
-            {
-                Monitor.Log($"Error patching Trinket.getDescription: {ex}", LogLevel.Error);
-            }
-
-            // 4. Patch Trinket.loadDisplayName for Maxed + Ascended "Perfect" name
-            try
-            {
-                var loadDisplayNameMethod = AccessTools.Method(typeof(Trinket), "loadDisplayName");
-                if (loadDisplayNameMethod != null)
-                {
-                    harmony.Patch(
-                        original: loadDisplayNameMethod,
-                        postfix: new HarmonyMethod(typeof(TrinketPatches), nameof(Trinket_loadDisplayName_Postfix))
-                    );
-                    Monitor.Log("Hooked Trinket.loadDisplayName successfully.", LogLevel.Trace);
-                }
-            }
-            catch (Exception ex)
-            {
-                Monitor.Log($"Error patching Trinket.loadDisplayName: {ex}", LogLevel.Error);
-            }
-
-            // 5. Patch Trinket.OnDamageMonster (called on weapon/tool hits)
-            try
-            {
-                var onDamageMonsterMethod = AccessTools.Method(
-                    typeof(Trinket),
-                    nameof(Trinket.OnDamageMonster),
-                    new[] { typeof(Farmer), typeof(Monster), typeof(int), typeof(bool), typeof(bool) }
-                );
-
-                if (onDamageMonsterMethod != null)
-                {
-                    harmony.Patch(
-                        original: onDamageMonsterMethod,
-                        postfix: new HarmonyMethod(typeof(TrinketPatches), nameof(Trinket_OnDamageMonster_Postfix))
-                    );
-                    Monitor.Log("Hooked Trinket.OnDamageMonster successfully.", LogLevel.Trace);
-                }
-            }
-            catch (Exception ex)
-            {
-                Monitor.Log($"Error patching Trinket.OnDamageMonster: {ex}", LogLevel.Error);
-            }
-
-            // 6. Patch Farmer.takeDamage for Basilisk Reflection
-            try
-            {
-                var farmerDamageMethod = AccessTools.Method(
-                    typeof(Farmer),
-                    nameof(Farmer.takeDamage),
-                    new[] { typeof(int), typeof(bool), typeof(Monster) }
-                );
-
-                if (farmerDamageMethod != null)
-                {
-                    harmony.Patch(
-                        original: farmerDamageMethod,
-                        prefix: new HarmonyMethod(typeof(TrinketPatches), nameof(Farmer_takeDamage_Prefix)),
-                        postfix: new HarmonyMethod(typeof(TrinketPatches), nameof(Farmer_takeDamage_Postfix))
-                    );
-                    Monitor.Log("Hooked Farmer.takeDamage for Damage Reflection successfully.", LogLevel.Trace);
-                }
-            }
-            catch (Exception ex)
-            {
-                Monitor.Log($"Error patching Farmer.takeDamage: {ex}", LogLevel.Error);
-            }
-
-            // 7. Patch MagicQuiverTrinketEffect.Update for Arrow Infinite Piercing
-            try
-            {
-                var quiverUpdateMethod = AccessTools.Method(
-                    typeof(MagicQuiverTrinketEffect),
-                    nameof(MagicQuiverTrinketEffect.Update),
-                    new[] { typeof(Farmer), typeof(GameTime), typeof(GameLocation) }
-                );
-
-                if (quiverUpdateMethod != null)
-                {
-                    harmony.Patch(
-                        original: quiverUpdateMethod,
-                        postfix: new HarmonyMethod(typeof(TrinketPatches), nameof(MagicQuiverTrinketEffect_Update_Postfix))
-                    );
-                    Monitor.Log("Hooked MagicQuiverTrinketEffect.Update successfully.", LogLevel.Trace);
-                }
-            }
-            catch (Exception ex)
-            {
-                Monitor.Log($"Error patching MagicQuiverTrinketEffect.Update: {ex}", LogLevel.Error);
-            }
-
-            // 8. Patch IceOrbTrinketEffect.Update for Ice Orb Multi-Target Collision
-            try
-            {
-                var iceOrbUpdateMethod = AccessTools.Method(
-                    typeof(IceOrbTrinketEffect),
-                    nameof(IceOrbTrinketEffect.Update),
-                    new[] { typeof(Farmer), typeof(GameTime), typeof(GameLocation) }
-                );
-
-                if (iceOrbUpdateMethod != null)
-                {
-                    harmony.Patch(
-                        original: iceOrbUpdateMethod,
-                        postfix: new HarmonyMethod(typeof(TrinketPatches), nameof(IceOrbTrinketEffect_Update_Postfix))
-                    );
-                    Monitor.Log("Hooked IceOrbTrinketEffect.Update successfully.", LogLevel.Trace);
-                }
-            }
-            catch (Exception ex)
-            {
-                Monitor.Log($"Error patching IceOrbTrinketEffect.Update: {ex}", LogLevel.Error);
-            }
-
-            // 8. Patch Projectile.update for Magic Quiver Pierce & Execution
-            try
-            {
-                var projectileUpdateMethod = AccessTools.Method(
-                    typeof(Projectile),
-                    nameof(Projectile.update),
-                    new[] { typeof(GameTime), typeof(GameLocation) }
-                );
-
-                if (projectileUpdateMethod != null)
-                {
-                    harmony.Patch(
-                        original: projectileUpdateMethod,
-                        postfix: new HarmonyMethod(typeof(TrinketPatches), nameof(Projectile_update_Postfix))
-                    );
-                    Monitor.Log("Hooked Projectile.update for Magic Quiver Piercing successfully.", LogLevel.Trace);
-                }
-            }
-            catch (Exception ex)
-            {
-                Monitor.Log($"Error patching Projectile.update: {ex}", LogLevel.Error);
-            }
-
-            // 9. Patch HungryFrogCompanion for Loot Drop and Cooldown Reset
-            try
-            {
-                var tongueReachedMethod = AccessTools.Method(
-                    typeof(HungryFrogCompanion),
-                    nameof(HungryFrogCompanion.tongueReachedMonster),
-                    new[] { typeof(Monster) }
-                );
-                if (tongueReachedMethod != null)
-                {
-                    harmony.Patch(
-                        original: tongueReachedMethod,
-                        postfix: new HarmonyMethod(typeof(TrinketPatches), nameof(HungryFrogCompanion_tongueReachedMonster_Postfix))
-                    );
-                    Monitor.Log("Hooked HungryFrogCompanion.tongueReachedMonster successfully.", LogLevel.Trace);
-                }
-
-                var fullnessTimerMethod = AccessTools.Method(
-                    typeof(HungryFrogCompanion),
-                    "triggerFullnessTimer"
-                );
-                if (fullnessTimerMethod != null)
-                {
-                    harmony.Patch(
-                        original: fullnessTimerMethod,
-                        prefix: new HarmonyMethod(typeof(TrinketPatches), nameof(HungryFrogCompanion_triggerFullnessTimer_Prefix)),
-                        postfix: new HarmonyMethod(typeof(TrinketPatches), nameof(HungryFrogCompanion_triggerFullnessTimer_Postfix))
-                    );
-                    Monitor.Log("Hooked HungryFrogCompanion.triggerFullnessTimer successfully.", LogLevel.Trace);
-                }
-            }
-            catch (Exception ex)
-            {
-                Monitor.Log($"Error patching HungryFrogCompanion: {ex}", LogLevel.Error);
-            }
-
-            // 10. Patch FairyBoxTrinketEffect.Update for Ally Heal & +1 Defense Blessing
-            try
-            {
-                var fairyUpdateMethod = AccessTools.Method(
-                    typeof(FairyBoxTrinketEffect),
-                    nameof(FairyBoxTrinketEffect.Update),
-                    new[] { typeof(Farmer), typeof(GameTime), typeof(GameLocation) }
-                );
-
-                if (fairyUpdateMethod != null)
-                {
-                    harmony.Patch(
-                        original: fairyUpdateMethod,
-                        prefix: new HarmonyMethod(typeof(TrinketPatches), nameof(FairyBoxTrinketEffect_Update_Prefix)),
-                        postfix: new HarmonyMethod(typeof(TrinketPatches), nameof(FairyBoxTrinketEffect_Update_Postfix))
-                    );
-                    Monitor.Log("Hooked FairyBoxTrinketEffect.Update successfully.", LogLevel.Trace);
-                }
-            }
-            catch (Exception ex)
-            {
-                Monitor.Log($"Error patching FairyBoxTrinketEffect.Update: {ex}", LogLevel.Error);
-            }
-
-            // 11. Patch Item.canStackWith to protect Ascension and Stats
-            try
-            {
-                var canStackMethod = AccessTools.Method(
-                    typeof(Item),
-                    nameof(Item.canStackWith),
-                    new[] { typeof(ISalable) }
-                );
-
-                if (canStackMethod != null)
-                {
-                    harmony.Patch(
-                        original: canStackMethod,
-                        postfix: new HarmonyMethod(typeof(TrinketPatches), nameof(Item_canStackWith_Postfix))
-                    );
-                    Monitor.Log("Hooked Item.canStackWith successfully.", LogLevel.Trace);
-                }
-            }
-            catch (Exception ex)
-            {
-                Monitor.Log($"Error patching Item.canStackWith: {ex}", LogLevel.Error);
-            }
-
-            // 12. Patch Item.getOne to preserve Ascension and ModData
-            try
-            {
-                var getOneMethod = AccessTools.Method(
-                    typeof(Item),
-                    nameof(Item.getOne)
-                );
-
-                if (getOneMethod != null)
-                {
-                    harmony.Patch(
-                        original: getOneMethod,
-                        postfix: new HarmonyMethod(typeof(TrinketPatches), nameof(Item_getOne_Postfix))
-                    );
-                    Monitor.Log("Hooked Item.getOne successfully.", LogLevel.Trace);
-                }
-            }
-            catch (Exception ex)
-            {
-                Monitor.Log($"Error patching Item.getOne: {ex}", LogLevel.Error);
-            }
-
-            // 13. Patch GameLocation.damageMonster for Spur +10% Crit Chance
-            try
-            {
-                var damageMonsterMethod = AccessTools.Method(
-                    typeof(GameLocation),
-                    nameof(GameLocation.damageMonster),
-                    new[] {
-                        typeof(Rectangle), typeof(int), typeof(int), typeof(bool), typeof(float),
-                        typeof(int), typeof(float), typeof(float), typeof(bool), typeof(Farmer), typeof(bool)
-                    }
-                );
-
-                if (damageMonsterMethod != null)
-                {
-                    harmony.Patch(
-                        original: damageMonsterMethod,
-                        prefix: new HarmonyMethod(typeof(TrinketPatches), nameof(GameLocation_damageMonster_Prefix))
-                    );
-                    Monitor.Log("Hooked GameLocation.damageMonster for Spur Crit Chance successfully.", LogLevel.Trace);
-                }
-            }
-            catch (Exception ex)
-            {
-                Monitor.Log($"Error patching GameLocation.damageMonster: {ex}", LogLevel.Error);
+                Monitor.Log($"Error patching {type.Name}.{methodName}: {ex}", LogLevel.Error);
             }
         }
 

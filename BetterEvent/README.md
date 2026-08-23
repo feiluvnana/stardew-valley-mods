@@ -1,6 +1,6 @@
-# 🌵 ExtendedDesertFestival
+# 🌵 BetterEvent
 
-**ExtendedDesertFestival** transforms the 1.6 Calico Desert Festival from a Spring-only event into a year-round festival across all four seasons in **Stardew Valley 1.6+**, complete with Calico Egg inventory persistence between festivals.
+**BetterEvent** transforms the 1.6 Calico Desert Festival from a Spring-only event into a year-round festival across all four seasons in **Stardew Valley 1.6+**, complete with Calico Egg inventory persistence between festivals.
 
 ---
 
@@ -66,7 +66,7 @@ In vanilla Stardew Valley, any unused Calico Eggs are automatically deleted from
 
 ### Building from Source
 ```powershell
-dotnet build ExtendedDesertFestival.csproj
+dotnet build BetterEvent.csproj
 ```
 
 ---

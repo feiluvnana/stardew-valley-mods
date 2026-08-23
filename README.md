@@ -15,7 +15,7 @@ A suite of high-performance, modular quality-of-life, progression enhancement, a
 | [**📦 BetterQOL**](./BetterQOL) | `1.4.3` | Quality-of-life suite for UI hover overlays, lookup, item stacking, and geodes. | UI Info Suite 2 style hover tooltips (crop timers, machine countdowns, tree stages, animal hearts), Lookup Anything (`F1`), unstackable item overrides up to 999, and instant "Crack All" geode processing. |
 | [**👑 BetterFurniture**](./BetterFurniture) | `1.0.0` | Interior decorating and luxury furniture expansion. | 4x4 spacious Princess King Bed with free placement anywhere, animated sconce flames, light sources, canopy layering, and farmhouse tile restorations. |
 | [**🗺️ BetterMap**](./BetterMap) | `1.0.0` | Farmhouse doorway and Ginger Island farm clutter cleaner. | Widens all Farmhouse exit doorways to 3x1 tiles, removes Ginger Island Farm driftwood fence and bleached log piles. |
-| [**🌵 ExtendedDesertFestival**](./ExtendedDesertFestival) | `1.1.1` | Expands the Calico Desert Festival across all seasons. | Enables Desert Festival in Summer, Fall, and Winter (15th–17th), preserves Calico Eggs across seasons. |
+| [**🌵 BetterEvent**](./BetterEvent) | `1.1.1` | Expands the Calico Desert Festival across all seasons. | Enables Desert Festival in Summer, Fall, and Winter (15th–17th), preserves Calico Eggs across seasons. |
 
 ---
 
@@ -33,7 +33,7 @@ A suite of high-performance, modular quality-of-life, progression enhancement, a
        ├── BetterIndustry/
        ├── BetterMap/
        ├── BetterQOL/
-       └── ExtendedDesertFestival/
+       └── BetterEvent/
    ```
 4. Run the game using **StardewModdingAPI.exe**.
 
@@ -58,7 +58,7 @@ dotnet build BetterFurniture/BetterFurniture.csproj
 dotnet build BetterIndustry/BetterIndustry.csproj
 dotnet build BetterMap/BetterMap.csproj
 dotnet build BetterQOL/BetterQOL.csproj
-dotnet build ExtendedDesertFestival/ExtendedDesertFestival.csproj
+dotnet build BetterEvent/BetterEvent.csproj
 ```
 
 ---
