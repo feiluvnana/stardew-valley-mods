@@ -1,13 +1,5 @@
 {
   "EnableCookingBalancing": true,
   "CookingProfitMargin": 1.25,
-  "EnableMeadFix": true,
-  "EnableAutoHarvest": true,
-  "EnableChestOutputTransfer": true,
-  "EnablePeriodicProcessing": true,
-  "ProcessIntervalTicks": 60,
-  "EnableCrabPotService": true,
-  "EnableCaskService": true,
-  "HopperCapacity": 36,
-  "PlaySoundEffects": true
+  "EnableMeadFix": true
 }

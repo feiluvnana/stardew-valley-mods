@@ -10,7 +10,7 @@ namespace BetterForge
 {
     public static class EnchantmentPatches
     {
-        private static ModConfig Config = null!;
+        public static ModConfig Config = null!;
         private static IMonitor Monitor = null!;
 
         public static void Initialize(ModConfig config, IMonitor monitor)

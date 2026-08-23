@@ -98,5 +98,20 @@ namespace BetterQOL
 
         /// <summary>Whether to display Community Center bundle and Museum donation needs in lookup cards.</summary>
         public bool ShowBundleAndMuseumInfo { get; set; } = true;
+
+        /// <summary>Whether to display the Community Center bundle progress section in the World Overview.</summary>
+        public bool ShowCommunityCenterProgress { get; set; } = true;
+
+        /// <summary>Whether to display the Friendship Overview section in the World Overview.</summary>
+        public bool ShowFriendshipOverview { get; set; } = true;
+
+        /// <summary>Whether to display the Collections & Perfection Tracker section in the World Overview.</summary>
+        public bool ShowProgressAndPerfection { get; set; } = true;
+
+        /// <summary>Whether to display Mine levels and Monster Slayer Goals in the World Overview.</summary>
+        public bool ShowMineAndGuildProgress { get; set; } = true;
+
+        /// <summary>Whether to display Museum donation progress in the World Overview.</summary>
+        public bool ShowMuseumProgress { get; set; } = true;
     }
 }

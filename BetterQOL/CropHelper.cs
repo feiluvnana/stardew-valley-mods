@@ -22,41 +22,93 @@ namespace BetterQOL
         public int RegrowDays { get; set; }
         public bool IsWatered { get; set; }
         public string? FertilizerName { get; set; }
+        public List<string> FertilizerNames { get; set; } = new();
+        public bool IsFertilized => FertilizerNames.Count > 0;
         public bool IsPaddyCrop { get; set; }
         public bool IsPaddyWatered { get; set; }
+        public bool IsHoeDirtOnly { get; set; }
     }
 
     public static class CropHelper
     {
+        public static List<string> ParseFertilizerNames(string? fertilizerRaw)
+        {
+            var results = new List<string>();
+            if (string.IsNullOrWhiteSpace(fertilizerRaw))
+                return results;
+
+            // Ultimate Fertilizer and multiple fertilizer mods separate IDs by '|'
+            var tokens = fertilizerRaw.Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            if (tokens.Length == 0)
+                return results;
+
+            // Count occurrences to support stacking mode (e.g. Speed-Gro x3)
+            var counts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            var distinctIds = new List<string>();
+            foreach (var token in tokens)
+            {
+                string id = token;
+                if (!counts.ContainsKey(id))
+                {
+                    counts[id] = 0;
+                    distinctIds.Add(id);
+                }
+                counts[id]++;
+            }
+
+            foreach (var id in distinctIds)
+            {
+                int count = counts[id];
+                var fertData = ItemRegistry.GetData(id) ?? ItemRegistry.GetData($"(O){id}");
+                string name = fertData?.DisplayName ?? id;
+                if (count > 1)
+                {
+                    results.Add($"{name} x{count}");
+                }
+                else
+                {
+                    results.Add(name);
+                }
+            }
+
+            return results;
+        }
+
         public static CropInfo? GetCropInfo(HoeDirt hoeDirt)
         {
             if (hoeDirt == null)
-                return null;
-
-            Crop? crop = hoeDirt.crop;
-            if (crop == null)
                 return null;
 
             var info = new CropInfo();
 
             // 1. Water status
             info.IsWatered = hoeDirt.state.Value == HoeDirt.watered;
+
+            // 2. Fertilizer status
+            string? fertilizerRaw = hoeDirt.fertilizer.Value;
+            info.FertilizerNames = ParseFertilizerNames(fertilizerRaw);
+            if (info.FertilizerNames.Count > 0)
+            {
+                info.FertilizerName = string.Join(", ", info.FertilizerNames);
+            }
+
+            Crop? crop = hoeDirt.crop;
+            if (crop == null)
+            {
+                // Bare tilled soil or empty garden pot
+                info.IsHoeDirtOnly = true;
+                info.CropName = ModEntry.I18n.Get("hover.dirt.tilled");
+                return info;
+            }
+
             info.IsPaddyCrop = crop.isPaddyCrop();
             if (info.IsPaddyCrop)
             {
-                info.IsPaddyWatered = hoeDirt.hasPaddyCrop();
+                info.IsPaddyWatered = hoeDirt.paddyWaterCheck();
                 if (info.IsPaddyWatered)
                 {
                     info.IsWatered = true;
                 }
-            }
-
-            // 2. Fertilizer status
-            string? fertilizerId = hoeDirt.fertilizer.Value;
-            if (!string.IsNullOrEmpty(fertilizerId))
-            {
-                var fertData = ItemRegistry.GetData(fertilizerId) ?? ItemRegistry.GetData($"(O){fertilizerId}");
-                info.FertilizerName = fertData?.DisplayName;
             }
 
             // 3. Dead crop check

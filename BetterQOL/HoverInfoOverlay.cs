@@ -69,13 +69,26 @@ namespace BetterQOL
             TooltipModel? tooltip = null;
 
             // 1. Check Objects (Machines, Casks, IndoorPots, CrabPots, etc.)
-            if (location.Objects.TryGetValue(tilePos, out var obj))
+            if (!location.Objects.TryGetValue(tilePos, out var obj))
+            {
+                // Fallback: check if the tile directly below has a BigCraftable spanning into this tile
+                if (location.Objects.TryGetValue(new Vector2(tilePos.X, tilePos.Y + 1), out var belowObj) && belowObj.bigCraftable.Value)
+                {
+                    obj = belowObj;
+                }
+            }
+
+            if (obj != null)
             {
                 if (obj is IndoorPot pot)
                 {
-                    if (Config.EnableCropHover && pot.hoeDirt.Value?.crop != null)
+                    if (Config.EnableCropHover && pot.hoeDirt.Value != null)
                     {
-                        tooltip = BuildCropTooltip(pot.hoeDirt.Value, isGardenPot: true);
+                        var dirt = pot.hoeDirt.Value;
+                        if (dirt.crop != null || dirt.state.Value == HoeDirt.watered || !string.IsNullOrEmpty(dirt.fertilizer.Value))
+                        {
+                            tooltip = BuildCropTooltip(dirt, isGardenPot: true);
+                        }
                     }
                     else if (Config.EnableTreeHover && pot.bush.Value != null)
                     {
@@ -95,9 +108,12 @@ namespace BetterQOL
             // 2. Check Terrain Features (Crops in HoeDirt, Fruit Trees, Wild Trees, Bushes, Giant Crops)
             if (tooltip == null && location.terrainFeatures.TryGetValue(tilePos, out var feature))
             {
-                if (Config.EnableCropHover && feature is HoeDirt hoeDirt && hoeDirt.crop != null)
+                if (Config.EnableCropHover && feature is HoeDirt hoeDirt)
                 {
-                    tooltip = BuildCropTooltip(hoeDirt, isGardenPot: false);
+                    if (hoeDirt.crop != null || hoeDirt.state.Value == HoeDirt.watered || !string.IsNullOrEmpty(hoeDirt.fertilizer.Value))
+                    {
+                        tooltip = BuildCropTooltip(hoeDirt, isGardenPot: false);
+                    }
                 }
                 else if (Config.EnableTreeHover && feature is FruitTree fruitTree)
                 {
@@ -164,6 +180,23 @@ namespace BetterQOL
                 }
             }
 
+            // 6. Check Buildings (Fish Pond, Mill, Junimo Hut, Silo, Shipping Bin, etc.)
+            if (tooltip == null && Config.EnableMachineHover && location.buildings.Count > 0)
+            {
+                foreach (var building in location.buildings)
+                {
+                    if (building != null && building.occupiesTile(tilePos))
+                    {
+                        var buildingInfo = MachineHelper.GetBuildingInfo(building);
+                        if (buildingInfo != null)
+                        {
+                            tooltip = BuildBuildingTooltip(buildingInfo);
+                            break;
+                        }
+                    }
+                }
+            }
+
             // Render World Tooltip if found
             if (tooltip != null)
             {
@@ -178,16 +211,34 @@ namespace BetterQOL
         private static TooltipModel BuildCropTooltip(HoeDirt hoeDirt, bool isGardenPot)
         {
             var info = CropHelper.GetCropInfo(hoeDirt);
+            if (info == null)
+                return new TooltipModel { Title = ModEntry.I18n.Get("hover.crop.generic").ToString() };
+
+            string title = info.CropName;
+            string? subtitle = null;
+            if (info.IsHoeDirtOnly)
+            {
+                if (isGardenPot)
+                {
+                    title = ModEntry.I18n.Get("hover.type.garden-pot-empty").ToString();
+                }
+                else
+                {
+                    title = ModEntry.I18n.Get("hover.dirt.tilled").ToString();
+                }
+            }
+            else
+            {
+                subtitle = isGardenPot ? ModEntry.I18n.Get("hover.type.garden-pot-crop").ToString() : null;
+            }
+
             var tooltip = new TooltipModel
             {
-                Title = info?.CropName ?? ModEntry.I18n.Get("hover.crop.generic").ToString(),
-                Subtitle = isGardenPot ? ModEntry.I18n.Get("hover.type.garden-pot-crop").ToString() : null,
-                IconTexture = Config.ShowItemIconInTooltip ? info?.IconTexture : null,
-                IconSourceRect = Config.ShowItemIconInTooltip ? info?.IconSourceRect : null
+                Title = title,
+                Subtitle = subtitle,
+                IconTexture = Config.ShowItemIconInTooltip ? info.IconTexture : null,
+                IconSourceRect = Config.ShowItemIconInTooltip ? info.IconSourceRect : null
             };
-
-            if (info == null)
-                return tooltip;
 
             if (info.IsDead)
             {
@@ -195,27 +246,30 @@ namespace BetterQOL
                 return tooltip;
             }
 
-            // Days remaining / Ready state
-            if (info.IsReadyToHarvest)
+            if (!info.IsHoeDirtOnly)
             {
-                tooltip.Lines.Add(new TooltipLine(ModEntry.I18n.Get("hover.crop.ready-to-harvest"), new Color(0, 140, 0)));
-            }
-            else
-            {
-                if (info.DaysRemaining == 1)
+                // Days remaining / Ready state
+                if (info.IsReadyToHarvest)
                 {
-                    tooltip.Lines.Add(new TooltipLine(ModEntry.I18n.Get("hover.crop.ready-tomorrow", new { stage = info.CurrentStage, totalStages = info.TotalStages }), new Color(180, 100, 0)));
+                    tooltip.Lines.Add(new TooltipLine(ModEntry.I18n.Get("hover.crop.ready-to-harvest"), new Color(0, 140, 0)));
                 }
                 else
                 {
-                    tooltip.Lines.Add(new TooltipLine(ModEntry.I18n.Get("hover.crop.ready-in-days", new { days = info.DaysRemaining, stage = info.CurrentStage, totalStages = info.TotalStages }), Game1.textColor));
+                    if (info.DaysRemaining == 1)
+                    {
+                        tooltip.Lines.Add(new TooltipLine(ModEntry.I18n.Get("hover.crop.ready-tomorrow", new { stage = info.CurrentStage, totalStages = info.TotalStages }), new Color(180, 100, 0)));
+                    }
+                    else
+                    {
+                        tooltip.Lines.Add(new TooltipLine(ModEntry.I18n.Get("hover.crop.ready-in-days", new { days = info.DaysRemaining, stage = info.CurrentStage, totalStages = info.TotalStages }), Game1.textColor));
+                    }
                 }
-            }
 
-            // Regrow schedule
-            if (info.IsRegrowable)
-            {
-                tooltip.Lines.Add(new TooltipLine(ModEntry.I18n.Get("hover.crop.regrow-cycle", new { days = info.RegrowDays }), Color.DarkSlateGray));
+                // Regrow schedule
+                if (info.IsRegrowable)
+                {
+                    tooltip.Lines.Add(new TooltipLine(ModEntry.I18n.Get("hover.crop.regrow-cycle", new { days = info.RegrowDays }), Color.DarkSlateGray));
+                }
             }
 
             // Water & Fertilizer
@@ -233,7 +287,14 @@ namespace BetterQOL
                     tooltip.Lines.Add(new TooltipLine(ModEntry.I18n.Get("hover.crop.unwatered"), new Color(200, 60, 20)));
                 }
 
-                if (!string.IsNullOrEmpty(info.FertilizerName))
+                if (info.FertilizerNames.Count > 0)
+                {
+                    foreach (var fertName in info.FertilizerNames)
+                    {
+                        tooltip.Lines.Add(new TooltipLine(ModEntry.I18n.Get("hover.crop.fertilizer", new { name = fertName }), new Color(46, 125, 50)));
+                    }
+                }
+                else if (!string.IsNullOrEmpty(info.FertilizerName))
                 {
                     tooltip.Lines.Add(new TooltipLine(ModEntry.I18n.Get("hover.crop.fertilizer", new { name = info.FertilizerName }), new Color(46, 125, 50)));
                 }
@@ -322,6 +383,13 @@ namespace BetterQOL
                 return tooltip;
             }
 
+            // Idle state
+            if (info.IsIdle)
+            {
+                tooltip.Lines.Add(new TooltipLine(info.IdleStatusText ?? ModEntry.I18n.Get("hover.machine.idle"), Color.DarkSlateGray));
+                return tooltip;
+            }
+
             // Processing countdown
             if (info.IsProcessing)
             {
@@ -334,6 +402,27 @@ namespace BetterQOL
                 {
                     tooltip.Lines.Add(new TooltipLine(ModEntry.I18n.Get("hover.machine.ready-at", new { time = info.TargetFinishTimeText }), Color.DarkSlateGray));
                 }
+            }
+
+            return tooltip;
+        }
+
+        private static TooltipModel? BuildBuildingTooltip(BuildingMachineInfo info)
+        {
+            if (info == null || info.Lines.Count == 0)
+                return null;
+
+            var tooltip = new TooltipModel
+            {
+                Title = info.BuildingName,
+                Subtitle = info.Subtitle,
+                IconTexture = Config.ShowItemIconInTooltip ? info.IconTexture : null,
+                IconSourceRect = Config.ShowItemIconInTooltip ? info.IconSourceRect : null
+            };
+
+            foreach (var line in info.Lines)
+            {
+                tooltip.Lines.Add(line);
             }
 
             return tooltip;
@@ -356,6 +445,10 @@ namespace BetterQOL
             if (!info.IsMature)
             {
                 tooltip.Lines.Add(new TooltipLine(ModEntry.I18n.Get("hover.fruit-tree.maturing", new { days = info.DaysUntilMature }), new Color(180, 100, 0)));
+                if (info.IsFertilized)
+                {
+                    tooltip.Lines.Add(new TooltipLine(ModEntry.I18n.Get("hover.fruit-tree.fertilized"), new Color(46, 125, 50)));
+                }
                 return tooltip;
             }
 
@@ -397,6 +490,10 @@ namespace BetterQOL
             if (!info.IsMature)
             {
                 tooltip.Lines.Add(new TooltipLine(ModEntry.I18n.Get("hover.tree.stage", new { stage = info.GrowthStage + 1, total = 5 }), new Color(180, 100, 0)));
+                if (info.IsFertilized)
+                {
+                    tooltip.Lines.Add(new TooltipLine(ModEntry.I18n.Get("hover.tree.fertilized"), new Color(46, 125, 50)));
+                }
             }
             else
             {

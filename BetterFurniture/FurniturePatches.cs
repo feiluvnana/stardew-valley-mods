@@ -100,11 +100,21 @@ namespace BetterFurniture
                 if (__instance == null || __instance.isTemporarilyInvisible)
                     return true;
 
+                // Ensure single-frame items never shift out of bounds via sourceIndexOffset
+                if (__instance.ItemId == "feiluvnana.BetterFurniture.PrincessNightstand" ||
+                    __instance.ItemId == "feiluvnana.BetterFurniture.PrincessWallSconce")
+                {
+                    if (AccessTools.Field(typeof(Furniture), "sourceIndexOffset")?.GetValue(__instance) is NetInt sourceIndexOffset && sourceIndexOffset.Value != 0)
+                    {
+                        sourceIndexOffset.Value = 0;
+                    }
+                }
+
                 if (__instance.ItemId == "feiluvnana.BetterFurniture.PrincessBedCanopy")
                 {
                     ParsedItemData data = ItemRegistry.GetDataOrErrorItem(__instance.QualifiedItemId);
                     Texture2D texture = data.GetTexture();
-                    Rectangle sourceRect = __instance.sourceRect.Value;
+                    Rectangle sourceRect = data.GetSourceRect();
                     Vector2 drawPos = new Vector2(__instance.boundingBox.X, __instance.boundingBox.Y - (sourceRect.Height * 4 - __instance.boundingBox.Height));
                     Vector2 localPos = Game1.GlobalToLocal(Game1.viewport, drawPos + ((__instance.shakeTimer > 0) ? new Vector2(Game1.random.Next(-1, 2), Game1.random.Next(-1, 2)) : Vector2.Zero));
 
@@ -119,7 +129,7 @@ namespace BetterFurniture
             }
             catch (Exception ex)
             {
-                Monitor.Log($"Error in Canopy Draw_Prefix: {ex}", LogLevel.Error);
+                Monitor.Log($"Error in Furniture Draw_Prefix: {ex}", LogLevel.Error);
             }
             return true;
         }

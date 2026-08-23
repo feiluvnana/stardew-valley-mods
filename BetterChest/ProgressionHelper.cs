@@ -164,19 +164,12 @@ namespace BetterChest
         }
 
         /// <summary>
-        /// Checks if the Desert Festival is currently happening or unlocked.
+        /// Checks if the Desert Festival is currently happening or active.
         /// </summary>
         public static bool IsDesertFestivalActive()
         {
             // Desert Festival occurs on Spring 15, 16, and 17
-            if (Game1.season == Season.Spring && Game1.dayOfMonth >= 15 && Game1.dayOfMonth <= 17)
-                return true;
-
-            // In Year 2+, allow Calico Eggs if player has attended before or in festival season
-            if (Game1.year >= 2)
-                return true;
-
-            return false;
+            return Game1.season == Season.Spring && Game1.dayOfMonth >= 15 && Game1.dayOfMonth <= 17;
         }
 
         /// <summary>
@@ -189,9 +182,8 @@ namespace BetterChest
                 return false;
 
             if (player.hasOrWillReceiveMail("ccIsComplete") ||
-                player.mailReceived.Contains("ccIsComplete") ||
-                player.hasOrWillReceiveMail("jojaVault") ||
-                player.mailReceived.Contains("jojaVault") ||
+                player.hasOrWillReceiveMail("JojaMember") ||
+                player.hasOrWillReceiveMail("jojaComplete") ||
                 player.hasCompletedCommunityCenter())
             {
                 return true;

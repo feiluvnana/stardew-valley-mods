@@ -65,6 +65,8 @@ namespace BetterQOL
                 }
                 else
                 {
+                    treasure = Utility.getTreasureFromGeode(geodeStack);
+
                     if (isMysteryBox)
                     {
                         Game1.stats.Increment("MysteryBoxesOpened");
@@ -74,11 +76,10 @@ namespace BetterQOL
                         Game1.stats.GeodesCracked++;
                     }
 
-                    treasure = Utility.getTreasureFromGeode(geodeStack);
-
                     if (!isArtifactTrove && !(treasure is StardewValley.Object { Type: "Minerals" }) && treasure is StardewValley.Object { Type: "Arch" } && !who.hasOrWillReceiveMail("artifactFound"))
                     {
                         treasure = ItemRegistry.Create("(O)390", 5);
+                        who.mailReceived.Add("artifactFound");
                     }
                 }
 

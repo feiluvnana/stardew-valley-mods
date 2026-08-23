@@ -26,7 +26,7 @@ namespace BetterQOL
         private string LastSearchText = string.Empty;
         private List<LookupLink> SearchResults = new();
         private string CurrentCategory = "All";
-        private static readonly string[] SearchCategories = new[] { "All", "Items", "Villagers", "Fish", "Crops", "Monsters", "Buildings" };
+        private static readonly string[] SearchCategories = new[] { "All", "Items", "Villagers", "Fish", "Crops", "Monsters", "Buildings", "Recipes", "Locations" };
         private readonly List<ClickableComponent> CategoryButtons = new();
 
         private int ScrollOffset = 0;
@@ -80,9 +80,9 @@ namespace BetterQOL
             );
 
             // 3. Search Box (top-right header)
-            int searchBoxW = 270;
+            int searchBoxW = 210;
             int searchBoxH = 48;
-            int searchBoxX = xPositionOnScreen + width - searchBoxW - 54;
+            int searchBoxX = xPositionOnScreen + width - searchBoxW - 48;
             int searchBoxY = headerTopY + 2;
 
             SearchBox = new TextBox(
@@ -421,6 +421,11 @@ namespace BetterQOL
             exitThisMenu();
         }
 
+        private string GetCategoryDisplayName(string category)
+        {
+            return ModEntry.I18n.Get($"lookup.search.category.{category.ToLowerInvariant()}").ToString();
+        }
+
         public override void draw(SpriteBatch b)
         {
             ActiveClickableLinks.Clear();
@@ -477,11 +482,12 @@ namespace BetterQOL
                 }
 
                 // Title & Subtitle with proper breathing room
-                int maxTitleWidth = (SearchBox != null ? SearchBox.X - 30 : xPositionOnScreen + width - 60) - headerLeftX;
+                int maxHeaderWidth = (SearchBox != null ? SearchBox.X - 16 : xPositionOnScreen + width - 54) - headerLeftX;
+
                 string title = CurrentSubject.Title;
-                if (Game1.dialogueFont.MeasureString(title).X > maxTitleWidth && maxTitleWidth > 60)
+                if (Game1.dialogueFont.MeasureString(title).X > maxHeaderWidth && maxHeaderWidth > 60)
                 {
-                    while (title.Length > 3 && Game1.dialogueFont.MeasureString(title + "...").X > maxTitleWidth)
+                    while (title.Length > 3 && Game1.dialogueFont.MeasureString(title + "...").X > maxHeaderWidth)
                     {
                         title = title.Substring(0, title.Length - 1);
                     }
@@ -489,16 +495,37 @@ namespace BetterQOL
                 }
 
                 Utility.drawTextWithShadow(b, title, Game1.dialogueFont, new Vector2(headerLeftX, headerTopY - 2), Game1.textColor);
+
                 if (!string.IsNullOrEmpty(CurrentSubject.Subtitle))
                 {
-                    Utility.drawTextWithShadow(b, CurrentSubject.Subtitle, Game1.smallFont, new Vector2(headerLeftX, headerTopY + 36), Color.DimGray);
+                    string subtitle = CurrentSubject.Subtitle;
+                    if (Game1.smallFont.MeasureString(subtitle).X > maxHeaderWidth && maxHeaderWidth > 60)
+                    {
+                        while (subtitle.Length > 3 && Game1.smallFont.MeasureString(subtitle + "...").X > maxHeaderWidth)
+                        {
+                            subtitle = subtitle.Substring(0, subtitle.Length - 1);
+                        }
+                        subtitle += "...";
+                    }
+                    Utility.drawTextWithShadow(b, subtitle, Game1.smallFont, new Vector2(headerLeftX, headerTopY + 36), Color.DimGray);
                 }
             }
             else
             {
                 // Search Mode Title
-                Utility.drawTextWithShadow(b, "Find Anything (F1)", Game1.dialogueFont, new Vector2(headerLeftX, headerTopY - 2), Game1.textColor);
-                Utility.drawTextWithShadow(b, "Type to query any item, villager, monster, or recipe...", Game1.smallFont, new Vector2(headerLeftX, headerTopY + 36), Color.DimGray);
+                string searchTitle = ModEntry.I18n.Get("lookup.menu.search-title").ToString();
+                string searchSub = ModEntry.I18n.Get("lookup.menu.search-subtitle").ToString();
+                int maxSearchW = (SearchBox != null ? SearchBox.X - 16 : xPositionOnScreen + width - 54) - headerLeftX;
+                if (Game1.smallFont.MeasureString(searchSub).X > maxSearchW && maxSearchW > 60)
+                {
+                    while (searchSub.Length > 3 && Game1.smallFont.MeasureString(searchSub + "...").X > maxSearchW)
+                    {
+                        searchSub = searchSub.Substring(0, searchSub.Length - 1);
+                    }
+                    searchSub += "...";
+                }
+                Utility.drawTextWithShadow(b, searchTitle, Game1.dialogueFont, new Vector2(headerLeftX, headerTopY - 2), Game1.textColor);
+                Utility.drawTextWithShadow(b, searchSub, Game1.smallFont, new Vector2(headerLeftX, headerTopY + 36), Color.DimGray);
             }
 
             // Search Box (Rendered cleanly with native texture and no cropping)
@@ -508,7 +535,7 @@ namespace BetterQOL
 
                 if (string.IsNullOrEmpty(SearchBox.Text) && !SearchBox.Selected)
                 {
-                    Utility.drawTextWithShadow(b, "Type to search...", Game1.smallFont, new Vector2(SearchBox.X + 16, SearchBox.Y + 12), Color.Gray * 0.75f);
+                    Utility.drawTextWithShadow(b, ModEntry.I18n.Get("lookup.menu.search-placeholder").ToString(), Game1.smallFont, new Vector2(SearchBox.X + 16, SearchBox.Y + 12), Color.Gray * 0.75f);
                 }
             }
 
@@ -556,10 +583,18 @@ namespace BetterQOL
                 int catX = contentX + 4;
                 int catY = currentY;
                 int catHeight = 30;
+                int startY = currentY;
                 foreach (var catName in SearchCategories)
                 {
-                    Vector2 catSize = Game1.smallFont.MeasureString(catName);
+                    string catDisplayName = GetCategoryDisplayName(catName);
+                    Vector2 catSize = Game1.smallFont.MeasureString(catDisplayName);
                     int catW = (int)catSize.X + 16;
+                    if (catX + catW > contentX + contentWidth && catX > contentX + 4)
+                    {
+                        catX = contentX + 4;
+                        catY += catHeight + 6;
+                    }
+
                     Rectangle catBounds = new Rectangle(catX, catY, catW, catHeight);
                     CategoryButtons.Add(new ClickableComponent(catBounds, catName));
 
@@ -578,17 +613,18 @@ namespace BetterQOL
 
                     int textX = catBounds.X + (catW - (int)catSize.X) / 2;
                     int textY = catBounds.Y + (catHeight - (int)catSize.Y) / 2;
-                    Utility.drawTextWithShadow(b, catName, Game1.smallFont, new Vector2(textX, textY), txtColor);
+                    Utility.drawTextWithShadow(b, catDisplayName, Game1.smallFont, new Vector2(textX, textY), txtColor);
 
                     catX += catW + 6;
                 }
-                currentY += catHeight + 12;
-                calculatedContentHeight += catHeight + 12;
+                int totalCatHeaderHeight = (catY - startY) + catHeight + 12;
+                currentY += totalCatHeaderHeight;
+                calculatedContentHeight += totalCatHeaderHeight;
 
                 // Search Results Mode
                 if (SearchResults.Count == 0)
                 {
-                    Utility.drawTextWithShadow(b, $"No results found for '{LastSearchText}' in [{CurrentCategory}]", Game1.smallFont, new Vector2(contentX, currentY + 16), Color.DarkSlateGray);
+                    Utility.drawTextWithShadow(b, ModEntry.I18n.Get("lookup.menu.no-results", new { query = LastSearchText, category = GetCategoryDisplayName(CurrentCategory) }).ToString(), Game1.smallFont, new Vector2(contentX, currentY + 16), Color.DarkSlateGray);
                     calculatedContentHeight += 50;
                 }
                 else

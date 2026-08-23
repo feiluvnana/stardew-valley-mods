@@ -242,46 +242,16 @@ namespace BetterForge
             }
         }
 
-        public static void TriggerFrogLootDrop(Monster monster, Farmer? who)
+        public static void TriggerFrogLootDrop(Monster monster, Farmer who)
         {
-            if (monster == null || who?.currentLocation == null) return;
+            if (monster == null || who == null || who.currentLocation == null) return;
 
             try
             {
                 var loc = who.currentLocation;
                 Vector2 dropPos = who.Position;
 
-                // 1. Extra drops from monster instance
-                var extraDrops = monster.getExtraDropItems();
-                if (extraDrops != null)
-                {
-                    foreach (var item in extraDrops)
-                    {
-                        if (item != null)
-                        {
-                            Game1.createItemDebris(item, dropPos, Game1.random.Next(4), loc);
-                        }
-                    }
-                }
-
-                // 2. Objects queued to drop
-                if (monster.objectsToDrop.Count > 0)
-                {
-                    for (int i = 0; i < monster.objectsToDrop.Count; i++)
-                    {
-                        string dropId = monster.objectsToDrop[i];
-                        if (!string.IsNullOrEmpty(dropId))
-                        {
-                            Item dropItem = ItemRegistry.Create(dropId);
-                            if (dropItem != null)
-                            {
-                                Game1.createItemDebris(dropItem, dropPos, Game1.random.Next(4), loc);
-                            }
-                        }
-                    }
-                }
-
-                // 3. Official monster drop table from game data
+                // Official monster drop table from game data (handles extra items and drop table)
                 loc.monsterDrop(monster, (int)dropPos.X, (int)dropPos.Y, who);
 
                 loc.playSound("coin");
@@ -393,7 +363,7 @@ namespace BetterForge
             }
 
             int duration = 8000;
-            var spurTrinket = who.getFirstTrinketWithID("IridiumSpur");
+            var spurTrinket = who.getFirstTrinketWithID("GoldenSpur");
             if (spurTrinket?.GetEffect() != null)
             {
                 duration = spurTrinket.GetEffect().GeneralStat * 1000;

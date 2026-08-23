@@ -47,15 +47,7 @@ namespace BetterQOL
                 }
             }
 
-            // 3. Check Equipped Trinkets
-            if (Game1.player != null && Game1.player.trinketItems.Count > 0)
-            {
-                int mouseX = Game1.getMouseX();
-                int mouseY = Game1.getMouseY();
-                // Check if hovering equipment area or if triggered on farmer
-            }
-
-            // 4. If in world, inspect hovered entities, characters, objects, or terrain
+            // 3. If in world, inspect hovered entities, characters, objects, or terrain
             if (Context.IsWorldReady && Game1.currentLocation != null)
             {
                 return FindTargetInWorld(Game1.currentLocation);
@@ -81,7 +73,7 @@ namespace BetterQOL
                         return LookupDataManager.BuildItemSubject(item);
                     }
 
-                    // Check equipment icons (boots, rings, hats, trinkets)
+                    // Check equipment icons (boots, rings, hats, shirts, pants, trinkets)
                     if (invPage.equipmentIcons != null)
                     {
                         foreach (var icon in invPage.equipmentIcons)
@@ -89,6 +81,27 @@ namespace BetterQOL
                             if (icon != null && icon.containsPoint(mouseX, mouseY))
                             {
                                 var equipItem = invPage.hoveredItem;
+                                if (equipItem == null)
+                                {
+                                    string slotName = icon.name ?? string.Empty;
+                                    if (slotName.Contains("Hat")) equipItem = Game1.player.hat.Value;
+                                    else if (slotName.Contains("Left Ring")) equipItem = Game1.player.leftRing.Value;
+                                    else if (slotName.Contains("Right Ring")) equipItem = Game1.player.rightRing.Value;
+                                    else if (slotName.Contains("Boots")) equipItem = Game1.player.boots.Value;
+                                    else if (slotName.Contains("Shirt")) equipItem = Game1.player.shirtItem.Value;
+                                    else if (slotName.Contains("Pants")) equipItem = Game1.player.pantsItem.Value;
+                                    else if (slotName.Contains("Trinket") && Game1.player.trinketItems.Count > 0)
+                                    {
+                                        for (int i = 0; i < Game1.player.trinketItems.Count; i++)
+                                        {
+                                            if (Game1.player.trinketItems[i] != null)
+                                            {
+                                                equipItem = Game1.player.trinketItems[i];
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
                                 if (equipItem != null)
                                     return LookupDataManager.BuildItemSubject(equipItem);
                             }
@@ -139,6 +152,64 @@ namespace BetterQOL
             if (menu is ShopMenu shopMenu)
             {
                 var item = (shopMenu.hoveredItem as Item) ?? shopMenu.inventory?.getItemAt(mouseX, mouseY);
+                if (item != null)
+                {
+                    return LookupDataManager.BuildItemSubject(item);
+                }
+            }
+
+            // MuseumMenu (Museum donation screen)
+            if (menu is MuseumMenu museumMenu)
+            {
+                var item = museumMenu.hoveredItem ?? museumMenu.inventory?.getItemAt(mouseX, mouseY) ?? museumMenu.heldItem;
+                if (item != null)
+                {
+                    return LookupDataManager.BuildItemSubject(item);
+                }
+            }
+
+            // ForgeMenu (Volcano Forge & Anvil)
+            if (menu is ForgeMenu forgeMenu)
+            {
+                var item = forgeMenu.hoveredItem
+                        ?? forgeMenu.inventory?.getItemAt(mouseX, mouseY)
+                        ?? (forgeMenu.leftIngredientSpot?.containsPoint(mouseX, mouseY) == true ? forgeMenu.leftIngredientSpot.item : null)
+                        ?? (forgeMenu.rightIngredientSpot?.containsPoint(mouseX, mouseY) == true ? forgeMenu.rightIngredientSpot.item : null)
+                        ?? forgeMenu.heldItem;
+                if (item != null)
+                {
+                    return LookupDataManager.BuildItemSubject(item);
+                }
+            }
+
+            // TailoringMenu (Sewing Machine & Dye Pots)
+            if (menu is TailoringMenu tailoringMenu)
+            {
+                var item = tailoringMenu.hoveredItem
+                        ?? tailoringMenu.inventory?.getItemAt(mouseX, mouseY)
+                        ?? (tailoringMenu.leftIngredientSpot?.containsPoint(mouseX, mouseY) == true ? tailoringMenu.leftIngredientSpot.item : null)
+                        ?? (tailoringMenu.rightIngredientSpot?.containsPoint(mouseX, mouseY) == true ? tailoringMenu.rightIngredientSpot.item : null)
+                        ?? tailoringMenu.heldItem;
+                if (item != null)
+                {
+                    return LookupDataManager.BuildItemSubject(item);
+                }
+            }
+
+            // GeodeMenu (Clint's geode cracking menu)
+            if (menu is GeodeMenu geodeMenu)
+            {
+                var item = geodeMenu.hoveredItem ?? geodeMenu.inventory?.getItemAt(mouseX, mouseY) ?? geodeMenu.heldItem;
+                if (item != null)
+                {
+                    return LookupDataManager.BuildItemSubject(item);
+                }
+            }
+
+            // JunimoNoteMenu (Community Center bundle screen)
+            if (menu is JunimoNoteMenu junimoMenu)
+            {
+                var item = junimoMenu.inventory?.getItemAt(mouseX, mouseY);
                 if (item != null)
                 {
                     return LookupDataManager.BuildItemSubject(item);

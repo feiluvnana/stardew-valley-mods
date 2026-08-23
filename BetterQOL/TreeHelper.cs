@@ -22,6 +22,7 @@ namespace BetterQOL
         public bool IsInSeason { get; set; }
         public bool StruckByLightning { get; set; }
         public int LightningDaysRemaining { get; set; }
+        public bool IsFertilized { get; set; }
 
         public bool IsWildTree { get; set; }
         public int GrowthStage { get; set; }
@@ -47,6 +48,12 @@ namespace BetterQOL
                 Name = data?.DisplayName ?? ModEntry.I18n.Get("hover.fruit-tree.generic"),
                 Subtitle = ModEntry.I18n.Get("hover.type.fruit-tree")
             };
+
+            // Check Fruit Tree Fertilizer (Ultimate Fertilizer mod support)
+            if (fruitTree.modData != null && fruitTree.modData.TryGetValue("fox_white25.ultimate_fertilizer/TreeFertilized", out var fertVal) && fertVal == "true")
+            {
+                info.IsFertilized = true;
+            }
 
             // Fruit Icon
             if (data?.Fruit != null && data.Fruit.Count > 0)
@@ -107,7 +114,8 @@ namespace BetterQOL
                 GrowthStage = tree.growthStage.Value,
                 IsMature = tree.growthStage.Value >= Tree.treeStage,
                 HasMoss = tree.hasMoss.Value,
-                IsTapped = tree.tapped.Value
+                IsTapped = tree.tapped.Value,
+                IsFertilized = tree.fertilized.Value
             };
 
             return info;

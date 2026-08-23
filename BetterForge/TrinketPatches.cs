@@ -13,7 +13,7 @@ namespace BetterForge
 {
     public static class TrinketPatches
     {
-        private static ModConfig Config = null!;
+        public static ModConfig Config = null!;
         private static IMonitor Monitor = null!;
 
         public static void Initialize(ModConfig config, IMonitor monitor)
@@ -370,8 +370,8 @@ namespace BetterForge
                 return false;
 
             int stackSize = Math.Max(1, trinket.Stack);
-            int iridiumCount = who.Items.CountId("(O)337") + who.Items.CountId("337");
-            int shardCount = who.Items.CountId("(O)74") + who.Items.CountId("74");
+            int iridiumCount = who.Items.CountId("(O)337");
+            int shardCount = who.Items.CountId("(O)74");
             int totalIridiumRequired = stackSize * Config.IridiumBarCost;
             int totalShardsRequired = stackSize * 1;
 
@@ -585,16 +585,7 @@ namespace BetterForge
                     var eval = TrinketReforgeLogic.Evaluate(__instance.ItemId, __instance.generationSeed.Value);
                     if (eval.IsMaxRoll)
                     {
-                        string baseName = __result;
-                        if (baseName.StartsWith("Perfect ", StringComparison.OrdinalIgnoreCase))
-                        {
-                            baseName = baseName.Substring(8).Trim();
-                        }
-                        if (baseName.EndsWith(" Hoàn Hảo", StringComparison.OrdinalIgnoreCase))
-                        {
-                            baseName = baseName.Substring(0, baseName.Length - 9).Trim();
-                        }
-
+                        string baseName = ItemRegistry.GetDataOrErrorItem(__instance.QualifiedItemId).DisplayName;
                         __result = ModEntry.I18n.Get("trinket.perfect-name-format", new { name = baseName });
                     }
                 }
@@ -624,35 +615,34 @@ namespace BetterForge
         // Hooked directly from Trinket.OnDamageMonster (called on weapon/tool hits)
         public static void Trinket_OnDamageMonster_Postfix(Trinket __instance, Farmer farmer, Monster monster, int damageAmount, bool isBomb, bool isCriticalHit)
         {
-            if (farmer == null || monster == null || damageAmount <= 0) return;
+            if (farmer == null || monster == null || damageAmount <= 0 || __instance == null) return;
+
+            string trinketId = __instance.ItemId?.ToLowerInvariant() ?? "";
 
             // 1. Golden / Iridium Spur: Crit Damage & Attack Buff
-            if (isCriticalHit && (TrinketAscensionLogic.HasAscendedTrinket(farmer, "spur") || TrinketAscensionLogic.HasAscendedTrinket(farmer, "golden") || TrinketAscensionLogic.HasAscendedTrinket(farmer, "iridium")))
+            if (isCriticalHit && (trinketId.Contains("spur") || trinketId.Contains("golden")) && TrinketAscensionLogic.IsAscended(__instance))
             {
                 TrinketAscensionLogic.TriggerGoldenSpurCritBonus(farmer, monster, damageAmount);
             }
 
             // 2. Ice Rod: Shatter Strike & Frost Slow Wave on Frozen Monsters
-            if (monster.stunTime.Value > 50 && (TrinketAscensionLogic.HasAscendedTrinket(farmer, "ice") || TrinketAscensionLogic.HasAscendedTrinket(farmer, "rod")))
+            if (monster.stunTime.Value > 50 && (trinketId.Contains("ice") || trinketId.Contains("rod")) && TrinketAscensionLogic.IsAscended(__instance))
             {
                 TrinketAscensionLogic.TriggerIceShatterAndSlowNearby(monster, farmer);
             }
 
             // 3. Basilisk Paw: 20% Lifesteal on Hit
-            if (TrinketAscensionLogic.HasAscendedTrinket(farmer, "basilisk") || TrinketAscensionLogic.HasAscendedTrinket(farmer, "paw"))
+            if ((trinketId.Contains("basilisk") || trinketId.Contains("paw")) && TrinketAscensionLogic.IsAscended(__instance))
             {
                 TrinketAscensionLogic.TriggerBasiliskLifesteal(farmer, damageAmount);
             }
 
             // 4. Parrot Egg: 2x Gold Coins & 35% Chance for Extra Loot Drop
-            if (monster.Health <= 0 || monster.Health <= damageAmount)
+            if ((monster.Health <= 0 || monster.Health <= damageAmount) && trinketId.Contains("parrot") && TrinketAscensionLogic.IsAscended(__instance))
             {
-                if (TrinketAscensionLogic.HasAscendedTrinket(farmer, "parrot"))
-                {
-                    monster.objectsToDrop.Add("GoldCoin");
-                    monster.objectsToDrop.Add("GoldCoin");
-                    TrinketAscensionLogic.TriggerParrotBonusLoot(monster, farmer);
-                }
+                farmer.Money += 25 + Game1.random.Next(25);
+                Game1.playSound("money");
+                TrinketAscensionLogic.TriggerParrotBonusLoot(monster, farmer);
             }
         }
 
@@ -718,7 +708,7 @@ namespace BetterForge
             // 1. Magic Quiver Arrow: Multi-target sweeping piercing
             if (__instance is BasicProjectile bp && bp.projectileID.Value == 14)
             {
-                Farmer? farmer = bp.GetPlayerWhoFiredMe(location);
+                Farmer? farmer = bp.theOneWhoFiredMe.Get(location) as Farmer;
                 if (farmer != null && (TrinketAscensionLogic.HasAscendedTrinket(farmer, "quiver") || TrinketAscensionLogic.HasAscendedTrinket(farmer, "magicquiver")))
                 {
                     bp.ignoreCharacterCollisions.Value = true;
@@ -733,7 +723,8 @@ namespace BetterForge
                         {
                             if (hitList.Add(monster))
                             {
-                                location.damageMonster(monster.GetBoundingBox(), bp.damageToFarmer.Value, bp.damageToFarmer.Value + 1, false, farmer, true);
+                                int dmg = Math.Max(1, bp.damageToFarmer.Value);
+                                location.damageMonster(monster.GetBoundingBox(), dmg, dmg + 1, false, farmer, true);
                                 location.playSound("hitEnemy");
                                 Game1.createRadialDebris(location, 12, (int)monster.Position.X + 32, (int)monster.Position.Y + 32, 4, false);
                             }
@@ -846,6 +837,7 @@ namespace BetterForge
             {
                 int healAmount = Math.Max(4, (int)(farmer.maxHealth * 0.05f * __instance.Power));
                 TrinketAscensionLogic.TriggerFairyAllyHealAndBlessing(farmer, healAmount);
+                __instance.HealTimer = 0f;
             }
         }
     }

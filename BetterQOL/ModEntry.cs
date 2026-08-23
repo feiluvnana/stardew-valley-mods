@@ -398,6 +398,46 @@ namespace BetterQOL
                 getValue: () => Config.ShowBundleAndMuseumInfo,
                 setValue: value => Config.ShowBundleAndMuseumInfo = value
             );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.show-community-center-progress.name"),
+                tooltip: () => I18n.Get("config.show-community-center-progress.tooltip"),
+                getValue: () => Config.ShowCommunityCenterProgress,
+                setValue: value => Config.ShowCommunityCenterProgress = value
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.show-friendship-overview.name"),
+                tooltip: () => I18n.Get("config.show-friendship-overview.tooltip"),
+                getValue: () => Config.ShowFriendshipOverview,
+                setValue: value => Config.ShowFriendshipOverview = value
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.show-progress-and-perfection.name"),
+                tooltip: () => I18n.Get("config.show-progress-and-perfection.tooltip"),
+                getValue: () => Config.ShowProgressAndPerfection,
+                setValue: value => Config.ShowProgressAndPerfection = value
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.show-mine-and-guild-progress.name"),
+                tooltip: () => I18n.Get("config.show-mine-and-guild-progress.tooltip"),
+                getValue: () => Config.ShowMineAndGuildProgress,
+                setValue: value => Config.ShowMineAndGuildProgress = value
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.show-museum-progress.name"),
+                tooltip: () => I18n.Get("config.show-museum-progress.tooltip"),
+                getValue: () => Config.ShowMuseumProgress,
+                setValue: value => Config.ShowMuseumProgress = value
+            );
         }
 
         private void InvalidateAssetCaches()

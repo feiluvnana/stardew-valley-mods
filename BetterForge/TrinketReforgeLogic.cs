@@ -153,9 +153,7 @@ namespace BetterForge
                 case "parrotegg":
                 {
                     eval.MaxTier = 4;
-                    int maxLevel = Math.Min(4, (int)(1 + (Game1.player?.totalMoneyEarned ?? 0) / 750000));
-                    int stat = r.Next(0, Math.Max(1, maxLevel));
-                    int level = stat + 1;
+                    int level = r.Next(1, 5);
                     eval.Tier = level;
                     eval.Score = (level - 1) / 3.0f;
                     eval.IsMaxRoll = (level == 4);
@@ -211,7 +209,7 @@ namespace BetterForge
 
             Random rng = Game1.random;
 
-            // Target exact next tier/level (guaranteed improvement)
+            // Target next tier or higher
             int targetTier = Math.Min(currentEval.MaxTier, currentEval.Tier + 1);
             int bestSeed = currentSeed;
             float bestScore = -1f;
@@ -223,8 +221,8 @@ namespace BetterForge
 
                 if (targetTier > currentEval.Tier)
                 {
-                    // Target exact next tier
-                    if (candEval.Tier == targetTier)
+                    // Target at least next tier (or allow jackpot roll)
+                    if (candEval.Tier >= targetTier)
                     {
                         if (candEval.Score > bestScore)
                         {

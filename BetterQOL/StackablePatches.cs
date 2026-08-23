@@ -18,6 +18,7 @@ namespace BetterQOL
             try
             {
                 // Patch maximumStackSize
+                PatchMaxStackSize(harmony, typeof(Item));
                 PatchMaxStackSize(harmony, typeof(StardewValley.Object));
                 PatchMaxStackSize(harmony, typeof(Ring));
                 PatchMaxStackSize(harmony, typeof(Clothing));
@@ -27,6 +28,7 @@ namespace BetterQOL
                 PatchMaxStackSize(harmony, typeof(Trinket));
 
                 // Patch canStackWith
+                PatchCanStackWith(harmony, typeof(Item));
                 PatchCanStackWith(harmony, typeof(StardewValley.Object));
                 PatchCanStackWith(harmony, typeof(Ring));
                 PatchCanStackWith(harmony, typeof(Clothing));
@@ -36,6 +38,7 @@ namespace BetterQOL
                 PatchCanStackWith(harmony, typeof(Trinket));
 
                 // Patch getOne
+                PatchGetOne(harmony, typeof(Item));
                 PatchGetOne(harmony, typeof(StardewValley.Object));
                 PatchGetOne(harmony, typeof(Ring));
                 PatchGetOne(harmony, typeof(Clothing));
@@ -54,7 +57,7 @@ namespace BetterQOL
 
         private static void PatchMaxStackSize(Harmony harmony, Type type)
         {
-            var method = type.GetMethod(nameof(Item.maximumStackSize), BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+            var method = AccessTools.DeclaredMethod(type, nameof(Item.maximumStackSize));
             if (method != null && !method.IsAbstract)
             {
                 harmony.Patch(
@@ -66,7 +69,7 @@ namespace BetterQOL
 
         private static void PatchCanStackWith(Harmony harmony, Type type)
         {
-            var method = type.GetMethod(nameof(Item.canStackWith), BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly, null, new[] { typeof(ISalable) }, null);
+            var method = AccessTools.DeclaredMethod(type, nameof(Item.canStackWith), new[] { typeof(ISalable) });
             if (method != null && !method.IsAbstract)
             {
                 harmony.Patch(
@@ -78,7 +81,7 @@ namespace BetterQOL
 
         private static void PatchGetOne(Harmony harmony, Type type)
         {
-            var method = type.GetMethod(nameof(Item.getOne), BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+            var method = AccessTools.DeclaredMethod(type, nameof(Item.getOne));
             if (method != null && !method.IsAbstract)
             {
                 harmony.Patch(

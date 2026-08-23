@@ -104,6 +104,10 @@ namespace BetterFurniture
                     location.furniture.Add(__instance);
                 }
 
+                who?.reduceActiveItemByOne();
+
+                __instance.UpdateBedTile(check_bounds: false);
+                __instance.actionOnPlayerEntryOrPlacement(location, dropDown: false);
                 __instance.initializeLightSource(vector);
                 location.playSound("woodyStep");
 
@@ -234,13 +238,23 @@ namespace BetterFurniture
                     int originY = (int)bedAtTile.TileLocation.Y;
 
                     bool isSpouse = false;
+                    Farmer? owner = null;
                     if (currentLocation is FarmHouse farmHouse && farmHouse.HasOwner)
                     {
-                        if (farmHouse.owner.team.GetSpouse(farmHouse.owner.UniqueMultiplayerID) == who.UniqueMultiplayerID)
+                        owner = farmHouse.owner;
+                    }
+                    else if (currentLocation is IslandFarmHouse)
+                    {
+                        owner = Game1.MasterPlayer;
+                    }
+
+                    if (owner != null)
+                    {
+                        if (owner.team.GetSpouse(owner.UniqueMultiplayerID) == who.UniqueMultiplayerID)
                         {
                             isSpouse = true;
                         }
-                        else if (farmHouse.owner != who && !farmHouse.owner.isMarriedOrRoommates())
+                        else if (owner != who && !owner.isMarriedOrRoommates())
                         {
                             isSpouse = true;
                         }

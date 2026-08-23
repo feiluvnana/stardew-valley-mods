@@ -131,16 +131,17 @@ namespace BetterQOL
 
         private static bool WasPetToday(Pet pet)
         {
-            var wasPetField = typeof(Pet).GetField("wasPet", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-                           ?? typeof(Pet).GetField("grantedPermit", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            if (pet == null)
+                return false;
+
+            if (pet.lastPetDay != null && pet.lastPetDay.TryGetValue(Game1.player.UniqueMultiplayerID, out int lastDay))
+            {
+                return lastDay == Game1.Date.TotalDays;
+            }
+
+            var wasPetField = typeof(Pet).GetField("wasPet", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
             if (wasPetField?.GetValue(pet) is NetBool wasPetNet)
                 return wasPetNet.Value;
-
-            var lastPetDayField = typeof(Pet).GetField("lastPetDay", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-            if (lastPetDayField?.GetValue(pet) is System.Collections.IDictionary dict)
-            {
-                return dict.Contains(Game1.player.UniqueMultiplayerID);
-            }
 
             return false;
         }

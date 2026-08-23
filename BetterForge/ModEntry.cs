@@ -70,8 +70,18 @@ namespace BetterForge
 
             configMenu.Register(
                 mod: ModManifest,
-                reset: () => Config = new ModConfig(),
-                save: () => Helper.WriteConfig(Config)
+                reset: () =>
+                {
+                    Config = new ModConfig();
+                    TrinketPatches.Config = Config;
+                    EnchantmentPatches.Config = Config;
+                },
+                save: () =>
+                {
+                    Helper.WriteConfig(Config);
+                    TrinketPatches.Config = Config;
+                    EnchantmentPatches.Config = Config;
+                }
             );
 
             // Section 1: Weapon & Tool Enchanting Options

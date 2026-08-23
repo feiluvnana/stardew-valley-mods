@@ -104,13 +104,13 @@ namespace BetterFurniture
                     string mirrorName = I18n.Get("furniture.princess_rococo_mirror.name");
                     string canopyName = I18n.Get("furniture.princess_bed_canopy.name");
 
-                    data["feiluvnana.BetterFurniture.PrincessDoubleBed"] = $"Princess Double Bed/bed double/4 4/4 4/1/10000/-1/{bedName}/0/Mods\\feiluvnana.BetterFurniture\\PrincessDoubleBed/true";
-                    data["feiluvnana.BetterFurniture.PrincessPastelWindow"] = $"Princess Pastel Window/window/2 2/2 2/1/2000/-1/{windowName}/0/Mods\\feiluvnana.BetterFurniture\\PrincessPastelWindow/true";
-                    data["feiluvnana.BetterFurniture.PrincessWallSconce"] = $"Princess Wall Sconce/painting/1 2/1 2/1/1000/-1/{sconceName}/0/Mods\\feiluvnana.BetterFurniture\\PrincessWallSconce/true";
-                    data["feiluvnana.BetterFurniture.PrincessNightstand"] = $"Princess Nightstand/lamp/1 2/1 1/1/2000/-1/{nightstandName}/0/Mods\\feiluvnana.BetterFurniture\\PrincessNightstand/true";
-                    data["feiluvnana.BetterFurniture.PrincessGrandRug"] = $"Princess Grand Rug/rug/4 3/4 3/2/3000/-1/{rugName}/0/Mods\\feiluvnana.BetterFurniture\\PrincessGrandRug/true";
-                    data["feiluvnana.BetterFurniture.PrincessRococoMirror"] = $"Princess Rococo Mirror/painting/2 2/2 2/1/2500/-1/{mirrorName}/0/Mods\\feiluvnana.BetterFurniture\\PrincessRococoMirror/true";
-                    data["feiluvnana.BetterFurniture.PrincessBedCanopy"] = $"Princess Bed Canopy/painting/4 3/4 3/1/3500/-1/{canopyName}/0/Mods\\feiluvnana.BetterFurniture\\PrincessBedCanopy/true";
+                    data["feiluvnana.BetterFurniture.PrincessDoubleBed"] = $"Princess Double Bed/bed double/4 4/4 4/1/10000/-1/{bedName}/0/Mods\\feiluvnana.BetterFurniture\\PrincessDoubleBed/false";
+                    data["feiluvnana.BetterFurniture.PrincessPastelWindow"] = $"Princess Pastel Window/window/4 2/4 2/1/2000/-1/{windowName}/0/Mods\\feiluvnana.BetterFurniture\\PrincessPastelWindow/false";
+                    data["feiluvnana.BetterFurniture.PrincessWallSconce"] = $"Princess Wall Sconce/painting/1 2/1 2/1/1000/-1/{sconceName}/0/Mods\\feiluvnana.BetterFurniture\\PrincessWallSconce/false";
+                    data["feiluvnana.BetterFurniture.PrincessNightstand"] = $"Princess Nightstand/lamp/1 2/1 1/1/2000/-1/{nightstandName}/0/Mods\\feiluvnana.BetterFurniture\\PrincessNightstand/false";
+                    data["feiluvnana.BetterFurniture.PrincessGrandRug"] = $"Princess Grand Rug/rug/4 3/4 3/1/3000/-1/{rugName}/0/Mods\\feiluvnana.BetterFurniture\\PrincessGrandRug/false";
+                    data["feiluvnana.BetterFurniture.PrincessRococoMirror"] = $"Princess Rococo Mirror/painting/2 2/2 2/1/2500/-1/{mirrorName}/0/Mods\\feiluvnana.BetterFurniture\\PrincessRococoMirror/false";
+                    data["feiluvnana.BetterFurniture.PrincessBedCanopy"] = $"Princess Bed Canopy/painting/4 3/4 3/1/3500/-1/{canopyName}/0/Mods\\feiluvnana.BetterFurniture\\PrincessBedCanopy/false";
                 });
             }
             // Data/Shops edits (SeedShop / Pierre's General Store)

@@ -47,9 +47,14 @@ namespace ExtendedDesertFestival
 
         public static bool IsDesertFestivalDay(int dayOfMonth, Season season)
         {
-            return dayOfMonth >= Config.FestivalStartDay
-                && dayOfMonth <= Config.FestivalEndDay
-                && IsSeasonEnabled(season);
+            if (season == Season.Spring)
+            {
+                return dayOfMonth >= 15 && dayOfMonth <= 17;
+            }
+
+            int start = Math.Clamp(Config.FestivalStartDay, 1, 28);
+            int end = Math.Clamp(Config.FestivalEndDay, start, 28);
+            return dayOfMonth >= start && dayOfMonth <= end && IsSeasonEnabled(season);
         }
 
         private void OnAssetRequested(object? sender, AssetRequestedEventArgs e)
@@ -61,12 +66,21 @@ namespace ExtendedDesertFestival
                     var data = asset.AsDictionary<string, PassiveFestivalData>().Data;
                     if (data.TryGetValue("DesertFestival", out var festival))
                     {
-                        festival.StartDay = Config.FestivalStartDay;
-                        festival.EndDay = Config.FestivalEndDay;
-
-                        if (IsSeasonEnabled(Game1.season))
+                        if (Game1.season == Season.Spring)
                         {
+                            // Never alter vanilla Spring Desert Festival (always Spring 15-17)
+                            festival.Season = Season.Spring;
+                            festival.StartDay = 15;
+                            festival.EndDay = 17;
+                        }
+                        else if (IsSeasonEnabled(Game1.season))
+                        {
+                            // Extended Desert Festival for Summer, Fall, Winter
                             festival.Season = Game1.season;
+                            int start = Math.Clamp(Config.FestivalStartDay, 1, 28);
+                            int end = Math.Clamp(Config.FestivalEndDay, start, 28);
+                            festival.StartDay = start;
+                            festival.EndDay = end;
                         }
                     }
                 });
@@ -81,8 +95,11 @@ namespace ExtendedDesertFestival
                 Game1.player.team.itemsToRemoveOvernight.Remove("(O)CalicoEgg");
             }
 
-            // Ensure festival asset reflects current season
-            Helper.GameContent.InvalidateCache("Data/PassiveFestivals");
+            // Invalidate cache on 1st day of month (season transition)
+            if (Game1.dayOfMonth == 1)
+            {
+                Helper.GameContent.InvalidateCache("Data/PassiveFestivals");
+            }
         }
 
         private void OnDayEnding(object? sender, DayEndingEventArgs e)

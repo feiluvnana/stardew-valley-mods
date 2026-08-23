@@ -28,5 +28,10 @@
   "ControllerLookupKey": "RightStick",
   "ShowGiftTastes": true,
   "ShowItemRecipes": true,
-  "ShowBundleAndMuseumInfo": true
+  "ShowBundleAndMuseumInfo": true,
+  "ShowCommunityCenterProgress": true,
+  "ShowFriendshipOverview": true,
+  "ShowProgressAndPerfection": true,
+  "ShowMineAndGuildProgress": true,
+  "ShowMuseumProgress": true
 }

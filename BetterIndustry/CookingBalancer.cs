@@ -48,10 +48,12 @@ namespace BetterIndustry
                     {
                         if (i + 1 >= ingredientsRaw.Length) break;
                         string ingredientId = ingredientsRaw[i];
+                        string normId = ingredientId.StartsWith("(O)") ? ingredientId.Substring(3) : ingredientId;
+
                         if (!int.TryParse(ingredientsRaw[i + 1], out int ingredientCount))
                             ingredientCount = 1;
 
-                        if (objectData.TryGetValue(ingredientId, out var ingData))
+                        if (objectData.TryGetValue(normId, out var ingData) || objectData.TryGetValue(ingredientId, out ingData))
                         {
                             totalIngredientCost += ingData.Price * ingredientCount;
                         }
@@ -64,13 +66,19 @@ namespace BetterIndustry
 
                     string[] yieldParts = parts[2].Split(' ');
                     string yieldId = yieldParts[0];
-
-                    if (objectData.TryGetValue(yieldId, out var dish))
+                    string normYieldId = yieldId.StartsWith("(O)") ? yieldId.Substring(3) : yieldId;
+                    int yieldCount = 1;
+                    if (yieldParts.Length > 1 && int.TryParse(yieldParts[1], out int parsedYield))
                     {
-                        // Profit margin balancing
+                        yieldCount = Math.Max(1, parsedYield);
+                    }
+
+                    if (objectData.TryGetValue(normYieldId, out var dish) || objectData.TryGetValue(yieldId, out dish))
+                    {
+                        // Profit margin balancing per unit produced
                         if (totalIngredientCost > 0)
                         {
-                            int targetPrice = (int)Math.Ceiling(totalIngredientCost * Config.CookingProfitMargin);
+                            int targetPrice = (int)Math.Ceiling(((double)totalIngredientCost / yieldCount) * Config.CookingProfitMargin);
                             if (dish.Price < targetPrice)
                             {
                                 dish.Price = targetPrice;

@@ -70,7 +70,7 @@ namespace BetterChest
                 // Fallback
             }
 
-            bool isForcedSpecialChest = shaft.mineLevel == 220 || shaft.mineLevel == 320 || shaft.mineLevel == 420;
+            bool isForcedSpecialChest = shaft.mineLevel == 220 || shaft.mineLevel == 320 || shaft.mineLevel == 420 || shaft.mineLevel == 520;
 
             if (!isTreasureRoom && !isForcedSpecialChest)
                 return;
@@ -78,7 +78,7 @@ namespace BetterChest
             if (shaft.Objects == null)
                 return;
 
-            // Ensure special chest exists on repeatable runs for Floor 100/200/300 even if marked consumed by vanilla
+            // Ensure special chest exists on repeatable runs for Floor 100/200/300/400 even if marked consumed by vanilla
             if (isForcedSpecialChest)
             {
                 Vector2 vector = new Vector2(9f, 9f);
@@ -92,7 +92,7 @@ namespace BetterChest
                     shaft.overlayObjects[vector] = chest;
                 }
 
-                if (shaft.mineLevel == 320 || shaft.mineLevel == 420)
+                if (shaft.mineLevel == 320 || shaft.mineLevel == 420 || shaft.mineLevel == 520)
                 {
                     Vector2 secVector = vector + new Vector2(-2f, 0f);
                     if (!shaft.overlayObjects.ContainsKey(secVector) && !shaft.Objects.ContainsKey(secVector))
@@ -106,7 +106,7 @@ namespace BetterChest
                     }
                 }
 
-                if (shaft.mineLevel == 420)
+                if (shaft.mineLevel == 420 || shaft.mineLevel == 520)
                 {
                     Vector2 tertVector = vector + new Vector2(2f, 0f);
                     if (!shaft.overlayObjects.ContainsKey(tertVector) && !shaft.Objects.ContainsKey(tertVector))
@@ -137,7 +137,7 @@ namespace BetterChest
                     continue;
 
                 chest.modData[GeneratedModDataKey] = "true";
-                bool isSpecial = isForcedSpecialChest || (chest.giftbox.Value == false && chest.bigCraftableSpriteIndex.Value == 344);
+                bool isSpecial = isForcedSpecialChest;
 
                 if (Config.EnableCustomRewards)
                 {
@@ -147,7 +147,11 @@ namespace BetterChest
                         chest.Items.Clear();
                         foreach (var reward in rewards)
                         {
-                            chest.Items.Add(reward);
+                            var leftover = chest.addItem(reward);
+                            if (leftover != null && leftover.Stack > 0)
+                            {
+                                chest.Items.Add(leftover);
+                            }
                         }
                     }
                 }
@@ -166,7 +170,11 @@ namespace BetterChest
                         var fallback = RewardGenerator.GenerateRewards(Config, Game1.random, isSpecialChest: isSpecial, mineLevel: shaft.mineLevel);
                         foreach (var item in fallback)
                         {
-                            chest.Items.Add(item);
+                            var leftover = chest.addItem(item);
+                            if (leftover != null && leftover.Stack > 0)
+                            {
+                                chest.Items.Add(leftover);
+                            }
                         }
                     }
                 }
