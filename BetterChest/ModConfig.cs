@@ -7,6 +7,16 @@
 // ============================================================================
 namespace BetterChest
 {
+    // C# CONCEPTS USED THROUGHOUT THIS FILE:
+    //   * A class is a blueprint bundling related data together; "public" means
+    //     every other file (and SMAPI's config serializer) can see it.
+    //   * Each "public bool X { get; set; } = true;" line is an AUTO-PROPERTY:
+    //     the compiler generates hidden storage plus getter/setter accessors.
+    //     The trailing "= true" is the DEFAULT VALUE used for a fresh config.
+    //   * Basic types: bool = true/false; int = whole numbers; float and
+    //     double = decimal numbers (double is the more precise of the two).
+    //   * Probability fields store 0.0-1.0 fractions (0.15f == 15%). The "f"
+    //     suffix marks a float literal — bare decimals like 1.00 are double.
     /// <summary>
     /// The mod's configuration model. Property defaults here are what a fresh
     /// config.json is created with; all values are tweakable via GMCM.
@@ -92,6 +102,9 @@ namespace BetterChest
         public float Floor100QuintupleStackChance { get; set; } = 0.05f;
 
         // Category Weights (Equal 15.0 each, ~14.285% chance per category across all 7 categories)
+        // NOTE the switch to type "double": doubles store bigger, more precise
+        // decimals than floats, and literals WITHOUT an "f" suffix (like 15.0)
+        // are doubles in C#. Weights are RELATIVE — only their ratios matter.
         /// <summary>Relative weight of the Legendary category when picking a category roll.</summary>
         public double LegendaryWeight { get; set; } = 15.0;
         /// <summary>Relative weight of the Agriculture category.</summary>

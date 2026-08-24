@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Netcode;
@@ -17,22 +14,41 @@ namespace BetterQOL
     /// <summary>
     /// Lookup builder for monsters, drop tables, spawn locations, and Monster Slayer goals.
     /// </summary>
+    /// <remarks>
+    /// BEGINNER NOTES:
+    /// - The card is assembled in layers: combat stats always appear; slayer goals, locations,
+    ///   and drops are added ONLY when data exists (conditional sections keep cards tidy).
+    /// - Slayer goals are matched by KEYWORD on the monster name because several game monsters
+    ///   share one adventure-guild goal (e.g. all bats count toward the Bat goal).
+    /// - Drop chances come from the game's raw data files, which store "itemId chance" pairs
+    ///   inside '/'-separated text - hence all the Split/TryParse parsing below.
+    /// </remarks>
     public static partial class LookupDataManager
     {
         #region 3. Monster Lookup
 
+        /// <summary>
+        /// Builds the monster card: combat stats, slayer-goal progress, spawn locations, and
+        /// clickable links for every item it can drop.
+        /// </summary>
         public static LookupSubject BuildMonsterSubject(Monster monster)
         {
             LookupSubject lookupSubject = new LookupSubject
             {
+                // "??" prefers the monster's localized display name, falling back to the raw
+                // class name (which equals its internal id) when no display name exists.
                 Title = (monster.displayName ?? monster.Name),
                 Subtitle = ModEntry.I18n.Get("hover.type.monster").ToString()
             };
+            // Reuse the monster's own sprite as the card icon; "?." guards against monsters
+            // whose sprite has not been assigned yet.
             if (monster.Sprite?.Texture != null)
             {
                 lookupSubject.MainIcon = monster.Sprite.Texture;
                 lookupSubject.MainIconSourceRect = monster.Sprite.SourceRect;
             }
+            // COMBAT STAT BLOCK: current/max HP, damage dealt to the farmer, resilience (damage
+            // reduction), movement speed, and XP awarded on kill - one coloured row each.
             LookupSection statsSection = new LookupSection(ModEntry.I18n.Get("lookup.section.stats"));
             statsSection.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.monster.hp"), $"{monster.Health} / {monster.MaxHealth}", new Color(220, 20, 60)));
             statsSection.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.monster.damage"), $"{monster.DamageToFarmer}", new Color(220, 100, 20)));
@@ -41,7 +57,11 @@ namespace BetterQOL
             statsSection.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.monster.exp"), $"{monster.ExperienceGained}", new Color(180, 50, 180)));
             lookupSubject.Sections.Add(statsSection);
 
+            // TUPLE DECONSTRUCTION: GetMonsterSlayerProgress returns a named tuple (a lightweight
+            // multi-value type). This one statement UNPACKS all four fields into separate local
+            // variables - far tidier than juggling four out-parameters.
             var (category, currentKills, requiredGoal, isCompleted) = GetMonsterSlayerProgress(monster.Name);
+            // Only build the slayer group when this monster actually belongs to a tracked goal.
             if (!string.IsNullOrEmpty(category) && requiredGoal > 0)
             {
                 LookupSection slayerSection = new LookupSection(ModEntry.I18n.Get("lookup.section.slayer"));
@@ -51,6 +71,8 @@ namespace BetterQOL
                 lookupSubject.Sections.Add(slayerSection);
             }
 
+            // Sections are added conditionally: a monster with unknown habitat simply gets no
+            // location group instead of an ugly empty row.
             string spawnLocations = GetMonsterSpawnLocations(monster.Name);
             if (!string.IsNullOrEmpty(spawnLocations))
             {
@@ -70,6 +92,7 @@ namespace BetterQOL
             return lookupSubject;
         }
 
+        /// <summary>Translates internal slayer-category names into localized UI text; the "=>" makes this an expression-bodied method (a one-liner).</summary>
         private static string GetLocalizedMonsterCategory(string category) => category switch
         {
             "Slimes" => ModEntry.I18n.Get("lookup.slayer.slimes").ToString(),
@@ -87,14 +110,23 @@ namespace BetterQOL
             _ => category
         };
 
+        /// <summary>
+        /// Maps a monster name onto its Monster Slayer goal by keyword-matching the lowercased
+        /// name. Returns a NAMED TUPLE bundling category, progress, goal, and a completion flag.
+        /// </summary>
         private static (string Category, int CurrentKills, int RequiredGoal, bool IsCompleted) GetMonsterSlayerProgress(string monsterName)
         {
+            // try/catch keeps stat lookups from ever crashing the popup.
             try
             {
+                // .ToLower() makes matching case-insensitive; .Contains tests substrings, so
+                // "Iridium Bat" matches "bat". Each branch SUMS every monster variant sharing one
+                // slayer goal - Game1.stats tracks kills separately per exact internal name.
                 string text = monsterName.ToLower();
                 if (text.Contains("magma sprite") || text.Contains("magma sparker"))
                 {
                     int kills = Game1.stats.getMonstersKilled("Magma Sprite") + Game1.stats.getMonstersKilled("Magma Sparker");
+                    // Named tuple literal: labelling each value keeps call sites readable.
                     return (Category: "Magma Sprites", CurrentKills: kills, RequiredGoal: 150, IsCompleted: kills >= 150);
                 }
                 if (text.Contains("slime") || text.Contains("sludge"))
@@ -155,13 +187,23 @@ namespace BetterQOL
             }
             catch
             {
+                // Deliberately empty: any lookup hiccup just falls through to the generic branch.
             }
+            // FALLBACK for monsters without a slayer goal: report the plain lifetime kill count;
+            // RequiredGoal 0 tells the caller to skip the whole slayer section.
             int defaultKills = Game1.stats.getMonstersKilled(monsterName);
             return (Category: monsterName, CurrentKills: defaultKills, RequiredGoal: 0, IsCompleted: false);
         }
 
+        /// <summary>
+        /// Keyword-matches the monster's name to a readable list of mines / island floors where
+        /// it spawns. Returns an empty string when we have no habitat data.
+        /// </summary>
         private static string GetMonsterSpawnLocations(string monsterName)
         {
+            // ORDER MATTERS in this if-chain: specific names are tested BEFORE broad ones, so
+            // "frost bat" resolves to ice floors 41-79 instead of being swallowed by the generic
+            // "bat" rule sitting further down.
             string text = monsterName.ToLower();
             if (text.Contains("magma sprite") || text.Contains("sparker"))
             {
@@ -270,15 +312,25 @@ namespace BetterQOL
             return string.Empty;
         }
 
+        /// <summary>
+        /// Collects everything this monster can drop into clickable item links. Two sources are
+        /// merged: the instance's own objectsToDrop list plus the game's Monsters data file,
+        /// which stores "itemId chance" pairs inside its text fields.
+        /// </summary>
         private static List<LookupLink> GetMonsterDropLinks(Monster monster)
         {
             List<LookupLink> list = new List<LookupLink>();
+            // Accumulator dictionary: item id -> drop chance (0..1). A Dictionary maps unique
+            // keys to values; assigning to an existing key OVERWRITES it, merging duplicates.
             Dictionary<string, double> dictionary = new Dictionary<string, double>();
             try
             {
                 Dictionary<string, string> monstersData = DataLoader.Monsters(Game1.content);
                 if (monstersData != null && monstersData.TryGetValue(monster.Name, out var value) && !string.IsNullOrEmpty(value))
                 {
+                    // The monster's data is one long '/'-separated string; field index 6 holds the
+                    // drops as "id chance id chance ...". So: Split on spaces, then STEP BY 2
+                    // (i += 2) to walk the id/chance pairs.
                     string[] array = value.Split('/');
                     if (array.Length > 6 && !string.IsNullOrEmpty(array[6]))
                     {
@@ -286,12 +338,17 @@ namespace BetterQOL
                         for (int i = 0; i + 1 < array2.Length; i += 2)
                         {
                             string key = array2[i];
+                            // TryParse converts text to double WITHOUT throwing on garbage, and
+                            // InvariantCulture forces '.' as decimal separator regardless of the
+                            // player's Windows language settings.
                             if (double.TryParse(array2[i + 1], NumberStyles.Any, CultureInfo.InvariantCulture, out var result))
                             {
                                 dictionary[key] = result;
                             }
                         }
                     }
+                    // Field index 14 holds a second drop table (special/rare drops), parsed
+                    // exactly the same way as above.
                     if (array.Length > 14 && !string.IsNullOrEmpty(array[14]))
                     {
                         string[] array3 = array[14].Split(' ');
@@ -309,6 +366,8 @@ namespace BetterQOL
             catch
             {
             }
+            // HASH SET DEDUPE: HashSet.Add returns false when the value already exists, giving a
+            // one-line "already seen?" check; "continue" jumps straight to the next loop pass.
             HashSet<string> hashSet = new HashSet<string>();
             foreach (string text in monster.objectsToDrop)
             {
@@ -316,14 +375,21 @@ namespace BetterQOL
                 {
                     continue;
                 }
+                // Try the id as-is first; the "??" fallback prepends "(O)", the game's qualified-id
+                // prefix for regular objects, for ids stored without it.
                 ParsedItemData dropData = ItemRegistry.GetData(text) ?? ItemRegistry.GetData("(O)" + text);
                 if (dropData != null)
                 {
+                    // Format the chance as a percentage. Nested ternaries choose precision:
+                    // >=100% plain, otherwise one decimal (two decimals below 1%).
                     string text2 = "";
                     if (dictionary.TryGetValue(text, out var value2))
                     {
                         text2 = (value2 >= 1.0) ? " (100%)" : ((value2 >= 0.01) ? $" ({value2 * 100.0:0.#}%)" : $" ({value2 * 100.0:0.00}%)");
                     }
+                    // The last argument is a LAMBDA - an inline function stored with the link and
+                    // run LATER, only when clicked. It "captures" dropData: closures remember the
+                    // local variables where they were created, even after this method returns.
                     list.Add(new LookupLink(dropData.DisplayName + text2, null, Game1.textColor, dropData.GetTexture(), dropData.GetSourceRect(0, null), () =>
                     {
                         Item val = ItemRegistry.Create(dropData.QualifiedItemId, 1, 0, false);
@@ -331,6 +397,7 @@ namespace BetterQOL
                     }));
                 }
             }
+            // Second pass: data-file-only drops that objectsToDrop didn't already cover.
             foreach (KeyValuePair<string, double> item in dictionary)
             {
                 string key3 = item.Key;

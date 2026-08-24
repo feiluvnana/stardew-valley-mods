@@ -11,16 +11,31 @@ using StardewValley.TerrainFeatures;
 
 namespace BetterQOL
 {
+    /// <summary>
+    /// Answers the question "WHAT is the cursor pointing at right now?" whenever the
+    /// player presses the lookup key. It checks, in priority order: any open menu,
+    /// on-screen HUD widgets (toolbar), then the world itself - and hands each match to
+    /// a Build*Subject factory in LookupDataManager which produces the page data.
+    /// "static" again: no instances needed, just a bundle of query functions.
+    /// </summary>
     public static class LookupTargetFinder
     {
+        /// <summary>
+        /// Entry point: resolve whatever is under the mouse into a LookupSubject, or
+        /// null when there's nothing meaningful to show.
+        /// </summary>
         public static LookupSubject? FindTargetSubject()
         {
+            // Ask SMAPI for the cursor. GetScaledScreenPixels returns UI-space pixels -
+            // coordinates already adjusted for the game's zoom level, matching the same
+            // space menus use for their clickable rectangles.
             var cursor = ModEntry.ModHelper.Input.GetCursorPosition();
             Vector2 uiPixels = cursor.GetScaledScreenPixels();
             int mouseX = (int)uiPixels.X;
             int mouseY = (int)uiPixels.Y;
 
             // 1. If a menu is open, inspect hovered items or elements in menu
+            // Menus take top priority: hovering an inventory slot should describe THAT.
             if (Game1.activeClickableMenu != null)
             {
                 var menuSubject = FindTargetInMenu(Game1.activeClickableMenu, mouseX, mouseY);
@@ -29,12 +44,15 @@ namespace BetterQOL
             }
 
             // 2. Check OnScreenMenus (e.g. Toolbar / Hotbar)
+            // The toolbar is not an IClickableMenu; it lives in this separate HUD list.
             if (Game1.onScreenMenus != null)
             {
                 foreach (var onScreenMenu in Game1.onScreenMenus)
                 {
                     if (onScreenMenu is Toolbar toolbar && toolbar.buttons != null)
                     {
+                        // Walk every hotbar button; index i corresponds 1:1 with the
+                        // same slot in the player's inventory list.
                         for (int i = 0; i < toolbar.buttons.Count; i++)
                         {
                             if (toolbar.buttons[i].containsPoint(mouseX, mouseY))
@@ -58,15 +76,23 @@ namespace BetterQOL
             return null;
         }
 
+        /// <summary>
+        /// Menu-specific lookup. Each "is SomeMenu m" check below is PATTERN MATCHING:
+        /// a combined type-test plus cast, so the typed variable only exists when the
+        /// menu actually is that type. First match that yields an item wins.
+        /// </summary>
         private static LookupSubject? FindTargetInMenu(IClickableMenu menu, int mouseX, int mouseY)
         {
 
             // GameMenu (Inventory, Crafting, Social)
+            // GameMenu is a tabbed container; pages[...] picks the visible tab's content.
             if (menu is GameMenu gameMenu && gameMenu.pages != null && gameMenu.currentTab < gameMenu.pages.Count)
             {
                 var activePage = gameMenu.pages[gameMenu.currentTab];
                 if (activePage is InventoryPage invPage)
                 {
+                    // "a ?? b" (null-coalescing): prefer the engine's hovered item, but
+                    // fall back to our own hit-test against the inventory grid.
                     var item = invPage.hoveredItem ?? invPage.inventory?.getItemAt(mouseX, mouseY);
                     if (item != null)
                     {
@@ -83,6 +109,10 @@ namespace BetterQOL
                                 var equipItem = invPage.hoveredItem;
                                 if (equipItem == null)
                                 {
+                                    // The icon only knows its own label; match keywords in
+                                    // that name to figure out WHICH equipment slot to read
+                                    // from the player object. ".Value" unwraps the Netcode
+                                    // wrapper around each equipped item reference.
                                     string slotName = icon.name ?? string.Empty;
                                     if (slotName.Contains("Hat")) equipItem = Game1.player.hat.Value;
                                     else if (slotName.Contains("Left Ring")) equipItem = Game1.player.leftRing.Value;
@@ -92,6 +122,7 @@ namespace BetterQOL
                                     else if (slotName.Contains("Pants")) equipItem = Game1.player.pantsItem.Value;
                                     else if (slotName.Contains("Trinket") && Game1.player.trinketItems.Count > 0)
                                     {
+                                        // Trinkets form a list; show the first occupied one.
                                         for (int i = 0; i < Game1.player.trinketItems.Count; i++)
                                         {
                                             if (Game1.player.trinketItems[i] != null)
@@ -116,6 +147,8 @@ namespace BetterQOL
                     {
                         return LookupDataManager.BuildItemSubject(item);
                     }
+                    // Hovering a RECIPE entry: create a throwaway instance of what the
+                    // recipe produces so we can describe it like any other item.
                     if (craftPage.hoverRecipe != null)
                     {
                         var created = craftPage.hoverRecipe.createItem();
@@ -137,6 +170,8 @@ namespace BetterQOL
             }
 
             // ItemGrabMenu (Chest / Inventory)
+            // One generic pattern covers chests, gift menus, etc. - three possible item
+            // sources chained with ?? so the first non-null wins.
             if (menu is ItemGrabMenu itemGrabMenu)
             {
                 var item = itemGrabMenu.hoveredItem
@@ -151,6 +186,8 @@ namespace BetterQOL
             // ShopMenu
             if (menu is ShopMenu shopMenu)
             {
+                // hoveredItem is stored as ISalable (an INTERFACE - a contract many item
+                // types implement), so cast to Item before treating it as one.
                 var item = (shopMenu.hoveredItem as Item) ?? shopMenu.inventory?.getItemAt(mouseX, mouseY);
                 if (item != null)
                 {
@@ -169,6 +206,8 @@ namespace BetterQOL
             }
 
             // ForgeMenu (Volcano Forge & Anvil)
+            // Long ?? chain: hovered item, then either forge slot ONLY if the cursor is
+            // actually over that slot, then whatever is held on the cursor.
             if (menu is ForgeMenu forgeMenu)
             {
                 var item = forgeMenu.hoveredItem
@@ -183,6 +222,7 @@ namespace BetterQOL
             }
 
             // TailoringMenu (Sewing Machine & Dye Pots)
+            // Identical structure to the forge: two ingredient slots plus held item.
             if (menu is TailoringMenu tailoringMenu)
             {
                 var item = tailoringMenu.hoveredItem
@@ -217,6 +257,8 @@ namespace BetterQOL
             }
 
             // MenuWithInventory
+            // Catch-all base class shared by many menus (fishing, quests, ...), so this
+            // last check handles everything the specific menus above missed.
             if (menu is MenuWithInventory menuWithInv)
             {
                 var item = menuWithInv.hoveredItem ?? menuWithInv.inventory?.getItemAt(mouseX, mouseY);
@@ -229,20 +271,34 @@ namespace BetterQOL
             return null;
         }
 
+        /// <summary>
+        /// World-space lookup. Layers are checked roughly "biggest first" (farmers,
+        /// characters, animals, clumps, buildings) down to tile-based dictionaries
+        /// (objects, terrain features) so tall/animated things win over the ground
+        /// beneath them. Always ends with a tile-info fallback, never null.
+        /// </summary>
         private static LookupSubject? FindTargetInWorld(GameLocation location)
         {
             var cursor = ModEntry.ModHelper.Input.GetCursorPosition();
+            // Tile = the grid cell under the cursor (dictionary key into the map data).
             Vector2 tilePos = cursor.Tile;
+            // AbsolutePixels = raw unscaled pixel position - right coordinate space for
+            // testing entity bounding boxes.
             Vector2 absPixels = cursor.AbsolutePixels;
             int absX = (int)absPixels.X;
             int absY = (int)absPixels.Y;
 
             // 1. Check Player Character / Farmers
+            // "farmers" includes every human player in multiplayer, not just yourself.
             foreach (var farmer in location.farmers)
             {
                 if (farmer != null)
                 {
+                    // Sprites anchor at the feet, so build a generous box extending UP
+                    // from Position (-80px) to cover head and torso too.
                     Rectangle farmerBox = new Rectangle((int)farmer.Position.X - 16, (int)farmer.Position.Y - 80, 96, 128);
+                    // Three-way hit test: generous sprite box OR the game's own collision
+                    // box OR simply sharing the cursor's grid tile.
                     if (farmerBox.Contains(absX, absY) || farmer.GetBoundingBox().Contains(absX, absY) || farmer.TilePoint == tilePos.ToPoint())
                     {
                         return LookupDataManager.BuildFarmerSubject(farmer);
@@ -264,6 +320,9 @@ namespace BetterQOL
 
                 if (hitsCharacter)
                 {
+                    // All of these derive from the Character base class; "is" checks pick
+                    // the most specific type so monsters get combat stats while villagers
+                    // get gift schedules. ORDER MATTERS: Monster before generic NPC.
                     if (character is Monster monster)
                     {
                         return LookupDataManager.BuildMonsterSubject(monster);
@@ -280,6 +339,7 @@ namespace BetterQOL
             }
 
             // 3. Farm Animals
+            // animals is a name-keyed dictionary; .Values iterates the FarmAnimal objects.
             foreach (var animal in location.animals.Values)
             {
                 if (animal == null)
@@ -293,6 +353,7 @@ namespace BetterQOL
             }
 
             // 4. Resource Clumps (Hardwood Stumps, Logs, Boulders, Meteorites, Fossil Rock)
+            // Clumps occupy multiple tiles and store their own bounding boxes.
             if (location.resourceClumps.Count > 0)
             {
                 foreach (var clump in location.resourceClumps)
@@ -305,10 +366,13 @@ namespace BetterQOL
             }
 
             // 5. Buildings (Fish Pond, Barn, Coop, Junimo Hut, Silo, Mill, Slime Hutch, Stable, Pet Bowl)
+            // occupiesTile() accounts for a building's full multi-tile footprint.
             foreach (var building in location.buildings)
             {
                 if (building != null && building.occupiesTile(tilePos))
                 {
+                    // Fish ponds get a dedicated page (fish stats, population); every
+                    // other building falls back to the generic building builder.
                     if (building is FishPond fishPond)
                     {
                         return LookupDataManager.BuildFishPondSubject(fishPond);
@@ -318,12 +382,16 @@ namespace BetterQOL
             }
 
             // 6. Objects (Chests, Machines, IndoorPots, Items placed in world)
+            // Objects live in a dictionary keyed by tile position - TryGetValue does the
+            // lookup and outputs the value in one step.
             if (location.Objects.TryGetValue(tilePos, out var obj))
             {
                 if (obj is Chest chest)
                 {
                     return LookupDataManager.BuildChestSubject(chest);
                 }
+                // A garden pot growing a crop: look up the crop's HARVEST item id and
+                // describe that item (so you see what the pot will produce).
                 if (obj is IndoorPot pot && pot.hoeDirt.Value?.crop != null)
                 {
                     string harvestId = pot.hoeDirt.Value.crop.indexOfHarvest.Value;
@@ -333,6 +401,8 @@ namespace BetterQOL
                         return LookupDataManager.BuildItemSubject(cropItem);
                     }
                 }
+                // Machine currently processing something: describe the OUTPUT inside it
+                // (e.g. a keg shows "Wine"), which is more useful than the empty keg.
                 if (obj.heldObject.Value != null)
                 {
                     return LookupDataManager.BuildItemSubject(obj.heldObject.Value);
@@ -347,6 +417,7 @@ namespace BetterQOL
                 {
                     return LookupDataManager.BuildGiantCropSubject(giantCrop);
                 }
+                // Tilled soil with a planted crop: describe the crop's harvest item.
                 if (feature is HoeDirt hoeDirt && hoeDirt.crop != null)
                 {
                     string harvestId = hoeDirt.crop.indexOfHarvest.Value;
@@ -371,6 +442,7 @@ namespace BetterQOL
             }
 
             // 8. Large Terrain Features (Bushes spanning larger areas)
+            // Not tile-keyed - pixel-test each bush's bounding box instead.
             foreach (var largeFeature in location.largeTerrainFeatures)
             {
                 if (largeFeature is Bush largeBush && largeBush.getBoundingBox().Contains(absX, absY))
@@ -383,12 +455,21 @@ namespace BetterQOL
             return LookupDataManager.BuildTileSubject(location, tilePos);
         }
 
+        /// <summary>
+        /// Resolves which villager row the cursor is over on the Social tab. The needed
+        /// fields are PRIVATE, so we use REFLECTION - runtime introspection that reads
+        /// fields by name without compile-time access. Reflection is slower and less
+        /// safe than normal code, hence the surrounding try/catch.
+        /// </summary>
         private static NPC? GetHoveredSocialNPC(SocialPage socialPage, int mouseX, int mouseY)
         {
             try
             {
-
+                // typeof(SocialPage) gets the class's runtime metadata; BindingFlags say
+                // "look at non-public instance fields too".
                 var slotField = typeof(SocialPage).GetField("characterSlots", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                // "is System.Collections.IList slots" both casts and null-checks the
+                // boxed reflection result in one expression.
                 if (slotField?.GetValue(socialPage) is System.Collections.IList slots)
                 {
                     var namesField = typeof(SocialPage).GetField("names", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
@@ -396,6 +477,8 @@ namespace BetterQOL
 
                     for (int i = 0; i < slots.Count; i++)
                     {
+                        // Find the row under the cursor, then map its index to the
+                        // parallel "names" list to learn WHICH villager it is.
                         if (slots[i] is ClickableComponent comp && comp.containsPoint(mouseX, mouseY))
                         {
                             if (names != null && i < names.Count && names[i] is string name)
@@ -406,6 +489,8 @@ namespace BetterQOL
                     }
                 }
             }
+            // Swallow ANY reflection failure (field renamed by a game update, etc.) -
+            // a broken social lookup should never crash the game.
             catch { }
             return null;
         }

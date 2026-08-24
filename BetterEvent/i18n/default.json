@@ -1,9 +1,9 @@
 {
-  "config.section.festivals": "Extended Desert Festival Options",
+  "config.section.festivals": "Festival Options",
   "config.start-day.name": "Festival Start Day",
-  "config.start-day.tooltip": "The day of the month when the Extended Desert Festival begins (default: 22).",
+  "config.start-day.tooltip": "The day of the month when the Desert Festival begins (default: 22).",
   "config.end-day.name": "Festival End Day",
-  "config.end-day.tooltip": "The day of the month when the Extended Desert Festival ends (default: 24).",
+  "config.end-day.tooltip": "The day of the month when the Desert Festival ends (default: 24).",
   "config.enable-summer.name": "Enable Summer Festival",
   "config.enable-summer.tooltip": "Extend Desert Festival to Summer.",
   "config.enable-fall.name": "Enable Fall Festival",

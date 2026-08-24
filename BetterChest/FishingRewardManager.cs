@@ -1,5 +1,9 @@
-using System;
-using System.Collections.Generic;
+// "using" directives import other libraries' namespaces so short names work:
+//   StardewValley       -> core game code (Game1.random, Item, ItemRegistry)
+//   StardewValley.Menus -> ItemGrabMenu, the screen shown for opened chests
+//   StardewValley.Tools -> FishingRod, the tool class that reeled the chest in
+// HashSet<>, List<>, IList<> and Math come from .NET's core collections and
+// numerics namespaces, imported implicitly in modern .NET projects.
 using StardewValley;
 using StardewValley.Menus;
 using StardewValley.Tools;
@@ -22,6 +26,10 @@ namespace BetterChest
     /// </summary>
     public static class FishingRewardManager
     {
+        // "static readonly" = constructed once when the class is first used and
+        // never re-pointed afterwards. HashSet<string> is a GENERIC type — the
+        // angle brackets declare that it stores strings. Its superpower is
+        // O(1) Contains(): lookup speed stays constant no matter how many ids.
         /// <summary>
         /// Every item id the mod treats as "trash". A HashSet gives instant Contains()
         /// lookups, and OrdinalIgnoreCase tolerates case differences. Both qualified
@@ -39,6 +47,10 @@ namespace BetterChest
             "168", "169", "170", "171", "172", "0", "TrashCan"
         };
 
+        // C# concept — RECORD: a compact, immutable data-carrier type. This
+        // "positional" form auto-generates a constructor accepting every
+        // parameter in order, a read-only property per parameter, and sensible
+        // value equality — all from a single line instead of a full class body.
         /// <summary>
         /// One row of the fishing loot table: which item, how many, how likely, and
         /// whether it is reserved for golden chests.
@@ -50,6 +62,12 @@ namespace BetterChest
         /// <param name="GoldenOnly">When true, the entry can only roll in golden treasure chests (defaults to false).</param>
         private record FishingLootEntry(string QualifiedId, int MinCount, int MaxCount, double Weight, bool GoldenOnly = false);
 
+        // Two shorthand features at work below:
+        //   * "new()" with no type name is TARGET-TYPED NEW (C# 9): the compiler
+        //     infers List<FishingLootEntry> from the field's declared type.
+        //   * The brace block is a COLLECTION INITIALIZER — syntactic sugar that
+        //     calls Add() once per element, and each bare "new(...)" likewise
+        //     infers the FishingLootEntry record type.
         /// <summary>
         /// The full fishing loot table. Weights are relative, so a 25.0 weight is
         /// twice as likely as a 12.5 weight regardless of the total.
@@ -121,6 +139,10 @@ namespace BetterChest
             if (grabMenu.ItemsToGrabMenu?.actualInventory == null)
                 return;
 
+            // IList<Item> is an INTERFACE — a contract promising certain members
+            // (Add, Count, an indexer...) without pinning down the concrete list
+            // class. Coding against the interface lets this work with whatever
+            // list implementation the game uses internally.
             IList<Item> inventory = grabMenu.ItemsToGrabMenu.actualInventory;
             bool isGolden = rod.goldenTreasure;
             Random random = Game1.random; // the game's shared, save-seeded RNG

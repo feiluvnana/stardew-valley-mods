@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -8,32 +6,61 @@ using StardewValley.Menus;
 
 namespace BetterQOL
 {
+    /// <summary>
+    /// A full-screen "Lookup Anything" window opened with F1. It INHERITS from the game's
+    /// IClickableMenu base class ("class X : Y" means "X is a Y that..."), which already
+    /// knows how to be positioned, receive clicks/keys/scroll, and close - we only
+    /// OVERRIDE the pieces we want to customize (drawing, input handling).
+    ///
+    /// The menu shows either a subject's details page or live search results, with a
+    /// back-button history so links can drill down through related subjects.
+    /// </summary>
     public class LookupMenu : IClickableMenu
     {
+        // The page currently displayed. "?" marks it nullable: null means search mode.
         private LookupSubject? CurrentSubject;
+        // Navigation history. Stack<T> is LIFO (last-in-first-out): Push remembers pages,
+        // Pop retrieves the most recent one - perfect for a Back button.
         private readonly Stack<LookupSubject> History = new();
 
+        // Texture-based buttons. Each pairs a screen rectangle with a sprite cut out of
+        // the game's cursors.png sheet; "?" because they're built in InitializeComponents.
         private ClickableTextureComponent? CloseButton;
         private ClickableTextureComponent? BackButton;
         private ClickableTextureComponent? UpButton;
         private ClickableTextureComponent? DownButton;
 
+        // The native Stardew text input widget plus an invisible click target covering it.
         private TextBox? SearchBox;
         private ClickableComponent? SearchBoxComponent;
+        // Previous frame's query - comparing against it detects when the user typed.
         private string LastSearchText = string.Empty;
+        // Rows shown while searching; empty list = show the details page instead.
         private List<LookupLink> SearchResults = new();
+        // Active filter tab for searches ("All", "Items", ...). "All" is lowercase-safe.
         private string CurrentCategory = "All";
+        // "static readonly" array: shared by every instance and never reassigned.
         private static readonly string[] SearchCategories = new[] { "All", "Items", "Villagers", "Fish", "Crops", "Monsters", "Buildings", "Recipes", "Locations" };
+        // Category tab hit-boxes, rebuilt each draw pass while search mode is active.
         private readonly List<ClickableComponent> CategoryButtons = new();
 
+        // Scrolling state: how far content is shifted up, how far it MAY shift, and the
+        // pixels moved per wheel notch. "const" = fixed at compile time.
         private int ScrollOffset = 0;
         private int MaxScrollOffset = 0;
         private const int ScrollStep = 40;
 
+        // Links currently visible on screen (re-registered during every Draw call) and
+        // which link/category the cursor hovers, used for highlight coloring.
         private readonly List<LookupLink> ActiveClickableLinks = new();
         private LookupLink? HoveredLink = null;
         private string? HoveredCategory = null;
 
+        /// <summary>
+        /// Builds the window centered on screen. ": base(...)" calls the parent class's
+        /// constructor FIRST with named arguments; Math.Min clamps size so the menu fits
+        /// smaller windows with a 24px margin on each side.
+        /// </summary>
         public LookupMenu(LookupSubject? initialSubject = null)
             : base(
                 x: (Game1.uiViewport.Width - Math.Min(860, Game1.uiViewport.Width - 48)) / 2,
@@ -43,12 +70,20 @@ namespace BetterQOL
                 showUpperRightCloseButton: true
             )
         {
+            // No subject given? Default to the world-overview page. "??" picks the right
+            // operand when the left is null.
             CurrentSubject = initialSubject ?? LookupDataManager.BuildWorldOverviewSubject();
+            // Vanilla-style click feedback sound.
             Game1.playSound("bigSelect");
 
             InitializeComponents();
         }
 
+        /// <summary>
+        /// OVERRIDE of the base class hook that fires when the game window/resolution
+        /// changes. "base.gameWindowSizeChanged(...)" runs the inherited behavior first,
+        /// then we recenter and rebuild every component for the new size.
+        /// </summary>
         public override void gameWindowSizeChanged(Rectangle oldBounds, Rectangle newBounds)
         {
             base.gameWindowSizeChanged(oldBounds, newBounds);
@@ -59,9 +94,15 @@ namespace BetterQOL
             InitializeComponents();
         }
 
+        /// <summary>
+        /// (Re)creates every button, the search box, and scroll buttons from current
+        /// geometry. Called on construction and after any resize.
+        /// </summary>
         private void InitializeComponents()
         {
             // 1. Close Button (top-right, outside inner content)
+            // Arguments: screen rect, texture sheet, source rect inside that sheet (a
+            // 12x12 red X), and 4f = draw scale (12px sprite -> 48px button).
             CloseButton = new ClickableTextureComponent(
                 new Rectangle(xPositionOnScreen + width - 38, yPositionOnScreen - 6, 48, 48),
                 Game1.mouseCursors,
@@ -71,6 +112,7 @@ namespace BetterQOL
 
             // 2. Back Button (top-left)
             int headerTopY = yPositionOnScreen + 30;
+            // Arrow sprite from the same cursors sheet at 3.5x scale.
             BackButton = new ClickableTextureComponent(
                 new Rectangle(xPositionOnScreen + 32, headerTopY + 4, 44, 44),
                 Game1.mouseCursors,
@@ -81,9 +123,12 @@ namespace BetterQOL
             // 3. Search Box (top-right header)
             int searchBoxW = 210;
             int searchBoxH = 48;
+            // Anchor the box to the window's right edge, 48px inset.
             int searchBoxX = xPositionOnScreen + width - searchBoxW - 48;
             int searchBoxY = headerTopY + 2;
 
+            // The game's built-in TextBox: loads its background texture by content path,
+            // uses null for a custom font slot, and renders with the small UI font.
             SearchBox = new TextBox(
                 Game1.content.Load<Texture2D>("LooseSprites\\textBox"),
                 null,
@@ -91,14 +136,17 @@ namespace BetterQOL
                 Game1.textColor
             )
             {
+                // Object-initializer block sets these properties right after construction.
                 X = searchBoxX,
                 Y = searchBoxY,
                 Width = searchBoxW,
                 Height = searchBoxH
             };
+            // A plain invisible component used purely for click hit-testing on the box.
             SearchBoxComponent = new ClickableComponent(new Rectangle(searchBoxX, searchBoxY, searchBoxW, searchBoxH), "SearchBox");
 
             // 4. Content Area Layout & Scroll Buttons
+            // Everything below the 104px header band is scrollable body.
             int dividerY = yPositionOnScreen + 104;
             int contentY = dividerY + 18;
             int contentHeight = height - 172;
@@ -106,6 +154,7 @@ namespace BetterQOL
 
             int btnX = xPositionOnScreen + width - 64;
 
+            // Up/down chevron sprites pinned to the right edge of the content area.
             UpButton = new ClickableTextureComponent(
                 new Rectangle(btnX, contentY, 36, 40),
                 Game1.mouseCursors,
@@ -121,16 +170,22 @@ namespace BetterQOL
             );
         }
 
+        /// <summary>
+        /// Jumps to a new subject page, remembering the current one on the history stack
+        /// and resetting search/scroll state for a clean view.
+        /// </summary>
         public void NavigateTo(LookupSubject subject)
         {
             if (CurrentSubject != null)
             {
+                // Push the page we're leaving so NavigateBack can restore it later.
                 History.Push(CurrentSubject);
             }
             CurrentSubject = subject;
             ScrollOffset = 0;
             if (SearchBox != null)
             {
+                // Clear the query AND release keyboard focus back to the game.
                 SearchBox.Text = string.Empty;
                 SearchBox.Selected = false;
                 Game1.keyboardDispatcher.Subscriber = null;
@@ -139,34 +194,49 @@ namespace BetterQOL
             Game1.playSound("smallSelect");
         }
 
+        /// <summary>
+        /// Back navigation: pop the previous page from history; if history is empty,
+        /// fall back to the search screen (keeping the box focused for typing).
+        /// </summary>
         public void NavigateBack()
         {
             if (History.Count > 0)
             {
+                // Pop returns AND removes the most recently pushed subject.
                 CurrentSubject = History.Pop();
                 ScrollOffset = 0;
                 Game1.playSound("smallSelect");
             }
             else if (CurrentSubject != null)
             {
+                // No history: switch into search mode by clearing the subject.
                 CurrentSubject = null;
                 ScrollOffset = 0;
                 if (SearchBox != null)
                 {
                     SearchBox.Selected = true;
+                    // Registering as the keyboard dispatcher's "subscriber" routes all
+                    // typed keys into this TextBox.
                     Game1.keyboardDispatcher.Subscriber = SearchBox;
                 }
                 Game1.playSound("smallSelect");
             }
         }
 
+        /// <summary>
+        /// OVERRIDE of the per-frame logic update. The base class animates buttons; we
+        /// additionally poll the search text and rerun the search whenever it changed.
+        /// </summary>
         public override void update(GameTime time)
         {
+            // Run inherited update logic (hover animations etc.) before our additions.
             base.update(time);
 
             if (SearchBox != null)
             {
                 SearchBox.Update();
+                // Text changed since last frame? Then re-search. This "compare against
+                // cached value" pattern avoids rerunning an expensive search every frame.
                 if (SearchBox.Text != LastSearchText)
                 {
                     LastSearchText = SearchBox.Text;
@@ -177,21 +247,29 @@ namespace BetterQOL
                     }
                     else
                     {
+                        // Empty query: leave search mode entirely.
                         SearchResults.Clear();
                     }
                 }
             }
         }
 
+        /// <summary>
+        /// OVERRIDE called each frame with the mouse position: updates button hover
+        /// animations and records which link/category chip the cursor is over.
+        /// </summary>
         public override void performHoverAction(int x, int y)
         {
             base.performHoverAction(x, y);
 
+            // tryHover scales the sprite up slightly when the mouse is over it.
+            // "?." (null-conditional) skips the call when the button doesn't exist yet.
             CloseButton?.tryHover(x, y, 0.2f);
             BackButton?.tryHover(x, y, 0.2f);
             UpButton?.tryHover(x, y, 0.2f);
             DownButton?.tryHover(x, y, 0.2f);
 
+            // Re-detect hovered link from scratch each frame; first hit wins.
             HoveredLink = null;
             foreach (var link in ActiveClickableLinks)
             {
@@ -202,6 +280,7 @@ namespace BetterQOL
                 }
             }
 
+            // Same idea for category filter tabs.
             HoveredCategory = null;
             foreach (var catBtn in CategoryButtons)
             {
@@ -213,14 +292,21 @@ namespace BetterQOL
             }
         }
 
+        /// <summary>
+        /// OVERRIDE handling left clicks. Order matters: specific controls first
+        /// (close/back/tabs/scroll/search), then links, and finally clicking outside
+        /// the window closes it - a standard menu event-routing pattern.
+        /// </summary>
         public override void receiveLeftClick(int x, int y, bool playSound = true)
         {
+            // Close button: highest priority, handled and consumed immediately.
             if (CloseButton != null && CloseButton.containsPoint(x, y))
             {
                 CloseMenu();
                 return;
             }
 
+            // Back button (only meaningful with history or an active search).
             if ((History.Count > 0 || (CurrentSubject != null && !string.IsNullOrEmpty(LastSearchText))) && BackButton != null && BackButton.containsPoint(x, y))
             {
                 NavigateBack();
@@ -232,6 +318,7 @@ namespace BetterQOL
             {
                 if (catBtn.containsPoint(x, y))
                 {
+                    // Switching filter re-runs the search for the same query text.
                     CurrentCategory = catBtn.name;
                     SearchResults = LookupDataManager.SearchAll(LastSearchText, CurrentCategory);
                     ScrollOffset = 0;
@@ -240,8 +327,10 @@ namespace BetterQOL
                 }
             }
 
+            // Scroll buttons jump two steps per click for faster paging.
             if (UpButton != null && UpButton.containsPoint(x, y))
             {
+                // Math.Max clamps so the offset can never go negative.
                 ScrollOffset = Math.Max(0, ScrollOffset - ScrollStep * 2);
                 Game1.playSound("shwip");
                 return;
@@ -249,6 +338,7 @@ namespace BetterQOL
 
             if (DownButton != null && DownButton.containsPoint(x, y))
             {
+                // Math.Min clamps against the maximum computed during Draw.
                 ScrollOffset = Math.Min(MaxScrollOffset, ScrollOffset + ScrollStep * 2);
                 Game1.playSound("shwip");
                 return;
@@ -259,6 +349,7 @@ namespace BetterQOL
             {
                 if (SearchBox != null)
                 {
+                    // Focus the box so keystrokes start typing into it.
                     SearchBox.Selected = true;
                     Game1.keyboardDispatcher.Subscriber = SearchBox;
                 }
@@ -266,6 +357,7 @@ namespace BetterQOL
             }
             else
             {
+                // Clicked anywhere else while the box was focused -> release focus.
                 if (SearchBox != null && SearchBox.Selected)
                 {
                     SearchBox.Selected = false;
@@ -274,6 +366,8 @@ namespace BetterQOL
             }
 
             // Click Clickable Link
+            // "?." short-circuits to null when no link is hovered; OnClick is the
+            // delegate that manufactures the destination subject.
             if (HoveredLink?.OnClick != null)
             {
                 var nextSubject = HoveredLink.OnClick();
@@ -291,6 +385,10 @@ namespace BetterQOL
             }
         }
 
+        /// <summary>
+        /// OVERRIDE: right-click goes BACK through history, or closes the menu entirely
+        /// when there's nowhere left to go back to.
+        /// </summary>
         public override void receiveRightClick(int x, int y, bool playSound = true)
         {
             if (History.Count > 0 || CurrentSubject != null)
@@ -303,6 +401,10 @@ namespace BetterQOL
             }
         }
 
+        /// <summary>
+        /// OVERRIDE: mouse wheel scrolling. "direction" is positive when rolling up,
+        /// negative when rolling down; clamps keep the offset within valid range.
+        /// </summary>
         public override void receiveScrollWheelAction(int direction)
         {
             if (direction > 0)
@@ -317,16 +419,23 @@ namespace BetterQOL
             }
         }
 
+        /// <summary>
+        /// OVERRIDE for gamepad input while the menu is open. "Buttons" is MonoGame's
+        /// enum of controller buttons (B, Y, DPad, triggers...).
+        /// </summary>
         public override void receiveGamePadButton(Buttons b)
         {
+            // Keep vanilla gamepad behavior (snapping between components) first.
             base.receiveGamePadButton(b);
 
             if (b == Buttons.B)
             {
+                // B is "cancel/back" on Xbox-style controllers.
                 NavigateBack();
             }
             else if (b == Buttons.Y)
             {
+                // Y toggles keyboard focus into/out of the search box.
                 if (SearchBox != null)
                 {
                     SearchBox.Selected = !SearchBox.Selected;
@@ -335,6 +444,7 @@ namespace BetterQOL
             }
             else if (b == Buttons.RightThumbstickDown || b == Buttons.DPadDown || b == Buttons.RightTrigger)
             {
+                // Three alternative inputs all page downward.
                 ScrollOffset = Math.Min(MaxScrollOffset, ScrollOffset + ScrollStep * 2);
                 Game1.playSound("shiny4");
             }
@@ -349,6 +459,12 @@ namespace BetterQOL
             }
         }
 
+        /// <summary>
+        /// OVERRIDE for discrete key presses. While search has focus it consumes keys
+        /// (Escape blurs, Enter opens the top result); otherwise Escape/Backspace/arrows
+        /// navigate. "(Keys)ModEntry.Config.LookupKey" CASTS a config integer into the
+        /// System.Windows.Keys enum so players can bind a different close key.
+        /// </summary>
         public override void receiveKeyPress(Keys key)
         {
             if (SearchBox != null && SearchBox.Selected)
@@ -360,6 +476,7 @@ namespace BetterQOL
                 }
                 else if (key == Keys.Enter && SearchResults.Count > 0)
                 {
+                    // Enter jumps straight to the best-scoring result.
                     var firstResult = SearchResults[0];
                     var nextSubject = firstResult.OnClick?.Invoke();
                     if (nextSubject != null)
@@ -370,6 +487,7 @@ namespace BetterQOL
                 return;
             }
 
+            // Outside the search box: Escape or the configured lookup key closes.
             if (key == Keys.Escape || key == (Keys)ModEntry.Config.LookupKey)
             {
                 CloseMenu();
@@ -378,10 +496,12 @@ namespace BetterQOL
 
             if (key == Keys.Back)
             {
+                // Backspace doubles as "go back one page".
                 NavigateBack();
                 return;
             }
 
+            // WASD-style scrolling alongside the arrow keys.
             if (key == Keys.Up || key == Keys.W)
             {
                 ScrollOffset = Math.Max(0, ScrollOffset - ScrollStep);
@@ -392,6 +512,10 @@ namespace BetterQOL
             }
         }
 
+        /// <summary>
+        /// Shuts down cleanly: release keyboard focus, play the closing sound, then let
+        /// the base class remove this menu from the game's active-menu slot.
+        /// </summary>
         private void CloseMenu()
         {
             if (SearchBox != null)
@@ -403,13 +527,26 @@ namespace BetterQOL
             exitThisMenu();
         }
 
+        /// <summary>
+        /// Maps an internal category name to a translated display label. ToLowerInvariant
+        /// gives culture-independent lowercasing, safe for building i18n keys like
+        /// "lookup.search.category.items". "$"" marks a string with {expressions} inside.
+        /// </summary>
         private string GetCategoryDisplayName(string category)
         {
             return ModEntry.I18n.Get($"lookup.search.category.{category.ToLowerInvariant()}").ToString();
         }
 
+        /// <summary>
+        /// OVERRIDE: paints the entire menu every frame (games redraw constantly rather
+        /// than persisting pixels). Sequence: dark overlay, parchment panel, scrollable
+        /// content culled to the viewport, header and masks on top, scrollbar, cursor.
+        /// "b" is the SpriteBatch - MonoGame's batched sprite-drawing helper.
+        /// </summary>
         public override void draw(SpriteBatch b)
         {
+            // Rebuild the clickable-link registry from scratch; Draw is also where each
+            // link's final on-screen position becomes known.
             ActiveClickableLinks.Clear();
 
             // 1. Dark semi-transparent background overlay
@@ -437,10 +574,14 @@ namespace BetterQOL
             int contentHeight = height - 172;
             int contentBottom = contentY + contentHeight;
 
+            // "currentY" is the moving pen: it starts at the top of the content (shifted
+            // up by ScrollOffset) and advances as each element is laid out below it.
             int currentY = contentY - ScrollOffset;
             int calculatedContentHeight = 0;
 
             // 3. DRAW CONTENT VIEWPORT WITH BOUNDS CULLING (NO b.End() or ScissorRasterizer needed)
+            // Culling trick: every element checks "would I land inside the visible band?"
+            // and skips drawing otherwise - cheaper than GPU clipping machinery.
             if (!string.IsNullOrWhiteSpace(LastSearchText))
             {
                 // Search Category Filter Tabs
@@ -452,8 +593,12 @@ namespace BetterQOL
                 foreach (var catName in SearchCategories)
                 {
                     string catDisplayName = GetCategoryDisplayName(catName);
+                    // MeasureString reports rendered pixel size BEFORE drawing - needed
+                    // to size each tab around its own label.
                     Vector2 catSize = Game1.smallFont.MeasureString(catDisplayName);
                     int catW = (int)catSize.X + 16;
+                    // Simple flow layout: when the next tab would overflow the row,
+                    // wrap down to a new line (same rule browsers use for words).
                     if (catX + catW > contentX + contentWidth && catX > contentX + 4)
                     {
                         catX = contentX + 4;
@@ -467,19 +612,25 @@ namespace BetterQOL
                     {
                         CategoryButtons.Add(new ClickableComponent(catBounds, catName));
 
+                        // OrdinalIgnoreCase compares letters by code point, ignoring case -
+                        // robust even if the category string came from config.
                         bool isSelected = CurrentCategory.Equals(catName, StringComparison.OrdinalIgnoreCase);
                         bool isHovered = HoveredCategory != null && string.Equals(HoveredCategory, catName, StringComparison.OrdinalIgnoreCase);
 
+                        // Nested ternaries pick three visual states: selected > hovered > idle.
                         Color bg = isSelected ? new Color(180, 100, 30) : (isHovered ? new Color(245, 230, 200) : new Color(230, 210, 175));
                         Color border = isSelected ? new Color(110, 40, 10) : new Color(170, 130, 90);
                         Color txtColor = isSelected ? Color.White : (isHovered ? Color.DarkBlue : Game1.textColor);
 
+                        // staminaRect is a 1x1 white pixel texture; stretching it draws any
+                        // flat rectangle. First the fill, then four 1px border strips.
                         b.Draw(Game1.staminaRect, catBounds, bg);
                         b.Draw(Game1.staminaRect, new Rectangle(catBounds.X, catBounds.Y, catBounds.Width, 1), border);
                         b.Draw(Game1.staminaRect, new Rectangle(catBounds.X, catBounds.Bottom - 1, catBounds.Width, 1), border);
                         b.Draw(Game1.staminaRect, new Rectangle(catBounds.X, catBounds.Y, 1, catBounds.Height), border);
                         b.Draw(Game1.staminaRect, new Rectangle(catBounds.Right - 1, catBounds.Y, 1, catBounds.Height), border);
 
+                        // Center the text within the tab by subtracting half its size.
                         int textX = catBounds.X + (catW - (int)catSize.X) / 2;
                         int textY = catBounds.Y + (catHeight - (int)catSize.Y) / 2;
                         Utility.drawTextWithShadow(b, catDisplayName, Game1.smallFont, new Vector2(textX, textY), txtColor);
@@ -487,6 +638,7 @@ namespace BetterQOL
 
                     catX += catW + 6;
                 }
+                // Account for however many rows of tabs were laid out.
                 int totalCatHeaderHeight = (catY - startY) + catHeight + 12;
                 currentY += totalCatHeaderHeight;
                 calculatedContentHeight += totalCatHeaderHeight;
@@ -509,6 +661,7 @@ namespace BetterQOL
 
                         if (currentY + rowHeight >= contentY && currentY <= contentBottom)
                         {
+                            // Register this visible row as clickable for this frame.
                             result.Bounds = rowBounds;
                             ActiveClickableLinks.Add(result);
 
@@ -522,6 +675,8 @@ namespace BetterQOL
                             int itemIconX = contentX + 6;
                             if (result.Icon != null)
                             {
+                                // "??" falls back to the WHOLE texture when no source
+                                // region was specified on the spritesheet.
                                 Rectangle src = result.IconSourceRect ?? new Rectangle(0, 0, result.Icon.Width, result.Icon.Height);
                                 b.Draw(result.Icon, new Rectangle(itemIconX, currentY + 6, 32, 32), src, Color.White);
                             }
@@ -529,6 +684,7 @@ namespace BetterQOL
                             int labelX = itemIconX + 42;
 
                             // Right-aligned Subtitle
+                            // Right alignment = anchor at (rightEdge - measured width).
                             int subX = contentX + contentWidth - 36;
                             if (!string.IsNullOrEmpty(result.Subtitle))
                             {
@@ -538,6 +694,7 @@ namespace BetterQOL
                             }
 
                             // Title with safety truncation if too wide
+                            // Shrink one character at a time until the title (plus "...") fits.
                             int maxLabelW = subX - labelX - 16;
                             string titleText = result.Text;
                             if (Game1.dialogueFont.MeasureString(titleText).X * 0.7f > maxLabelW && maxLabelW > 40)
@@ -575,6 +732,7 @@ namespace BetterQOL
 
                     foreach (var field in section.Fields)
                     {
+                        // Append ": " to non-empty labels; ternary keeps empty labels clean.
                         string label = !string.IsNullOrEmpty(field.Label) ? $"{field.Label}: " : string.Empty;
                         Vector2 labelSize = Game1.smallFont.MeasureString(label);
 
@@ -594,9 +752,12 @@ namespace BetterQOL
 
                             foreach (var link in field.Links)
                             {
+                                // Each chip is sized around its own text (plus icon room).
                                 Vector2 textSize = Game1.smallFont.MeasureString(link.Text);
                                 int chipWidth = (int)textSize.X + (link.Icon != null ? chipIconSize + 16 : 14) + 12;
 
+                                // Flow-wrap: when the next chip would cross the right
+                                // margin, restart at the left on a fresh line.
                                 if (chipX + chipWidth > contentX + contentWidth - 8)
                                 {
                                     chipX = contentX + 16;
@@ -628,6 +789,8 @@ namespace BetterQOL
 
                                     if (link.Icon != null)
                                     {
+                                        // Vertically center the 24px icon within the chip,
+                                        // then push the text start past the icon column.
                                         int iconY = chipBounds.Y + (chipHeight - chipIconSize) / 2;
                                         Rectangle src = link.IconSourceRect ?? new Rectangle(0, 0, link.Icon.Width, link.Icon.Height);
                                         b.Draw(link.Icon, new Rectangle(drawIconX, iconY, chipIconSize, chipIconSize), src, Color.White);
@@ -642,6 +805,7 @@ namespace BetterQOL
                                     Utility.drawTextWithShadow(b, link.Text, Game1.smallFont, new Vector2(drawTextX, textY), isHovered ? Color.DarkBlue : link.TextColor);
                                 }
 
+                                // Advance the pen rightward for the next chip.
                                 chipX += chipWidth + chipSpacing;
                             }
 
@@ -650,6 +814,8 @@ namespace BetterQOL
                         }
                         else
                         {
+                            // Plain "Label: Value" row. parseText word-wraps long values to
+                            // the available width; Math.Max keeps a sane minimum column.
                             int valWidth = contentWidth - (int)labelSize.X - 32;
                             string wrappedValue = Game1.parseText(field.Value ?? string.Empty, Game1.smallFont, Math.Max(140, valWidth));
                             Vector2 valSize = Game1.smallFont.MeasureString(wrappedValue);
@@ -666,6 +832,7 @@ namespace BetterQOL
                         }
                     }
 
+                    // Thin separator rule between sections.
                     if (currentY + 20 >= contentY && currentY <= contentBottom)
                     {
                         b.Draw(Game1.staminaRect, new Rectangle(contentX + 6, currentY + 6, contentWidth - 12, 1), Color.SaddleBrown * 0.15f);
@@ -675,9 +842,13 @@ namespace BetterQOL
                 }
             }
 
+            // Now that every element's height is known, compute how far scrolling may go
+            // (0 when content fits without scrolling).
             MaxScrollOffset = Math.Max(0, calculatedContentHeight - contentHeight);
 
             // 4. HEADER BACKGROUND & OVERLAYS (Draw on top of scrolled content for clean visual cutoff)
+            // Drawing these AFTER the body hides anything that scrolled underneath -
+            // a simple alternative to real clipping/scissor rectangles.
             // Solid parchment top mask
             b.Draw(Game1.staminaRect, new Rectangle(xPositionOnScreen + 16, yPositionOnScreen + 16, width - 32, 92), new Color(248, 230, 192));
             // Solid parchment bottom mask
@@ -714,9 +885,11 @@ namespace BetterQOL
                 }
 
                 // Title & Subtitle with proper breathing room
+                // Available width runs from here to just left of the search box.
                 int maxHeaderWidth = (SearchBox != null ? SearchBox.X - 16 : xPositionOnScreen + width - 54) - headerLeftX;
 
                 string title = CurrentSubject.Title;
+                // Same character-by-character truncation trick used in search rows.
                 if (Game1.dialogueFont.MeasureString(title).X > maxHeaderWidth && maxHeaderWidth > 60)
                 {
                     while (title.Length > 3 && Game1.dialogueFont.MeasureString(title + "...").X > maxHeaderWidth)
@@ -765,6 +938,7 @@ namespace BetterQOL
             {
                 SearchBox.Draw(b);
 
+                // Placeholder hint text shown only while the box is empty AND unfocused.
                 if (string.IsNullOrEmpty(SearchBox.Text) && !SearchBox.Selected)
                 {
                     Utility.drawTextWithShadow(b, ModEntry.I18n.Get("lookup.menu.search-placeholder").ToString(), Game1.smallFont, new Vector2(SearchBox.X + 16, SearchBox.Y + 12), Color.Gray * 0.75f);
@@ -787,12 +961,16 @@ namespace BetterQOL
                 b.Draw(Game1.staminaRect, new Rectangle(trackX, trackY, 6, trackH), Color.SaddleBrown * 0.25f);
 
                 // Scroll Thumb
+                // Thumb height shrinks as content grows (window/total ratio); its
+                // position slides down proportionally to the scroll offset. The cast
+                // "(float)" forces floating-point division - integer math would yield 0.
                 float scrollPct = (float)ScrollOffset / MaxScrollOffset;
                 int thumbH = Math.Max(20, (int)(trackH * (float)contentHeight / (contentHeight + MaxScrollOffset)));
                 int thumbY = trackY + (int)((trackH - thumbH) * scrollPct);
                 b.Draw(Game1.staminaRect, new Rectangle(trackX - 1, thumbY, 8, thumbH), Color.SaddleBrown * 0.8f);
             }
 
+            // Last of all: draw the custom mouse cursor so it sits above everything.
             drawMouse(b);
         }
     }

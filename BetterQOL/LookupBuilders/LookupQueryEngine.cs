@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Netcode;
@@ -40,17 +37,38 @@ namespace BetterQOL
     /// <summary>
     /// Global live search engine and subject query dispatcher for Lookup Anything.
     /// </summary>
+    /// <remarks>
+    /// BEGINNER NOTES:
+    /// - SearchAll scans several game data sources (villagers, all items, monsters, buildings,
+    ///   recipes, map locations) and collects matching LookupLink results for the live-search box.
+    /// - Every result carries a LAZY callback: the detailed card is only constructed if/when
+    ///   the player clicks, which keeps big searches fast.
+    /// - Mixed tabs/spaces and "//IL_xxxx:" markers below are decompiler leftovers, kept
+    ///   untouched deliberately.
+    /// </remarks>
         public static partial class LookupDataManager
     {
+        /// <summary>
+        /// Runs a live search across every enabled category and returns up to 50 clickable
+        /// result links. "category" narrows the scan ("Villagers", "Fish", "Monsters", ...);
+        /// "All" enables every source at once.
+        /// </summary>
         public static List<LookupLink> SearchAll(string query, string category = "All")
         {
             List<LookupLink> list = new List<LookupLink>();
+            // GUARD CLAUSE: an empty search box would match literally everything, so exit early
+            // and skip all of the expensive scans below.
             if (string.IsNullOrWhiteSpace(query))
             {
                 return list;
             }
+		// Normalize input once: lowercase makes matching case-insensitive.
 		string value = query.Trim().ToLower();
 		string text = category.Trim();
+		// Each bool below answers "should we scan this source?" - true when the user picked
+		// that specific category OR asked for All. The clunky switch assigning 'num' and the
+		// "(byte)num != 0" test afterwards are decompiled output of a simpler
+		// "category is Items/Fish/Crops?" check.
 		bool flag = text == "All" || text == "Villagers" || text == "NPCs";
 		int num;
 		switch (text)
@@ -69,6 +87,9 @@ namespace BetterQOL
 		bool flag4 = text == "All" || text == "Buildings";
 		bool flag5 = text == "All" || text == "Recipes";
 		bool flag6 = text == "All" || text == "Locations";
+		// VILLAGER SCAN: getAllCharacters returns EVERYONE (monsters, pets, ...), so filters run
+		// first; "continue" skips non-villagers. ".Any(...)" stops duplicate entries when the
+		// same name appears twice in the world's character list.
 		if (flag)
 		{
 			foreach (NPC allCharacter in Utility.getAllCharacters())
@@ -80,11 +101,15 @@ namespace BetterQOL
 				string name = ((Character)allCharacter).displayName ?? ((Character)allCharacter).Name;
 				if (name.ToLower().Contains(value) && !list.Any((LookupLink r) => r.Text == name))
 				{
+					// Copying to 'target' matters! The click-lambda captures this VARIABLE, not the
+					// loop slot - without the copy every link would open the LAST NPC found.
 					NPC target = allCharacter;
 					list.Add(new LookupLink(name, ((object)ModEntry.I18n.Get("lookup.search.sub.villager")).ToString(), (Color?)new Color(180, 50, 180), target.Portrait, (Rectangle?)new Rectangle(0, 0, 64, 64), (() => BuildNPCSubject(target))));
 				}
 			}
 		}
+		// ITEM SCAN: walk every registered item TYPE (objects, weapons, furniture, ...) and each
+		// id inside it, matching display names against the query.
 		if (flag2)
 		{
 			foreach (IItemDataDefinition itemType in ItemRegistry.ItemTypes)
@@ -100,6 +125,9 @@ namespace BetterQOL
 					{
 						continue;
 					}
+					// Category numbers are the game's internal groups: -4 = fish; -79 fruits,
+					// -75 vegetables, -74 seeds. These checks only apply when the user actually
+					// picked the Fish or Crops tab.
 					if ((!(text == "Fish") || itemData.Category == -4) && (!(text == "Crops") || itemData.Category == -75 || itemData.Category == -79 || itemData.Category == -74))
 					{
 						ParsedItemData data = itemData;
@@ -118,6 +146,8 @@ namespace BetterQOL
 				break;
 			}
 		}
+		// MONSTER SCAN: read the game's raw Monsters data table (id -> stat text) instead of
+		// spawning real monsters just to inspect them.
 		if (flag3)
 		{
 			try
@@ -145,6 +175,9 @@ namespace BetterQOL
 								Subtitle = ((object)ModEntry.I18n.Get("lookup.type.monster")).ToString()
 							};
 							LookupSection lookupSection = new LookupSection((ModEntry.I18n.Get("lookup.section.combat")));
+							// The monster data string is '/'-separated; indexes used here: 0 = HP,
+							// 1 = damage, 7 = defense, 8 = experience. Length guards protect against
+							// mod-added entries with fewer fields.
 							string[] array = monsterData.Split('/');
 							if (array.Length != 0)
 							{
@@ -174,8 +207,10 @@ namespace BetterQOL
 			}
 			catch
 			{
+				// Data table unavailable? Skip monsters silently.
 			}
 		}
+		// BUILDING SCAN: same pattern - read the Buildings data table rather than walking maps.
 		if (flag4)
 		{
 			try
@@ -212,6 +247,9 @@ namespace BetterQOL
 							}
 							if (bData.BuildMaterials != null && bData.BuildMaterials.Count > 0)
 							{
+								// LINQ .Select PROJECTS each material record into display text via a
+								// multi-line lambda; string.Join then glues them with commas. Note
+								// LINQ is LAZY - nothing executes until Join enumerates it.
 								IEnumerable<string> values = bData.BuildMaterials.Select(m =>
 								{
 									ParsedItemData data4 = ItemRegistry.GetData(m.ItemId);
@@ -233,6 +271,8 @@ namespace BetterQOL
 			{
 			}
 		}
+		// RECIPE SCANS: craftingRecipes / cookingRecipes are static id->data dictionaries the
+		// game builds once at startup. The constructor's bool picks cooking (true) or crafting.
 		if (flag5)
 		{
 			try
@@ -263,13 +303,18 @@ namespace BetterQOL
 						};
 						LookupSection lookupSection = new LookupSection((ModEntry.I18n.Get("lookup.section.recipe-requirements")))
 						{
+							// COLLECTION-INITIALIZER inside an object initializer: "Fields = { ... }"
+							// adds these rows while the section object itself is being created.
 							Fields = 
 							{
 								new LookupField((ModEntry.I18n.Get("lookup.recipe.crafting-station")), ((object)ModEntry.I18n.Get("lookup.recipe.station-inventory")).ToString(), (Color?)new Color(20, 110, 220)),
+								// ContainsKey on the player's learned-recipe dictionary answers "do I know this recipe?".
 								new LookupField((ModEntry.I18n.Get("lookup.recipe.unlocked")), ((NetDictionary<string, int, NetInt, SerializableDictionary<string, int>, NetStringDictionary<int, NetInt>>)(object)Game1.player.craftingRecipes).ContainsKey(recipeKey) ? ((object)ModEntry.I18n.Get("lookup.recipe.known")).ToString() : ((object)ModEntry.I18n.Get("lookup.recipe.not-learned")).ToString(), (Color)(((NetDictionary<string, int, NetInt, SerializableDictionary<string, int>, NetStringDictionary<int, NetInt>>)(object)Game1.player.craftingRecipes).ContainsKey(recipeKey) ? new Color(0, 140, 0) : Color.DarkSlateGray)),
 								new LookupField((ModEntry.I18n.Get("lookup.recycling.yields")), $"{recipe.numberProducedPerCraft}x {rName}", (Color?)new Color(0, 140, 0))
 							}
 						};
+						// recipeList maps ingredient id -> quantity; convert each entry into a
+						// clickable link showing "3x Wood" style text.
 						List<LookupLink> list2 = new List<LookupLink>();
 						foreach (KeyValuePair<string, int> recipe3 in recipe.recipeList)
 						{
@@ -325,6 +370,8 @@ namespace BetterQOL
 								new LookupField((ModEntry.I18n.Get("lookup.recipe.unlocked")), ((NetDictionary<string, int, NetInt, SerializableDictionary<string, int>, NetStringDictionary<int, NetInt>>)(object)Game1.player.cookingRecipes).ContainsKey(recipeKey2) ? ((object)ModEntry.I18n.Get("lookup.recipe.known")).ToString() : ((object)ModEntry.I18n.Get("lookup.recipe.not-learned")).ToString(), (Color)(((NetDictionary<string, int, NetInt, SerializableDictionary<string, int>, NetStringDictionary<int, NetInt>>)(object)Game1.player.cookingRecipes).ContainsKey(recipeKey2) ? new Color(0, 140, 0) : Color.DarkSlateGray))
 							}
 						};
+						// GetValueOrDefault looks up "how many times cooked" and returns 0 for dishes
+						// never made, avoiding a KeyNotFoundException.
 						List<LookupField> fields = lookupSection.Fields;
 						string label = (ModEntry.I18n.Get("lookup.recipe.times-cooked"));
 						ITranslationHelper i18n = ModEntry.I18n;
@@ -362,6 +409,8 @@ namespace BetterQOL
 			{
 			}
 		}
+		// LOCATION SCAN: simple display-name match across every loaded map; clicking a result
+		// opens that location's world-overview card.
 		if (flag6)
 		{
 			try

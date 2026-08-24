@@ -1,4 +1,3 @@
-using System;
 using HarmonyLib;
 using StardewValley;
 using StardewValley.Extensions;

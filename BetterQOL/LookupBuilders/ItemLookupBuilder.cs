@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Netcode;
@@ -40,8 +37,26 @@ namespace BetterQOL
     /// <summary>
     /// Lookup builder for inventory items, weapons, tools, crops, fish, forage, minerals, recipes, and crafting.
     /// </summary>
+    /// <remarks>
+    /// BEGINNER NOTES:
+    /// - BuildItemSubject is the entry point; every "Add...Section" helper appends one
+    ///   optional LookupSection to the card and silently does nothing when the item isn't
+    ///   relevant - that's why they all start with an early "return".
+    /// - Item categories drive dispatch: -4 fish, -5 eggs, -6 milk, -7 cooking,
+    ///   -12 minerals, -75 vegetables/produce, -79 fruit, -98 skill books.
+    /// - Trinket stats are RE-DERIVED from item.generationSeed: the game seeds a Random
+    ///   with that value at generation time, so replaying the same rolls reproduces the
+    ///   exact stats this trinket has.
+    /// - Raw data tables are '/'-separated strings; parsing means Split('/') plus index
+    ///   guards (e.g. fish table fields: [1] difficulty, [2] behavior, [5] times, [6] seasons).
+    /// - "//IL_xxxx:" markers and "if (1 == 0)" blocks are decompiler artifacts, kept as-is.
+    /// </remarks>
     public static partial class LookupDataManager
     {
+	/// <summary>
+	/// The main item card: overview (description, edibility, sell prices by quality,
+	/// how many you own) plus every optional section the helpers below decide to add.
+	/// </summary>
 	public static LookupSubject BuildItemSubject(Item item)
 	{
 		//IL_005d: Unknown result type (might be due to invalid IL or missing references)
@@ -78,6 +93,8 @@ namespace BetterQOL
 		string text = data?.Description ?? string.Empty;
 		if (string.IsNullOrEmpty(text) && !(item is Tool))
 		{
+			// getDescription() appends machine-readable lines like "\nSell Price:" and
+			// "\nNeeded for:"; cut the text back to just the human description part.
 			text = item.getDescription();
 			int num = text.IndexOf("\nSell Price:", StringComparison.Ordinal);
 			if (num >= 0)
@@ -96,6 +113,8 @@ namespace BetterQOL
 		}
 		Item obj2 = item;
 		SObject val = (SObject)(object)((obj2 is SObject) ? obj2 : null);
+		// Edibility <= -300 is the game's "not edible" convention, so only show
+		// energy/health recovery for items above that threshold.
 		if (val != null && val.Edibility > -300)
 		{
 			int num2 = ((Item)val).staminaRecoveredOnConsumption();
@@ -110,6 +129,7 @@ namespace BetterQOL
 			}
 		}
 		int num4 = item.sellToStorePrice(-1L);
+		// Quality price tiers: silver = x1.25, gold = x1.5, iridium = x2 of the base price.
 		if (num4 > 0)
 		{
 			int value3 = (int)((double)num4 * 1.25);
@@ -226,6 +246,10 @@ namespace BetterQOL
 		return lookupSubject;
 	}
 
+	/// <summary>
+	/// Counts how many of this item the player owns: inventory vs everything in storage
+	/// (chests anywhere on any map, building interiors, and the farmhouse fridge).
+	/// </summary>
 	private static (int InventoryCount, int StorageCount) GetItemOwnedCounts(Item item)
 	{
 		int num = 0;
@@ -262,6 +286,8 @@ namespace BetterQOL
 						}
 					}
 				}
+				// The farmhouse fridge is a special chest that isn't in location.objects,
+				// so it gets its own scan.
 				FarmHouse val2 = (FarmHouse)(object)((location is FarmHouse) ? location : null);
 				if (val2 != null && ((NetFieldBase<Chest, NetRef<Chest>>)(object)val2.fridge).Value != null && ((NetFieldBase<Chest, NetRef<Chest>>)(object)val2.fridge).Value.Items != null)
 				{
@@ -307,6 +333,7 @@ namespace BetterQOL
 		return (InventoryCount: num, StorageCount: num2);
 	}
 
+	/// <summary>Combat card for melee weapons, slingshots, boots, and rings.</summary>
 	private static void AddWeaponAndCombatSection(LookupSubject subject, Item item)
 	{
 		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
@@ -336,6 +363,7 @@ namespace BetterQOL
 			{
 				LookupSection lookupSection = new LookupSection((ModEntry.I18n.Get("lookup.section.weapon-combat")));
 				lookupSection.Fields.Add(new LookupField((ModEntry.I18n.Get("lookup.weapon.damage")), $"{((NetFieldBase<int, NetInt>)(object)val.minDamage).Value} - {((NetFieldBase<int, NetInt>)(object)val.maxDamage).Value}", (Color?)new Color(200, 60, 20)));
+				// critChance is a 0..1 fraction, so x100 turns it into a percentage.
 				double value = ((NetFieldBase<float, NetFloat>)(object)val.critChance).Value * 100f;
 				lookupSection.Fields.Add(new LookupField((ModEntry.I18n.Get("lookup.weapon.crit-strike")), ((object)ModEntry.I18n.Get("lookup.weapon.crit-multiplier", (object)new
 				{
@@ -358,6 +386,7 @@ namespace BetterQOL
 				{
 					lookupSection.Fields.Add(new LookupField((ModEntry.I18n.Get("lookup.weapon.knockback")), $"{((NetFieldBase<float, NetFloat>)(object)val.knockback).Value:0.0}", Color.DarkSlateGray));
 				}
+				// Forging at the volcano adds one level per dwarf gem used (max 3).
 				int totalForgeLevels = ((Tool)val).GetTotalForgeLevels(false);
 				if (totalForgeLevels > 0)
 				{
@@ -435,6 +464,7 @@ namespace BetterQOL
 		}
 	}
 
+	/// <summary>Tool card: upgrade tier, enchantments, and fishing-rod bait/tackle state.</summary>
 	private static void AddToolSection(LookupSubject subject, Item item)
 	{
 		//IL_0120: Unknown result type (might be due to invalid IL or missing references)
@@ -488,8 +518,10 @@ namespace BetterQOL
 				List<SObject> tackle = val2.GetTackle();
 				if (tackle != null && tackle.Count > 0)
 				{
-					IEnumerable<string> values = from t in tackle
-						where t != null
+				// Old-style LINQ "query syntax" (from/where/select) - same as the method
+				// chaining used elsewhere, just different spelling.
+				IEnumerable<string> values = from t in tackle
+					where t != null
 						select ((object)ModEntry.I18n.Get("lookup.tool.tackle-uses", (object)new
 						{
 							name = ((Item)t).DisplayName,
@@ -506,6 +538,7 @@ namespace BetterQOL
 		}
 	}
 
+	/// <summary>Human-readable explanation for a known enchantment name, or empty string.</summary>
 	private static string GetEnchantmentDescription(string enchantmentName)
 	{
 		string text = enchantmentName.ToLower();
@@ -564,6 +597,7 @@ namespace BetterQOL
 		return string.Empty;
 	}
 
+	/// <summary>Human-readable explanation for a known ring effect, or empty string.</summary>
 	private static string GetRingEffectDescription(string ringId, string ringName)
 	{
 		string text = ringName.ToLower();
@@ -662,6 +696,7 @@ namespace BetterQOL
 		return string.Empty;
 	}
 
+	/// <summary>True for Trinket instances, "(TR)" ids, or known trinket id keywords.</summary>
 	private static bool IsTrinketItem(Item item)
 	{
 		if (item is Trinket || item.QualifiedItemId.StartsWith("(TR)"))
@@ -672,6 +707,10 @@ namespace BetterQOL
 		return text.Contains("fairybox") || text.Contains("frogegg") || text.Contains("magicquiver") || text.Contains("goldenspur") || text.Contains("iridiumspur") || text.Contains("icerod") || text.Contains("parrotegg") || text.Contains("basiliskpaw");
 	}
 
+	/// <summary>
+	/// Trinket card: re-rolls each trinket's random stats from its generationSeed so the
+	/// displayed numbers match the actual item, plus BetterForge/BetterTrinket ascension info.
+	/// </summary>
 	private static void AddTrinketSection(LookupSubject subject, Item item)
 	{
 		//IL_08bf: Unknown result type (might be due to invalid IL or missing references)
@@ -694,6 +733,9 @@ namespace BetterQOL
 			Trinket val = (Trinket)(object)((item is Trinket) ? item : null);
 			string value = ((object)ModEntry.I18n.Get("lookup.type.item")).ToString();
 			string value2 = "";
+			// KEY IDEA: a trinket rolls its stats from Random(generationSeed) when created.
+			// Replaying the same dice sequence here reproduces THIS item's exact stats,
+			// so we can show real numbers without touching the game object.
 			int num = val?.generationSeed.Value ?? 0;
 			Random random = Utility.CreateRandom((double)num, 0.0, 0.0, 0.0, 0.0);
 			string text3;
@@ -702,6 +744,8 @@ namespace BetterQOL
 				value2 = ((object)ModEntry.I18n.Get("lookup.trinket.fairy-box.range")).ToString();
 				if (val != null)
 				{
+					// Tier ladder: each NextBool roll upgrades the level with falling odds
+					// (45% for 2, then 25%, 12.5%, ~7%) - higher tiers are rarer.
 					int num2 = 1;
 					if (RandomExtensions.NextBool(random, 0.45))
 					{
@@ -739,6 +783,8 @@ namespace BetterQOL
 				if (val != null)
 				{
 					string variant = ((object)ModEntry.I18n.Get("lookup.trinket.variant.normal")).ToString();
+					// Variant roll: 4% "perfect", then 10% split evenly into rapid/heavy,
+					// otherwise the normal stat range.
 					int num3;
 					int maxDmg;
 					float num4;
@@ -790,6 +836,8 @@ namespace BetterQOL
 				value2 = ((object)ModEntry.I18n.Get("lookup.trinket.ice-rod.range")).ToString();
 				if (val != null)
 				{
+					// Random cooldown/freeze windows; a 5% roll makes it "perfect"
+					// (best fixed values instead of the random range).
 					float num5 = random.Next(3000, 5001);
 					int num6 = random.Next(2000, 4001);
 					bool flag = false;
@@ -889,6 +937,7 @@ namespace BetterQOL
 					case 5:
 						text3 = ((object)ModEntry.I18n.Get("lookup.trinket.frog.poison")).ToString();
 						break;
+					// Two cases share one body: prismatic frogs are twice as likely (2/8).
 					case 6:
 					case 7:
 						text3 = ((object)ModEntry.I18n.Get("lookup.trinket.frog.prismatic")).ToString();
@@ -916,6 +965,8 @@ namespace BetterQOL
 				lookupSection.Fields.Add(new LookupField((ModEntry.I18n.Get("lookup.trinket.possible-ranges")), value2, Color.DarkSlateGray));
 			}
 			lookupSection.Fields.Add(new LookupField((ModEntry.I18n.Get("lookup.trinket.anvil-reforging")), ((object)ModEntry.I18n.Get("lookup.trinket.reforge-desc")).ToString(), (Color?)new Color(180, 100, 0)));
+			// Ascension is a feature of this mod's companion mods (BetterForge /
+			// BetterTrinket): they tag the item in modData, which we just read back.
 			bool flag2 = val != null && (((NetDictionary<string, string, NetString, SerializableDictionary<string, string>, NetStringDictionary<string, NetString>>)(object)((Item)val).modData).ContainsKey("feiluvnana.BetterForge/IsAscended") || ((NetDictionary<string, string, NetString, SerializableDictionary<string, string>, NetStringDictionary<string, NetString>>)(object)((Item)val).modData).ContainsKey("feiluvnana.BetterTrinket/IsAscended"));
 			bool flag3 = ModEntry.ModHelper.ModRegistry.IsLoaded("feiluvnana.BetterForge");
 			string text4 = text;
@@ -998,6 +1049,7 @@ namespace BetterQOL
 		}
 	}
 
+	/// <summary>Skill-book card: what power the book grants and whether you've read it.</summary>
 	private static void AddSkillBookSection(LookupSubject subject, Item item)
 	{
 		//IL_0611: Unknown result type (might be due to invalid IL or missing references)
@@ -1167,6 +1219,7 @@ namespace BetterQOL
 		}
 	}
 
+	/// <summary>Collections/perfection rows: shipped, fish caught (with size), cooked, crafted.</summary>
 	private static void AddCollectionAndPerfectionSection(LookupSubject subject, Item item)
 	{
 		//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
@@ -1236,6 +1289,7 @@ namespace BetterQOL
 		}
 	}
 
+	/// <summary>True when the item's id exists in the game's Fish data table.</summary>
 	private static bool IsFishItem(Item item)
 	{
 		try
@@ -1249,6 +1303,8 @@ namespace BetterQOL
 		}
 	}
 
+	/// <summary>Fishing card parsed from the Fish table: difficulty, behavior, seasons,
+	/// times, weather, min skill, spawn locations, and fish-pond produce.</summary>
 	private static void AddFishDataSection(LookupSubject subject, Item item)
 	{
 		//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
@@ -1272,6 +1328,8 @@ namespace BetterQOL
 				return;
 			}
 			LookupSection lookupSection = new LookupSection((ModEntry.I18n.Get("lookup.section.fishing-details")));
+			// Fish table fields by index: [1] difficulty, [2] behavior pattern,
+			// [5] time windows, [6] seasons, [7] weather, [9] min fishing level.
 			string diff = array[1];
 			string text = ((array.Length > 2 && !string.IsNullOrEmpty(array[2])) ? array[2] : "mixed");
 			string text2 = text.ToLowerInvariant();
@@ -1292,6 +1350,7 @@ namespace BetterQOL
 			{
 				string[] array2 = array[5].Split(' ', StringSplitOptions.RemoveEmptyEntries);
 				List<string> list = new List<string>();
+				// Times come as flat "start end start end" pairs, so step 2 at a time.
 				for (int num = 0; num < array2.Length; num += 2)
 				{
 					if (num + 1 < array2.Length)
@@ -1336,6 +1395,8 @@ namespace BetterQOL
 			{
 				name = item.DisplayName
 			})).ToString(), (Color?)new Color(0, 140, 0)));
+			// Special pond produce per species - a long nested else-if chain (the
+			// decompiler's rendering of what was probably a switch on the fish name).
 			string text7 = item.Name.ToLowerInvariant();
 			string text8 = text7;
 			if (1 == 0)
@@ -1445,6 +1506,7 @@ namespace BetterQOL
 		}
 	}
 
+	/// <summary>Scans every location's Fish list for this fish and returns friendly names.</summary>
 	private static List<string> GetFishSpawnLocations(string fishId)
 	{
 		List<string> list = new List<string>();
@@ -1486,6 +1548,8 @@ namespace BetterQOL
 		return list;
 	}
 
+	/// <summary>Maps internal location keys ("Town", "Forest"...) onto player-friendly names,
+	/// falling back to the data's DisplayName (with token/localization unwrapping).</summary>
 	private static string GetFriendlyLocationName(string locKey, LocationData locData, SpawnFishData fishEntry)
 	{
 		if (locKey.Equals("Forest", StringComparison.OrdinalIgnoreCase))
@@ -1595,10 +1659,12 @@ namespace BetterQOL
 		return locKey;
 	}
 
+	/// <summary>Converts a raw 24h-style game time (like "1900") into "7:00 PM" text.</summary>
 	private static string FormatGameTime(string rawTime)
 	{
 		if (int.TryParse(rawTime, out var result))
 		{
+			// Hundreds digit = hour, last two = minutes; then convert 24h to 12h AM/PM.
 			int num = result / 100;
 			int num2 = result % 100;
 			string value = ((num >= 12 && num < 24) ? "PM" : "AM");
@@ -1615,6 +1681,7 @@ namespace BetterQOL
 		return rawTime;
 	}
 
+	/// <summary>Same idea as GetFriendlyLocationName but for the forage tables (switch-based).</summary>
 	private static string GetFriendlyForageLocationName(string locKey)
 	{
 		if (1 == 0)
@@ -1644,6 +1711,7 @@ namespace BetterQOL
 		return result;
 	}
 
+	/// <summary>Where this forage item spawns: live data scan first, then hardcoded fallbacks.</summary>
 	private static void AddForageDataSection(LookupSubject subject, Item item)
 	{
 		//IL_0121: Unknown result type (might be due to invalid IL or missing references)
@@ -1705,6 +1773,8 @@ namespace BetterQOL
 			string item18 = ((object)ModEntry.I18n.Get("lookup.location.the-beach")).ToString();
 			string item19 = ((object)ModEntry.I18n.Get("lookup.location.calico-desert")).ToString();
 			string item20 = ((object)ModEntry.I18n.Get("lookup.location.ginger-island-south")).ToString();
+			// Fallback table: some forageables (or modded data) aren't in the location
+			// scan, so a few well-known ids get hardcoded season/location hints.
 			switch (item.ItemId)
 			{
 			case "16":
@@ -1816,6 +1886,7 @@ namespace BetterQOL
 		}
 	}
 
+	/// <summary>Where minerals/artifacts come from (artifact spots, geodes, nodes, drops).</summary>
 	private static void AddMineralAndArtifactLocationSection(LookupSubject subject, Item item)
 	{
 		//IL_0335: Unknown result type (might be due to invalid IL or missing references)
@@ -1874,6 +1945,7 @@ namespace BetterQOL
 		}
 	}
 
+	/// <summary>Crop card: growth time, regrowth, seasons, trellis, extra-harvest chance.</summary>
 	private static void AddCropDataSection(LookupSubject subject, Item item)
 	{
 		//IL_0105: Unknown result type (might be due to invalid IL or missing references)
@@ -1932,6 +2004,7 @@ namespace BetterQOL
 		}
 	}
 
+	/// <summary>What machines can process this item (wine, jelly, juice, pickles, smoking...).</summary>
 	private static void AddArtisanProductsSection(LookupSubject subject, Item item, int basePrice)
 	{
 		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
@@ -1977,6 +2050,8 @@ namespace BetterQOL
 		List<LookupLink> list = new List<LookupLink>();
 		string text = item.ItemId.ToLowerInvariant();
 		string text2 = item.Name.ToLowerInvariant();
+		// Fruit (-79): keg wine = x3 price, preserves-jar jelly = 2x+50,
+		// dehydrator dried fruit = 7.5x+25.
 		if (item.Category == -79)
 		{
 			int price = basePrice * 3;
@@ -2022,6 +2097,7 @@ namespace BetterQOL
 					{
 						if (item.Category == -4 || IsFishItem(item))
 						{
+							// Smoked fish = x2 price (x1.4 again with the Artisan profession).
 							int num = basePrice * 2;
 							ParsedItemData data4 = ItemRegistry.GetData("(O)SmokedFish");
 							if (data4 != null)
@@ -2039,6 +2115,7 @@ namespace BetterQOL
 				}
 				goto IL_03d4;
 			}
+			// Vegetables (-75): keg juice = x2.25, preserves-jar pickles = 2x+50.
 			int price4 = (int)((double)basePrice * 2.25);
 			ParsedItemData data5 = ItemRegistry.GetData("(O)350");
 			list.Add(new LookupLink(((object)ModEntry.I18n.Get("lookup.artisan.juice", (object)new
@@ -2117,10 +2194,13 @@ namespace BetterQOL
 		}
 		if (item.Category == -79 || item.Category == -75)
 		{
+			// Seed Maker works for any crop: yields 1-3 seeds (rarely ancient mixed in).
 			list.Add(new LookupLink(((object)ModEntry.I18n.Get("lookup.artisan.seeds-yield")).ToString(), ((object)ModEntry.I18n.Get("lookup.artisan.seed-maker-time")).ToString(), (Color?)new Color(46, 125, 50), (Texture2D?)null, (Rectangle?)null, (Func<LookupSubject?>?)null));
 		}
 		if (text2.Contains("wine") || text2.Contains("cheese") || text2.Contains("pale ale") || text2.Contains("beer") || text2.Contains("mead"))
 		{
+			// Cask aging reaches iridium quality after 56 days (wine), 14 (cheese),
+			// or 34 (ale/mead); the ternary chain picks the right number.
 			int value = basePrice * 2;
 			int days = (text2.Contains("wine") ? 56 : (text2.Contains("cheese") ? 14 : 34));
 			list.Add(new LookupLink($"{ModEntry.I18n.Get("hover.quality.iridium")} ({value}g)", ((object)ModEntry.I18n.Get("lookup.building.cask-aging", (object)new { days })).ToString(), (Color?)new Color(180, 50, 180), (Texture2D?)null, (Rectangle?)null, (Func<LookupSubject?>?)null));
@@ -2132,6 +2212,8 @@ namespace BetterQOL
 			subject.Sections.Add(lookupSection);
 		}
 		return;
+		// "IL_xxxx" labels + goto jumps are decompiler leftovers from optimized
+		// branches; flow is still simple. This block handles dried mushrooms (7.5x+25).
 		IL_03d4:
 		int price6 = (int)((double)basePrice * 7.5) + 25;
 		ParsedItemData val = ItemRegistry.GetData("(O)DriedMushrooms") ?? ItemRegistry.GetData("(O)DriedFruit");
@@ -2143,6 +2225,7 @@ namespace BetterQOL
 		goto IL_0550;
 	}
 
+	/// <summary>Explains what a placeable machine does when the item IS a machine.</summary>
 	private static void AddMachineItemSection(LookupSubject subject, Item item)
 	{
 		//IL_0653: Unknown result type (might be due to invalid IL or missing references)
@@ -2151,6 +2234,8 @@ namespace BetterQOL
 			string text = item.ItemId.ToLowerInvariant();
 			string text2 = item.Name.ToLowerInvariant();
 			string text3 = "";
+			// Long if/else-if ladder matching the item by name OR id - each arm
+			// loads a localized "what this machine does" blurb.
 			if (text2 == "furnace" || text == "13")
 			{
 				text3 = ((object)ModEntry.I18n.Get("lookup.machine.furnace")).ToString();
@@ -2276,6 +2361,7 @@ namespace BetterQOL
 		}
 	}
 
+	/// <summary>Fruit-tree sapling card: harvest season, maturation, spacing, aging.</summary>
 	private static void AddFruitTreeSaplingSection(LookupSubject subject, Item item)
 	{
 		//IL_0207: Unknown result type (might be due to invalid IL or missing references)
@@ -2342,6 +2428,7 @@ namespace BetterQOL
 		}
 	}
 
+	/// <summary>Fun/functional lore blurbs for a handful of special items.</summary>
 	private static void AddSpecialItemLoreSection(LookupSubject subject, Item item)
 	{
 		//IL_0366: Unknown result type (might be due to invalid IL or missing references)
@@ -2415,6 +2502,7 @@ namespace BetterQOL
 		}
 	}
 
+	/// <summary>Shows sewing products and dye colors this item can be used for.</summary>
 	private static void AddTailoringAndDyeSection(LookupSubject subject, Item item)
 	{
 		//IL_0393: Unknown result type (might be due to invalid IL or missing references)
@@ -2436,6 +2524,8 @@ namespace BetterQOL
 			{
 				foreach (TailorItemRecipe item3 in list2)
 				{
+					// SecondItemTags are context tags like "color_red" or "item_wool";
+					// HasContextTag checks whether THIS item satisfies the recipe slot.
 					if (item3.SecondItemTags != null && item3.SecondItemTags.Any((string tag) => item.HasContextTag(tag) || tag == item.ItemId || tag == item.QualifiedItemId || tag == "(O)" + item.ItemId) && item3.CraftedItemIds != null && item3.CraftedItemIds.Count > 0)
 					{
 						string text = item3.CraftedItemIds[0];
@@ -2450,6 +2540,8 @@ namespace BetterQOL
 				}
 			}
 			HashSet<string> contextTags = item.GetContextTags();
+			// Items carry "color_xxx" context tags; the ladder picks a dye color name
+			// (blue wins over cyan/ocean-blue because of the || ordering).
 			if (contextTags != null)
 			{
 				string text2 = null;
@@ -2511,6 +2603,7 @@ namespace BetterQOL
 		}
 	}
 
+	/// <summary>Animal-product card: incubation notes, mayo/cheese/cloth/oil outputs.</summary>
 	private static void AddAnimalProductProcessingSection(LookupSubject subject, Item item)
 	{
 		//IL_0084: Unknown result type (might be due to invalid IL or missing references)
@@ -2662,6 +2755,7 @@ namespace BetterQOL
 		}
 	}
 
+	/// <summary>What the Recycling Machine yields for this piece of trash.</summary>
 	private static void AddRecyclingSection(LookupSubject subject, Item item)
 	{
 		//IL_01de: Unknown result type (might be due to invalid IL or missing references)
@@ -2707,6 +2801,7 @@ namespace BetterQOL
 		}
 	}
 
+	/// <summary>Geode/mystery-box card: where to crack it open and what can drop.</summary>
 	private static void AddGeodeAndMysteryBoxSection(LookupSubject subject, Item item)
 	{
 		//IL_0251: Unknown result type (might be due to invalid IL or missing references)
@@ -2761,6 +2856,7 @@ namespace BetterQOL
 		}
 	}
 
+	/// <summary>Fertilizer/retaining-soil card: what the soil effect does.</summary>
 	private static void AddFertilizerDetailsSection(LookupSubject subject, Item item)
 	{
 		//IL_02a2: Unknown result type (might be due to invalid IL or missing references)
@@ -2822,6 +2918,7 @@ namespace BetterQOL
 		}
 	}
 
+	/// <summary>Reads the item's Buffs list from object data and formats positive stat effects.</summary>
 	private static List<string> GetFoodBuffs(Item item)
 	{
 		List<string> list = new List<string>();
@@ -2921,6 +3018,7 @@ namespace BetterQOL
 		return list;
 	}
 
+	/// <summary>Finds every incomplete Community Center bundle that still needs this item.</summary>
 	private static List<string> GetNeededBundles(Item item)
 	{
 		List<string> list = new List<string>();
@@ -2951,6 +3049,7 @@ namespace BetterQOL
 					continue;
 				}
 				string item2 = ((array2.Length >= 6 && !string.IsNullOrEmpty(array2[5])) ? array2[5] : array2[0]);
+				// Field [2] = flat "id stack quality id stack quality ..." triplet list.
 				string[] array3 = array2[2].Split(' ');
 				if (!((NetDictionary<int, bool[], NetArray<bool, NetBool>, SerializableDictionary<int, bool[]>, NetBundles>)(object)((NetFieldBase<NetWorldState, NetRef<NetWorldState>>)(object)Game1.netWorldState).Value.Bundles).TryGetValue(result, out array4))
 				{
@@ -2984,7 +3083,10 @@ namespace BetterQOL
 							num6 = 1;
 						}
 						bool flag = (byte)num6 != 0;
+						// Negative ingredient ids mean "any item of that Category"
+						// (e.g. -77 for "any vegetable"), so compare categories too.
 						bool flag2 = int.TryParse(text, out var result4) && result4 < 0 && item.Category == result4;
+						// The bundle may demand a minimum quality (field [num4 + 2]).
 						bool flag3 = item.Quality >= num5;
 						if (((flag | flag2) & flag3) && !list.Contains(item2))
 						{
@@ -3000,6 +3102,7 @@ namespace BetterQOL
 		return list;
 	}
 
+	/// <summary>Villagers who love or like this item, as clickable NPC cards.</summary>
 	private static (List<LookupLink> Lovers, List<LookupLink> Likers) GetItemGiftTastesLinks(Item item)
 	{
 		//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
@@ -3015,6 +3118,7 @@ namespace BetterQOL
 				continue;
 			}
 			int giftTasteForThisItem = npc.getGiftTasteForThisItem(item);
+			// Gift-taste constants: 0 = love, 2 = like (1/3/4... are neutral/dislike/hate).
 			if (giftTasteForThisItem == 0 && !list.Any((LookupLink l) => l.Text == (((Character)npc).displayName ?? ((Character)npc).Name)))
 			{
 				NPC targetNPC = npc;
@@ -3029,6 +3133,7 @@ namespace BetterQOL
 		return (Lovers: list.Take(12).ToList(), Likers: list2.Take(12).ToList());
 	}
 
+	/// <summary>Crafting/cooking recipes that consume this item, as clickable output cards.</summary>
 	private static List<LookupLink> GetRecipesUsingItemLinks(Item item)
 	{
 		//IL_0077: Unknown result type (might be due to invalid IL or missing references)
@@ -3040,6 +3145,8 @@ namespace BetterQOL
 		//IL_01dd: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0212: Unknown result type (might be due to invalid IL or missing references)
 		List<LookupLink> list = new List<LookupLink>();
+		// Crafting recipes live in one static dictionary, cooking recipes in another;
+		// both store "recipe string" values parsed by RecipeContainsItem below.
 		foreach (KeyValuePair<string, string> craftingRecipe in CraftingRecipe.craftingRecipes)
 		{
 			string recipeName = craftingRecipe.Key;
@@ -3067,6 +3174,8 @@ namespace BetterQOL
 		return list.Take(12).ToList();
 	}
 
+	/// <summary>Checks a recipe's ingredient string ("id count id count ...") for this item;
+	/// a negative id means "any item of that category".</summary>
 	private static bool RecipeContainsItem(string recipeStr, Item item)
 	{
 		string[] array = recipeStr.Split('/');
@@ -3075,6 +3184,7 @@ namespace BetterQOL
 			return false;
 		}
 		string[] array2 = array[0].Split(' ');
+		// Ingredient pairs are "id count" repeated, so step the loop 2 at a time.
 		for (int i = 0; i < array2.Length; i += 2)
 		{
 			string text = array2[i];

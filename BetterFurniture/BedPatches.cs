@@ -1,4 +1,11 @@
-using System;
+// Using directives import types from other libraries so short names work here:
+//   HarmonyLib               -> runtime method patching (HarmonyMethod, AccessTools).
+//   Microsoft.Xna.Framework  -> Vector2 and Rectangle (positions & collision boxes).
+//   Netcode                  -> multiplayer-synced field wrappers (NetRoot).
+//   StardewModdingAPI        -> SMAPI's logging interface (IMonitor, LogLevel).
+//   StardewValley            -> core game classes (Game1, Furniture, Farmer, GameLocation).
+//   StardewValley.Locations  -> location subclasses (FarmHouse, IslandFarmHouse).
+//   StardewValley.Objects    -> the BedFurniture class.
 using HarmonyLib;
 using Microsoft.Xna.Framework;
 using Netcode;
@@ -20,6 +27,9 @@ namespace BetterFurniture
     /// </summary>
     public static class BedPatches
     {
+        /// <summary>SMAPI logger for error reporting, assigned once by Apply().
+        /// "static" = shared by every method in this class; "= null!" silences
+        /// the compiler warning until it really gets assigned.</summary>
         private static IMonitor Monitor = null!;
 
         /// <summary>
@@ -33,6 +43,10 @@ namespace BetterFurniture
 
             // Each harmony.Patch call targets one game method by reflection
             // (AccessTools.Method) and attaches our prefix to run before it.
+            // The "original:" / "prefix:" labels are NAMED ARGUMENTS — they make
+            // the call self-documenting regardless of parameter order.
+            // A prefix returning bool acts as a gate: false = "skip the original
+            // method entirely", true = "carry on into vanilla code".
 
             harmony.Patch(
                 original: AccessTools.Method(typeof(BedFurniture), nameof(BedFurniture.DoesTileHaveProperty)),
@@ -132,6 +146,8 @@ namespace BetterFurniture
         /// <param name="__result">Set to true = "placement succeeded".</param>
         public static bool PlacementAction_Prefix(BedFurniture __instance, GameLocation location, int x, int y, Farmer who, ref bool __result)
         {
+            // "try": if anything below throws an exception, control jumps to the
+            // catch block at the bottom so the game never hard-crashes here.
             try
             {
                 // Remember which location and tile the bed now occupies. Pixel
@@ -202,6 +218,8 @@ namespace BetterFurniture
                 if (__instance.bedType == BedFurniture.BedType.Double && __instance.getTilesWide() >= 4)
                 {
                     // The bed's top-left corner tile and its full footprint size.
+                    // "(int)" CASTS the stored float coordinate to a whole number
+                    // (tile coordinates live in floats; tiles are whole numbers).
                     int originX = (int)__instance.TileLocation.X;
                     int originY = (int)__instance.TileLocation.Y;
                     int width = __instance.getTilesWide();
@@ -278,6 +296,8 @@ namespace BetterFurniture
 
                     // Top 1 tile (headboard, 64px) is solid
                     // Copy the full box but keep only its top 64 pixels.
+                    // (Rectangle is a STRUCT — a value type — so "=" copies the
+                    // whole box; editing the copy never touches the original.)
                     Rectangle headboard = boundingBox;
                     headboard.Height = 64;
                     if (headboard.Intersects(rect))
@@ -333,9 +353,13 @@ namespace BetterFurniture
                     int originY = (int)bedAtTile.TileLocation.Y;
 
                     bool isSpouse = false;
+                    // "Farmer?" = a reference ALLOWED to be null until we find the
+                    // owner below. The "?" is C#'s nullable reference annotation.
                     Farmer? owner = null;
                     // Find the bed's owner: the farmhouse owner normally; on the
                     // island farm house the master player owns everything.
+                    // "currentLocation is FarmHouse farmHouse" is PATTERN MATCHING:
+                    // it type-checks AND hands us a correctly-typed variable.
                     if (currentLocation is FarmHouse farmHouse && farmHouse.HasOwner)
                     {
                         owner = farmHouse.owner;

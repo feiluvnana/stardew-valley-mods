@@ -1,4 +1,9 @@
-using System;
+// "using" directives import other libraries' namespaces so short names work:
+//   HarmonyLib              -> the Harmony patching library (Patch, Prefix...)
+//   StardewModdingAPI       -> SMAPI: logging types (IMonitor, LogLevel)
+//   StardewValley           -> core game code (Farmer, Game1, Item, Random)
+//   StardewValley.Locations -> MineShaft, the Skull Cavern location class
+//   StardewValley.Objects   -> Chest and other placeable world objects
 using HarmonyLib;
 using StardewModdingAPI;
 using StardewValley;
@@ -24,6 +29,9 @@ namespace BetterChest
     /// </summary>
     public static class ChestPatches
     {
+        // C# recap: "const" = a value frozen at compile time. This entire class
+        // is "static" — it can NEVER be instantiated with "new"; it merely
+        // groups these members under one accessible name (ChestPatches.Apply).
         /// <summary>
         /// Prefix of the per-player "already rolled" flag stored in a chest's
         /// modData dictionary (full key = this prefix + the player's multiplayer id).
@@ -42,6 +50,9 @@ namespace BetterChest
                 // Locate Chest.checkForAction via reflection. The third argument lists the
                 // parameter types (Farmer, bool) because the game has overloaded versions
                 // of checkForAction — this selects exactly the right one.
+                // "var" = implicit typing: the compiler deduces the local's type
+                // (here MethodInfo) from the right-hand side. It is still fully
+                // statically typed — unlike JavaScript's dynamic var.
                 var checkForActionMethod = AccessTools.Method(
                     typeof(Chest),
                     nameof(Chest.checkForAction),
@@ -63,6 +74,9 @@ namespace BetterChest
                     ModEntry.ModMonitor.Log("Hooked Chest.checkForAction for per-player reward rolls.", LogLevel.Trace);
                 }
             }
+            // "catch" executes ONLY if something above threw an Exception (a
+            // runtime error object). Absorbing the failure here keeps the game
+            // running even if a future game update breaks the patch target.
             catch (Exception ex)
             {
                 ModEntry.ModMonitor.Log($"Failed to patch Chest.checkForAction: {ex}", LogLevel.Error);
@@ -78,6 +92,8 @@ namespace BetterChest
         /// <param name="justCheckingForActivity">True when the game is only probing whether the chest holds anything, not actually opening it.</param>
         public static void CheckForAction_Prefix(Chest __instance, Farmer who, bool justCheckingForActivity)
         {
+            // C# note: in a "void" (returns-nothing) method, a bare "return;"
+            // simply exits the method early.
             // Skip "peek" queries and null objects — only act on real openings.
             if (justCheckingForActivity || who == null || __instance == null)
                 return;

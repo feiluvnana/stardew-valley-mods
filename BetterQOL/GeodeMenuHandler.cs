@@ -1,4 +1,3 @@
-using System;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
@@ -28,6 +27,8 @@ namespace BetterQOL
 
         /// <summary>The injected button, or null whenever the geode menu is closed/disabled.</summary>
         public static ClickableComponent? CrackAllButton { get; private set; }
+        // Remembers hover state between frames so rendering and click handling agree on
+        // whether the cursor (or gamepad snap) is over our button.
         private static bool isHoveringCrackAll = false;
 
         /// <summary>Caches SMAPI services and subscribes the five events this handler needs.</summary>
@@ -300,11 +301,19 @@ namespace BetterQOL
             menu.geodeTreasure = null;
         }
 
+        /// <summary>
+        /// SMAPI input event: any mouse click / controller button press anywhere.
+        /// Here we decide whether the player aimed at our Crack All button or the anvil,
+        /// then route to bulk or instant cracking (bypassing vanilla's slow animation).
+        /// </summary>
         private static void OnButtonPressed(object? sender, ButtonPressedEventArgs e)
         {
+            // Ignore presses when no geode menu is open, or while a multiplayer host
+            // response is still pending (clicks would desync).
             if (Game1.activeClickableMenu is not GeodeMenu menu || menu.waitingForServerResponse)
                 return;
 
+            // Only left-click / action-tool style buttons matter for cracking.
             if (!e.Button.IsUseToolButton() && !e.Button.IsActionButton())
                 return;
 

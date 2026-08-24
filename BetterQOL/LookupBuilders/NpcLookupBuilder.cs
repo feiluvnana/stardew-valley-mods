@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Netcode;
@@ -40,8 +37,22 @@ namespace BetterQOL
     /// <summary>
     /// Lookup builder for NPCs, villagers, friendship levels, gift tastes, and schedules.
     /// </summary>
+    /// <remarks>
+    /// BEGINNER NOTES:
+    /// - This code was DECOMPILED, hence the odd-looking casts such as ((Character)npc),
+    ///   (Color?) and the "//IL_xxxx:" marker comments. They look strange but compile fine
+    ///   and were left untouched on purpose.
+    /// - Friendship lives in a Netcode dictionary keyed by NPC name; 250 points == 1 heart.
+    /// - Gift preferences come from Game1.NPCGiftTastes: one '/'-separated string per NPC in
+    ///   which ODD indexes are item-id space-lists (1=loved, 3=liked, 5=disliked, 9=neutral)
+    ///   and EVEN indexes are the NPC's spoken reactions to those tiers.
+    /// </remarks>
     public static partial class LookupDataManager
     {
+	/// <summary>
+	/// Builds an NPC/villager card: friendship hearts, today's whereabouts, talk/gift tracking,
+	/// relationship status, optional gift-taste links, and the day's movement schedule.
+	/// </summary>
 	public static LookupSubject BuildNPCSubject(NPC npc)
 	{
 		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
@@ -63,12 +74,17 @@ namespace BetterQOL
 		//IL_0424: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0890: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0882: Unknown result type (might be due to invalid IL or missing references)
+		// The redundant ((Character)npc) casts are decompiler artifacts - noisy but harmless.
+		// "??" falls back to the internal name when no display name is set.
 		LookupSubject lookupSubject = new LookupSubject
 		{
 			Title = (((Character)npc).displayName ?? ((Character)npc).Name),
+			// Character cards show the NPC's portrait; 64x64 is the standard frame size.
 			Portrait = npc.Portrait,
 			PortraitSourceRect = new Rectangle(0, 0, 64, 64)
 		};
+		// Birthday line: concatenation builds a translation key like "season.summer"; if the
+		// season is somehow unset, "??" defaults it to spring.
 		string season = ((object)ModEntry.I18n.Get("season." + (npc.Birthday_Season?.ToLower() ?? "spring"))).ToString();
 		lookupSubject.Subtitle = (ModEntry.I18n.Get("lookup.npc.subtitle", (object)new
 		{
@@ -76,9 +92,16 @@ namespace BetterQOL
 			day = npc.Birthday_Day
 		}));
 		LookupSection lookupSection = new LookupSection((ModEntry.I18n.Get("lookup.section.relationship")));
+		// "default(Friendship)" creates an all-zero Friendship struct - a dummy required
+		// because TryGetValue must have a variable to write into when the key IS found. The
+		// long generic cast above it is decompiler noise: friendshipData is simply a
+		// dictionary of "NPC name" -> friendship record.
 		Friendship val = default(Friendship);
 		if (((NetDictionary<string, Friendship, NetRef<Friendship>, SerializableDictionary<string, Friendship>, NetStringDictionary<Friendship, NetRef<Friendship>>>)(object)Game1.player.friendshipData).TryGetValue(((Character)npc).Name, out val))
 		{
+			// HEART MATH: 250 points per heart. "/" gives whole hearts, "%" gives leftover
+			// points toward the next one. Max hearts depend on the relationship type, chosen by
+			// a NESTED TERNARY: spouse/roommate 14, dating 10, friends 8.
 			int points = val.Points;
 			int hearts = points / 250;
 			int ptsInHeart = points % 250;
@@ -94,13 +117,17 @@ namespace BetterQOL
 					y = (int)((Character)npc).Tile.Y
 				})).ToString(), (Color?)new Color(20, 110, 220)));
 			}
+			// Talking to a villager daily slowly builds friendship; this flag says if you did today.
 			bool flag = Game1.player.hasPlayerTalkedToNPC(((Character)npc).Name);
 			lookupSection.Fields.Add(new LookupField((ModEntry.I18n.Get("lookup.npc.talked-today")), (flag ? ModEntry.I18n.Get("lookup.common.yes") : ModEntry.I18n.Get("lookup.common.no")), (Color?)(flag ? new Color(0, 140, 0) : new Color(200, 60, 20))));
+			// The game allows TWO gifts per villager per week (birthdays don't count); the row
+			// turns green once both gift slots are used.
 			lookupSection.Fields.Add(new LookupField((ModEntry.I18n.Get("lookup.npc.gifts-this-week")), ((object)ModEntry.I18n.Get("lookup.npc.gifts-this-week-format", (object)new
 			{
 				count = val.GiftsThisWeek,
 				today = ((val.GiftsToday > 0) ? ModEntry.I18n.Get("lookup.common.yes") : ModEntry.I18n.Get("lookup.common.no"))
 			})).ToString(), (Color)((val.GiftsThisWeek >= 2) ? new Color(0, 140, 0) : Game1.textColor)));
+			// Relationship badge, checked in priority order: married > roommate (Krobus) > dating.
 			if (val.IsMarried())
 			{
 				lookupSection.Fields.Add(new LookupField((ModEntry.I18n.Get("lookup.npc.status")), (ModEntry.I18n.Get("lookup.npc.status-married")), (Color?)new Color(180, 50, 180)));
@@ -119,9 +146,11 @@ namespace BetterQOL
 			lookupSection.Fields.Add(new LookupField((ModEntry.I18n.Get("lookup.npc.friendship")), (ModEntry.I18n.Get("lookup.npc.unmet")), Color.DarkSlateGray));
 		}
 		lookupSubject.Sections.Add(lookupSection);
+		// Respect the user's mod setting before doing the fairly expensive gift-table parsing.
 		if (ModEntry.Config.ShowGiftTastes)
 		{
 			LookupSection lookupSection2 = new LookupSection((ModEntry.I18n.Get("lookup.section.gifts")));
+			// Four link lists arrive at once via tuple deconstruction.
 			var (list, list2, list3, list4) = GetNPCAllGiftPreferenceLinks(npc);
 			if (list.Count > 0)
 			{
@@ -148,6 +177,9 @@ namespace BetterQOL
 			{
 				lookupSection3.Fields.Add(new LookupField((ModEntry.I18n.Get("lookup.npc.today-schedule")), ((object)ModEntry.I18n.Get("lookup.npc.schedule-island")).ToString(), (Color?)new Color(20, 110, 220)));
 			}
+			// Schedule keys are game TIMES (900 = 9:00 AM) stored unordered, so the LINQ
+			// ".OrderBy(kv => kv.Key)" sorts them chronologically and ToList() snapshots the
+			// result. "(kv => kv.Key)" is a lambda picking which field to sort by.
 			else if (npc.Schedule != null && npc.Schedule.Count > 0)
 			{
 				List<KeyValuePair<int, SchedulePathDescription>> list5 = npc.Schedule.OrderBy((KeyValuePair<int, SchedulePathDescription> kv) => kv.Key).ToList();
@@ -157,6 +189,8 @@ namespace BetterQOL
 					int key = keyValuePair.Key;
 					SchedulePathDescription value = keyValuePair.Value;
 					string text = FormatGameTime(key.ToString());
+					// Resolve WHERE the NPC is heading with layered fallbacks: route target, then
+					// their current room, then a generic "unknown" placeholder.
 					object obj = value.targetLocationName;
 					if (obj == null)
 					{
@@ -164,8 +198,12 @@ namespace BetterQOL
 						obj = ((currentLocation != null) ? currentLocation.DisplayName : null) ?? ((object)ModEntry.I18n.Get("lookup.schedule.unknown-location")).ToString();
 					}
 					string text2 = (string)obj;
+					// Prefer the pretty localized display name over the raw internal map id.
 					GameLocation locationFromName = Game1.getLocationFromName(text2);
 					string value2 = ((locationFromName != null) ? locationFromName.DisplayName : null) ?? text2;
+					// CURRENT-STOP HIGHLIGHT: one schedule slot runs from this entry's time until
+					// the NEXT entry's time (2600 = end of day). If the clock is inside that
+					// window, flag2 marks the row for the green "right now" tag.
 					bool flag2 = false;
 					int num2 = ((num + 1 < list5.Count) ? list5[num + 1].Key : 2600);
 					if (Game1.timeOfDay >= key && Game1.timeOfDay < num2)
@@ -195,10 +233,17 @@ namespace BetterQOL
 		}
 		catch
 		{
+			// Swallowed on purpose: a broken schedule shouldn't hide the rest of the card.
 		}
 		return lookupSubject;
 	}
 
+	/// <summary>
+	/// Reads the game's NPCGiftTastes table and turns each preference tier into clickable item
+	/// links. Per-NPC format: '/'-separated fields where ODD indexes are space-separated item
+	/// id lists (1=loved, 3=liked, 5=disliked, 9=neutral) and EVEN indexes are reaction text.
+	/// Returns capped, deduplicated lists packed into a named tuple.
+	/// </summary>
 	private static (List<LookupLink> Loved, List<LookupLink> Liked, List<LookupLink> Neutral, List<LookupLink> Disliked) GetNPCAllGiftPreferenceLinks(NPC npc)
 	{
 		//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
@@ -218,14 +263,21 @@ namespace BetterQOL
 			if (Game1.NPCGiftTastes != null && Game1.NPCGiftTastes.TryGetValue(((Character)npc).Name, out var value))
 			{
 				string[] array = value.Split('/');
+				// Index 1 = LOVED gifts (purple hearts). Ids are space-separated and may need the
+				// "(O)" object prefix prepended before the game can resolve them.
 				if (array.Length > 1 && !string.IsNullOrEmpty(array[1]))
 				{
 					string[] array2 = array[1].Split(' ');
 					foreach (string text in array2)
 					{
 						ParsedItemData data = ItemRegistry.GetData(text) ?? ItemRegistry.GetData("(O)" + text);
+						// Duplicate guard: ".Any(...)" is LINQ - it runs the lambda predicate over
+						// every element until one matches (a link with this name already exists).
 						if (data != null && !list.Any((LookupLink l) => l.Text == data.DisplayName))
 						{
+							// "delegate { ... }" is the old-school spelling of a lambda: an anonymous
+							// method attached to the link and executed later, on click (it captures
+							// 'data' from this loop iteration).
 							list.Add(new LookupLink(data.DisplayName, (string?)null, (Color?)new Color(180, 50, 180), data.GetTexture(), (Rectangle?)data.GetSourceRect(0, (int?)null), (Func<LookupSubject?>?)delegate
 							{
 								Item val = ItemRegistry.Create(data.QualifiedItemId, 1, 0, false);
@@ -266,6 +318,8 @@ namespace BetterQOL
 						}
 					}
 				}
+				// Index 9 = NEUTRAL gifts (grey). Index 7 (outright HATED) is deliberately not
+				// shown - disliked covers the negative tiers in this UI.
 				if (array.Length > 9 && !string.IsNullOrEmpty(array[9]))
 				{
 					string[] array5 = array[9].Split(' ');
@@ -286,7 +340,9 @@ namespace BetterQOL
 		}
 		catch
 		{
+			// Missing or malformed gift data just yields empty lists - safe to ignore.
 		}
+		// Take(n) trims each list so the popup stays a readable size.
 		return (Loved: list.Take(12).ToList(), Liked: list2.Take(12).ToList(), Neutral: list3.Take(8).ToList(), Disliked: list4.Take(8).ToList());
 	}
 

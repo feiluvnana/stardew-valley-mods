@@ -1,4 +1,9 @@
-using System;
+// "using" directives import other libraries' namespaces so short names work:
+//   HarmonyLib          -> the Harmony patching library (Patch, Postfix...)
+//   StardewModdingAPI   -> SMAPI: logging types (IMonitor, LogLevel)
+//   StardewValley       -> core game code; Game1 holds global game state
+//   StardewValley.Menus -> UI screens; ItemGrabMenu is the chest-loot dialog
+//   StardewValley.Tools -> tools the player holds, e.g. FishingRod
 using HarmonyLib;
 using StardewModdingAPI;
 using StardewValley;
@@ -16,6 +21,9 @@ using StardewValley.Tools;
 // ============================================================================
 namespace BetterChest
 {
+    // C# concept — STATIC CLASS: "new FishingPatches()" would not compile. A
+    // static class cannot be instantiated and may only contain static members,
+    // making it a tidy home for self-contained patch plumbing.
     /// <summary>
     /// Registers and hosts the Harmony patch on
     /// <see cref="FishingRod.openTreasureMenuEndFunction"/>, the method the game

@@ -1,5 +1,8 @@
-using System;
-using System.Collections.Generic;
+// "using" directives import other libraries' namespaces so short names work:
+//   StardewValley         -> core game code: Item, ItemRegistry, Game1
+//   StardewValley.Objects -> Furniture, checked by IsCosmeticItem below
+// Func<>, List<>, Dictionary<> and Random come from .NET core namespaces that
+// modern projects import implicitly (ImplicitUsings).
 using StardewValley;
 using StardewValley.Objects;
 
@@ -16,6 +19,9 @@ using StardewValley.Objects;
 // ============================================================================
 namespace BetterChest
 {
+    // C# concept — ENUM: a fixed set of NAMED CONSTANTS backed by integers
+    // (first member = 0, then 1, 2, ...). Writing LootCategory.Mining beats a
+    // magic number like 2 — typos become compile errors instead of silent bugs.
     /// <summary>
     /// The loot families a chest roll can draw from. Category choice and item choice
     /// are separate dice rolls, each weighted independently.
@@ -101,6 +107,14 @@ namespace BetterChest
     /// </summary>
     public static class RewardGenerator
     {
+        // How to READ each row: new(itemId, category, minStack, maxStack, weight,
+        // availabilityPredicate, allowMultipliers). The predicate argument, e.g.
+        // "c => c.EnableLegendaryCategory && c.EnablePrismaticShard", is a LAMBDA
+        // EXPRESSION — an anonymous function captured for later use. NOTHING in
+        // it runs while this table is built; GenerateRewards INVOKES the stored
+        // delegate ("entry.IsEnabled(config)") at roll time, so flipping a
+        // config toggle or meeting a progression gate takes effect instantly
+        // without rebuilding the table.
         /// <summary>
         /// The master loot table. Each row's lambda ("c => c.EnableX") is a predicate
         /// evaluated at roll time against the live config, so toggles/gates apply
@@ -190,6 +204,9 @@ namespace BetterChest
             new("(O)TreasureTotem", LootCategory.Lootboxes, 2, 5, 18.0, c => c.EnableLootboxCategory && (!c.GatekeepMasteryItems || ProgressionHelper.IsMasteryUnlocked("Foraging")), false), // Treasure Totem (Buffed base stack, No Mult)
         };
 
+        // "static" method — call it as RewardGenerator.GenerateRewards(...) with
+        // no object instance. Return type List<Item> is a GENERIC collection: a
+        // resizable array that only accepts Stardew Valley Item references.
         /// <summary>
         /// Rolls a full chest's worth of rewards using the two-stage weighted lottery.
         /// </summary>
@@ -212,6 +229,9 @@ namespace BetterChest
             // its summed weight. Tuples are copies when read from a dictionary, so the
             // code below must write the tuple BACK after changing it.
             var categoryPools = new Dictionary<LootCategory, (List<RewardEntry> Entries, double TotalWeight)>();
+            // Enum.GetValues(typeof(LootCategory)) uses reflection to fetch an
+            // array of every enum member — one empty bucket per category, with
+            // no hard-coded list to maintain.
             foreach (LootCategory cat in Enum.GetValues(typeof(LootCategory)))
             {
                 categoryPools[cat] = (new List<RewardEntry>(), 0);
@@ -278,10 +298,14 @@ namespace BetterChest
                 return results;
 
             // Determine number of rolls using diminishing probabilities & guaranteed minimums
+            // These locals are DECLARED here but filled in exactly ONE of the
+            // three branches below (special / shallow / standard chest types).
             int minRolls;
             int maxRolls;
             // decayChances[r] = chance the (r+1)th roll is granted once r rolls exist;
             // the chain STOPS at the first failure ("break" below).
+            // C# concept — ARRAY: "float[]" is a fixed-length, zero-indexed list
+            // of floats; decayChances[r] reads slot r directly.
             float[] decayChances;
 
             if (applySpecialBuff)
@@ -402,6 +426,8 @@ namespace BetterChest
 
                 // 2. Select Item from chosen Category
                 var catData = categoryPools[selectedCategory];
+                // C# note — "continue" abandons THIS loop iteration and jumps to
+                // the next one ("break" would exit the loop entirely).
                 // Category somehow empty (shouldn't happen) — skip to the next roll.
                 if (catData.Entries.Count == 0 || catData.TotalWeight <= 0)
                     continue;

@@ -1,4 +1,5 @@
-using System;
+// "using" imports the game's own namespace so short names resolve:
+//   StardewValley -> Game1 (global game state), Farmer, Utility, stats/mail APIs.
 using StardewValley;
 
 // ============================================================================
@@ -13,6 +14,9 @@ using StardewValley;
 // ============================================================================
 namespace BetterChest
 {
+    // C# concept — STATIC UTILITY CLASS: never instantiated; simply a labeled
+    // bag of stateless question methods, called like
+    // ProgressionHelper.IsIslandUnlocked(). Perfect for pure true/false gates.
     /// <summary>
     /// Static utility class of progression gate checks used to keep late-game loot
     /// gated behind its in-game unlocks (island, Qi's room, Mastery, festivals...).

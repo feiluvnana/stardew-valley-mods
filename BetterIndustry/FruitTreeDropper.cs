@@ -1,5 +1,3 @@
-using System;
-using System.Linq;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
@@ -13,6 +11,8 @@ using StardewValley.TerrainFeatures;
 // extra daily action rather than a change to how existing game code behaves.
 namespace BetterIndustry
 {
+    // "static class" refresher: cannot be instantiated with "new"; it's just a tidy
+    // bundle of functions sharing state via ModEntry's static properties.
     /// <summary>
     /// Auto-drops fruit from fully-loaded fruit trees at the start of each day.
     /// </summary>
@@ -97,9 +97,13 @@ namespace BetterIndustry
 
                 // Tiles are 64x64 pixels: tile coordinate * 64 gives pixels, and "+32"
                 // aims at the tile centre so debris bursts out of the trunk.
+                // Vector2 (imported from Microsoft.Xna.Framework at the top of this file)
+                // is a simple X/Y floating-point struct used for all world positions.
                 Vector2 origin = new Vector2(pair.Key.X * 64f + 32f, pair.Key.Y * 64f + 32f);
                 // ToArray() snapshots the list because we Clear() it below while still in
                 // this foreach - mutating a collection during iteration throws.
+                // "Item" is the game's base class for anything inventory-storable; tree
+                // fruits are held here as generic Item references.
                 foreach (Item fruit in fruits.ToArray())
                 {
                     if (fruit == null)

@@ -3,8 +3,13 @@
 // startup - you never write serialization code yourself; plain public properties with a
 // default value are all that's required. The SAME object is handed to Generic Mod Config
 // Menu (see IGenericModConfigMenuApi.cs) so players can edit these values in-game.
+
+// "namespace" groups related classes under one shared prefix so their names can't
+// collide with classes from other mods or the game itself.
 namespace BetterIndustry
 {
+    // "public class" = visible to every other piece of code (SMAPI must see it to
+    // serialize/deserialize it); without a modifier, members default to "internal".
     /// <summary>
     /// All configurable options for BetterIndustry, persisted to config.json by SMAPI
     /// and exposed to the in-game settings menu via Generic Mod Config Menu.
@@ -17,6 +22,9 @@ namespace BetterIndustry
         //                           after that, your edited config.json wins until reset via GMCM.
         //   float literals need an "f" suffix (1.25f): without it, 1.25 is a double,
         //   which won't implicitly fit inside a float property.
+        //   bool -> true/false toggle.  int -> whole number (counts/thresholds).
+        //   Every property here also needs a matching registration call in
+        //   ModEntry.OnGameLaunched so GMCM knows how to display and edit it.
 
         // ---------------- Cooking Balancing ----------------
         /// <summary>Whether cooking dishes are rebalanced to be profitable over raw ingredients.</summary>
@@ -44,6 +52,9 @@ namespace BetterIndustry
         /// <summary>Price multiplier for Vegetable Juice relative to the base vegetable price (default 2.75x, vanilla 2.25x).</summary>
         public float JuiceMultiplier { get; set; } = 2.75f;
 
+        // Vanilla background: Casks only accept wine, beer, mead, roe and cheese/goat
+        // cheese, slowly upgrading them through Silver -> Gold -> Iridium quality in the
+        // cellar over in-game seasons.
         /// <summary>Whether Casks can age additional artisan goods such as Vegetable Juice.</summary>
         public bool EnableExpandedAging { get; set; } = true;
 

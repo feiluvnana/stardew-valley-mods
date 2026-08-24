@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Netcode;
@@ -40,8 +37,24 @@ namespace BetterQOL
     /// <summary>
     /// Lookup builder for farm buildings, fish ponds, farm summaries, perfection, Community Center, and almanac.
     /// </summary>
+    /// <remarks>
+    /// BEGINNER NOTES:
+    /// - This is the biggest builder file: it powers building/chest/farmer cards AND the big
+    ///   "world overview" almanac card assembled from many smaller section-builders below.
+    /// - Game progress is tracked via MAIL FLAGS (strings like "ccBoilerRoom" stored in
+    ///   mailReceived sets - the game's universal "has this happened?" mechanism) and STATS
+    ///   (Game1.player.stats numeric counters).
+    /// - Raw data files (DataLoader.Bundles/Objects/Fish...) are '/'-separated text tables;
+    ///   parsing them means Split('/') plus int.TryParse with index guards everywhere.
+    /// - The "//IL_xxxx:" markers, "if (1 == 0)" blocks and redundant casts are decompiler
+    ///   artifacts kept untouched on purpose.
+    /// </remarks>
     public static partial class LookupDataManager
     {
+	/// <summary>
+	/// Builds any farm-building card by dispatching on its type: Junimo hut, barn/coop
+	/// (with incubators), mill, shipping bin, silo, slime hutch, stable, pet bowl.
+	/// </summary>
 	public static LookupSubject BuildBuildingSubject(Building building)
 	{
 		//IL_0ed7: Unknown result type (might be due to invalid IL or missing references)
@@ -70,10 +83,13 @@ namespace BetterQOL
 			Subtitle = ((object)ModEntry.I18n.Get("lookup.type.building")).ToString()
 		};
 		LookupSection lookupSection = new LookupSection((ModEntry.I18n.Get("lookup.section.building-status")));
+		// Dispatch by concrete type: "X is Y ? X : null" is the decompiler's rendering of the
+		// C# "building as JunimoHut" / pattern-match cast - null when the type doesn't match.
 		JunimoHut val = (JunimoHut)(object)((building is JunimoHut) ? building : null);
 		if (val != null)
 		{
 			lookupSubject.Title = ((object)ModEntry.I18n.Get("lookup.building.junimo-hut")).ToString();
+			// Double negative: the field is "noHarvest", so NOT noHarvest = harvesting enabled.
 			bool flag = !((NetFieldBase<bool, NetBool>)(object)val.noHarvest).Value;
 			lookupSection.Fields.Add(new LookupField((ModEntry.I18n.Get("lookup.building.harvesting-state")), flag ? ((object)ModEntry.I18n.Get("lookup.building.harvesting-active")).ToString() : ((object)ModEntry.I18n.Get("lookup.building.harvesting-paused")).ToString(), (Color?)(flag ? new Color(0, 140, 0) : new Color(200, 60, 20))));
 			int value2 = ((NetFieldBase<int, NetInt>)(object)val.raisinDays).Value;
@@ -112,6 +128,8 @@ namespace BetterQOL
 					if (((Item)value9).Name != null && ((Item)value9).Name.Contains("Incubator") && ((NetFieldBase<SObject, NetRef<SObject>>)(object)value9.heldObject).Value != null)
 					{
 						SObject value5 = ((NetFieldBase<SObject, NetRef<SObject>>)(object)value9.heldObject).Value;
+						// Incubators count down in game-minutes; ~1000 minutes ≈ one in-game day,
+						// so integer division gives the remaining whole days.
 						int days = value9.MinutesUntilReady / 1000;
 						lookupSection.Fields.Add(new LookupField((ModEntry.I18n.Get("lookup.building.incubator")), ((object)ModEntry.I18n.Get("lookup.incubator.hatching-format", (object)new
 						{
@@ -176,6 +194,7 @@ namespace BetterQOL
 					if (shippingBin != null && ((ICollection<Item>)shippingBin).Count > 0)
 					{
 						List<LookupLink> list5 = new List<LookupLink>();
+						// Show at most 36 items to keep the card from growing unbounded.
 						foreach (Item item3 in ((IEnumerable<Item>)shippingBin).Take(36))
 						{
 							ParsedItemData data4 = ItemRegistry.GetData(item3.QualifiedItemId);
@@ -189,6 +208,7 @@ namespace BetterQOL
 			{
 				Farm farm2 = Game1.getFarm();
 				int num2 = farm2?.piecesOfHay.Value ?? 0;
+				// Each silo adds 240 hay capacity; red when under a quarter full.
 				int num3 = (farm2?.buildings.Count(b => b.buildingType.Value.Contains("Silo")) ?? 1) * 240;
 				lookupSection.Fields.Add(new LookupField((ModEntry.I18n.Get("lookup.silo.capacity")), ((object)ModEntry.I18n.Get("lookup.silo.hay-format", (object)new
 				{
@@ -239,6 +259,7 @@ namespace BetterQOL
 		return lookupSubject;
 	}
 
+	/// <summary>Builds a chest/fridge card: capacity usage, total stacked items, and clickable contents.</summary>
 	public static LookupSubject BuildChestSubject(Chest chest)
 	{
 		//IL_013a: Unknown result type (might be due to invalid IL or missing references)
@@ -281,6 +302,7 @@ namespace BetterQOL
 		return lookupSubject;
 	}
 
+	/// <summary>Farmer card: skills/professions, gear links, wallet, stardrops, buffs, misc stats.</summary>
 	public static LookupSubject BuildFarmerSubject(Farmer farmer)
 	{
 		//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
@@ -338,6 +360,8 @@ namespace BetterQOL
 			current = (int)farmer.Stamina,
 			max = farmer.MaxStamina
 		})).ToString(), (Color?)new Color(0, 140, 0)));
+		// Stardrop count derived backwards from max energy: base game starts at 270 and
+		// each of the 7 stardrops adds exactly +34, so divide and clamp into 0..7.
 		int num = Math.Clamp((farmer.MaxStamina - 270) / 34, 0, 7);
 		lookupSection.Fields.Add(new LookupField((ModEntry.I18n.Get("lookup.farmer.stardrops")), ((object)ModEntry.I18n.Get("lookup.perfection.stardrops-found-format", (object)new
 		{
@@ -351,6 +375,8 @@ namespace BetterQOL
 			{
 				Buff value = appliedBuff.Value;
 				string label = ((!string.IsNullOrEmpty(value.displayName)) ? value.displayName : appliedBuff.Key);
+				// Buff timers are stored in milliseconds: 60000 ms = 1 minute, and the
+				// remainder % 60000 / 1000 converts to leftover seconds. Huge values mean permanent.
 				string text = ((value.millisecondsDuration > 0 && value.millisecondsDuration < 9999999) ? ((object)ModEntry.I18n.Get("lookup.buff.duration-left", (object)new
 				{
 					m = value.millisecondsDuration / 60000,
@@ -465,6 +491,8 @@ namespace BetterQOL
 			num2 += ((NetFieldBase<int, NetInt>)(object)value2.defenseBonus).Value;
 			num3 += ((NetFieldBase<int, NetInt>)(object)value2.immunityBonus).Value;
 		}
+		// A few ring ids contribute defense/immunity that isn't exposed as a plain stat,
+		// so their bonuses are added by hand for both ring slots.
 		if (((NetFieldBase<Ring, NetRef<Ring>>)(object)farmer.leftRing).Value != null)
 		{
 			string itemId = ((Item)((NetFieldBase<Ring, NetRef<Ring>>)(object)farmer.leftRing).Value).ItemId;
@@ -570,6 +598,8 @@ namespace BetterQOL
 		lookupSection6.Fields.Add(new LookupField((ModEntry.I18n.Get("lookup.farmer.daily-luck")), $"{farmer.DailyLuck:F3}", (Color?)((farmer.DailyLuck >= 0.0) ? new Color(0, 140, 0) : new Color(200, 60, 20))));
 		lookupSubject.Sections.Add(lookupSection6);
 		return lookupSubject;
+		// A "local function": a method declared inside another method. It can use the
+		// gearLinks list above directly (a "closure" over the surrounding variables).
 		void AddGearLink(string slotName, Item? gItem)
 		{
 			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
@@ -582,8 +612,10 @@ namespace BetterQOL
 		}
 	}
 
+	/// <summary>Maps a profession id (0-29+) onto its localized name via one giant switch.</summary>
 	private static string GetProfessionName(int id)
 	{
+		// "if (1 == 0)" is always false - a harmless leftover from the decompiler.
 		if (1 == 0)
 		{
 		}
@@ -627,6 +659,10 @@ namespace BetterQOL
 		return result;
 	}
 
+	/// <summary>
+	/// Fish-pond card: population vs capacity, roe quality/price forecast (including aged
+	/// roe and the Sturgeon's caviar special case), drop chances, and quests.
+	/// </summary>
 	public static LookupSubject BuildFishPondSubject(FishPond pond)
 	{
 		//IL_016a: Unknown result type (might be due to invalid IL or missing references)
@@ -669,6 +705,8 @@ namespace BetterQOL
 		int value2 = ((NetFieldBase<int, NetInt>)(object)((Building)pond).maxOccupants).Value;
 		if (pond.FishCount < value2)
 		{
+			// How often a new fish spawns: game data defines it per species ("SpawnTime");
+			// fall back to 3 days when the data lookup fails.
 			int num = 3;
 			try
 			{
@@ -681,6 +719,7 @@ namespace BetterQOL
 			catch
 			{
 			}
+			// Countdown = spawn interval minus days already waited; 0 means "arrives tomorrow".
 			int num2 = Math.Max(0, num - ((NetFieldBase<int, NetInt>)(object)pond.daysSinceSpawn).Value);
 			lookupSection.Fields.Add(new LookupField((ModEntry.I18n.Get("lookup.fish-pond.spawn-countdown")), (num2 == 0) ? ((object)ModEntry.I18n.Get("hover.fishpond.spawning-tomorrow")).ToString() : ((object)ModEntry.I18n.Get("lookup.fish-pond.spawn-days-format", (object)new
 			{
@@ -703,6 +742,8 @@ namespace BetterQOL
 		}
 		lookupSubject.Sections.Add(lookupSection);
 		LookupSection lookupSection2 = new LookupSection((ModEntry.I18n.Get("lookup.section.fish-pond-drops")));
+		// Base sell price of the fish: prefer the raw data-table price, otherwise create a
+		// temporary Item and ask the game itself (sellToStorePrice), defaulting to 50g.
 		int num3 = 0;
 		if (val != null && int.TryParse(val.RawData?.ToString(), out var result))
 		{
@@ -713,8 +754,10 @@ namespace BetterQOL
 			Item val2 = ItemRegistry.Create(val?.QualifiedItemId ?? value, 1, 0, false);
 			num3 = ((val2 != null) ? val2.sellToStorePrice(-1L) : 50);
 		}
+		// Roe price formula: 30g + half the fish's price; "aged" roe (Preserves Jar) doubles it.
 		int num4 = 30 + num3 / 2;
 		int aged = num4 * 2;
+		// Special case: Sturgeon roe processed in a Preserves Jar becomes caviar instead.
 		if (text.Contains("Sturgeon") || value == "698" || value == "(O)698")
 		{
 			lookupSection2.Fields.Add(new LookupField((ModEntry.I18n.Get("lookup.fish-pond.caviar-label")), ((object)ModEntry.I18n.Get("lookup.fish-pond.caviar-desc")).ToString(), (Color?)new Color(180, 50, 180)));
@@ -733,6 +776,8 @@ namespace BetterQOL
 			if (fishPondData2 != null && fishPondData2.ProducedItems != null && fishPondData2.ProducedItems.Count > 0)
 			{
 				List<LookupLink> list = new List<LookupLink>();
+				// Each possible drop has: drop chance, min-max stack range, and a population
+				// gate (grey until the pond holds that many fish).
 				foreach (FishPondReward producedItem in fishPondData2.ProducedItems)
 				{
 					ParsedItemData rData = ItemRegistry.GetData(((GenericSpawnItemData)producedItem).ItemId);
@@ -767,12 +812,19 @@ namespace BetterQOL
 		return lookupSubject;
 	}
 
+	/// <summary>Thin wrapper that turns a map tile into a card via BuildWorldOverviewSubject.</summary>
 	public static LookupSubject BuildTileSubject(GameLocation location, Vector2 tilePos)
 	{
 		//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 		return BuildWorldOverviewSubject(location, tilePos);
 	}
 
+	/// <summary>
+	/// Assembles the BIG almanac card from many section builders: daily highlights, calendar,
+	/// luck, weather, events, farm chores, CC progress, friendship, perfection, museum,
+	/// mines, seasonal crops/forage, skills, island, and optional tile details. Sections only
+	/// appear when they have content AND their config toggle allows them.
+	/// </summary>
 	public static LookupSubject BuildWorldOverviewSubject(GameLocation? location = null, Vector2? tilePos = null)
 	{
 		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
@@ -855,6 +907,7 @@ namespace BetterQOL
 		return lookupSubject;
 	}
 
+	/// <summary>Daily headline rows: date, luck/weather keywords, and quick chore tallies.</summary>
 	private static LookupSection BuildDailyOverviewSummarySection()
 	{
 		//IL_0186: Unknown result type (might be due to invalid IL or missing references)
@@ -950,6 +1003,8 @@ namespace BetterQOL
 				name = (((Character)n).displayName ?? ((Character)n).Name)
 			})).ToString())) : ((object)ModEntry.I18n.Get("lookup.calendar.no-birthdays")).ToString());
 			bool flag = Game1.getLocationFromName("Town")?.characters?.Any(c => c.Name.Equals("Bookseller", StringComparison.OrdinalIgnoreCase)) ?? false;
+			// Weekday index: seasons are 28 days = exactly 4 weeks, so (day-1) % 7 gives
+			// 0=Monday..6=Sunday. Cart visits Friday (4), Sunday (6), and winter fair days.
 			int dayOfMonth = Game1.dayOfMonth;
 			int num6 = (dayOfMonth - 1) % 7;
 			bool flag2 = num6 == 4 || num6 == 6 || (Game1.currentSeason == "winter" && dayOfMonth >= 15 && dayOfMonth <= 17);
@@ -985,6 +1040,8 @@ namespace BetterQOL
 			}
 			else
 			{
+				// Each completed CC room sets one "cc..." mail flag on the host player,
+				// so counting flags = counting finished rooms.
 				int num7 = 0;
 				if (((NetHashSet<string>)(object)Game1.MasterPlayer.mailReceived).Contains("ccBoilerRoom"))
 				{
@@ -1022,8 +1079,10 @@ namespace BetterQOL
 		return lookupSection;
 	}
 
+	/// <summary>Formats today's date with weekday, season, day and year in one localized string.</summary>
 	private static string GetFullDateString()
 	{
+		// (day - 1) % 7 turns the 1-based day number into a weekday index for the switch below.
 		int dayOfMonth = Game1.dayOfMonth;
 		int num = (dayOfMonth - 1) % 7;
 		if (1 == 0)
@@ -1057,6 +1116,7 @@ namespace BetterQOL
 		})).ToString();
 	}
 
+	/// <summary>28-day calendar: birthdays, festivals, Queen of Sauce episodes, and cart days.</summary>
 	private static LookupSection BuildCalendarSection()
 	{
 		//IL_024e: Unknown result type (might be due to invalid IL or missing references)
@@ -1068,6 +1128,7 @@ namespace BetterQOL
 		//IL_035b: Unknown result type (might be due to invalid IL or missing references)
 		LookupSection lookupSection = new LookupSection((ModEntry.I18n.Get("lookup.section.calendar-events")));
 		List<NPC> list = new List<NPC>();
+		// (NPC, int) tuples pair each villager with days-until-birthday for easy sorting.
 		List<(NPC, int)> list2 = new List<(NPC, int)>();
 		foreach (NPC allCharacter in Utility.getAllCharacters())
 		{
@@ -1103,6 +1164,7 @@ namespace BetterQOL
 		if (list2.Count > 0)
 		{
 			List<LookupLink> list4 = new List<LookupLink>();
+			// OrderBy sorts the tuples by their DaysUntil field so soonest birthdays come first.
 			foreach (var item4 in list2.OrderBy<(NPC, int), int>(((NPC Npc, int DaysUntil) u) => u.DaysUntil))
 			{
 				NPC item = item4.Item1;
@@ -1138,6 +1200,7 @@ namespace BetterQOL
 		return lookupSection;
 	}
 
+	/// <summary>Returns the festival name for a season/day pair, or null if none.</summary>
 	private static string? GetFestivalName(string season, int day)
 	{
 		switch (season.ToLower())
@@ -1201,6 +1264,7 @@ namespace BetterQOL
 		return null;
 	}
 
+	/// <summary>Shows DailyLuck with a keyword badge (best/good/normal/bad/worst).</summary>
 	private static LookupSection BuildDailyLuckSection()
 	{
 		//IL_0151: Unknown result type (might be due to invalid IL or missing references)
@@ -1246,6 +1310,7 @@ namespace BetterQOL
 		return lookupSection;
 	}
 
+	/// <summary>Detects tomorrow's forecast from Game1.weatherForTomorrow plus special rain types.</summary>
 	private static LookupSection BuildWeatherSection(GameLocation? location)
 	{
 		//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
@@ -1305,6 +1370,7 @@ namespace BetterQOL
 		return lookupSection;
 	}
 
+	/// <summary>One-off daily highlights: TV recipes, traveling-cart stock, and other events.</summary>
 	private static LookupSection BuildSpecialEventsSection()
 	{
 		//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
@@ -1344,6 +1410,7 @@ namespace BetterQOL
 			})).ToString(), (Color?)new Color(20, 110, 220)));
 		}
 		int dayOfMonth = Game1.dayOfMonth;
+		// Weekday again: 6=Sunday airs a NEW recipe, 2=Wednesday reruns an old one.
 		int num = (dayOfMonth - 1) % 7;
 		switch (num)
 		{
@@ -1376,6 +1443,8 @@ namespace BetterQOL
 		}
 		else
 		{
+			// Days until Friday: (target - today + 7) % 7 wraps around the week; the
+			// result of 0 is bumped to 7 so "today" never claims a visit.
 			int num2 = (4 - num + 7) % 7;
 			if (num2 == 0)
 			{
@@ -1390,6 +1459,16 @@ namespace BetterQOL
 		return lookupSection;
 	}
 
+	/// <summary>
+	/// The Queen of Sauce TV cooking-show lookup: returns the recipe airing on a given
+	/// Sunday (new episode) or Wednesday (rerun), or null when nothing airs / data fails.
+	/// </summary>
+	/// <remarks>
+	/// BEGINNER NOTES:
+	/// - The game stores every recipe's air date as an absolute day number since year 1;
+	///   dividing by 7 groups days into "weeks" so any Sunday/Wednesday can find its show.
+	/// - Reruns skip recipes the player already knows, picking the first unknown one instead.
+	/// </remarks>
 	private static (string RecipeName, bool Known)? GetQueenOfSauceRecipe(bool isSunday)
 	{
 		try
@@ -1415,6 +1494,8 @@ namespace BetterQOL
 				if (1 == 0)
 				{
 				}
+				// Absolute day since year 1: (year-1)*112 days + season offset (0/28/56/84)
+				// + day of month; dividing by 7 gives the "week number" used as the TV key.
 				int num2 = num;
 				if (dictionary.TryGetValue((((Game1.year - 1) * 112 + Game1.dayOfMonth + num2) / 7).ToString(), out var value))
 				{
@@ -1429,6 +1510,8 @@ namespace BetterQOL
 			}
 			else
 			{
+				// Rerun: walk the schedule in order and air the first recipe the
+				// player has NOT learned yet (dictionary order = chronological).
 				foreach (KeyValuePair<string, string> item2 in dictionary)
 				{
 					string[] array2 = item2.Value.Split('/');
@@ -1445,6 +1528,7 @@ namespace BetterQOL
 		return null;
 	}
 
+	/// <summary>Farm-wide chore summary: machines ready, watered crops, petted animals, hay, and more.</summary>
 	private static LookupSection BuildFarmSummarySection()
 	{
 		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
@@ -1526,6 +1610,9 @@ namespace BetterQOL
 						num6++;
 					}
 				}
+				// Machines ready for harvest exist in TWO places - loose on the farm
+				// (scanned above) and inside building interiors like barns/coops,
+				// so every building's "indoors" gets its own pass here.
 				foreach (Building building in ((GameLocation)farm).buildings)
 				{
 					if (((NetFieldBase<GameLocation, NetRef<GameLocation>>)(object)building.indoors).Value == null)
@@ -1615,6 +1702,7 @@ namespace BetterQOL
 			if (farm2 != null)
 			{
 				int value2 = ((NetFieldBase<int, NetInt>)(object)((GameLocation)farm2).piecesOfHay).Value;
+				// Hay stored across all silos: 240 capacity each.
 				int num7 = ((IEnumerable<Building>)((GameLocation)farm2).buildings).Count((Building b) => ((NetFieldBase<string, NetString>)(object)b.buildingType).Value.Contains("Silo")) * 240;
 				if (num7 > 0)
 				{
@@ -1631,6 +1719,8 @@ namespace BetterQOL
 		}
 		try
 		{
+			// Greenhouse and island farm are separate GameLocations, so the same
+			// crop scan runs again there (each wrapped in its own try for safety).
 			GameLocation locationFromName = Game1.getLocationFromName("Greenhouse");
 			if (locationFromName != null)
 			{
@@ -1710,6 +1800,7 @@ namespace BetterQOL
 		return lookupSection;
 	}
 
+	/// <summary>Extra rows for a clicked map tile: building on it, crop, terrain feature, machines.</summary>
 	private static LookupSection BuildTileDetailsSection(GameLocation location, Vector2 tilePos)
 	{
 		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
@@ -1735,6 +1826,7 @@ namespace BetterQOL
 		return lookupSection;
 	}
 
+	/// <summary>Crops planted this season: growth progress, watered state, regrow behavior.</summary>
 	private static LookupSection BuildSeasonalCropsSection()
 	{
 		//IL_02dd: Unknown result type (might be due to invalid IL or missing references)
@@ -1761,6 +1853,8 @@ namespace BetterQOL
 					ParsedItemData harvestItem = ItemRegistry.GetData(value.HarvestItemId);
 					if (harvestItem != null && !list.Any((LookupLink l) => l.Text.StartsWith(harvestItem.DisplayName)))
 					{
+						// Growth time = the sum of every phase length in DaysInPhase;
+						// RegrowDays > 0 means the crop keeps producing after harvest.
 						int days = value.DaysInPhase?.Sum() ?? 0;
 						string text2 = ((value.RegrowDays > 0) ? ((object)ModEntry.I18n.Get("lookup.seasonal.crop-info-regrow", (object)new
 						{
@@ -1792,6 +1886,7 @@ namespace BetterQOL
 		return lookupSection;
 	}
 
+	/// <summary>Forageable items per season with clickable links (hardcoded id lists per season).</summary>
 	private static LookupSection BuildSeasonalForageSection()
 	{
 		//IL_0257: Unknown result type (might be due to invalid IL or missing references)
@@ -1807,6 +1902,8 @@ namespace BetterQOL
 		if (1 == 0)
 		{
 		}
+		// Forageables aren't tagged in data, so each season gets a hardcoded list of
+		// qualified item ids (the "(O)" prefix marks "Object" category).
 		string[] array = text2 switch
 		{
 			"spring" => new string[7] { "(O)16", "(O)18", "(O)20", "(O)22", "(O)399", "(O)257", "(O)296" }, 
@@ -1829,6 +1926,7 @@ namespace BetterQOL
 				list.Add(new LookupLink(data.DisplayName, null, Game1.textColor, data.GetTexture(), data.GetSourceRect(0, null), () => (item != null) ? BuildItemSubject(item) : null));
 			}
 		}
+		// Beach forage (clams, cockles, mussels, coral...) shows in every season.
 		List<LookupLink> list2 = new List<LookupLink>();
 		string[] array4 = new string[4] { "(O)372", "(O)393", "(O)397", "(O)152" };
 		foreach (string text4 in array4)
@@ -1851,6 +1949,7 @@ namespace BetterQOL
 		return lookupSection;
 	}
 
+	/// <summary>Five skill levels, mastery progress (sum of levels >= 50 unlocks it), and stat rows.</summary>
 	private static LookupSection BuildSkillsAndMasterySection()
 	{
 		//IL_0095: Unknown result type (might be due to invalid IL or missing references)
@@ -1881,6 +1980,8 @@ namespace BetterQOL
 		})).ToString(), (Color?)new Color(0, 140, 0)));
 		try
 		{
+			// Mastery unlocks only when the five skills total 50 levels (10 each);
+			// before that, the whole mastery panel stays hidden.
 			int num = farmingLevel + miningLevel + foragingLevel + fishingLevel + combatLevel;
 			if (num >= 50)
 			{
@@ -1889,6 +1990,7 @@ namespace BetterQOL
 				{
 					exp = $"{value:N0}"
 				})).ToString(), (Color?)new Color(180, 50, 180)));
+				// Each mastery perk claims a "Mastery_0..4" stat flag (0 = not claimed).
 				bool flag = Game1.player.stats.Get("Mastery_0") != 0;
 				bool flag2 = Game1.player.stats.Get("Mastery_1") != 0;
 				bool flag3 = Game1.player.stats.Get("Mastery_2") != 0;
@@ -1907,6 +2009,7 @@ namespace BetterQOL
 		return lookupSection;
 	}
 
+	/// <summary>Ginger Island progress: golden walnuts found (goal 130) and island unlocks.</summary>
 	private static LookupSection? BuildIslandProgressSection()
 	{
 		//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
@@ -1914,6 +2017,8 @@ namespace BetterQOL
 		//IL_012e: Unknown result type (might be due to invalid IL or missing references)
 		try
 		{
+			// The island section only exists once the player has actually been there
+			// (mail flag "Visited_Island" or at least one walnut found).
 			if (((NetFieldBase<NetWorldState, NetRef<NetWorldState>>)(object)Game1.netWorldState).Value.GoldenWalnutsFound > 0 || Game1.player.hasOrWillReceiveMail("Visited_Island"))
 			{
 				LookupSection lookupSection = new LookupSection((ModEntry.I18n.Get("lookup.section.ginger-island")));
@@ -1938,6 +2043,7 @@ namespace BetterQOL
 		return null;
 	}
 
+	/// <summary>Community Center bundles: rooms, per-bundle completion bits, or Joja route costs.</summary>
 	private static LookupSection BuildCommunityCenterSection()
 	{
 		//IL_0073: Unknown result type (might be due to invalid IL or missing references)
@@ -1964,6 +2070,7 @@ namespace BetterQOL
 		LookupSection lookupSection = new LookupSection((ModEntry.I18n.Get("lookup.section.community-center")));
 		try
 		{
+			// Joja membership replaces the CC route entirely - show membership costs instead.
 			if (((NetHashSet<string>)(object)Game1.MasterPlayer.mailReceived).Contains("JojaMember"))
 			{
 				lookupSection.Fields.Add(new LookupField((ModEntry.I18n.Get("lookup.section.status")), ((object)ModEntry.I18n.Get("lookup.joja.active-desc")).ToString(), (Color?)new Color(20, 110, 220)));
@@ -1999,8 +2106,9 @@ namespace BetterQOL
 				lookupSection.Fields.Add(new LookupField((ModEntry.I18n.Get("lookup.cc.abandoned-jojamart")), ((NetHashSet<string>)(object)Game1.MasterPlayer.mailReceived).Contains("ccMovieTheater") ? ((object)ModEntry.I18n.Get("lookup.cc.theater-built")).ToString() : ((object)ModEntry.I18n.Get("lookup.cc.theater-missing")).ToString(), (Color?)(((NetHashSet<string>)(object)Game1.MasterPlayer.mailReceived).Contains("ccMovieTheater") ? new Color(0, 140, 0) : new Color(180, 50, 180))));
 				return lookupSection;
 			}
-			Dictionary<string, string> dictionary = DataLoader.Bundles(Game1.content);
-			NetBundles bundles = ((NetFieldBase<NetWorldState, NetRef<NetWorldState>>)(object)Game1.netWorldState).Value.Bundles;
+		// Bundles data table (definitions) + the live NetBundles (per-slot donation bits).
+		Dictionary<string, string> dictionary = DataLoader.Bundles(Game1.content);
+		NetBundles bundles = ((NetFieldBase<NetWorldState, NetRef<NetWorldState>>)(object)Game1.netWorldState).Value.Bundles;
 			if (dictionary == null)
 			{
 				lookupSection.Fields.Add(new LookupField((ModEntry.I18n.Get("lookup.section.status")), ((object)ModEntry.I18n.Get("lookup.world.cc-in-progress")).ToString(), (Color?)new Color(0, 140, 0)));
@@ -2038,6 +2146,7 @@ namespace BetterQOL
 				}
 			};
 			Dictionary<string, List<(string, string)>> dictionary3 = new Dictionary<string, List<(string, string)>>();
+			// Bundle keys look like "Room/BundleId/BundleName" - group all bundles by room.
 			foreach (KeyValuePair<string, string> item3 in dictionary)
 			{
 				string key = item3.Key.Split('/')[0];
@@ -2057,6 +2166,8 @@ namespace BetterQOL
 				List<LookupLink> list = new List<LookupLink>();
 				foreach (var item5 in value)
 				{
+					// Bundle VALUE fields: [0]=icon color, [2]="id stack quality ..." triplets,
+					// [4]=items required (when the bundle allows fewer than all slots).
 					string item = item5.Item1;
 					string item2 = item5.Item2;
 					string[] array = item2.Split('/');
@@ -2067,12 +2178,15 @@ namespace BetterQOL
 					string text = array[0];
 					string text2 = array[2];
 					int num2 = ((array.Length > 4 && int.TryParse(array[4], out var result)) ? result : (-1));
+					// Bundle id comes from the KEY ("Room/Id/Name"); parse field [1].
 					int num3 = 0;
 					string[] array2 = item.Split('/');
 					if (array2.Length > 1 && int.TryParse(array2[1], out var result2))
 					{
 						num3 = result2;
 					}
+					// Completion check: the live bundle stores one bool per item slot;
+					// count the true bits and compare against the required amount.
 					bool flag = false;
 					if (((NetDictionary<int, bool[], NetArray<bool, NetBool>, SerializableDictionary<int, bool[]>, NetBundles>)(object)bundles).TryGetValue(num3, out array3) && array3 != null)
 					{
@@ -2090,6 +2204,8 @@ namespace BetterQOL
 						num++;
 						continue;
 					}
+					// List missing items: walk the triplets in strides of 3 (id/stack/quality)
+					// and skip slots already donated; cap the link list at 8 per bundle.
 					string[] array5 = text2.Split(' ');
 					for (int num7 = 0; num7 + 2 < array5.Length; num7 += 3)
 					{
@@ -2136,6 +2252,7 @@ namespace BetterQOL
 		return lookupSection;
 	}
 
+	/// <summary>All villagers ranked by friendship hearts, with dating/married status and gift info.</summary>
 	private static LookupSection BuildFriendshipOverviewSection()
 	{
 		//IL_02bc: Unknown result type (might be due to invalid IL or missing references)
@@ -2160,8 +2277,11 @@ namespace BetterQOL
 					continue;
 				}
 				num3++;
+				// 250 friendship points = one heart (same rate as everywhere else in the game).
 				int num4 = val.Points / 250;
 				num2 += num4;
+				// Datable villagers cap at 8 hearts until you start dating them (then 10);
+				// everyone else can reach 10 right away.
 				int num5 = ((((NetFieldBase<bool, NetBool>)(object)allCharacter.datable).Value && !val.IsDating()) ? 8 : 10);
 				if (num4 >= num5)
 				{
@@ -2212,6 +2332,10 @@ namespace BetterQOL
 		return lookupSection;
 	}
 
+	/// <summary>
+	/// Perfection tracker: 12 monster-slayer goals, friend hearts, skill total, stardrops,
+	/// cooked/crafted recipes, fish caught, walnuts, and a weighted overall percentage.
+	/// </summary>
 	private static LookupSection BuildProgressAndPerfectionSection()
 	{
 		//IL_02ac: Unknown result type (might be due to invalid IL or missing references)
@@ -2369,6 +2493,7 @@ namespace BetterQOL
 			int item46 = monsterSlayerProgress12.CurrentKills;
 			int item47 = monsterSlayerProgress12.RequiredGoal;
 			bool item48 = monsterSlayerProgress12.IsCompleted;
+			// 12 slayer goals: count how many monster categories are fully completed.
 			int num5 = (item4 ? 1 : 0) + (item8 ? 1 : 0) + (item12 ? 1 : 0) + (item16 ? 1 : 0) + (item20 ? 1 : 0) + (item24 ? 1 : 0) + (item28 ? 1 : 0) + (item32 ? 1 : 0) + (item36 ? 1 : 0) + (item40 ? 1 : 0) + (item44 ? 1 : 0) + (item48 ? 1 : 0);
 			lookupSection.Fields.Add(new LookupField((ModEntry.I18n.Get("lookup.perfection.slayer-pct")), ((object)ModEntry.I18n.Get("lookup.perfection.slayer-format", (object)new
 			{
@@ -2376,6 +2501,8 @@ namespace BetterQOL
 			})).ToString(), (Color)((num5 == 12) ? new Color(0, 140, 0) : Game1.textColor)));
 			int num6 = 0;
 			int num7 = 0;
+			// HashSet.Add returns false for duplicates, so it doubles as a de-dup filter
+			// while counting every socializable villager exactly once.
 			HashSet<string> hashSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 			Friendship val3 = default(Friendship);
 			foreach (NPC allCharacter in Utility.getAllCharacters())
@@ -2483,6 +2610,8 @@ namespace BetterQOL
 					}
 				}
 			}
+			// Fallback total (67 vanilla fish) when the data table can't be read,
+			// so the percentage never divides by zero or shows 0/0.
 			if (num15 == 0)
 			{
 				num15 = 67;
@@ -2497,7 +2626,11 @@ namespace BetterQOL
 			{
 				count = goldenWalnutsFound
 			})).ToString(), (Color)((goldenWalnutsFound >= 130) ? new Color(0, 140, 0) : Game1.textColor)));
+			// Weighted overall score: each category contributes up to its weight
+			// (e.g. slayer 10, friends 10, skills 5, fish 10, walnuts 5...), summed
+			// into a percentage that caps at 100.
 			float num17 = num3 + (float)num4 * 1f + (flag ? 10f : 0f) + (float)num5 / 12f * 10f + (float)num6 / (float)Math.Max(1, num7) * 10f + ((num9 >= 50) ? 5f : ((float)num9 / 50f * 5f)) + (float)num10 / 7f * 10f + (float)num11 / (float)Math.Max(1, count) * 10f + (float)num12 / (float)Math.Max(1, num13) * 10f + (float)num16 / (float)Math.Max(1, num15) * 10f + (float)goldenWalnutsFound / 130f * 5f;
+			// Insert(0, ...) puts the headline percentage FIRST, above the detail rows.
 			lookupSection.Fields.Insert(0, new LookupField(((object)ModEntry.I18n.Get("lookup.perfection.tracker-title")).ToString(), ((object)ModEntry.I18n.Get("lookup.perfection.overall-format", (object)new
 			{
 				percent = $"{Math.Min(100f, num17):0.0}"
@@ -2509,6 +2642,7 @@ namespace BetterQOL
 		return lookupSection;
 	}
 
+		/// <summary>Museum card: donations vs 95 total, missing artifacts/minerals links, milestones.</summary>
 		private static LookupSection BuildMuseumProgressSection()
 	{
 		LookupSection lookupSection = new LookupSection(ModEntry.I18n.Get("lookup.section.museum-progress"));
@@ -2521,6 +2655,8 @@ namespace BetterQOL
 				count = donatedCount,
 				remaining = Math.Max(0, 95 - donatedCount)
 			}).ToString(), (donatedCount >= 95) ? new Color(0, 140, 0) : new Color(180, 100, 0)));
+			// MuseumPieces stores ids WITHOUT the "(O)" prefix; collect both forms so
+			// later lookups match either way.
 			HashSet<string> hashSet = new HashSet<string>();
 			if (museumPieces != null)
 			{
@@ -2596,7 +2732,9 @@ namespace BetterQOL
 				5, 10, 15, 20, 25, 30, 35, 40, 50, 60,
 				70, 80, 90, 95
 			};
-			int num = source.FirstOrDefault((int m) => m > donatedCount);
+			// Donation milestones (rewards at 5, 10, ... 95 items); FirstOrDefault picks the
+		// first threshold still above our count = the NEXT milestone. 0 means all reached.
+		int num = source.FirstOrDefault((int m) => m > donatedCount);
 			if (num > 0)
 			{
 				lookupSection.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.building.milestone"), ModEntry.I18n.Get("lookup.museum.next-milestone-format", new
@@ -2616,11 +2754,13 @@ namespace BetterQOL
 		return lookupSection;
 	}
 
+	/// <summary>Mines card: deepest regular floor, Skull Cavern record, and 12 slayer goals.</summary>
 	private static LookupSection BuildMineAndGuildProgressSection()
 	{
 		LookupSection lookupSection = new LookupSection(ModEntry.I18n.Get("lookup.section.mine-guild-progress"));
 		try
 		{
+			// Floors 1-120 are the regular mine; anything deeper is the Skull Cavern record.
 			int deepestMineLevel = Game1.player.deepestMineLevel;
 			int num = Math.Min(120, deepestMineLevel);
 			lookupSection.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.mine.regular-depth-label"), (num >= 120) ? ModEntry.I18n.Get("lookup.mine.regular-depth-bottom").ToString() : ModEntry.I18n.Get("lookup.mine.regular-depth-progress", new
@@ -2638,6 +2778,8 @@ namespace BetterQOL
 			{
 				lookupSection.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.farmer.skull-record"), ModEntry.I18n.Get("lookup.farmer.skull-unexplored").ToString(), Color.DarkSlateGray));
 			}
+			// All 12 slayer goals fetched up front into a fixed-size tuple array,
+			// then rendered one row per category below.
 			(string, int, int, bool)[] array = new(string, int, int, bool)[12]
 			{
 				GetMonsterSlayerProgress("Green Slime"),
