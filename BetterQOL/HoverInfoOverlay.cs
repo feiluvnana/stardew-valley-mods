@@ -605,17 +605,22 @@ namespace BetterQOL
 
         /// <summary>
         /// Composes the bush tooltip: tea bush maturity/harvest window or berry bloom state.
+        /// Returns null for unharvestable decorative or non-blooming berry bushes to prevent empty tooltips.
         /// </summary>
-        private static TooltipModel BuildBushTooltip(Bush bush)
+        private static TooltipModel? BuildBushTooltip(Bush bush)
         {
             var info = TreeHelper.GetBushInfo(bush);
+            if (info == null)
+                return null;
+
+            // Only show tooltips for berry bushes if they are actively blooming (ready to harvest)
+            if (!info.IsTeaBush && !info.IsInBloom)
+                return null;
+
             var tooltip = new TooltipModel
             {
-                Title = info?.Name ?? ModEntry.I18n.Get("hover.bush.generic")
+                Title = info.Name
             };
-
-            if (info == null)
-                return tooltip;
 
             if (info.IsTeaBush && !info.IsMature)
             {

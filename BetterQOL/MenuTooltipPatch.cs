@@ -87,8 +87,8 @@ namespace BetterQOL
         /// <param name="__result">Harmony-injected return value; 'ref' lets us MODIFY what callers receive.</param>
         public static void DescriptionPostfix(Item? __instance, ref string __result)
         {
-            // Nothing to decorate when there's no item, or when no menu is open on screen.
-            if (__instance == null || Game1.activeClickableMenu == null)
+            // Nothing to decorate when there's no item, or when the world is not loaded.
+            if (__instance == null || !Context.IsWorldReady)
                 return;
 
             string extra = BuildItemExtraText(__instance);
@@ -118,27 +118,7 @@ namespace BetterQOL
             // ModEntry.Config is a static shortcut to the live settings object.
             var config = ModEntry.Config;
 
-            // 1. Sell Price
-            if (config.ShowItemSellPriceOnHover)
-            {
-                // sellToStorePrice() already applies shipping-profession price bonuses.
-                int singlePrice = item.sellToStorePrice();
-                if (singlePrice > 0)
-                {
-                    if (item.Stack > 1)
-                    {
-                        // Anonymous type 'new { ... }' passes named values into the translation template;
-                        // total = per-unit price multiplied by stack size.
-                        lines.Add(ModEntry.I18n.Get("hover.item.sell-price-stack", new { price = singlePrice, total = singlePrice * item.Stack, count = item.Stack }));
-                    }
-                    else
-                    {
-                        lines.Add(ModEntry.I18n.Get("hover.item.sell-price", new { price = singlePrice }));
-                    }
-                }
-            }
-
-            // 2. Community Center Bundles
+            // 1. Community Center Bundles
             if (config.ShowBundleNeedOnHover)
             {
                 var bundles = GetNeededBundles(item);
@@ -148,7 +128,7 @@ namespace BetterQOL
                 }
             }
 
-            // 3. Museum Donation
+            // 2. Museum Donation
             if (config.ShowMuseumNeedOnHover)
             {
                 // Museum pieces are artifacts ("Arch" type) and minerals; mineralsCategory is a
@@ -196,10 +176,17 @@ namespace BetterQOL
                     return results;
 
                 // Raw asset shape: key "AreaName/index", value "/"-separated fields
-                // (short name at [0], ingredient list at [2], required count at [4], localized name at [5]).
+                // (short name at [0], ingredient list at [2], required count at [4], localized name at [5] or [6]).
                 var bundleData = DataLoader.Bundles(Game1.content);
                 if (bundleData == null || Game1.netWorldState.Value.Bundles == null)
                     return results;
+
+                Dictionary<string, string>? bundleNamesDict = null;
+                try
+                {
+                    bundleNamesDict = Game1.content.Load<Dictionary<string, string>>("Strings\\BundleNames");
+                }
+                catch { }
 
                 foreach (var kvp in bundleData)
                 {
@@ -214,7 +201,21 @@ namespace BetterQOL
                     if (parts.Length < 3)
                         continue;
 
-                    string bundleName = parts.Length >= 6 && !string.IsNullOrEmpty(parts[5]) ? parts[5] : parts[0];
+                    // Resolve localized bundle name: index 6 (Vietnamese/xnb), index 5 (vanilla display name), or Strings/BundleNames lookup
+                    string bundleName = parts[0];
+                    if (parts.Length >= 7 && !string.IsNullOrWhiteSpace(parts[6]))
+                    {
+                        bundleName = parts[6].Trim();
+                    }
+                    else if (parts.Length >= 6 && !string.IsNullOrWhiteSpace(parts[5]))
+                    {
+                        bundleName = parts[5].Trim();
+                    }
+                    else if (bundleNamesDict != null && bundleNamesDict.TryGetValue(parts[0], out string? locName) && !string.IsNullOrWhiteSpace(locName))
+                    {
+                        bundleName = locName.Trim();
+                    }
+
                     string[] reqParts = parts[2].Split(' ');
 
                     // World state stores one bool per ingredient slot (true = already donated);

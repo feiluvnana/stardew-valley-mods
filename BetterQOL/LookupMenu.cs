@@ -49,6 +49,7 @@ namespace BetterQOL
         private int ScrollOffset = 0;
         private int MaxScrollOffset = 0;
         private const int ScrollStep = 40;
+        private bool IsDraggingScrollbar = false;
 
         // Links currently visible on screen (re-registered during every Draw call) and
         // which link/category the cursor hovers, used for highlight coloring.
@@ -344,6 +345,22 @@ namespace BetterQOL
                 return;
             }
 
+            // Scrollbar Track & Thumb Drag Click
+            if (MaxScrollOffset > 0)
+            {
+                int trackX = xPositionOnScreen + width - 64;
+                int trackY = yPositionOnScreen + 104 + 18 + 44;
+                int trackH = (height - 172) - 88;
+                var trackRect = new Rectangle(trackX - 6, trackY, 36, trackH);
+                if (trackRect.Contains(x, y))
+                {
+                    IsDraggingScrollbar = true;
+                    SetScrollFromY(y, trackY, trackH, height - 172);
+                    Game1.playSound("shiny4");
+                    return;
+                }
+            }
+
             // Click Search Box
             if (SearchBoxComponent != null && SearchBoxComponent.containsPoint(x, y))
             {
@@ -384,6 +401,46 @@ namespace BetterQOL
                 CloseMenu();
             }
         }
+
+        /// <summary>
+        /// OVERRIDE: left click held - drags the scrollbar thumb smoothly when dragging.
+        /// </summary>
+        public override void leftClickHeld(int x, int y)
+        {
+            base.leftClickHeld(x, y);
+            if (IsDraggingScrollbar && MaxScrollOffset > 0)
+            {
+                int trackY = yPositionOnScreen + 104 + 18 + 44;
+                int trackH = (height - 172) - 88;
+                SetScrollFromY(y, trackY, trackH, height - 172);
+            }
+        }
+
+        /// <summary>
+        /// OVERRIDE: release left click - ends scrollbar dragging.
+        /// </summary>
+        public override void releaseLeftClick(int x, int y)
+        {
+            base.releaseLeftClick(x, y);
+            IsDraggingScrollbar = false;
+        }
+
+        /// <summary>
+        /// Maps vertical mouse position onto the scrollbar track to compute the new ScrollOffset.
+        /// </summary>
+        private void SetScrollFromY(int mouseY, int trackY, int trackH, int contentHeight)
+        {
+            int thumbH = Math.Max(20, (int)(trackH * (float)contentHeight / (contentHeight + MaxScrollOffset)));
+            int usableTrackH = trackH - thumbH;
+            if (usableTrackH <= 0)
+                return;
+
+            float relY = mouseY - trackY - (thumbH / 2f);
+            float pct = Math.Clamp(relY / usableTrackH, 0f, 1f);
+            ScrollOffset = (int)Math.Round(pct * MaxScrollOffset);
+        }
+
+
 
         /// <summary>
         /// OVERRIDE: right-click goes BACK through history, or closes the menu entirely

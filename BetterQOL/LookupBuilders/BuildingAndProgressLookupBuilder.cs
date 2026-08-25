@@ -2114,39 +2114,31 @@ namespace BetterQOL
 				lookupSection.Fields.Add(new LookupField((ModEntry.I18n.Get("lookup.section.status")), ((object)ModEntry.I18n.Get("lookup.world.cc-in-progress")).ToString(), (Color?)new Color(0, 140, 0)));
 				return lookupSection;
 			}
-			Dictionary<string, string> dictionary2 = new Dictionary<string, string>
+			Dictionary<string, string>? bundleNamesDict = null;
+			try
 			{
-				{
-					"Pantry",
-					((object)ModEntry.I18n.Get("lookup.cc.room.pantry")).ToString()
-				},
-				{
-					"CraftsRoom",
-					((object)ModEntry.I18n.Get("lookup.cc.room.crafts")).ToString()
-				},
-				{
-					"FishTank",
-					((object)ModEntry.I18n.Get("lookup.cc.room.fish-tank")).ToString()
-				},
-				{
-					"BoilerRoom",
-					((object)ModEntry.I18n.Get("lookup.cc.room.boiler")).ToString()
-				},
-				{
-					"Vault",
-					((object)ModEntry.I18n.Get("lookup.cc.room.vault")).ToString()
-				},
-				{
-					"BulletinBoard",
-					((object)ModEntry.I18n.Get("lookup.cc.room.bulletin")).ToString()
-				},
-				{
-					"AbandonedJojaMart",
-					((object)ModEntry.I18n.Get("lookup.cc.room.abandoned-joja")).ToString()
-				}
+				bundleNamesDict = Game1.content.Load<Dictionary<string, string>>("Strings\\BundleNames");
+			}
+			catch { }
+
+			Dictionary<string, string> roomNameMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+			{
+				{ "Pantry", ModEntry.I18n.Get("lookup.cc.room.pantry").ToString() },
+				{ "Crafts Room", ModEntry.I18n.Get("lookup.cc.room.crafts").ToString() },
+				{ "CraftsRoom", ModEntry.I18n.Get("lookup.cc.room.crafts").ToString() },
+				{ "Fish Tank", ModEntry.I18n.Get("lookup.cc.room.fish-tank").ToString() },
+				{ "FishTank", ModEntry.I18n.Get("lookup.cc.room.fish-tank").ToString() },
+				{ "Boiler Room", ModEntry.I18n.Get("lookup.cc.room.boiler").ToString() },
+				{ "BoilerRoom", ModEntry.I18n.Get("lookup.cc.room.boiler").ToString() },
+				{ "Vault", ModEntry.I18n.Get("lookup.cc.room.vault").ToString() },
+				{ "Bulletin Board", ModEntry.I18n.Get("lookup.cc.room.bulletin").ToString() },
+				{ "BulletinBoard", ModEntry.I18n.Get("lookup.cc.room.bulletin").ToString() },
+				{ "Abandoned Joja Mart", ModEntry.I18n.Get("lookup.cc.room.abandoned-joja").ToString() },
+				{ "AbandonedJojaMart", ModEntry.I18n.Get("lookup.cc.room.abandoned-joja").ToString() }
 			};
+
 			Dictionary<string, List<(string, string)>> dictionary3 = new Dictionary<string, List<(string, string)>>();
-			// Bundle keys look like "Room/BundleId/BundleName" - group all bundles by room.
+			// Bundle keys look like "Room/BundleId" or "Room/BundleId/BundleName" - group all bundles by room.
 			foreach (KeyValuePair<string, string> item3 in dictionary)
 			{
 				string key = item3.Key.Split('/')[0];
@@ -2160,14 +2152,14 @@ namespace BetterQOL
 			foreach (KeyValuePair<string, List<(string, string)>> item4 in dictionary3)
 			{
 				string key2 = item4.Key;
-				string valueOrDefault = dictionary2.GetValueOrDefault(key2, key2);
+				string valueOrDefault = roomNameMap.TryGetValue(key2, out var rName) ? rName : (roomNameMap.TryGetValue(key2.Replace(" ", ""), out var rName2) ? rName2 : key2);
 				List<(string, string)> value = item4.Value;
 				int num = 0;
 				List<LookupLink> list = new List<LookupLink>();
 				foreach (var item5 in value)
 				{
-					// Bundle VALUE fields: [0]=icon color, [2]="id stack quality ..." triplets,
-					// [4]=items required (when the bundle allows fewer than all slots).
+					// Bundle VALUE fields: [0]=English name, [1]=reward, [2]="id stack quality ..." triplets,
+					// [4]=items required, [5]=vanilla localized name, [6]=xnb localized name.
 					string item = item5.Item1;
 					string item2 = item5.Item2;
 					string[] array = item2.Split('/');
@@ -2176,9 +2168,22 @@ namespace BetterQOL
 						continue;
 					}
 					string text = array[0];
+					if (array.Length >= 7 && !string.IsNullOrWhiteSpace(array[6]))
+					{
+						text = array[6].Trim();
+					}
+					else if (array.Length >= 6 && !string.IsNullOrWhiteSpace(array[5]))
+					{
+						text = array[5].Trim();
+					}
+					else if (bundleNamesDict != null && bundleNamesDict.TryGetValue(array[0], out string? locBundle) && !string.IsNullOrWhiteSpace(locBundle))
+					{
+						text = locBundle.Trim();
+					}
+
 					string text2 = array[2];
 					int num2 = ((array.Length > 4 && int.TryParse(array[4], out var result)) ? result : (-1));
-					// Bundle id comes from the KEY ("Room/Id/Name"); parse field [1].
+					// Bundle id comes from the KEY ("Room/Id"); parse field [1].
 					int num3 = 0;
 					string[] array2 = item.Split('/');
 					if (array2.Length > 1 && int.TryParse(array2[1], out var result2))
@@ -2216,9 +2221,22 @@ namespace BetterQOL
 							continue;
 						}
 						ParsedItemData itemData = ItemRegistry.GetData(text3) ?? ItemRegistry.GetData("(O)" + text3);
-						if (itemData != null && !list.Any((LookupLink l) => l.Text.StartsWith(itemData.DisplayName)))
+						string dispName = itemData?.DisplayName;
+						if (string.IsNullOrEmpty(dispName) && int.TryParse(text3, out int catId) && catId < 0)
 						{
-							list.Add(new LookupLink(itemData.DisplayName + " (" + text + ")", null, Game1.textColor, itemData.GetTexture(), itemData.GetSourceRect(0, null), () => { Item val = ItemRegistry.Create(itemData.QualifiedItemId, 1, 0, false); return (val != null) ? BuildItemSubject(val) : null; }));
+							dispName = catId switch
+							{
+								-4 => ModEntry.I18n.Get("lookup.category.any-fish").ToString(),
+								-5 => ModEntry.I18n.Get("lookup.category.any-egg").ToString(),
+								-6 => ModEntry.I18n.Get("lookup.category.any-milk").ToString(),
+								-2 => ModEntry.I18n.Get("lookup.category.any-gem").ToString(),
+								_ => ModEntry.I18n.Get("lookup.category.any-item").ToString()
+							};
+						}
+
+						if (!string.IsNullOrEmpty(dispName) && !list.Any((LookupLink l) => l.Text.StartsWith(dispName)))
+						{
+							list.Add(new LookupLink(dispName + " (" + text + ")", null, Game1.textColor, itemData?.GetTexture(), (itemData != null) ? (Rectangle?)itemData.GetSourceRect(0, null) : null, () => { if (itemData != null) { Item val = ItemRegistry.Create(itemData.QualifiedItemId, 1, 0, false); return (val != null) ? BuildItemSubject(val) : null; } return null; }));
 							if (list.Count >= 8)
 							{
 								break;

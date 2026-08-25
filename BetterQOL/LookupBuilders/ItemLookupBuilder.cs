@@ -3033,6 +3033,13 @@ namespace BetterQOL
 			{
 				return list;
 			}
+			Dictionary<string, string>? bundleNamesDict = null;
+			try
+			{
+				bundleNamesDict = Game1.content.Load<Dictionary<string, string>>("Strings\\BundleNames");
+			}
+			catch { }
+
 			bool[] array4 = default(bool[]);
 			foreach (KeyValuePair<string, string> item3 in dictionary)
 			{
@@ -3048,7 +3055,19 @@ namespace BetterQOL
 				{
 					continue;
 				}
-				string item2 = ((array2.Length >= 6 && !string.IsNullOrEmpty(array2[5])) ? array2[5] : array2[0]);
+				string item2 = array2[0];
+				if (array2.Length >= 7 && !string.IsNullOrWhiteSpace(array2[6]))
+				{
+					item2 = array2[6].Trim();
+				}
+				else if (array2.Length >= 6 && !string.IsNullOrWhiteSpace(array2[5]))
+				{
+					item2 = array2[5].Trim();
+				}
+				else if (bundleNamesDict != null && bundleNamesDict.TryGetValue(array2[0], out string? locName) && !string.IsNullOrWhiteSpace(locName))
+				{
+					item2 = locName.Trim();
+				}
 				// Field [2] = flat "id stack quality id stack quality ..." triplet list.
 				string[] array3 = array2[2].Split(' ');
 				if (!((NetDictionary<int, bool[], NetArray<bool, NetBool>, SerializableDictionary<int, bool[]>, NetBundles>)(object)((NetFieldBase<NetWorldState, NetRef<NetWorldState>>)(object)Game1.netWorldState).Value.Bundles).TryGetValue(result, out array4))

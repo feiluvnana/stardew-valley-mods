@@ -363,23 +363,8 @@ namespace BetterQOL
 
             var info = new BuildingMachineInfo
             {
-                // buildingType is a NetString (read via ".Value"); "??" falls back to
-                // a generic translated label when it's unexpectedly empty.
-                BuildingName = building.buildingType.Value ?? ModEntry.I18n.Get("hover.building.generic")
+                BuildingName = GetLocalizedBuildingName(building)
             };
-
-            // Custom Display Name if available
-            // Buildings can carry a nicer custom name in their data row;
-            // TokenParser resolves tokenized text into final display strings.
-            try
-            {
-                var data = building.GetData();
-                if (data != null && !string.IsNullOrEmpty(data.Name))
-                {
-                    info.BuildingName = TokenParser.ParseText(data.Name);
-                }
-            }
-            catch { }
 
             // 1. Fish Pond
             // Fish ponds raise fish, occasionally producing roe/items and sometimes
@@ -990,6 +975,55 @@ namespace BetterQOL
                     finishTime = ModEntry.I18n.Get("hover.time.in-days-at", new { days = daysAhead, time = timeString });
                 }
             }
+        }
+
+        /// <summary>
+        /// Resolves a localized building name, using Data/Buildings display name tokens or fallback translation keys.
+        /// </summary>
+        public static string GetLocalizedBuildingName(Building building)
+        {
+            try
+            {
+                var data = building.GetData();
+                if (data != null && !string.IsNullOrEmpty(data.Name))
+                {
+                    string parsed = TokenParser.ParseText(data.Name);
+                    if (!string.IsNullOrEmpty(parsed))
+                        return parsed;
+                }
+            }
+            catch { }
+
+            string bType = building.buildingType.Value ?? string.Empty;
+            return bType switch
+            {
+                "Fish Pond" => ModEntry.I18n.Get("hover.building.fishpond"),
+                "Mill" => ModEntry.I18n.Get("hover.building.mill"),
+                "Silo" => ModEntry.I18n.Get("hover.building.silo"),
+                "Shipping Bin" => ModEntry.I18n.Get("hover.building.shipping-bin"),
+                "Pet Bowl" => ModEntry.I18n.Get("hover.building.pet-bowl"),
+                "Slime Hutch" => ModEntry.I18n.Get("hover.building.slime-hutch"),
+                "Stable" => ModEntry.I18n.Get("hover.building.stable"),
+                "Barn" => ModEntry.I18n.Get("hover.building.barn"),
+                "Big Barn" => ModEntry.I18n.Get("hover.building.big-barn"),
+                "Deluxe Barn" => ModEntry.I18n.Get("hover.building.deluxe-barn"),
+                "Coop" => ModEntry.I18n.Get("hover.building.coop"),
+                "Big Coop" => ModEntry.I18n.Get("hover.building.big-coop"),
+                "Deluxe Coop" => ModEntry.I18n.Get("hover.building.deluxe-coop"),
+                "Shed" => ModEntry.I18n.Get("hover.building.shed"),
+                "Big Shed" => ModEntry.I18n.Get("hover.building.big-shed"),
+                "Greenhouse" => ModEntry.I18n.Get("hover.building.greenhouse"),
+                "FarmHouse" => ModEntry.I18n.Get("hover.building.farmhouse"),
+                "Cabin" => ModEntry.I18n.Get("hover.building.cabin"),
+                "Gold Clock" => ModEntry.I18n.Get("hover.building.gold-clock"),
+                "Well" => ModEntry.I18n.Get("hover.building.well"),
+                "Junimo Hut" => ModEntry.I18n.Get("hover.building.junimo-hut"),
+                "Earth Obelisk" => ModEntry.I18n.Get("hover.building.earth-obelisk"),
+                "Water Obelisk" => ModEntry.I18n.Get("hover.building.water-obelisk"),
+                "Desert Obelisk" => ModEntry.I18n.Get("hover.building.desert-obelisk"),
+                "Island Obelisk" => ModEntry.I18n.Get("hover.building.island-obelisk"),
+                _ => !string.IsNullOrEmpty(bType) ? bType : ModEntry.I18n.Get("hover.building.generic")
+            };
         }
     }
 }

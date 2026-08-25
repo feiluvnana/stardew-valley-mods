@@ -98,13 +98,19 @@ namespace BetterQOL
             int friendship = pet.friendshipTowardFarmer.Value;
             bool wasPet = WasPetToday(pet);
 
+            string? rawType = pet.petType.Value;
+            string typeName = rawType?.ToLowerInvariant() switch
+            {
+                "cat" => ModEntry.I18n.Get("hover.pet.cat"),
+                "dog" => ModEntry.I18n.Get("hover.pet.dog"),
+                "turtle" => ModEntry.I18n.Get("hover.pet.turtle"),
+                _ => !string.IsNullOrEmpty(rawType) ? rawType : ModEntry.I18n.Get("hover.type.pet")
+            };
+
             return new AnimalInfo
             {
                 Name = !string.IsNullOrEmpty(pet.displayName) ? pet.displayName : pet.Name,
-                // "??" supplies a fallback value when the left side is null: some pets
-                // have no type string, so we show a translated "Pet" label instead.
-                // ModEntry.I18n.Get reads translations from the mod's i18n folder.
-                TypeName = pet.petType.Value ?? ModEntry.I18n.Get("hover.type.pet"),
+                TypeName = typeName,
                 WasPetToday = wasPet,
                 FriendshipPoints = Math.Max(0, friendship),
                 Hearts = Math.Clamp(friendship / 200f, 0f, 5f),
