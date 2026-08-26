@@ -20,10 +20,8 @@
 //   Common                  -> Generic Mod Config Menu (GMCM) API interface
 // ============================================================================
 using HarmonyLib;
-using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
-using StardewValley;
 using StardewValley.Locations;
 using StardewValley.Objects;
 using Common;

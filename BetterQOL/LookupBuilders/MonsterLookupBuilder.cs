@@ -1,13 +1,8 @@
 using System.Globalization;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Netcode;
-using StardewModdingAPI;
 using StardewValley;
-using StardewValley.Characters;
 using StardewValley.ItemTypeDefinitions;
 using StardewValley.Monsters;
-using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
 namespace BetterQOL
 {
