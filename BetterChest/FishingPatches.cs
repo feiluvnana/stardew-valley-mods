@@ -68,20 +68,20 @@ namespace BetterChest
             foreach (var instruction in instructions)
             {
                 // Match ldc.r4 constants for 0.4f and 0.6f
+                // In-place modification preserves existing labels and blocks (e.g. jump targets from brtrue.s)
                 if (instruction.opcode == OpCodes.Ldc_R4 && instruction.operand is float val)
                 {
                     // Standard fishing chest decay rate (vanilla 0.40f -> mod default 0.60f)
                     if (Math.Abs(val - 0.4f) < 0.001f)
                     {
-                        yield return new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(FishingPatches), nameof(GetFishingChestDecayRate)));
-                        continue;
+                        instruction.opcode = OpCodes.Call;
+                        instruction.operand = AccessTools.Method(typeof(FishingPatches), nameof(GetFishingChestDecayRate));
                     }
-
                     // Golden fishing chest decay rate (vanilla 0.60f -> mod default 0.80f)
-                    if (Math.Abs(val - 0.6f) < 0.001f)
+                    else if (Math.Abs(val - 0.6f) < 0.001f)
                     {
-                        yield return new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(FishingPatches), nameof(GetGoldenChestDecayRate)));
-                        continue;
+                        instruction.opcode = OpCodes.Call;
+                        instruction.operand = AccessTools.Method(typeof(FishingPatches), nameof(GetGoldenChestDecayRate));
                     }
                 }
 
