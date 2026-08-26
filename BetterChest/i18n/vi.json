@@ -155,15 +155,9 @@
 
   "config.section.fishing-chests": "Cài Đặt Rương Kho Báu Câu Cá",
   "config.enable-fishing-chest-buff.name": "Bật Tăng Cường Rương Câu Cá",
-  "config.enable-fishing-chest-buff.tooltip": "Tăng số lần mở rương kho báu câu cá và bảo đảm thêm lượt mở bù cho mỗi rác thải mở ra.",
-  "config.fishing-chest-min-rolls.name": "Số Lượt Mở Tối Thiểu (Rương Thường)",
-  "config.fishing-chest-min-rolls.tooltip": "Số lượt mở tối thiểu của rương câu cá thường (mặc định 3).",
-  "config.fishing-chest-max-rolls.name": "Số Lượt Mở Tối Đa (Rương Thường)",
-  "config.fishing-chest-max-rolls.tooltip": "Số lượt mở tối đa của rương câu cá thường (mặc định 5).",
-  "config.golden-chest-min-rolls.name": "Số Lượt Mở Tối Thiểu (Rương Vàng)",
-  "config.golden-chest-min-rolls.tooltip": "Số lượt mở tối thiểu của rương câu cá vàng 1.6 (mặc định 5).",
-  "config.golden-chest-max-rolls.name": "Số Lượt Mở Tối Đa (Rương Vàng)",
-  "config.golden-chest-max-rolls.tooltip": "Số lượt mở tối đa của rương câu cá vàng 1.6 (mặc định 8).",
-  "config.enable-fishing-trash-reroll-bonus.name": "Bật Lượt Mở Bù Khi Trúng Rác",
-  "config.enable-fishing-trash-reroll-bonus.tooltip": "Tự động cộng thêm +1 lượt mở phần thưởng chất lượng cho mỗi món rác hoặc vật phẩm vụn trong rương."
+  "config.enable-fishing-chest-buff.tooltip": "Tăng cường rương kho báu câu cá bằng cách điều chỉnh hệ số suy giảm tỉ lệ mở thưởng, giúp mở thêm nhiều vật phẩm chuẩn cốt truyện.",
+  "config.fishing-chest-decay-rate.name": "Hệ Số Suy Giảm (Rương Thường)",
+  "config.fishing-chest-decay-rate.tooltip": "Hệ số suy giảm xác suất mở thêm vật phẩm của rương thường (mặc định game gốc là 0.40; mod là 0.60).",
+  "config.golden-chest-decay-rate.name": "Hệ Số Suy Giảm (Rương Vàng)",
+  "config.golden-chest-decay-rate.tooltip": "Hệ số suy giảm xác suất mở thêm vật phẩm của rương vàng 1.6 (mặc định game gốc là 0.60; mod là 0.80)."
 }

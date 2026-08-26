@@ -94,15 +94,30 @@ $$\text{Active Legendary Weight} = \text{Base Legendary Weight} \times \text{Dep
 
 ---
 
-## 🎣 Module 2: Streamlined Fishing Treasure Chests
+## 🎣 Module 2: Vanilla-Faithful Decaying Fishing Treasure Chests
 
-### High Roll Counts
-- **Standard Fishing Chests:** Generates **3 to 5 rolls** of valuable fishing loot (ores, coal, high-stack wood/stone, geodes, bait, tackle, gems, rings, weapons, mystery boxes).
-- **1.6 Golden Fishing Chests:** Generates **5 to 8 rolls** of enhanced loot (including Golden Mystery Boxes, Marine Jellies, Golden Animal Crackers, Stardrop Tea).
+### Balanced Probability Multipliers
+Instead of injecting a flat custom loot table that bypasses progression, **BetterChest** hooks directly into the **vanilla Stardew Valley 1.6 roll engine** and tunes the probability decay multiplier of the loot loop:
 
-### Trash Compensation (+1 Bonus Reroll)
-- Any trash or trivial items rolled (Trash, Driftwood, Broken CD/Glasses, Soggy Newspaper, $\le 3$ stone/wood) are preserved in your inventory.
-- For **every single trash item found**, BetterChest automatically grants **+1 bonus roll** from the fishing reward pool, ensuring trash drops never reduce your total reward count!
+- **Standard Fishing Chests:** Decay multiplier set to **`0.60`** (Vanilla default: `0.40`).
+  - Roll 1: 100% (Guaranteed)
+  - Roll 2: 60.0%
+  - Roll 3: 21.6%
+  - Roll 4: 4.7%
+  - *Expected Average:* **~1.88 items** (typically 1–2 items, occasionally 3).
+- **1.6 Golden Fishing Chests:** Decay multiplier set to **`0.80`** (Vanilla default: `0.60`).
+  - Roll 1: 100% (Guaranteed)
+  - Roll 2: 80.0%
+  - Roll 3: 51.2%
+  - Roll 4: 26.2%
+  - Roll 5: 10.7%
+  - *Expected Average:* **~2.73 items** (typically 2–4 items).
+
+### 100% Vanilla 1.6 Progression & Scaling
+Because all rolls execute through the native game code:
+- High-tier ores, geodes, and gems scale with **Fishing Level** and **Cast Distance from Land**.
+- Rare drops (weapons, rings, Prismatic Shard) respect game luck and skill requirements.
+- 1.6 content (Golden Animal Crackers, Golden Mystery Boxes, Mastery books) only drops when unlocked.
 
 ---
 
@@ -119,7 +134,8 @@ $$\text{Active Legendary Weight} = \text{Base Legendary Weight} \times \text{Dep
 | `GatekeepMysteryBoxes` | Gated until Mr. Qi Mystery Box event occurs | `true` |
 | `GatekeepCalicoEggs` | Gated to Desert Festival season (Spring 15–17) or Year 2+ | `true` |
 | `GatekeepAutoPetter` | Gated until Community Center / Joja completion | `false` |
-| `EnableFishingTrashRerollBonus` | Grants +1 bonus roll for every trash item found in fishing chests | `true` |
+| `FishingChestDecayRate` | Probability decay multiplier for regular fishing chests (vanilla 0.40) | `0.60` |
+| `GoldenChestDecayRate` | Probability decay multiplier for golden fishing chests (vanilla 0.60) | `0.80` |
 
 ---
 
@@ -266,11 +282,8 @@ $$\text{Active Legendary Weight} = \text{Base Legendary Weight} \times \text{Dep
   "GatekeepRadioactiveItems": true,
   "GatekeepAutoPetter": false,
   "EnableFishingChestBuff": true,
-  "FishingChestMinRolls": 3,
-  "FishingChestMaxRolls": 5,
-  "GoldenChestMinRolls": 5,
-  "GoldenChestMaxRolls": 8,
-  "EnableFishingTrashRerollBonus": true
+  "FishingChestDecayRate": 0.6,
+  "GoldenChestDecayRate": 0.8
 }
 ```
 

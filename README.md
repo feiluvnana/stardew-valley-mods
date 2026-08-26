@@ -8,7 +8,7 @@ A suite of high-performance, modular quality-of-life, progression enhancement, a
 
 | Mod | Version | Description | Key Features |
 | :--- | :---: | :--- | :--- |
-| [**💎 BetterChest**](./BetterChest) | `1.4.0` | Dynamic loot overhaul for Skull Cavern & Fishing treasure chests. | 7 gameplay categories (54 items), decaying multi-rolls, critical stack multipliers (up to 5x), linear legendary depth scaling, milestone gatekeeping, and skill-scaled fishing floors with 1.6 Golden Chest rewards. |
+| [**💎 BetterChest**](./BetterChest) | `1.5.0` | Dynamic loot overhaul for Skull Cavern & Fishing treasure chests. | 7 gameplay categories (54 items), decaying multi-rolls, critical stack multipliers (up to 5x), linear legendary depth scaling, milestone gatekeeping, and vanilla-faithful decaying fishing chest rolls (0.60/0.80). |
 | [**🌋 BetterForge**](./BetterForge) | `1.0.0` | Volcano Forge, Mini-Forge, and Anvil overhauls. | 100% fair uniform weapon/tool enchantments ($1/N$), "Never Downgrade" trinket reforging, "Perfect" tier prefixes, and permanent Prismatic Ascension powers (+0.5 Luck, enhanced abilities). |
 | [**🏭 BetterIndustry**](./BetterIndustry) | `2.0.2` | Artisan goods and cooking rebalance suite. | Quality-preserving machines, flower mead 2.0x value scaling, Truffle Oil scaling fix, vegetable juice buffs, expanded cask aging, and profitable cooking (+25%). |
 | [**📦 BetterQOL**](./BetterQOL) | `1.4.5` | Quality-of-life suite for UI hover overlays, lookup, item stacking, and geodes. | UI Info Suite 2 style hover tooltips (crop timers, machine countdowns, tree stages, animal hearts), Lookup Anything (`F1`), unstackable item overrides up to 999, and instant "Crack All" geode processing. |

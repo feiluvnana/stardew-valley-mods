@@ -1,38 +1,42 @@
 // "using" directives import other libraries' namespaces so short names work:
-//   HarmonyLib          -> the Harmony patching library (Patch, Postfix...)
+//   HarmonyLib          -> the Harmony patching library (Patch, Transpiler...)
 //   StardewModdingAPI   -> SMAPI: logging types (IMonitor, LogLevel)
-//   StardewValley       -> core game code; Game1 holds global game state
-//   StardewValley.Menus -> UI screens; ItemGrabMenu is the chest-loot dialog
+//   StardewValley       -> core game code
 //   StardewValley.Tools -> tools the player holds, e.g. FishingRod
+//   System.Reflection.Emit -> CIL OpCodes (Ldc_R4, Call, etc.)
 using HarmonyLib;
 using StardewModdingAPI;
-using StardewValley;
-using StardewValley.Menus;
 using StardewValley.Tools;
+using System.Reflection.Emit;
 
 // ============================================================================
-// FishingPatches improves FISHING treasure chests (the chest you reel in on
-// your fishing line). It uses Harmony — a library that injects extra code
-// into existing game methods at runtime — so the mod never edits game files.
-// When the vanilla code opens a treasure chest menu, our "postfix" (code
-// that runs AFTER the original method) hands the chest to
-// FishingRewardManager, which tops it up with extra rolls of useful loot.
-// Key concept demonstrated: the Harmony Apply + Postfix patching pattern.
+// FishingPatches tunes FISHING treasure chests (standard chests and 1.6 golden
+// chests) by modifying the probability decay multiplier of the vanilla roll loop.
+//
+// HOW IT WORKS:
+// In vanilla Stardew Valley 1.6 (FishingRod.openTreasureMenuEndFunction), chest
+// loot is rolled in a decaying loop:
+//     while (random <= decayRate) { decayRate *= (golden ? 0.6f : 0.4f); rollItem(); }
+//
+// Instead of replacing or flooding the chest with flat custom items, this mod
+// uses a Harmony TRANSPILER to replace the hardcoded float constants (0.4f and 0.6f)
+// with live calls to GetFishingChestDecayRate() and GetGoldenChestDecayRate().
+//
+// This guarantees:
+//   1. 100% vanilla 1.6 loot progression, depth scaling, luck scaling, and mastery checks.
+//   2. Clean, balanced multi-rolls without inventory-flooding or game-breaking loot.
+//   3. Full GMCM in-game configurability.
 // ============================================================================
 namespace BetterChest
 {
-    // C# concept — STATIC CLASS: "new FishingPatches()" would not compile. A
-    // static class cannot be instantiated and may only contain static members,
-    // making it a tidy home for self-contained patch plumbing.
     /// <summary>
-    /// Registers and hosts the Harmony patch on
-    /// <see cref="FishingRod.openTreasureMenuEndFunction"/>, the method the game
-    /// calls when the player successfully reels in a fishing treasure chest.
+    /// Registers and hosts the Harmony transpiler patch on
+    /// <see cref="FishingRod.openTreasureMenuEndFunction"/> to customize roll decay rates.
     /// </summary>
     public static class FishingPatches
     {
         /// <summary>
-        /// Wires this class's postfix patch into the game. Called once at startup
+        /// Wires this class's transpiler patch into the game. Called once at startup
         /// from <see cref="ModEntry.Entry"/>.
         /// </summary>
         /// <param name="harmony">The shared Harmony instance created by the mod entry point.</param>
@@ -40,54 +44,71 @@ namespace BetterChest
         {
             try
             {
-                // harmony.Patch(...) modifies a game method AT RUNTIME:
-                //   original -> the game method we hook. AccessTools.Method finds it via
-                //              reflection (typeof = the FishingRod class, nameof = the
-                //              method's name), giving a compile-checked name instead of
-                //              a typo-prone string.
-                //   postfix  -> OUR method that runs AFTER the original finishes.
-                //              (A "prefix" would run BEFORE it instead.)
                 harmony.Patch(
                     original: AccessTools.Method(typeof(FishingRod), nameof(FishingRod.openTreasureMenuEndFunction)),
-                    postfix: new HarmonyMethod(typeof(FishingPatches), nameof(OpenTreasureMenuEndFunction_Postfix))
+                    transpiler: new HarmonyMethod(typeof(FishingPatches), nameof(OpenTreasureMenuEndFunction_Transpiler))
                 );
+                ModEntry.ModMonitor.Log("Hooked FishingRod.openTreasureMenuEndFunction with decaying roll transpiler.", LogLevel.Trace);
             }
             catch (Exception ex)
             {
-                // If a game update renames/removes the target method, patching throws.
-                // We log it ($"..." = string interpolation, embedding variables in text)
-                // and keep playing instead of crashing the game.
                 ModEntry.ModMonitor.Log($"Failed to patch FishingRod.openTreasureMenuEndFunction: {ex}", LogLevel.Error);
             }
         }
 
         /// <summary>
-        /// Runs after the vanilla treasure-chest menu opens, adding the mod's bonus
-        /// loot when the player has enabled the fishing chest buff in config.
+        /// Harmony Transpiler for <c>FishingRod.openTreasureMenuEndFunction</c>.
+        /// Replaces the hardcoded decay constants (0.4f for standard chests, 0.6f for golden chests)
+        /// with dynamic helper calls returning the user-configured decay rates.
         /// </summary>
-        /// <param name="__instance">
-        /// Harmony special parameter: automatically filled with the FishingRod
-        /// object whose patched method was called (the rod the player fished with).
-        /// </param>
-        public static void OpenTreasureMenuEndFunction_Postfix(FishingRod __instance)
+        /// <param name="instructions">The original method's CIL instructions.</param>
+        /// <returns>Modified CIL instruction stream.</returns>
+        public static IEnumerable<CodeInstruction> OpenTreasureMenuEndFunction_Transpiler(IEnumerable<CodeInstruction> instructions)
         {
-            try
+            foreach (var instruction in instructions)
             {
-                // Early exit if the user turned this feature off in config.
-                if (!ModEntry.Config.EnableFishingChestBuff)
-                    return;
-
-                // Pattern matching: "x is Type y" tests whether the menu currently on
-                // screen is an ItemGrabMenu AND casts it into grabMenu in one step.
-                if (Game1.activeClickableMenu is ItemGrabMenu grabMenu)
+                // Match ldc.r4 constants for 0.4f and 0.6f
+                if (instruction.opcode == OpCodes.Ldc_R4 && instruction.operand is float val)
                 {
-                    FishingRewardManager.EnhanceFishingChest(__instance, grabMenu);
+                    // Standard fishing chest decay rate (vanilla 0.40f -> mod default 0.60f)
+                    if (Math.Abs(val - 0.4f) < 0.001f)
+                    {
+                        yield return new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(FishingPatches), nameof(GetFishingChestDecayRate)));
+                        continue;
+                    }
+
+                    // Golden fishing chest decay rate (vanilla 0.60f -> mod default 0.80f)
+                    if (Math.Abs(val - 0.6f) < 0.001f)
+                    {
+                        yield return new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(FishingPatches), nameof(GetGoldenChestDecayRate)));
+                        continue;
+                    }
                 }
+
+                yield return instruction;
             }
-            catch (Exception ex)
-            {
-                ModEntry.ModMonitor.Log($"Error applying BetterChest fishing treasure enhancements: {ex}", LogLevel.Error);
-            }
+        }
+
+        /// <summary>
+        /// Returns the effective decay rate for standard fishing treasure chests.
+        /// </summary>
+        public static float GetFishingChestDecayRate()
+        {
+            if (ModEntry.Config != null && ModEntry.Config.EnableFishingChestBuff)
+                return ModEntry.Config.FishingChestDecayRate;
+
+            return 0.4f;
+        }
+
+        /// <summary>
+        /// Returns the effective decay rate for golden fishing treasure chests.
+        /// </summary>
+        public static float GetGoldenChestDecayRate()
+        {
+            if (ModEntry.Config != null && ModEntry.Config.EnableFishingChestBuff)
+                return ModEntry.Config.GoldenChestDecayRate;
+
+            return 0.6f;
         }
     }
 }

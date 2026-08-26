@@ -203,17 +203,11 @@ namespace BetterChest
         // =========================================================================
         // === 3. FISHING TREASURE CHEST SETTINGS                                ===
         // =========================================================================
-        /// <summary>Enable the bonus-roll overhaul for fishing treasure chests.</summary>
+        /// <summary>Enable the decaying-roll enhancement for fishing treasure chests.</summary>
         public bool EnableFishingChestBuff { get; set; } = true;
-        /// <summary>Fewest bonus rolls a regular fishing treasure chest receives.</summary>
-        public int FishingChestMinRolls { get; set; } = 3;
-        /// <summary>Most bonus rolls a regular fishing treasure chest receives.</summary>
-        public int FishingChestMaxRolls { get; set; } = 5;
-        /// <summary>Fewest bonus rolls a golden fishing treasure chest receives.</summary>
-        public int GoldenChestMinRolls { get; set; } = 5;
-        /// <summary>Most bonus rolls a golden fishing treasure chest receives.</summary>
-        public int GoldenChestMaxRolls { get; set; } = 8;
-        /// <summary>Grant +1 extra bonus roll for every piece of trash already inside the chest.</summary>
-        public bool EnableFishingTrashRerollBonus { get; set; } = true;
+        /// <summary>Probability decay multiplier for regular fishing treasure chest rolls (vanilla default is 0.40).</summary>
+        public float FishingChestDecayRate { get; set; } = 0.60f;
+        /// <summary>Probability decay multiplier for 1.6 golden fishing treasure chest rolls (vanilla default is 0.60).</summary>
+        public float GoldenChestDecayRate { get; set; } = 0.80f;
     }
 }

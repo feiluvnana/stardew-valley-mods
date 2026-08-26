@@ -155,15 +155,9 @@
 
   "config.section.fishing-chests": "Fishing Treasure Chest Settings",
   "config.enable-fishing-chest-buff.name": "Enable Fishing Chest Buff",
-  "config.enable-fishing-chest-buff.tooltip": "Enhance fishing treasure chests with higher roll counts and guaranteed bonus rerolls for trash drops.",
-  "config.fishing-chest-min-rolls.name": "Standard Chest Min Rolls",
-  "config.fishing-chest-min-rolls.tooltip": "Minimum number of item rolls in standard fishing chests (default 3).",
-  "config.fishing-chest-max-rolls.name": "Standard Chest Max Rolls",
-  "config.fishing-chest-max-rolls.tooltip": "Maximum number of item rolls in standard fishing chests (default 5).",
-  "config.golden-chest-min-rolls.name": "Golden Chest Min Rolls",
-  "config.golden-chest-min-rolls.tooltip": "Minimum number of item rolls in 1.6 Golden Fishing Chests (default 5).",
-  "config.golden-chest-max-rolls.name": "Golden Chest Max Rolls",
-  "config.golden-chest-max-rolls.tooltip": "Maximum number of item rolls in 1.6 Golden Fishing Chests (default 8).",
-  "config.enable-fishing-trash-reroll-bonus.name": "Enable Trash Bonus Rerolls",
-  "config.enable-fishing-trash-reroll-bonus.tooltip": "Guarantees a +1 bonus roll of quality fishing loot for every trash or trivial item found in the chest."
+  "config.enable-fishing-chest-buff.tooltip": "Enhance fishing treasure chests by adjusting the roll decay multiplier, giving more rolls of vanilla-faithful loot.",
+  "config.fishing-chest-decay-rate.name": "Standard Chest Decay Rate",
+  "config.fishing-chest-decay-rate.tooltip": "Roll probability decay multiplier for regular fishing treasure chests (vanilla default is 0.40; mod default is 0.60).",
+  "config.golden-chest-decay-rate.name": "Golden Chest Decay Rate",
+  "config.golden-chest-decay-rate.tooltip": "Roll probability decay multiplier for 1.6 golden fishing treasure chests (vanilla default is 0.60; mod default is 0.80)."
 }

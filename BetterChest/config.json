@@ -77,9 +77,6 @@
   "GatekeepRadioactiveItems": true,
   "GatekeepAutoPetter": false,
   "EnableFishingChestBuff": true,
-  "FishingChestMinRolls": 3,
-  "FishingChestMaxRolls": 5,
-  "GoldenChestMinRolls": 5,
-  "GoldenChestMaxRolls": 8,
-  "EnableFishingTrashRerollBonus": true
+  "FishingChestDecayRate": 0.6,
+  "GoldenChestDecayRate": 0.8
 }

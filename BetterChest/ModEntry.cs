@@ -345,11 +345,8 @@ namespace BetterChest
             // Fishing Treasure Chests GMCM Section
             AddSection(configMenu, "fishing-chests");
             AddBool(configMenu, "enable-fishing-chest-buff", () => Config.EnableFishingChestBuff, v => Config.EnableFishingChestBuff = v);
-            AddInt(configMenu, "fishing-chest-min-rolls", () => Config.FishingChestMinRolls, v => Config.FishingChestMinRolls = v, 1, 10);
-            AddInt(configMenu, "fishing-chest-max-rolls", () => Config.FishingChestMaxRolls, v => Config.FishingChestMaxRolls = v, 1, 12);
-            AddInt(configMenu, "golden-chest-min-rolls", () => Config.GoldenChestMinRolls, v => Config.GoldenChestMinRolls = v, 1, 10);
-            AddInt(configMenu, "golden-chest-max-rolls", () => Config.GoldenChestMaxRolls, v => Config.GoldenChestMaxRolls = v, 1, 12);
-            AddBool(configMenu, "enable-fishing-trash-reroll-bonus", () => Config.EnableFishingTrashRerollBonus, v => Config.EnableFishingTrashRerollBonus = v);
+            AddFloat(configMenu, "fishing-chest-decay-rate", () => Config.FishingChestDecayRate, v => Config.FishingChestDecayRate = v, 0.10f, 0.99f, 0.01f);
+            AddFloat(configMenu, "golden-chest-decay-rate", () => Config.GoldenChestDecayRate, v => Config.GoldenChestDecayRate = v, 0.10f, 0.99f, 0.01f);
         }
 
         // =====================================================================
