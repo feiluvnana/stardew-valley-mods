@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Netcode;
@@ -46,8 +47,56 @@ namespace BetterQOL
     /// - Mixed tabs/spaces and "//IL_xxxx:" markers below are decompiler leftovers, kept
     ///   untouched deliberately.
     /// </remarks>
-        public static partial class LookupDataManager
+    public static partial class LookupDataManager
     {
+		/// <summary>
+		/// Strips diacritics (accents) and decomposes combined characters (including Vietnamese đ/Đ)
+		/// for culture-insensitive and accent-insensitive text comparison.
+		/// </summary>
+		public static string RemoveDiacritics(string text)
+		{
+			if (string.IsNullOrWhiteSpace(text))
+			{
+				return string.Empty;
+			}
+			string normalized = text.Normalize(NormalizationForm.FormD);
+			StringBuilder sb = new StringBuilder(normalized.Length);
+			for (int i = 0; i < normalized.Length; i++)
+			{
+				char c = normalized[i];
+				UnicodeCategory category = CharUnicodeInfo.GetUnicodeCategory(c);
+				if (category != UnicodeCategory.NonSpacingMark)
+				{
+					if (c == 'đ' || c == '₫')
+					{
+						sb.Append('d');
+					}
+					else if (c == 'Đ')
+					{
+						sb.Append('D');
+					}
+					else
+					{
+						sb.Append(c);
+					}
+				}
+			}
+			return sb.ToString().Normalize(NormalizationForm.FormC);
+		}
+
+		/// <summary>
+		/// Checks whether target contains cleanQuery, ignoring case and diacritics/accents.
+		/// </summary>
+		public static bool MatchesSearch(string? target, string cleanQuery)
+		{
+			if (string.IsNullOrEmpty(target) || string.IsNullOrEmpty(cleanQuery))
+			{
+				return false;
+			}
+			string cleanTarget = RemoveDiacritics(target).Trim().ToLowerInvariant();
+			return cleanTarget.Contains(cleanQuery);
+		}
+
         /// <summary>
         /// Runs a live search across every enabled category and returns up to 50 clickable
         /// result links. "category" narrows the scan ("Villagers", "Fish", "Monsters", ...);
@@ -62,8 +111,8 @@ namespace BetterQOL
             {
                 return list;
             }
-		// Normalize input once: lowercase makes matching case-insensitive.
-		string value = query.Trim().ToLower();
+		// Normalize query: remove diacritics and convert to lowercase for case/accent-insensitive search.
+		string cleanQuery = RemoveDiacritics(query).Trim().ToLowerInvariant();
 		string text = category.Trim();
 		// Each bool below answers "should we scan this source?" - true when the user picked
 		// that specific category OR asked for All. The clunky switch assigning 'num' and the
@@ -99,12 +148,16 @@ namespace BetterQOL
 					continue;
 				}
 				string name = ((Character)allCharacter).displayName ?? ((Character)allCharacter).Name;
-				if (name.ToLower().Contains(value) && !list.Any((LookupLink r) => r.Text == name))
+				if ((MatchesSearch(name, cleanQuery) || MatchesSearch(((Character)allCharacter).Name, cleanQuery)) && !list.Any((LookupLink r) => r.Text == name))
 				{
 					// Copying to 'target' matters! The click-lambda captures this VARIABLE, not the
 					// loop slot - without the copy every link would open the LAST NPC found.
 					NPC target = allCharacter;
 					list.Add(new LookupLink(name, ((object)ModEntry.I18n.Get("lookup.search.sub.villager")).ToString(), (Color?)new Color(180, 50, 180), target.Portrait, (Rectangle?)new Rectangle(0, 0, 64, 64), (() => BuildNPCSubject(target))));
+					if (list.Count >= 50)
+					{
+						break;
+					}
 				}
 			}
 		}
@@ -121,7 +174,7 @@ namespace BetterQOL
 				foreach (string allId in itemType.GetAllIds())
 				{
 					ParsedItemData itemData = itemType.GetData(allId);
-					if (itemData == null || string.IsNullOrEmpty(itemData.DisplayName) || !itemData.DisplayName.ToLower().Contains(value) || list.Any((LookupLink r) => r.Text == itemData.DisplayName))
+					if (itemData == null || string.IsNullOrEmpty(itemData.DisplayName) || (!MatchesSearch(itemData.DisplayName, cleanQuery) && !MatchesSearch(itemData.InternalName, cleanQuery)) || list.Any((LookupLink r) => r.Text == itemData.DisplayName))
 					{
 						continue;
 					}
@@ -131,7 +184,12 @@ namespace BetterQOL
 					if ((!(text == "Fish") || itemData.Category == -4) && (!(text == "Crops") || itemData.Category == -75 || itemData.Category == -79 || itemData.Category == -74))
 					{
 						ParsedItemData data = itemData;
-						string subtitle = ((!string.IsNullOrEmpty(data.ObjectType)) ? data.ObjectType : ((object)ModEntry.I18n.Get("lookup.search.sub.item")).ToString());
+						Item sampleItem = ItemRegistry.Create(data.QualifiedItemId, 1, 0, false);
+						string catName = sampleItem?.getCategoryName();
+						string subtitle = !string.IsNullOrWhiteSpace(catName)
+							? catName
+							: ((object)ModEntry.I18n.Get("lookup.search.sub.item")).ToString();
+
 						list.Add(new LookupLink(data.DisplayName, subtitle, Game1.textColor, data.GetTexture(), data.GetSourceRect(0, null), () => { Item val = ItemRegistry.Create(data.QualifiedItemId, 1, 0, false); return (val != null) ? BuildItemSubject(val) : null; }));
 						if (list.Count >= 50)
 						{
@@ -158,7 +216,7 @@ namespace BetterQOL
 					foreach (KeyValuePair<string, string> item in dictionary)
 					{
 						string mName = item.Key;
-						if (!mName.ToLower().Contains(value) || list.Any((LookupLink r) => r.Text == mName))
+						if (!MatchesSearch(mName, cleanQuery) || list.Any((LookupLink r) => r.Text == mName))
 						{
 							continue;
 						}
@@ -221,8 +279,8 @@ namespace BetterQOL
 					foreach (KeyValuePair<string, BuildingData> item2 in dictionary2)
 					{
 						BuildingData bData = item2.Value;
-						string bName = bData.Name ?? item2.Key;
-						if (!bName.ToLower().Contains(value) || list.Any((LookupLink r) => r.Text == bName))
+						string bName = !string.IsNullOrEmpty(bData.Name) ? TokenParser.ParseText(bData.Name) : item2.Key;
+						if ((!MatchesSearch(bName, cleanQuery) && !MatchesSearch(bData.Name, cleanQuery) && !MatchesSearch(item2.Key, cleanQuery)) || list.Any((LookupLink r) => r.Text == bName))
 						{
 							continue;
 						}
@@ -237,9 +295,10 @@ namespace BetterQOL
 								Subtitle = ((object)ModEntry.I18n.Get("lookup.type.building")).ToString()
 							};
 							LookupSection lookupSection = new LookupSection((ModEntry.I18n.Get("lookup.section.building-details")));
-							if (!string.IsNullOrEmpty(bData.Description))
+							string desc = !string.IsNullOrEmpty(bData.Description) ? TokenParser.ParseText(bData.Description) : string.Empty;
+							if (!string.IsNullOrEmpty(desc))
 							{
-								lookupSection.Fields.Add(new LookupField((ModEntry.I18n.Get("lookup.item.description")), bData.Description, Color.DarkSlateGray));
+								lookupSection.Fields.Add(new LookupField((ModEntry.I18n.Get("lookup.item.description")), desc, Color.DarkSlateGray));
 							}
 							if (bData.BuildCost > 0)
 							{
@@ -282,7 +341,7 @@ namespace BetterQOL
 					string recipeKey = craftingRecipe.Key;
 					CraftingRecipe recipe = new CraftingRecipe(recipeKey, false);
 					string rName = recipe.DisplayName ?? recipeKey;
-					if (!rName.ToLower().Contains(value) || list.Any((LookupLink r) => r.Text == rName))
+					if ((!MatchesSearch(rName, cleanQuery) && !MatchesSearch(recipeKey, cleanQuery)) || list.Any((LookupLink r) => r.Text == rName))
 					{
 						continue;
 					}
@@ -343,7 +402,7 @@ namespace BetterQOL
 					string recipeKey2 = cookingRecipe.Key;
 					CraftingRecipe recipe2 = new CraftingRecipe(recipeKey2, true);
 					string rName2 = recipe2.DisplayName ?? recipeKey2;
-					if (!rName2.ToLower().Contains(value) || list.Any((LookupLink r) => r.Text == rName2))
+					if ((!MatchesSearch(rName2, cleanQuery) && !MatchesSearch(recipeKey2, cleanQuery)) || list.Any((LookupLink r) => r.Text == rName2))
 					{
 						continue;
 					}
@@ -422,7 +481,7 @@ namespace BetterQOL
 						continue;
 					}
 					string lName = location.DisplayName ?? location.Name;
-					if (lName.ToLower().Contains(value) && !list.Any((LookupLink r) => r.Text == lName))
+					if ((MatchesSearch(lName, cleanQuery) || MatchesSearch(location.Name, cleanQuery)) && !list.Any((LookupLink r) => r.Text == lName))
 					{
 						GameLocation targetLoc = location;
 						list.Add(new LookupLink(lName, ModEntry.I18n.Get("lookup.search.sub.location").ToString(), new Color(46, 125, 50), null, null, () => BuildWorldOverviewSubject(targetLoc)));

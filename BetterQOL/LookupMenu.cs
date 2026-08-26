@@ -29,6 +29,8 @@ namespace BetterQOL
         private ClickableTextureComponent? BackButton;
         private ClickableTextureComponent? UpButton;
         private ClickableTextureComponent? DownButton;
+        private ClickableTextureComponent? ScrollBar;
+        private Rectangle ScrollBarRunner;
 
         // The native Stardew text input widget plus an invisible click target covering it.
         private TextBox? SearchBox;
@@ -146,28 +148,40 @@ namespace BetterQOL
             // A plain invisible component used purely for click hit-testing on the box.
             SearchBoxComponent = new ClickableComponent(new Rectangle(searchBoxX, searchBoxY, searchBoxW, searchBoxH), "SearchBox");
 
-            // 4. Content Area Layout & Scroll Buttons
+            // 4. Content Area Layout & Scroll Buttons (Vanilla OptionsPage Style)
             // Everything below the 104px header band is scrollable body.
             int dividerY = yPositionOnScreen + 104;
             int contentY = dividerY + 18;
             int contentHeight = height - 172;
             int contentBottom = contentY + contentHeight;
 
-            int btnX = xPositionOnScreen + width - 64;
+            int btnX = xPositionOnScreen + width - 68;
 
             // Up/down chevron sprites pinned to the right edge of the content area.
             UpButton = new ClickableTextureComponent(
-                new Rectangle(btnX, contentY, 36, 40),
+                new Rectangle(btnX, contentY, 44, 48),
                 Game1.mouseCursors,
                 new Rectangle(421, 459, 11, 12),
-                3.2f
+                4f
             );
 
             DownButton = new ClickableTextureComponent(
-                new Rectangle(btnX, contentBottom - 40, 36, 40),
+                new Rectangle(btnX, contentBottom - 48, 44, 48),
                 Game1.mouseCursors,
                 new Rectangle(421, 472, 11, 12),
-                3.2f
+                4f
+            );
+
+            int runnerX = btnX + 10;
+            int runnerY = UpButton.bounds.Bottom + 4;
+            int runnerHeight = DownButton.bounds.Y - runnerY - 4;
+            ScrollBarRunner = new Rectangle(runnerX, runnerY, 24, runnerHeight);
+
+            ScrollBar = new ClickableTextureComponent(
+                new Rectangle(runnerX, runnerY, 24, 40),
+                Game1.mouseCursors,
+                new Rectangle(435, 463, 6, 10),
+                4f
             );
         }
 
@@ -269,6 +283,7 @@ namespace BetterQOL
             BackButton?.tryHover(x, y, 0.2f);
             UpButton?.tryHover(x, y, 0.2f);
             DownButton?.tryHover(x, y, 0.2f);
+            ScrollBar?.tryHover(x, y, 0.2f);
 
             // Re-detect hovered link from scratch each frame; first hit wins.
             HoveredLink = null;
@@ -348,14 +363,16 @@ namespace BetterQOL
             // Scrollbar Track & Thumb Drag Click
             if (MaxScrollOffset > 0)
             {
-                int trackX = xPositionOnScreen + width - 64;
-                int trackY = yPositionOnScreen + 104 + 18 + 44;
-                int trackH = (height - 172) - 88;
-                var trackRect = new Rectangle(trackX - 6, trackY, 36, trackH);
-                if (trackRect.Contains(x, y))
+                if (ScrollBar != null && ScrollBar.containsPoint(x, y))
                 {
                     IsDraggingScrollbar = true;
-                    SetScrollFromY(y, trackY, trackH, height - 172);
+                    Game1.playSound("shiny4");
+                    return;
+                }
+                if (ScrollBarRunner.Contains(x, y))
+                {
+                    IsDraggingScrollbar = true;
+                    SetScrollFromRunnerY(y);
                     Game1.playSound("shiny4");
                     return;
                 }
@@ -410,9 +427,7 @@ namespace BetterQOL
             base.leftClickHeld(x, y);
             if (IsDraggingScrollbar && MaxScrollOffset > 0)
             {
-                int trackY = yPositionOnScreen + 104 + 18 + 44;
-                int trackH = (height - 172) - 88;
-                SetScrollFromY(y, trackY, trackH, height - 172);
+                SetScrollFromRunnerY(y);
             }
         }
 
@@ -426,17 +441,22 @@ namespace BetterQOL
         }
 
         /// <summary>
-        /// Maps vertical mouse position onto the scrollbar track to compute the new ScrollOffset.
+        /// Maps vertical mouse position onto the scrollbar track runner to compute the new ScrollOffset.
         /// </summary>
-        private void SetScrollFromY(int mouseY, int trackY, int trackH, int contentHeight)
+        private void SetScrollFromRunnerY(int mouseY)
         {
-            int thumbH = Math.Max(20, (int)(trackH * (float)contentHeight / (contentHeight + MaxScrollOffset)));
-            int usableTrackH = trackH - thumbH;
-            if (usableTrackH <= 0)
+            if (MaxScrollOffset <= 0)
                 return;
 
-            float relY = mouseY - trackY - (thumbH / 2f);
-            float pct = Math.Clamp(relY / usableTrackH, 0f, 1f);
+            int runnerY = ScrollBarRunner.Y;
+            int runnerH = ScrollBarRunner.Height;
+            int thumbH = 40;
+            int usableH = runnerH - thumbH;
+            if (usableH <= 0)
+                return;
+
+            float relY = mouseY - runnerY - (thumbH / 2f);
+            float pct = Math.Clamp(relY / usableH, 0f, 1f);
             ScrollOffset = (int)Math.Round(pct * MaxScrollOffset);
         }
 
@@ -1010,21 +1030,26 @@ namespace BetterQOL
                 UpButton?.draw(b);
                 DownButton?.draw(b);
 
-                int trackX = xPositionOnScreen + width - 48;
-                int trackY = contentY + 44;
-                int trackH = contentHeight - 88;
+                IClickableMenu.drawTextureBox(
+                    b,
+                    Game1.mouseCursors,
+                    new Rectangle(403, 383, 6, 6),
+                    ScrollBarRunner.X,
+                    ScrollBarRunner.Y,
+                    ScrollBarRunner.Width,
+                    ScrollBarRunner.Height,
+                    Color.White,
+                    4f,
+                    drawShadow: false
+                );
 
-                // Track Background
-                b.Draw(Game1.staminaRect, new Rectangle(trackX, trackY, 6, trackH), Color.SaddleBrown * 0.25f);
-
-                // Scroll Thumb
-                // Thumb height shrinks as content grows (window/total ratio); its
-                // position slides down proportionally to the scroll offset. The cast
-                // "(float)" forces floating-point division - integer math would yield 0.
                 float scrollPct = (float)ScrollOffset / MaxScrollOffset;
-                int thumbH = Math.Max(20, (int)(trackH * (float)contentHeight / (contentHeight + MaxScrollOffset)));
-                int thumbY = trackY + (int)((trackH - thumbH) * scrollPct);
-                b.Draw(Game1.staminaRect, new Rectangle(trackX - 1, thumbY, 8, thumbH), Color.SaddleBrown * 0.8f);
+                int thumbY = ScrollBarRunner.Y + (int)((ScrollBarRunner.Height - 40) * scrollPct);
+                if (ScrollBar != null)
+                {
+                    ScrollBar.bounds.Y = thumbY;
+                    ScrollBar.draw(b);
+                }
             }
 
             // Last of all: draw the custom mouse cursor so it sits above everything.
