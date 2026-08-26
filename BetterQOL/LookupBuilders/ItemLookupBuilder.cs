@@ -2535,49 +2535,69 @@ namespace BetterQOL
 			if (contextTags != null)
 			{
 				string text2 = null;
-				if (contextTags.Contains("color_red"))
+				Color value = Color.DarkSlateGray;
+				if (contextTags.Contains("color_prismatic") || contextTags.Contains("color_rainbow"))
 				{
-					text2 = "Red";
+					text2 = ModEntry.I18n.Get("lookup.dye-color.prismatic");
+					value = new Color(180, 50, 180);
 				}
-				else if (contextTags.Contains("color_orange"))
+				else if (contextTags.Contains("color_red") || contextTags.Contains("color_dark_red") || contextTags.Contains("color_light_red") || contextTags.Contains("color_crimson") || contextTags.Contains("color_salmon") || contextTags.Contains("color_ruby"))
 				{
-					text2 = "Orange";
+					text2 = ModEntry.I18n.Get("lookup.dye-color.red");
+					value = new Color(220, 20, 60);
 				}
-				else if (contextTags.Contains("color_yellow"))
+				else if (contextTags.Contains("color_orange") || contextTags.Contains("color_dark_orange") || contextTags.Contains("color_light_orange") || contextTags.Contains("color_copper"))
 				{
-					text2 = "Yellow";
+					text2 = ModEntry.I18n.Get("lookup.dye-color.orange");
+					value = new Color(220, 100, 20);
 				}
-				else if (contextTags.Contains("color_green"))
+				else if (contextTags.Contains("color_yellow") || contextTags.Contains("color_dark_yellow") || contextTags.Contains("color_light_yellow") || contextTags.Contains("color_gold") || contextTags.Contains("color_sand_yellow"))
 				{
-					text2 = "Green";
+					text2 = ModEntry.I18n.Get("lookup.dye-color.yellow");
+					value = new Color(200, 160, 0);
 				}
-				else if (contextTags.Contains("color_blue") || contextTags.Contains("color_cyan") || contextTags.Contains("color_ocean_blue"))
+				else if (contextTags.Contains("color_green") || contextTags.Contains("color_dark_green") || contextTags.Contains("color_light_green") || contextTags.Contains("color_lime") || contextTags.Contains("color_olive") || contextTags.Contains("color_jade"))
 				{
-					text2 = "Blue";
+					text2 = ModEntry.I18n.Get("lookup.dye-color.green");
+					value = new Color(46, 125, 50);
 				}
-				else if (contextTags.Contains("color_purple"))
+				else if (contextTags.Contains("color_blue") || contextTags.Contains("color_dark_blue") || contextTags.Contains("color_light_blue") || contextTags.Contains("color_cyan") || contextTags.Contains("color_ocean_blue") || contextTags.Contains("color_aquamarine"))
 				{
-					text2 = "Purple";
+					text2 = ModEntry.I18n.Get("lookup.dye-color.blue");
+					value = new Color(20, 110, 220);
 				}
-				else if (contextTags.Contains("color_pink"))
+				else if (contextTags.Contains("color_purple") || contextTags.Contains("color_dark_purple") || contextTags.Contains("color_light_purple") || contextTags.Contains("color_violet") || contextTags.Contains("color_amethyst") || contextTags.Contains("color_iridium"))
 				{
-					text2 = "Pink";
+					text2 = ModEntry.I18n.Get("lookup.dye-color.purple");
+					value = new Color(180, 50, 180);
 				}
-				else if (contextTags.Contains("color_gray"))
+				else if (contextTags.Contains("color_pink") || contextTags.Contains("color_light_pink") || contextTags.Contains("color_magenta"))
 				{
-					text2 = "Gray";
+					text2 = ModEntry.I18n.Get("lookup.dye-color.pink");
+					value = new Color(230, 80, 140);
 				}
-				else if (contextTags.Contains("color_brown"))
+				else if (contextTags.Contains("color_white"))
 				{
-					text2 = "Brown";
+					text2 = ModEntry.I18n.Get("lookup.dye-color.white");
+					value = Color.DarkSlateGray;
+				}
+				else if (contextTags.Contains("color_gray") || contextTags.Contains("color_grey") || contextTags.Contains("color_light_gray") || contextTags.Contains("color_dark_gray") || contextTags.Contains("color_silver") || contextTags.Contains("color_iron"))
+				{
+					text2 = ModEntry.I18n.Get("lookup.dye-color.gray");
+					value = Color.DarkSlateGray;
+				}
+				else if (contextTags.Contains("color_brown") || contextTags.Contains("color_dark_brown") || contextTags.Contains("color_light_brown"))
+				{
+					text2 = ModEntry.I18n.Get("lookup.dye-color.brown");
+					value = new Color(140, 80, 40);
 				}
 				else if (contextTags.Contains("color_black"))
 				{
-					text2 = "Black";
+					text2 = ModEntry.I18n.Get("lookup.dye-color.black");
+					value = new Color(40, 40, 40);
 				}
 				if (text2 != null)
 				{
-					Color value = (Color)(text2.StartsWith("Red") ? new Color(220, 20, 60) : (text2.StartsWith("Orange") ? new Color(220, 100, 20) : (text2.StartsWith("Yellow") ? new Color(200, 160, 0) : (text2.StartsWith("Green") ? new Color(46, 125, 50) : (text2.StartsWith("Blue") ? new Color(20, 110, 220) : (text2.StartsWith("Purple") ? new Color(180, 50, 180) : Color.DarkSlateGray))))));
 					list.Add(new LookupField((ModEntry.I18n.Get("lookup.tailoring.dye-color")), text2, value));
 				}
 			}
