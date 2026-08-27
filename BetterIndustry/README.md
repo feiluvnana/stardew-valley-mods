@@ -81,17 +81,25 @@ When **Qi Seasoning** is consumed during cooking:
 
 ---
 
-## ⭐ Module 3: Quality-Preserving Machines
+## ⭐ Module 3: Balanced Artisan Machine Star Matrix
 
-In vanilla, artisan machines strip all star quality (Silver, Gold, Iridium) from input items, penalizing players for using high-quality crops and animal products.
+In vanilla, artisan machines strip all star quality (Silver, Gold, Iridium) from input items. BetterIndustry replaces this with a **balanced Symmetrical 15% probability matrix**, ensuring high-tier crops yield high-tier artisan goods while preserving the strategic necessity of **Cellar Casks** for aging.
 
-### Features
-* **Full Quality Inheritance:** Kegs, Preserves Jars, Cheese Presses, Mayonnaise Machines, Looms, Dehydrators, and Fish Smokers preserve the input item's star quality on finished goods.
-* **Examples:**
-  * *Iridium Starfruit* in Keg $\rightarrow$ **Iridium Starfruit Wine**.
-  * *Iridium Large Milk* in Cheese Press $\rightarrow$ **Iridium Cheese**.
-  * *Iridium Egg* in Mayo Machine $\rightarrow$ **Iridium Mayonnaise**.
-  * *Iridium Wool* in Loom $\rightarrow$ **Iridium Cloth** (2.0x base sell value).
+### 🎲 Quality Probability Distribution Table
+
+| Input Item Quality | Normal (0⭐) | Silver (1⭐) | Gold (2⭐) | Iridium (4⭐) | Primary Outcome |
+| :--- | :---: | :---: | :---: | :---: | :--- |
+| **Regular (0⭐)** | **85%** | **15%** | **0%** | **0%** | Mostly Regular with Silver bonus |
+| **Silver (1⭐)** | **15%** | **70%** | **15%** | **0%** | Balanced around Silver (symmetrical) |
+| **Gold (2⭐)** | **0%** | **15%** | **70%** | **15%** | Guaranteed at least Silver, mostly Gold |
+| **Iridium (4⭐)** | **0%** | **0%** | **85%** | **15%** | **Guaranteed Gold floor (85%), 15% Instant Iridium** |
+
+### 🍷 Cellar Cask Fast-Aging Synergy
+* Kegging an **Iridium Starfruit** produces **Gold Wine (85%)** or **Instant Iridium Wine (15%)**.
+* Putting that **Gold Wine** into a Cellar Cask requires only **28 days** (instead of 56 days) to reach Iridium quality, cutting aging time in half and creating perfect synergy between Fertilizer, Quality Crops, and Cask Aging!
+
+### 🐄 Animal Product Perks
+* **Large Milk / Large Egg / Dinosaur Egg / Ostrich Egg**: Grants an automatic baseline of Gold quality (Normal/Silver $\rightarrow$ 100% Gold, Gold/Iridium $\rightarrow$ 85% Gold / 15% Iridium).
 
 ---
 
@@ -152,7 +160,8 @@ Mature fruit trees will automatically drop their ripe fruit onto the ground over
   "EnableEnhancedFoodBuffs": true,
   "IridiumBuffDurationMultiplier": 2.0,
   "EnableMeadFix": true,
-  "EnableQualityPreserving": true,
+  "EnableMachineQuality": true,
+  "ApplyDailyLuckToMachines": true,
   "EnableTruffleOilFix": true,
   "TruffleOilMultiplier": 1.5,
   "EnableJuiceBuff": true,
@@ -172,7 +181,8 @@ Mature fruit trees will automatically drop their ripe fruit onto the ground over
 | **Cooking** | `EnableEnhancedFoodBuffs` | `true` | bool | Grants +2 to active stat buffs for Iridium dishes and scales buff duration. |
 | **Cooking** | `IridiumBuffDurationMultiplier` | `2.0` | `1.0` – `3.0` (`0.05`) | Buff duration multiplier for Iridium-quality meals. |
 | **Artisan** | `EnableMeadFix` | `true` | bool | Retains flower honey flavor and 2.0x value scaling when brewed into mead. |
-| **Artisan** | `EnableQualityPreserving` | `true` | bool | Preserves input star quality across all artisan machines. |
+| **Artisan** | `EnableMachineQuality` | `true` | bool | Enables balanced 15% probability matrix for artisan machines. |
+| **Artisan** | `ApplyDailyLuckToMachines` | `true` | bool | Daily luck slightly shifts machine quality rolls toward higher star tiers. |
 | **Artisan** | `EnableTruffleOilFix` | `true` | bool | Truffle Oil scales value and quality based on the input Truffle. |
 | **Artisan** | `TruffleOilMultiplier` | `1.5` | `1.0` – `3.0` (`0.05`) | Multiplier for Truffle Oil relative to input truffle price. |
 | **Artisan** | `EnableJuiceBuff` | `true` | bool | Buffs the price multiplier for Vegetable Juice brewed in Kegs. |

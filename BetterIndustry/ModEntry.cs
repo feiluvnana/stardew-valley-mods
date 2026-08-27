@@ -80,6 +80,7 @@ namespace BetterIndustry
             // Apply Harmony patches
             var harmony = new HarmonyLib.Harmony(ModManifest.UniqueID);
             CookingPatches.Apply(harmony);
+            MachineQualityPatches.Apply(harmony);
 
             // Game Loop Events
             // GameLaunched: fires once the game finished booting (right moment to query
@@ -217,10 +218,18 @@ namespace BetterIndustry
 
             configMenu.AddBoolOption(
                 mod: ModManifest,
-                name: () => I18n.Get("config.quality-preserving.name"),
-                tooltip: () => I18n.Get("config.quality-preserving.tooltip"),
-                getValue: () => Config.EnableQualityPreserving,
-                setValue: value => Config.EnableQualityPreserving = value
+                name: () => I18n.Get("config.machine-quality.name"),
+                tooltip: () => I18n.Get("config.machine-quality.tooltip"),
+                getValue: () => Config.EnableMachineQuality,
+                setValue: value => Config.EnableMachineQuality = value
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.machine-luck.name"),
+                tooltip: () => I18n.Get("config.machine-luck.tooltip"),
+                getValue: () => Config.ApplyDailyLuckToMachines,
+                setValue: value => Config.ApplyDailyLuckToMachines = value
             );
 
             configMenu.AddBoolOption(

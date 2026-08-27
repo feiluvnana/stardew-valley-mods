@@ -217,9 +217,8 @@ namespace BetterChest
             if (Utility.IsPassiveFestivalDay("DesertFestival"))
                 return true;
 
-            // Fallback: the festival runs on days 15-17 (note: this checks only the
-            // day of month, not the season).
-            return Game1.dayOfMonth >= 15 && Game1.dayOfMonth <= 17;
+            // Fallback: Spring 15-17
+            return Game1.currentSeason.Equals("spring", StringComparison.OrdinalIgnoreCase) && Game1.dayOfMonth >= 15 && Game1.dayOfMonth <= 17;
         }
 
         /// <summary>

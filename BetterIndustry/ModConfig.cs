@@ -49,8 +49,19 @@ namespace BetterIndustry
         /// <summary>Whether mead retains the input flower honey type and 2.0x price scaling.</summary>
         public bool EnableMeadFix { get; set; } = true;
 
-        /// <summary>Whether artisan machines (Keg, Preserves Jar, Cheese Press, Mayonnaise Machine, Loom, Oil Maker) retain input item quality.</summary>
-        public bool EnableQualityPreserving { get; set; } = true;
+        /// <summary>Whether artisan machines use the balanced Option 2 Quarter-Step quality matrix (75/25 & 50/25) based on input quality.</summary>
+        public bool EnableMachineQuality { get; set; } = true;
+
+        /// <summary>Whether Daily Luck slightly shifts machine quality rolls toward higher star tiers.</summary>
+        public bool ApplyDailyLuckToMachines { get; set; } = true;
+
+        /// <summary>Legacy alias for EnableMachineQuality.</summary>
+        [System.Text.Json.Serialization.JsonIgnore]
+        public bool EnableQualityPreserving
+        {
+            get => EnableMachineQuality;
+            set => EnableMachineQuality = value;
+        }
 
         /// <summary>Whether Truffle Oil price and quality scale with the input Truffle.</summary>
         public bool EnableTruffleOilFix { get; set; } = true;

@@ -259,8 +259,8 @@ namespace BetterQOL
             // marker key in modData), same custom name template, same description text.
             if (Config.EnableTrinketStacking && __instance is Trinket thisTrinket && other is Trinket otherTrinket)
             {
-                bool thisAscended = thisTrinket.modData.ContainsKey("feiluvnana.BetterTrinket/IsAscended");
-                bool otherAscended = otherTrinket.modData.ContainsKey("feiluvnana.BetterTrinket/IsAscended");
+                bool thisAscended = thisTrinket.modData.ContainsKey("feiluvnana.BetterForge/IsAscended") || thisTrinket.modData.ContainsKey("feiluvnana.BetterTrinket/IsAscended");
+                bool otherAscended = otherTrinket.modData.ContainsKey("feiluvnana.BetterForge/IsAscended") || otherTrinket.modData.ContainsKey("feiluvnana.BetterTrinket/IsAscended");
 
                 if (thisTrinket.QualifiedItemId == otherTrinket.QualifiedItemId &&
                     thisTrinket.generationSeed.Value == otherTrinket.generationSeed.Value &&
