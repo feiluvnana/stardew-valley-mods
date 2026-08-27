@@ -59,5 +59,15 @@
   "config.apex-fish-exp-bonus.name": "Thưởng EXP Cá Đỉnh Cao",
   "config.apex-fish-exp-bonus.tooltip": "Điểm kinh nghiệm cộng thêm khi câu cá có độ khó >= 85 (Cá tuyết Lingcod, Cá băng Ice Pip, Cá chép bọ cạp, Lươn nham thạch, Bạch tuộc; mặc định: +15 EXP).",
   "config.legendary-fish-exp-bonus.name": "Thưởng EXP Cá Huyền Thoại",
-  "config.legendary-fish-exp-bonus.tooltip": "Điểm kinh nghiệm cộng thêm khi câu được bất kỳ loài cá Huyền Thoại hoặc Đại Gia Đình Huyền Thoại nào (mặc định: +60 EXP)."
+  "config.legendary-fish-exp-bonus.tooltip": "Điểm kinh nghiệm cộng thêm khi câu được bất kỳ loài cá Huyền Thoại hoặc Đại Gia Đình Huyền Thoại nào (mặc định: +60 EXP).",
+
+  "config.section.crab-pots": "Cài Đặt Lồng Bẫy Cua",
+  "config.enable-crab-pot-price-balancing.name": "Bật Tăng Giá Vật Phẩm Lồng Bẫy",
+  "config.enable-crab-pot-price-balancing.tooltip": "Tái cân bằng giá bán cơ bản cho toàn bộ 10 loại thủy sản lồng bẫy cua (Tôm hùm 200g, Cua 150g, Tôm tích 110g, Ốc/Hàu 95g, Tôm 90g, Sò/Nghêu 75g, Vẹm 55g, Ốc mút 45g).",
+  "config.enable-crab-pot-exp-balancing.name": "Bật Phân Tầng EXP Thu Hoạch",
+  "config.enable-crab-pot-exp-balancing.tooltip": "Trao điểm kinh nghiệm phân tầng theo giá trị vật phẩm khi thu hoạch lồng bẫy (Tôm hùm 24 EXP, Cua 16 EXP, Thủy sản quý 12 EXP, Nghêu sò 8 EXP, Rác 5 EXP).",
+  "config.enable-crab-pot-trash-reduction.name": "Bật Giảm Tỉ Lệ Rác Lồng Bẫy",
+  "config.enable-crab-pot-trash-reduction.tooltip": "Giảm mạnh tỉ lệ xuất hiện rác trong lồng bẫy bằng cách chuyển đổi ngẫu nhiên rác thành thủy sản hợp lệ của vùng nước đó.",
+  "config.crab-pot-trash-reroll-chance.name": "Tỉ Lệ Chuyển Đổi Rác",
+  "config.crab-pot-trash-reroll-chance.tooltip": "Xác suất chuyển đổi một lần dính rác thành thủy sản thật (mặc định: 0.65 / 65%, kéo tỉ lệ rác từ ~38% xuống chỉ còn ~13%)."
 }

@@ -59,5 +59,15 @@
   "config.apex-fish-exp-bonus.name": "Apex Fish EXP Bonus",
   "config.apex-fish-exp-bonus.tooltip": "Bonus experience added to challenging fish catches with Difficulty >= 85 (e.g. Lingcod, Ice Pip, Scorpion Carp, Lava Eel, Octopus; default: +15 EXP).",
   "config.legendary-fish-exp-bonus.name": "Legendary Fish EXP Bonus",
-  "config.legendary-fish-exp-bonus.tooltip": "Bonus experience added to all Legendary and Extended Family fish catches (default: +60 EXP)."
+  "config.legendary-fish-exp-bonus.tooltip": "Bonus experience added to all Legendary and Extended Family fish catches (default: +60 EXP).",
+
+  "config.section.crab-pots": "Crab Pot Settings",
+  "config.enable-crab-pot-price-balancing.name": "Enable Crab Pot Price Buffs",
+  "config.enable-crab-pot-price-balancing.tooltip": "Rebalances base sell prices for all 10 Crab Pot catches (Lobster 200g, Crab 150g, Crayfish 110g, Snail/Oyster 95g, Shrimp 90g, Cockle/Clam 75g, Mussel 55g, Periwinkle 45g).",
+  "config.enable-crab-pot-exp-balancing.name": "Enable Tiered Crab Pot EXP",
+  "config.enable-crab-pot-exp-balancing.tooltip": "Awards tiered harvesting experience for Crab Pots (Lobster 24 EXP, Crab 16 EXP, Delicacies 12 EXP, Shellfish 8 EXP, Trash 5 EXP).",
+  "config.enable-crab-pot-trash-reduction.name": "Enable Trash Reduction",
+  "config.enable-crab-pot-trash-reduction.tooltip": "Significantly nerfs crab pot trash rates by rerolling trash catches into valid local shellfish.",
+  "config.crab-pot-trash-reroll-chance.name": "Trash Reroll Chance",
+  "config.crab-pot-trash-reroll-chance.tooltip": "Probability of converting a trash roll into a genuine shellfish catch (default: 0.65 / 65%, dropping trash rates from ~38% to ~13%)."
 }

@@ -98,5 +98,36 @@ namespace BetterFishing
 
         /// <summary>Experience bonus added to Legendary fish catches (default: +60 EXP).</summary>
         public int LegendaryFishExpBonus { get; set; } = 60;
+
+        // =====================================================================
+        // === 7. CRAB POT OVERHAUL SETTINGS                                 ===
+        // =====================================================================
+        /// <summary>Enable rebalanced base sell prices for crab pot catches.</summary>
+        public bool EnableCrabPotPriceBalancing { get; set; } = true;
+
+        /// <summary>Enable tiered harvest experience for crab pots.</summary>
+        public bool EnableCrabPotExpBalancing { get; set; } = true;
+
+        /// <summary>Enable trash chance reduction (rerolls trash into valid catches).</summary>
+        public bool EnableCrabPotTrashReduction { get; set; } = true;
+
+        /// <summary>Probability of converting a trash roll into a valid shellfish catch (default: 0.65 / 65%).</summary>
+        public float CrabPotTrashRerollChance { get; set; } = 0.65f;
+
+        public int LobsterPrice { get; set; } = 200;
+        public int CrabPrice { get; set; } = 150;
+        public int CrayfishPrice { get; set; } = 110;
+        public int SnailPrice { get; set; } = 95;
+        public int OysterPrice { get; set; } = 95;
+        public int ShrimpPrice { get; set; } = 90;
+        public int CocklePrice { get; set; } = 75;
+        public int ClamPrice { get; set; } = 75;
+        public int MusselPrice { get; set; } = 55;
+        public int PeriwinklePrice { get; set; } = 45;
+
+        public int LobsterExp { get; set; } = 24;
+        public int CrabExp { get; set; } = 16;
+        public int Tier2CrabPotExp { get; set; } = 12;
+        public int Tier1CrabPotExp { get; set; } = 8;
     }
 }

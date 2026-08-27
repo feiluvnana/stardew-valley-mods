@@ -40,6 +40,11 @@ $$P_{\text{base}}(D) = F + c_1 \cdot D + c_2 \cdot \left(\frac{D}{50}\right)^2 +
 * **Rewarding Legendary Catches**: Adds **$+60\text{ EXP}$** to all 10 Legendary and Extended Family catches (Legend $39 \rightarrow 99\text{ EXP}$).
 * **Vanilla Multipliers Preserved**: Perfect catches ($\times 2.4$) and Treasure chest catches ($\times 2.2$) continue to multiply on top of the calculated base EXP.
 
+### 7. 🦀 Crab Pot Overhaul (Trash Nerf, Prices & Tiered EXP)
+* **🗑️ Trash Chance Nerfed**: Applies a 65% trash reroll check, converting trash rolls into valid shellfish and dropping the effective trash rate from ~38% down to ~13%.
+* **💰 Rebalanced Base Sell Prices**: Lobster (200g), Crab (150g), Crayfish (110g), Snail & Oyster (95g), Shrimp (90g), Cockle & Clam (75g), Mussel (55g), Periwinkle (45g).
+* **🧠 Tiered Harvest Experience**: Lobster (24 EXP), Crab (16 EXP), Delicacies (12 EXP), Shellfish (8 EXP), Trash (5 EXP).
+
 ---
 
 ## ⚙️ Configuration (GMCM)
@@ -63,3 +68,7 @@ All options can be configured in-game via **Generic Mod Config Menu** or in `con
 | `EnableFishingExpBalancing` | `true` | Enables targeted fishing experience balancing. |
 | `ApexFishExpBonus` | `15` | Bonus EXP for hard non-legendary fish (D >= 85). |
 | `LegendaryFishExpBonus` | `60` | Bonus EXP for Legendary fish catches. |
+| `EnableCrabPotPriceBalancing` | `true` | Enables rebalanced sell prices for crab pot catches. |
+| `EnableCrabPotExpBalancing` | `true` | Enables tiered harvest experience for crab pots. |
+| `EnableCrabPotTrashReduction` | `true` | Enables crab pot trash chance reduction. |
+| `CrabPotTrashRerollChance` | `0.65` | Probability of converting trash into genuine shellfish (default: 65%). |

@@ -22,10 +22,11 @@ namespace BetterFishing
             ModHelper = helper;
             I18n = helper.Translation;
 
-            // Apply Harmony transpiler patches for fishing treasure chest decay & balanced fishing exp
+            // Apply Harmony transpiler and helper patches
             var harmony = new Harmony(ModManifest.UniqueID);
             FishingChestPatches.Apply(harmony);
             FishingExpPatches.Apply(harmony);
+            CrabPotPatches.Apply(harmony);
 
             // Asset hooks for fish price balancing
             helper.Events.Content.AssetRequested += FishPriceBalancer.OnAssetRequested;
@@ -91,6 +92,13 @@ namespace BetterFishing
             AddBool(configMenu, "enable-fishing-exp-balancing", () => Config.EnableFishingExpBalancing, v => Config.EnableFishingExpBalancing = v);
             AddInt(configMenu, "apex-fish-exp-bonus", () => Config.ApexFishExpBonus, v => Config.ApexFishExpBonus = v, 0, 100);
             AddInt(configMenu, "legendary-fish-exp-bonus", () => Config.LegendaryFishExpBonus, v => Config.LegendaryFishExpBonus = v, 0, 300);
+
+            // Section 7: Crab Pot Settings
+            AddSection(configMenu, "crab-pots");
+            AddBool(configMenu, "enable-crab-pot-price-balancing", () => Config.EnableCrabPotPriceBalancing, v => Config.EnableCrabPotPriceBalancing = v);
+            AddBool(configMenu, "enable-crab-pot-exp-balancing", () => Config.EnableCrabPotExpBalancing, v => Config.EnableCrabPotExpBalancing = v);
+            AddBool(configMenu, "enable-crab-pot-trash-reduction", () => Config.EnableCrabPotTrashReduction, v => Config.EnableCrabPotTrashReduction = v);
+            AddFloat(configMenu, "crab-pot-trash-reroll-chance", () => Config.CrabPotTrashRerollChance, v => Config.CrabPotTrashRerollChance = v, 0f, 1f, 0.05f);
         }
 
         private void AddSection(IGenericModConfigMenuApi menu, string sectionKey)

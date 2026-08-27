@@ -236,11 +236,48 @@ namespace BetterFishing
                     }
                 }
 
-                Monitor.Log($"BetterFishing: Evaluated and updated prices for {modifiedCount} fish species.", LogLevel.Trace);
+                // Apply Crab Pot price balancing
+                ApplyCrabPotPrices(objectData);
+
+                Monitor.Log($"BetterFishing: Evaluated and updated prices for {modifiedCount} fish species & crab pot catches.", LogLevel.Trace);
             }
             catch (Exception ex)
             {
                 Monitor.Log($"Error applying fish price balancing in BetterFishing: {ex}", LogLevel.Error);
+            }
+        }
+
+        /// <summary>
+        /// Applies rebalanced base sell prices for the 10 Crab Pot catches.
+        /// </summary>
+        private static void ApplyCrabPotPrices(IDictionary<string, ObjectData> objectData)
+        {
+            if (!Config.EnableCrabPotPriceBalancing)
+                return;
+
+            var crabPotPrices = new Dictionary<string, int>
+            {
+                ["715"] = Config.LobsterPrice,
+                ["717"] = Config.CrabPrice,
+                ["716"] = Config.CrayfishPrice,
+                ["721"] = Config.SnailPrice,
+                ["723"] = Config.OysterPrice,
+                ["720"] = Config.ShrimpPrice,
+                ["718"] = Config.CocklePrice,
+                ["372"] = Config.ClamPrice,
+                ["719"] = Config.MusselPrice,
+                ["722"] = Config.PeriwinklePrice
+            };
+
+            foreach (var (itemId, price) in crabPotPrices)
+            {
+                if (objectData.TryGetValue(itemId, out var objData) || objectData.TryGetValue($"(O){itemId}", out objData))
+                {
+                    if (Config.PreventNerf && price < objData.Price)
+                        continue;
+
+                    objData.Price = price;
+                }
             }
         }
 
