@@ -102,9 +102,7 @@ namespace BetterChest
             // UniqueID (from ModManifest — the IManifest object SMAPI built out
             // of manifest.json) namespaces every patch for later identification.
             var harmony = new Harmony(ModManifest.UniqueID);
-            // Install both runtime hooks; see each class's Apply method.
             ChestPatches.Apply(harmony);
-            FishingPatches.Apply(harmony);
 
             // C# concept — EVENTS with "+=": an event is a broadcast channel.
             // "+=" SUBSCRIBES our method as a listener, so SMAPI invokes
@@ -341,12 +339,6 @@ namespace BetterChest
             AddBool(configMenu, "enable-mystery-boxes", () => Config.EnableMysteryBoxes, v => Config.EnableMysteryBoxes = v);
             AddBool(configMenu, "enable-omni-geodes", () => Config.EnableOmniGeodes, v => Config.EnableOmniGeodes = v);
             AddBool(configMenu, "enable-calico-eggs", () => Config.EnableCalicoEggs, v => Config.EnableCalicoEggs = v);
-
-            // Fishing Treasure Chests GMCM Section
-            AddSection(configMenu, "fishing-chests");
-            AddBool(configMenu, "enable-fishing-chest-buff", () => Config.EnableFishingChestBuff, v => Config.EnableFishingChestBuff = v);
-            AddFloat(configMenu, "fishing-chest-decay-rate", () => Config.FishingChestDecayRate, v => Config.FishingChestDecayRate = v, 0.10f, 0.99f, 0.01f);
-            AddFloat(configMenu, "golden-chest-decay-rate", () => Config.GoldenChestDecayRate, v => Config.GoldenChestDecayRate = v, 0.10f, 0.99f, 0.01f);
         }
 
         // =====================================================================

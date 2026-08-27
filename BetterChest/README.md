@@ -1,6 +1,6 @@
-# 💎 BetterChest
+# 💎 BetterChest (v1.7.0)
 
-**BetterChest** is a comprehensive, progression-balanced loot overhaul for **Stardew Valley 1.6+**, transforming both **Skull Cavern Treasure Rooms** and **Fishing Treasure Chests** (Standard and 1.6 Golden Chests) with dynamic gameplay loot engines, decaying multi-rolls, critical stack multipliers, depth scaling, linear legendary scaling, and intelligent progression gatekeeping.
+**BetterChest** is a comprehensive, progression-balanced loot overhaul for **Stardew Valley 1.6+**, transforming **Skull Cavern Treasure Rooms** with dynamic gameplay loot engines, decaying multi-rolls, critical stack multipliers, depth scaling, linear legendary scaling, and intelligent progression gatekeeping. *(Note: Fishing treasure chest enhancements have been migrated to BetterFishing).*
 
 ---
 
@@ -13,13 +13,10 @@
    - [Linear Legendary Depth Scaling](#linear-legendary-depth-scaling)
    - [Depth-Based Tier Scaling](#depth-based-tier-scaling)
    - [Supercharged Floor 100+ Special Chests](#supercharged-floor-100-special-chests)
-3. [Module 2: Streamlined Fishing Treasure Chests](#-module-2-streamlined-fishing-treasure-chests)
-   - [High Roll Counts](#high-roll-counts)
-   - [Trash Compensation (+1 Bonus Reroll)](#trash-compensation-1-bonus-reroll)
-4. [🛡️ Master Gatekeeping & Unlock Matrix](#️-master-gatekeeping--unlock-matrix)
-5. [📊 Complete Drop Rate & Probability Table](#-complete-drop-rate--probability-table)
-6. [⚙️ Configuration (`config.json`)](#️-configuration-configjson)
-7. [🛠️ Building & Installation](#️-building--installation)
+3. [🛡️ Master Gatekeeping & Unlock Matrix](#️-master-gatekeeping--unlock-matrix)
+4. [📊 Complete Drop Rate & Probability Table](#-complete-drop-rate--probability-table)
+5. [⚙️ Configuration (`config.json`)](#️-configuration-configjson)
+6. [🛠️ Building & Installation](#️-building--installation)
 
 ---
 
@@ -94,33 +91,6 @@ $$\text{Active Legendary Weight} = \text{Base Legendary Weight} \times \text{Dep
 
 ---
 
-## 🎣 Module 2: Vanilla-Faithful Decaying Fishing Treasure Chests
-
-### Balanced Probability Multipliers
-Instead of injecting a flat custom loot table that bypasses progression, **BetterChest** hooks directly into the **vanilla Stardew Valley 1.6 roll engine** and tunes the probability decay multiplier of the loot loop:
-
-- **Standard Fishing Chests:** Decay multiplier set to **`0.60`** (Vanilla default: `0.40`).
-  - Roll 1: 100% (Guaranteed)
-  - Roll 2: 60.0%
-  - Roll 3: 21.6%
-  - Roll 4: 4.7%
-  - *Expected Average:* **~1.88 items** (typically 1–2 items, occasionally 3).
-- **1.6 Golden Fishing Chests:** Decay multiplier set to **`0.80`** (Vanilla default: `0.60`).
-  - Roll 1: 100% (Guaranteed)
-  - Roll 2: 80.0%
-  - Roll 3: 51.2%
-  - Roll 4: 26.2%
-  - Roll 5: 10.7%
-  - *Expected Average:* **~2.73 items** (typically 2–4 items).
-
-### 100% Vanilla 1.6 Progression & Scaling
-Because all rolls execute through the native game code:
-- High-tier ores, geodes, and gems scale with **Fishing Level** and **Cast Distance from Land**.
-- Rare drops (weapons, rings, Prismatic Shard) respect game luck and skill requirements.
-- 1.6 content (Golden Animal Crackers, Golden Mystery Boxes, Mastery books) only drops when unlocked.
-
----
-
 ## 🛡️ Master Gatekeeping & Unlock Matrix
 
 | Feature / Setting | Description | Default |
@@ -134,8 +104,6 @@ Because all rolls execute through the native game code:
 | `GatekeepMysteryBoxes` | Gated until Mr. Qi Mystery Box event occurs | `true` |
 | `GatekeepCalicoEggs` | Gated to Desert Festival season (Spring 15–17) or Year 2+ | `true` |
 | `GatekeepAutoPetter` | Gated until Community Center / Joja completion | `false` |
-| `FishingChestDecayRate` | Probability decay multiplier for regular fishing chests (vanilla 0.40) | `0.60` |
-| `GoldenChestDecayRate` | Probability decay multiplier for golden fishing chests (vanilla 0.60) | `0.80` |
 
 ---
 
@@ -280,10 +248,7 @@ Because all rolls execute through the native game code:
   "GatekeepMysteryBoxes": true,
   "GatekeepCalicoEggs": true,
   "GatekeepRadioactiveItems": true,
-  "GatekeepAutoPetter": false,
-  "EnableFishingChestBuff": true,
-  "FishingChestDecayRate": 0.6,
-  "GoldenChestDecayRate": 0.8
+  "GatekeepAutoPetter": false
 }
 ```
 

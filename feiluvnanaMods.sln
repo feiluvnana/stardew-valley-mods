@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
@@ -16,6 +16,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BetterMap", "BetterMap\BetterMap.csproj", "{DDE1E5AA-4EB4-4FEF-BD9F-6F138B085B6C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BetterQOL", "BetterQOL\BetterQOL.csproj", "{A8C3432D-3F05-40F2-8C9F-87A9DB0916D8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BetterFishing", "BetterFishing\BetterFishing.csproj", "{3D9B51E2-9E9C-426F-A0FD-5A69B22B22E1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -111,6 +113,18 @@ Global
 		{A8C3432D-3F05-40F2-8C9F-87A9DB0916D8}.Release|x64.Build.0 = Release|Any CPU
 		{A8C3432D-3F05-40F2-8C9F-87A9DB0916D8}.Release|x86.ActiveCfg = Release|Any CPU
 		{A8C3432D-3F05-40F2-8C9F-87A9DB0916D8}.Release|x86.Build.0 = Release|Any CPU
+		{3D9B51E2-9E9C-426F-A0FD-5A69B22B22E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D9B51E2-9E9C-426F-A0FD-5A69B22B22E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D9B51E2-9E9C-426F-A0FD-5A69B22B22E1}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3D9B51E2-9E9C-426F-A0FD-5A69B22B22E1}.Debug|x64.Build.0 = Debug|Any CPU
+		{3D9B51E2-9E9C-426F-A0FD-5A69B22B22E1}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3D9B51E2-9E9C-426F-A0FD-5A69B22B22E1}.Debug|x86.Build.0 = Debug|Any CPU
+		{3D9B51E2-9E9C-426F-A0FD-5A69B22B22E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D9B51E2-9E9C-426F-A0FD-5A69B22B22E1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D9B51E2-9E9C-426F-A0FD-5A69B22B22E1}.Release|x64.ActiveCfg = Release|Any CPU
+		{3D9B51E2-9E9C-426F-A0FD-5A69B22B22E1}.Release|x64.Build.0 = Release|Any CPU
+		{3D9B51E2-9E9C-426F-A0FD-5A69B22B22E1}.Release|x86.ActiveCfg = Release|Any CPU
+		{3D9B51E2-9E9C-426F-A0FD-5A69B22B22E1}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

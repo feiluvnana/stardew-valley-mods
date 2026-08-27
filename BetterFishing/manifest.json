@@ -1,0 +1,10 @@
+{
+  "Name": "Better Fishing",
+  "Author": "feiluvnana",
+  "Version": "1.0.0",
+  "Description": "Dynamic difficulty-based fish price scaling, movement and trait bonuses, dual anchor calibration, and decaying treasure chest rolls.",
+  "UniqueID": "feiluvnana.BetterFishing",
+  "EntryDll": "BetterFishing.dll",
+  "MinimumApiVersion": "4.0.0",
+  "UpdateKeys": []
+}

@@ -151,13 +151,5 @@
   "config.enable-omni-geodes.name": "Bật Hốc Tinh Toàn Năng",
   "config.enable-omni-geodes.tooltip": "Cho phép Hốc tinh toàn năng xuất hiện.",
   "config.enable-calico-eggs.name": "Bật Trứng Calico",
-  "config.enable-calico-eggs.tooltip": "Cho phép Trứng Calico xuất hiện.",
-
-  "config.section.fishing-chests": "Cài Đặt Rương Kho Báu Câu Cá",
-  "config.enable-fishing-chest-buff.name": "Bật Tăng Cường Rương Câu Cá",
-  "config.enable-fishing-chest-buff.tooltip": "Tăng cường rương kho báu câu cá bằng cách điều chỉnh hệ số suy giảm tỉ lệ mở thưởng, giúp mở thêm nhiều vật phẩm chuẩn cốt truyện.",
-  "config.fishing-chest-decay-rate.name": "Hệ Số Suy Giảm (Rương Thường)",
-  "config.fishing-chest-decay-rate.tooltip": "Hệ số suy giảm xác suất mở thêm vật phẩm của rương thường (mặc định game gốc là 0.40; mod là 0.60).",
-  "config.golden-chest-decay-rate.name": "Hệ Số Suy Giảm (Rương Vàng)",
-  "config.golden-chest-decay-rate.tooltip": "Hệ số suy giảm xác suất mở thêm vật phẩm của rương vàng 1.6 (mặc định game gốc là 0.60; mod là 0.80)."
+  "config.enable-calico-eggs.tooltip": "Cho phép Trứng Calico xuất hiện."
 }

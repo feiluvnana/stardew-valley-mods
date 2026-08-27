@@ -8,7 +8,8 @@ A suite of high-performance, modular quality-of-life, progression enhancement, a
 
 | Mod | Version | Description | Key Features |
 | :--- | :---: | :--- | :--- |
-| [**💎 BetterChest**](./BetterChest) | `1.6.0` | Dynamic loot overhaul for Skull Cavern & Fishing treasure chests. | 7 gameplay categories (54+ items including 1.6 Books), decaying multi-rolls, critical stack multipliers (up to 5x), linear legendary depth scaling, milestone gatekeeping, and vanilla-faithful decaying fishing chest rolls (0.60/0.80). |
+| [**💎 BetterChest**](./BetterChest) | `1.7.0` | Dynamic loot overhaul for Skull Cavern treasure rooms. | 7 gameplay categories (54+ items including 1.6 Books), decaying multi-rolls, critical stack multipliers (up to 5x), linear legendary depth scaling, and milestone gatekeeping. |
+| [**🎣 BetterFishing**](./BetterFishing) | `1.0.0` | Balanced fish price scaling, trait bonuses, and fishing treasure chest multi-rolls. | Dynamic difficulty-based base price scaling, movement bonuses (2%–6%), environmental & isolated location traits (+2%), +100% legendary prize multiplier, dual anchors (Catfish 200g, Legend 5,000g), and decaying treasure chest rolls (0.60/0.80). |
 | [**🌋 BetterForge**](./BetterForge) | `1.0.0` | Volcano Forge, Mini-Forge, and Anvil overhauls. | 100% fair uniform weapon/tool enchantments ($1/N$), "Never Downgrade" trinket reforging, "Perfect" tier prefixes, and permanent Prismatic Ascension powers (+0.5 Luck, enhanced abilities). |
 | [**🏭 BetterIndustry**](./BetterIndustry) | `2.2.0` | Artisan goods and cooking rebalance suite. | Food quality & star levels (Silver, Gold, Iridium), 40/30/20/10 machine quality matrix, flower mead 2.0x value scaling, Truffle Oil scaling fix, vegetable juice buffs, expanded cask aging, and profitable cooking (+25%). |
 | [**📦 BetterQOL**](./BetterQOL) | `1.4.7` | Quality-of-life suite for UI hover overlays, lookup, item stacking, and geodes. | UI Info Suite 2 style hover tooltips (crop timers, machine countdowns, tree stages, animal hearts), Lookup Anything (`F1`), unstackable item overrides up to 999, and instant "Crack All" geode processing. |
@@ -27,6 +28,7 @@ A suite of high-performance, modular quality-of-life, progression enhancement, a
    Stardew Valley/Mods/
    └── [feiluvnana Mods]/
        ├── BetterChest/
+       ├── BetterFishing/
        ├── BetterForge/
        ├── BetterFurniture/
        ├── BetterIndustry/
@@ -52,6 +54,7 @@ All mods are built targeting **.NET 6.0** and the **Stardew Valley 1.6+** SMAPI 
 Run the following commands from the workspace root:
 ```powershell
 dotnet build BetterChest/BetterChest.csproj
+dotnet build BetterFishing/BetterFishing.csproj
 dotnet build BetterForge/BetterForge.csproj
 dotnet build BetterFurniture/BetterFurniture.csproj
 dotnet build BetterIndustry/BetterIndustry.csproj

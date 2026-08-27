@@ -75,8 +75,5 @@
   "GatekeepMysteryBoxes": true,
   "GatekeepCalicoEggs": true,
   "GatekeepRadioactiveItems": true,
-  "GatekeepAutoPetter": false,
-  "EnableFishingChestBuff": true,
-  "FishingChestDecayRate": 0.6,
-  "GoldenChestDecayRate": 0.8
+  "GatekeepAutoPetter": false
 }

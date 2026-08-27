@@ -199,15 +199,5 @@ namespace BetterChest
         public bool GatekeepRadioactiveItems { get; set; } = true;
         /// <summary>Require the Community Center (or Joja) completion before Auto-Petter can drop.</summary>
         public bool GatekeepAutoPetter { get; set; } = false;
-
-        // =========================================================================
-        // === 3. FISHING TREASURE CHEST SETTINGS                                ===
-        // =========================================================================
-        /// <summary>Enable the decaying-roll enhancement for fishing treasure chests.</summary>
-        public bool EnableFishingChestBuff { get; set; } = true;
-        /// <summary>Probability decay multiplier for regular fishing treasure chest rolls (vanilla default is 0.40).</summary>
-        public float FishingChestDecayRate { get; set; } = 0.60f;
-        /// <summary>Probability decay multiplier for 1.6 golden fishing treasure chest rolls (vanilla default is 0.60).</summary>
-        public float GoldenChestDecayRate { get; set; } = 0.80f;
     }
 }

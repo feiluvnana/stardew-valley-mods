@@ -23,10 +23,10 @@ This document serves as the persistent knowledge base and rule set for AI coding
 
 | Directory | Mod | Description |
 | :--- | :--- | :--- |
-| `BetterChest` | **💎 BetterChest** | Skull Cavern 7-category dynamic loot pool, decaying multi-rolls (1–8 rolls, min guarantees), jackpot stack multipliers (up to 5x), linear legendary depth scaling, and simplified fishing treasure chests with trash compensation (+1 roll). |
+| `BetterChest` | **💎 BetterChest** | Skull Cavern 7-category dynamic loot pool, decaying multi-rolls (1–8 rolls, min guarantees), jackpot stack multipliers (up to 5x), linear legendary depth scaling, and milestone gatekeeping. |
+| `BetterFishing` | **🎣 BetterFishing** | Balanced dynamic fish price scaling, movement behavior bonuses, environmental & isolated location traits, +100% legendary multiplier, dual anchors (Catfish 200g, Legend 5,000g), and decaying treasure chest rolls. |
 | `BetterForge` | **🌋 BetterForge** | 100% fair uniform weapon/tool enchantments ($1/N$), "Never Downgrade" trinket reforging, "Perfect" tier prefixes, and permanent Prismatic Ascension powers (+0.5 Luck, enhanced abilities). |
 | `BetterIndustry` | **🏭 BetterIndustry** | Artisan goods and cooking rebalance: Quality-preserving machines, Flower mead 2.0x value scaling, Truffle Oil scaling fix, Vegetable Juice buffs, Expanded Cask aging, and profitable cooking (+25%). |
-
 | `BetterQOL` | **📦 BetterQOL** | Live hover overlays (crop/machine timers, tree maturation, animal hearts), rich Lookup Anything (`F1` key with search & almanac), bulk/instant geode cracking, and unstackable item stack size overrides up to 999. |
 | `BetterFurniture` | **👑 BetterFurniture** | 4x4 Princess King Bed with free placement anywhere, animated sconce flames, light sources, canopy layering, and farmhouse tile restorations. |
 | `BetterMap` | **🗺️ BetterMap** | Widens all Farmhouse exit doorways to 3x1 tiles, removes Ginger Island Farm driftwood fence and bleached log piles. |

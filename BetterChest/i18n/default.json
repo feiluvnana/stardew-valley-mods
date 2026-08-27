@@ -151,13 +151,5 @@
   "config.enable-omni-geodes.name": "Enable Omni Geodes",
   "config.enable-omni-geodes.tooltip": "Allow Omni Geodes to appear.",
   "config.enable-calico-eggs.name": "Enable Calico Eggs",
-  "config.enable-calico-eggs.tooltip": "Allow Calico Eggs to appear.",
-
-  "config.section.fishing-chests": "Fishing Treasure Chest Settings",
-  "config.enable-fishing-chest-buff.name": "Enable Fishing Chest Buff",
-  "config.enable-fishing-chest-buff.tooltip": "Enhance fishing treasure chests by adjusting the roll decay multiplier, giving more rolls of vanilla-faithful loot.",
-  "config.fishing-chest-decay-rate.name": "Standard Chest Decay Rate",
-  "config.fishing-chest-decay-rate.tooltip": "Roll probability decay multiplier for regular fishing treasure chests (vanilla default is 0.40; mod default is 0.60).",
-  "config.golden-chest-decay-rate.name": "Golden Chest Decay Rate",
-  "config.golden-chest-decay-rate.tooltip": "Roll probability decay multiplier for 1.6 golden fishing treasure chests (vanilla default is 0.60; mod default is 0.80)."
+  "config.enable-calico-eggs.tooltip": "Allow Calico Eggs to appear."
 }
