@@ -6,13 +6,14 @@
 
 ## 📖 Table of Contents
 1. [Module 1: Flower Honey Mead Fix](#-module-1-flower-honey-mead-fix)
-2. [Module 2: Cooking Profit Balancing](#-module-2-cooking-profit-balancing)
+2. [Module 2: Cooking Profit Balancing & Food Star Levels](#-module-2-cooking-profit-balancing--food-star-levels)
 3. [Module 3: Quality-Preserving Machines](#-module-3-quality-preserving-machines)
 4. [Module 4: Truffle Oil Scaling Fix](#-module-4-truffle-oil-scaling-fix)
 5. [Module 5: Vegetable Juice Buff](#-module-5-vegetable-juice-buff)
 6. [Module 6: Expanded Cask Aging](#-module-6-expanded-cask-aging)
-7. [⚙️ Configuration (GMCM & config.json)](#️-configuration-gmcm--configjson)
-8. [🛠️ Building & Installation](#️-building--installation)
+7. [Module 7: Fruit Tree Automation](#-module-7-fruit-tree-automation)
+8. [⚙️ Configuration (GMCM & config.json)](#️-configuration-gmcm--configjson)
+9. [🛠️ Building & Installation](#️-building--installation)
 
 ---
 
@@ -30,14 +31,35 @@ In vanilla Stardew Valley, brewing any high-value flower honey (such as Fairy Ro
 
 ---
 
-## 🍳 Module 2: Cooking Profit Balancing
+## 🍳 Module 2: Cooking Profit Balancing & Food Star Levels
 
-In vanilla, many cooked recipes sell for less than the raw ingredients required to cook them.
+In vanilla, cooking always creates normal (0-star) dishes regardless of whether top-tier Iridium ingredients were used, and many recipes sell for less than their raw ingredients.
 
-### Profit Margin Guarantee
-* **Dynamic Price Floor:** Ensures every cooked meal sells for at least its raw ingredient sum multiplied by `CookingProfitMargin` (default **1.25x** / **+25% profit**):
+### 1. Dynamic Profit Margin Guarantee
+* Ensures every cooked meal sells for at least its raw ingredient sum multiplied by `CookingProfitMargin` (default **1.25x** / **+25% profit**):
   $$\text{Cooked Meal Price} = \max\left(\text{Vanilla Price},\; \sum \text{Raw Ingredient Values} \times \text{CookingProfitMargin}\right)$$
-* Eliminates the penalty of cooking your farm's produce and makes cooking a viable economic choice.
+
+### 2. Ingredient Quality Inheritance & Star Levels
+* Dynamically calculates the cooked meal's star rating from the average quality of consumed ingredients:
+  $$Q_{avg} = \frac{\sum (\text{Quality}_i \times \text{Count}_i)}{\text{Total Ingredients Count}}$$
+
+| Average Ingredient Quality ($Q_{avg}$) | Dish Quality | Sell Value | Energy & Health Scaling | Active Buff Bonus | Duration Multiplier |
+| :---: | :---: | :---: | :---: | :---: | :---: |
+| $Q_{avg} < 0.75$ | **Regular (0)** | $1.00\times$ | $1.0\times$ ($2.5\times$ Edibility) | Base | $1.0\times$ |
+| $0.75 \le Q_{avg} < 2.0$ | **Silver (⭐)** | $1.25\times$ | $1.4\times$ ($3.5\times$ Edibility) | $+1$ to active stats | $1.5\times$ |
+| $2.0 \le Q_{avg} < 3.5$ | **Gold (⭐⭐)** | $1.50\times$ | $1.8\times$ ($4.5\times$ Edibility) | $+1$ to active stats | $1.5\times$ |
+| $Q_{avg} \ge 3.5$ | **Iridium (⭐⭐⭐⭐)** | $2.00\times$ | $2.6\times$ ($6.5\times$ Edibility) | $+2$ to active stats | $2.0\times$ |
+
+### 3. Enhanced Qi Seasoning Synergy
+* **Regular (0) / Silver (1) $\rightarrow$ Gold (2)** (Vanilla standard guaranteed)
+* **Gold (2) $\rightarrow$ Iridium (4)** (Allows players to reach master-tier Iridium dishes when seasoning Gold-quality meals!)
+* **Iridium (4) $\rightarrow$ Iridium (4)**
+
+### 4. Smart Ingredient Priority
+* Configure `IngredientQualityPriority` in GMCM to automatically select:
+  * `HighestQualityFirst` (Default): Uses your highest-quality crops to create premium food.
+  * `LowestQualityFirst`: Preserves top-quality crops and consumes lower-tier ingredients first.
+  * `InventoryOrder`: Follows vanilla bottom-up inventory order.
 
 ---
 
@@ -95,19 +117,31 @@ In vanilla, Casks in the Farmhouse Cellar can only age Wine, Cheese, Goat Cheese
 
 ---
 
+## 🌳 Module 7: Fruit Tree Automation
+
+Mature fruit trees will automatically drop their ripe fruit onto the ground overnight once they reach the configured threshold (default 3 fruit), streamlining daily farm harvesting.
+
+---
+
 ## ⚙️ Configuration (GMCM & config.json)
 
 ```json
 {
   "EnableCookingBalancing": true,
   "CookingProfitMargin": 1.25,
+  "EnableFoodQuality": true,
+  "IngredientQualityPriority": "HighestQuality",
+  "EnableEnhancedFoodBuffs": true,
+  "IridiumBuffDurationMultiplier": 2.0,
   "EnableMeadFix": true,
   "EnableQualityPreserving": true,
   "EnableTruffleOilFix": true,
   "TruffleOilMultiplier": 1.5,
   "EnableJuiceBuff": true,
   "JuiceMultiplier": 2.75,
-  "EnableExpandedAging": true
+  "EnableExpandedAging": true,
+  "EnableAutoFruitDrop": true,
+  "MaxFruitsBeforeDrop": 3
 }
 ```
 
@@ -115,6 +149,10 @@ In vanilla, Casks in the Farmhouse Cellar can only age Wine, Cheese, Goat Cheese
 | :--- | :--- | :---: | :---: | :--- |
 | **Cooking** | `EnableCookingBalancing` | `true` | bool | Enables ingredient-based cooking price scaling. |
 | **Cooking** | `CookingProfitMargin` | `1.25` | `1.0` – `5.0` (`0.05`) | Minimum profit multiplier over raw ingredients (+25%). |
+| **Cooking** | `EnableFoodQuality` | `true` | bool | Enables food quality calculation (Silver, Gold, Iridium) and enhanced Qi Seasoning. |
+| **Cooking** | `IngredientQualityPriority` | `"HighestQuality"` | Dropdown | Ingredient selection order (`HighestQuality`, `LowestQuality`, `InventoryOrder`). |
+| **Cooking** | `EnableEnhancedFoodBuffs` | `true` | bool | Grants +2 to active stat buffs for Iridium dishes and scales buff duration. |
+| **Cooking** | `IridiumBuffDurationMultiplier` | `2.0` | `1.0` – `3.0` (`0.05`) | Buff duration multiplier for Iridium-quality meals. |
 | **Artisan** | `EnableMeadFix` | `true` | bool | Retains flower honey flavor and 2.0x value scaling when brewed into mead. |
 | **Artisan** | `EnableQualityPreserving` | `true` | bool | Preserves input star quality across all artisan machines. |
 | **Artisan** | `EnableTruffleOilFix` | `true` | bool | Truffle Oil scales value and quality based on the input Truffle. |
@@ -122,6 +160,8 @@ In vanilla, Casks in the Farmhouse Cellar can only age Wine, Cheese, Goat Cheese
 | **Artisan** | `EnableJuiceBuff` | `true` | bool | Buffs the price multiplier for Vegetable Juice brewed in Kegs. |
 | **Artisan** | `JuiceMultiplier` | `2.75` | `1.0` – `5.0` (`0.05`) | Multiplier for Vegetable Juice relative to raw vegetable price. |
 | **Artisan** | `EnableExpandedAging` | `true` | bool | Allows Casks to age additional artisan goods (Vegetable Juice). |
+| **Fruit Tree** | `EnableAutoFruitDrop` | `true` | bool | Auto-drops fruit overnight when tree reaches threshold. |
+| **Fruit Tree** | `MaxFruitsBeforeDrop` | `3` | `1` – `10` (`1`) | Number of fruit on tree that triggers auto-drop. |
 
 ---
 

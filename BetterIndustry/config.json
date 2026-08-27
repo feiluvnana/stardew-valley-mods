@@ -1,6 +1,10 @@
 {
   "EnableCookingBalancing": true,
   "CookingProfitMargin": 1.25,
+  "EnableFoodQuality": true,
+  "IngredientQualityPriority": "HighestQuality",
+  "EnableEnhancedFoodBuffs": true,
+  "IridiumBuffDurationMultiplier": 2.0,
   "EnableMeadFix": true,
   "EnableQualityPreserving": true,
   "EnableTruffleOilFix": true,

@@ -77,6 +77,10 @@ namespace BetterIndustry
             helper.Events.Content.AssetRequested += CookingBalancer.OnAssetRequested;
             helper.Events.Content.AssetRequested += ArtisanBalancer.OnAssetRequested;
 
+            // Apply Harmony patches
+            var harmony = new HarmonyLib.Harmony(ModManifest.UniqueID);
+            CookingPatches.Apply(harmony);
+
             // Game Loop Events
             // GameLaunched: fires once the game finished booting (right moment to query
             // other mods' APIs). DayStarted: fires every in-game morning at 6:00am.
@@ -135,7 +139,7 @@ namespace BetterIndustry
             // CURRENT value into the menu, a setter lambda writing the chosen value back
             // into Config, and (for numbers) min/max/interval slider bounds.
             // I18n.Get(...) pulls localized display text from the i18n folder's json files.
-            // ---------------- Section 1: Cooking Balance ----------------
+            // ---------------- Section 1: Cooking & Food Quality ----------------
             configMenu.AddSectionTitle(
                 mod: ModManifest,
                 text: () => I18n.Get("config.section.cooking")
@@ -157,6 +161,43 @@ namespace BetterIndustry
                 setValue: value => Config.CookingProfitMargin = value,
                 min: 1.0f,
                 max: 5.0f,
+                interval: 0.05f
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.food-quality.name"),
+                tooltip: () => I18n.Get("config.food-quality.tooltip"),
+                getValue: () => Config.EnableFoodQuality,
+                setValue: value => Config.EnableFoodQuality = value
+            );
+
+            configMenu.AddTextOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.quality-priority.name"),
+                tooltip: () => I18n.Get("config.quality-priority.tooltip"),
+                getValue: () => Config.IngredientQualityPriority,
+                setValue: value => Config.IngredientQualityPriority = value,
+                allowedValues: new[] { "HighestQuality", "LowestQuality", "InventoryOrder" },
+                formatAllowedValue: val => I18n.Get($"config.quality-priority.{val.ToLowerInvariant()}")
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.enhanced-buffs.name"),
+                tooltip: () => I18n.Get("config.enhanced-buffs.tooltip"),
+                getValue: () => Config.EnableEnhancedFoodBuffs,
+                setValue: value => Config.EnableEnhancedFoodBuffs = value
+            );
+
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.iridium-buff-duration.name"),
+                tooltip: () => I18n.Get("config.iridium-buff-duration.tooltip"),
+                getValue: () => Config.IridiumBuffDurationMultiplier,
+                setValue: value => Config.IridiumBuffDurationMultiplier = value,
+                min: 1.0f,
+                max: 3.0f,
                 interval: 0.05f
             );
 

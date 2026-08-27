@@ -26,12 +26,24 @@ namespace BetterIndustry
         //   Every property here also needs a matching registration call in
         //   ModEntry.OnGameLaunched so GMCM knows how to display and edit it.
 
-        // ---------------- Cooking Balancing ----------------
+        // ---------------- Cooking Balancing & Food Quality ----------------
         /// <summary>Whether cooking dishes are rebalanced to be profitable over raw ingredients.</summary>
         public bool EnableCookingBalancing { get; set; } = true;
 
         /// <summary>Profit margin multiplier for cooked food over raw ingredients (e.g. 1.25 = +25% profit).</summary>
         public float CookingProfitMargin { get; set; } = 1.25f;
+
+        /// <summary>Whether cooked dishes calculate quality (Silver, Gold, Iridium) from ingredients and enhanced Qi Seasoning.</summary>
+        public bool EnableFoodQuality { get; set; } = true;
+
+        /// <summary>Ingredient quality selection priority: HighestQuality, LowestQuality, or InventoryOrder.</summary>
+        public string IngredientQualityPriority { get; set; } = "HighestQuality";
+
+        /// <summary>Whether high-quality cooked food (especially Iridium) grants enhanced stat buffs (+2) and longer durations.</summary>
+        public bool EnableEnhancedFoodBuffs { get; set; } = true;
+
+        /// <summary>Buff duration multiplier for Iridium-quality cooked food and drinks (default 2.0x).</summary>
+        public float IridiumBuffDurationMultiplier { get; set; } = 2.0f;
 
         // ---------------- Artisan Goods Balancing ----------------
         /// <summary>Whether mead retains the input flower honey type and 2.0x price scaling.</summary>
