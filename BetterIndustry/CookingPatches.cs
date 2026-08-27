@@ -236,6 +236,8 @@ namespace BetterIndustry
         /// <summary>
         /// Plans which ingredient items to consume from player inventory and fridge containers,
         /// sorting candidates by the configured IngredientQualityPriority.
+        /// Non-quality culinary staples (Flour, Sugar, Oil, Vinegar, Rice) are excluded from the
+        /// quality denominator so they don't dilute the star rating of farm produce.
         /// </summary>
         private static List<ConsumptionPlan>? PlanIngredientConsumption(
             CraftingRecipe recipe,
@@ -245,7 +247,8 @@ namespace BetterIndustry
             averageQuality = 0.0;
             var plans = new List<ConsumptionPlan>();
             int totalQualityPoints = 0;
-            int totalIngredientsCount = 0;
+            int qualityEligibleCount = 0;
+            int fallbackTotalCount = 0;
 
             // Gather all available items from player inventory and material containers
             // Snapshot current available stack counts to avoid over-allocating
@@ -344,7 +347,12 @@ namespace BetterIndustry
                     remainingNeeded -= take;
 
                     totalQualityPoints += cand.Quality * take;
-                    totalIngredientsCount += take;
+                    fallbackTotalCount += take;
+
+                    if (!IsNonQualityStaple(cand.Item))
+                    {
+                        qualityEligibleCount += take;
+                    }
 
                     if (remainingNeeded <= 0)
                         break;
@@ -357,12 +365,39 @@ namespace BetterIndustry
                 }
             }
 
-            if (totalIngredientsCount > 0)
+            if (qualityEligibleCount > 0)
             {
-                averageQuality = (double)totalQualityPoints / totalIngredientsCount;
+                averageQuality = (double)totalQualityPoints / qualityEligibleCount;
+            }
+            else if (fallbackTotalCount > 0)
+            {
+                averageQuality = (double)totalQualityPoints / fallbackTotalCount;
             }
 
             return plans;
+        }
+
+        /// <summary>
+        /// Determines whether an item is a non-quality cooking staple (e.g. Flour, Sugar, Oil, Vinegar, Rice)
+        /// that cannot naturally have star quality, so it does not dilute the star rating of farm produce.
+        /// </summary>
+        private static bool IsNonQualityStaple(Item item)
+        {
+            if (item == null) return false;
+
+            // If the item actually carries a quality star (e.g. from mods or special goods), treat as quality-eligible.
+            if (item.Quality > 0) return false;
+
+            string id = item.ItemId;
+            string qid = item.QualifiedItemId;
+
+            return id is "245" or "246" or "247" or "419" or "423"
+                || qid is "(O)245" or "(O)246" or "(O)247" or "(O)419" or "(O)423"
+                || string.Equals(id, "Sugar", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(id, "WheatFlour", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(id, "Oil", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(id, "Vinegar", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(id, "Rice", StringComparison.OrdinalIgnoreCase);
         }
 
         /// <summary>

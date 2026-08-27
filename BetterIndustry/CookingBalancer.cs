@@ -115,8 +115,19 @@ namespace BetterIndustry
                         // tag instead ("category_fish", "category_egg", "-80" style ids).
                         else if (ingredientId.StartsWith("-") || ingredientId.StartsWith("category_", StringComparison.OrdinalIgnoreCase) || ingredientId.StartsWith("tag_", StringComparison.OrdinalIgnoreCase))
                         {
-                            // Category or context tag ingredient (e.g. category_fish, category_egg), estimate 100g base
-                            totalIngredientCost += 100 * ingredientCount;
+                            int estimatedCategoryCost = 100;
+                            if (ingredientId == "-5" || ingredientId.Equals("category_egg", StringComparison.OrdinalIgnoreCase))
+                                estimatedCategoryCost = 50;
+                            else if (ingredientId == "-6" || ingredientId.Equals("category_milk", StringComparison.OrdinalIgnoreCase))
+                                estimatedCategoryCost = 125;
+                            else if (ingredientId == "-4" || ingredientId.Equals("category_fish", StringComparison.OrdinalIgnoreCase))
+                                estimatedCategoryCost = 100;
+                            else if (ingredientId == "-75" || ingredientId.Equals("category_vegetable", StringComparison.OrdinalIgnoreCase))
+                                estimatedCategoryCost = 100;
+                            else if (ingredientId == "-79" || ingredientId.Equals("category_fruit", StringComparison.OrdinalIgnoreCase))
+                                estimatedCategoryCost = 100;
+
+                            totalIngredientCost += estimatedCategoryCost * ingredientCount;
                         }
                     }
 

@@ -40,8 +40,11 @@ In vanilla, cooking always creates normal (0-star) dishes regardless of whether 
   $$\text{Cooked Meal Price} = \max\left(\text{Vanilla Price},\; \sum \text{Raw Ingredient Values} \times \text{CookingProfitMargin}\right)$$
 
 ### 2. Ingredient Quality Inheritance & Star Levels
-* Dynamically calculates the cooked meal's star rating from the average quality of consumed ingredients:
-  $$Q_{avg} = \frac{\sum (\text{Quality}_i \times \text{Count}_i)}{\text{Total Ingredients Count}}$$
+* Dynamically calculates the cooked meal's star rating from the average quality of consumed produce ingredients:
+  $$Q_{avg} = \frac{\sum (\text{Quality}_i \times \text{Count}_i)}{\text{Quality-Eligible Ingredients Count}}$$
+* **Smart Produce Protection:** Non-quality store-bought staples (Wheat Flour, Sugar, Oil, Vinegar, Rice) are automatically filtered out from the denominator so they **never dilute** the star rating of your farm's crops, fish, and artisan ingredients!
+  * *Example:* 1 Iridium Tomato (4) + 1 Wheat Flour (staple) $\rightarrow$ **Iridium Spaghetti (4)**!
+  * *Example:* 1 Iridium Egg (4) + 1 Sugar (staple) + 1 Flour (staple) $\rightarrow$ **Iridium Chocolate Cake (4)**!
 
 | Average Ingredient Quality ($Q_{avg}$) | Dish Quality | Sell Value | Energy & Health Scaling | Active Buff Bonus | Duration Multiplier |
 | :---: | :---: | :---: | :---: | :---: | :---: |
