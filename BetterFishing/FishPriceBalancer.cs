@@ -17,7 +17,7 @@ namespace BetterFishing
         /// <summary>
         /// Known item IDs of Legendary and Qi Extended Family fish.
         /// </summary>
-        private static readonly HashSet<string> LegendaryFishIds = new(StringComparer.OrdinalIgnoreCase)
+        public static readonly HashSet<string> LegendaryFishIds = new(StringComparer.OrdinalIgnoreCase)
         {
             "159", // Crimsonfish
             "898", // Son of Crimsonfish
@@ -30,6 +30,30 @@ namespace BetterFishing
             "682", // Mutant Carp
             "902"  // Radioactive Carp
         };
+
+        /// <summary>
+        /// Determines whether a given fish ID represents a Legendary or Extended Family fish.
+        /// </summary>
+        public static bool IsLegendaryFish(string? fishId, string? fishName = null)
+        {
+            if (string.IsNullOrWhiteSpace(fishId))
+                return false;
+
+            string cleanId = fishId.StartsWith("(O)") ? fishId[3..] : fishId;
+            if (LegendaryFishIds.Contains(cleanId))
+                return true;
+
+            if (!string.IsNullOrWhiteSpace(fishName))
+            {
+                return fishName.Contains("Legend", StringComparison.OrdinalIgnoreCase) ||
+                       fishName.Contains("Crimsonfish", StringComparison.OrdinalIgnoreCase) ||
+                       fishName.Contains("Glacierfish", StringComparison.OrdinalIgnoreCase) ||
+                       fishName.Contains("Angler", StringComparison.OrdinalIgnoreCase) ||
+                       fishName.Contains("Mutant Carp", StringComparison.OrdinalIgnoreCase);
+            }
+
+            return false;
+        }
 
         /// <summary>
         /// Known item IDs of fish exclusive to small, isolated, or specialized sub-locations.

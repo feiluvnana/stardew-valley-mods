@@ -51,5 +51,13 @@
   "config.fishing-chest-decay-rate.name": "Standard Chest Decay Rate",
   "config.fishing-chest-decay-rate.tooltip": "Roll probability decay multiplier for regular fishing treasure chests (vanilla default is 0.40; mod default is 0.60).",
   "config.golden-chest-decay-rate.name": "Golden Chest Decay Rate",
-  "config.golden-chest-decay-rate.tooltip": "Roll probability decay multiplier for 1.6 golden fishing treasure chests (vanilla default is 0.60; mod default is 0.80)."
+  "config.golden-chest-decay-rate.tooltip": "Roll probability decay multiplier for 1.6 golden fishing treasure chests (vanilla default is 0.60; mod default is 0.80).",
+
+  "config.section.fishing-exp": "Fishing Experience (EXP) Settings",
+  "config.enable-fishing-exp-balancing.name": "Enable Fishing EXP Balancing",
+  "config.enable-fishing-exp-balancing.tooltip": "Enables targeted experience bonuses for challenging apex fish (Difficulty >= 85) and Legendary achievements, keeping standard fish at 100% vanilla EXP.",
+  "config.apex-fish-exp-bonus.name": "Apex Fish EXP Bonus",
+  "config.apex-fish-exp-bonus.tooltip": "Bonus experience added to challenging fish catches with Difficulty >= 85 (e.g. Lingcod, Ice Pip, Scorpion Carp, Lava Eel, Octopus; default: +15 EXP).",
+  "config.legendary-fish-exp-bonus.name": "Legendary Fish EXP Bonus",
+  "config.legendary-fish-exp-bonus.tooltip": "Bonus experience added to all Legendary and Extended Family fish catches (default: +60 EXP)."
 }

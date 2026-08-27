@@ -51,5 +51,13 @@
   "config.fishing-chest-decay-rate.name": "Hệ Số Suy Giảm (Rương Thường)",
   "config.fishing-chest-decay-rate.tooltip": "Hệ số suy giảm xác suất mở thêm vật phẩm của rương thường (mặc định game gốc là 0.40; mod là 0.60).",
   "config.golden-chest-decay-rate.name": "Hệ Số Suy Giảm (Rương Vàng)",
-  "config.golden-chest-decay-rate.tooltip": "Hệ số suy giảm xác suất mở thêm vật phẩm của rương vàng 1.6 (mặc định game gốc là 0.60; mod là 0.80)."
+  "config.golden-chest-decay-rate.tooltip": "Hệ số suy giảm xác suất mở thêm vật phẩm của rương vàng 1.6 (mặc định game gốc là 0.60; mod là 0.80).",
+
+  "config.section.fishing-exp": "Cài Đặt Điểm Kinh Nghiệm (EXP) Câu Cá",
+  "config.enable-fishing-exp-balancing.name": "Bật Cân Bằng EXP Câu Cá",
+  "config.enable-fishing-exp-balancing.tooltip": "Áp dụng điểm thưởng kinh nghiệm nhắm mục tiêu cho các loài cá cực khó (Độ khó >= 85) và cá Huyền Thoại, giữ nguyên 100% EXP game gốc cho cá thường.",
+  "config.apex-fish-exp-bonus.name": "Thưởng EXP Cá Đỉnh Cao",
+  "config.apex-fish-exp-bonus.tooltip": "Điểm kinh nghiệm cộng thêm khi câu cá có độ khó >= 85 (Cá tuyết Lingcod, Cá băng Ice Pip, Cá chép bọ cạp, Lươn nham thạch, Bạch tuộc; mặc định: +15 EXP).",
+  "config.legendary-fish-exp-bonus.name": "Thưởng EXP Cá Huyền Thoại",
+  "config.legendary-fish-exp-bonus.tooltip": "Điểm kinh nghiệm cộng thêm khi câu được bất kỳ loài cá Huyền Thoại hoặc Đại Gia Đình Huyền Thoại nào (mặc định: +60 EXP)."
 }

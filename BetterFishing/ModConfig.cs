@@ -86,5 +86,17 @@ namespace BetterFishing
 
         /// <summary>Probability decay multiplier for 1.6 golden fishing treasure chest rolls (vanilla default is 0.60; mod default is 0.80).</summary>
         public float GoldenChestDecayRate { get; set; } = 0.80f;
+
+        // =====================================================================
+        // === 6. FISHING EXPERIENCE (EXP) SETTINGS                          ===
+        // =====================================================================
+        /// <summary>Enable targeted fishing experience balancing for apex and legendary fish.</summary>
+        public bool EnableFishingExpBalancing { get; set; } = true;
+
+        /// <summary>Experience bonus added to challenging/apex fish catches (Difficulty >= 85, default: +15 EXP).</summary>
+        public int ApexFishExpBonus { get; set; } = 15;
+
+        /// <summary>Experience bonus added to Legendary fish catches (default: +60 EXP).</summary>
+        public int LegendaryFishExpBonus { get; set; } = 60;
     }
 }

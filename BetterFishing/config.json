@@ -20,5 +20,8 @@
   "PriceRoundingInterval": 5,
   "EnableFishingChestBuff": true,
   "FishingChestDecayRate": 0.6,
-  "GoldenChestDecayRate": 0.8
+  "GoldenChestDecayRate": 0.8,
+  "EnableFishingExpBalancing": true,
+  "ApexFishExpBonus": 15,
+  "LegendaryFishExpBonus": 60
 }

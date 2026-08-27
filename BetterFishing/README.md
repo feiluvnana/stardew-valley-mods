@@ -34,6 +34,12 @@ $$P_{\text{base}}(D) = F + c_1 \cdot D + c_2 \cdot \left(\frac{D}{50}\right)^2 +
 ### 5. 🎁 Decaying Multi-Roll Fishing Treasure Chests
 * Migrated from *BetterChest*: replaces vanilla hardcoded decay multipliers (`0.40f` $\rightarrow$ `0.60f` for standard chests; `0.60f` $\rightarrow$ `0.80f` for 1.6 golden chests) for rewarding, vanilla-faithful multi-rolls.
 
+### 6. 🧠 Targeted Fishing Experience (EXP) Balancing
+* **100% Vanilla EXP for Standard Fish ($D < 85$)**: Preserves vanilla experience progression exactly for common and mid-tier fish (Carp 8 EXP, Catfish 28 EXP, etc.).
+* **Targeted Buff for Underwhelming Apex Fish ($D \ge 85$)**: Adds a modest **$+15\text{ EXP}$** bonus to brutally difficult non-legendary catches (Lingcod $31 \rightarrow 46\text{ EXP}$, Octopus $34 \rightarrow 49\text{ EXP}$, Lava Eel $33 \rightarrow 48\text{ EXP}$).
+* **Rewarding Legendary Catches**: Adds **$+60\text{ EXP}$** to all 10 Legendary and Extended Family catches (Legend $39 \rightarrow 99\text{ EXP}$).
+* **Vanilla Multipliers Preserved**: Perfect catches ($\times 2.4$) and Treasure chest catches ($\times 2.2$) continue to multiply on top of the calculated base EXP.
+
 ---
 
 ## ⚙️ Configuration (GMCM)
@@ -54,3 +60,6 @@ All options can be configured in-game via **Generic Mod Config Menu** or in `con
 | `EnableFishingChestBuff` | `true` | Enable decaying-roll enhancement for treasure chests. |
 | `FishingChestDecayRate` | `0.60` | Roll probability decay for standard chests (vanilla 0.40). |
 | `GoldenChestDecayRate` | `0.80` | Roll probability decay for golden chests (vanilla 0.60). |
+| `EnableFishingExpBalancing` | `true` | Enables targeted fishing experience balancing. |
+| `ApexFishExpBonus` | `15` | Bonus EXP for hard non-legendary fish (D >= 85). |
+| `LegendaryFishExpBonus` | `60` | Bonus EXP for Legendary fish catches. |

@@ -22,9 +22,10 @@ namespace BetterFishing
             ModHelper = helper;
             I18n = helper.Translation;
 
-            // Apply Harmony transpiler patch for fishing treasure chest decay
+            // Apply Harmony transpiler patches for fishing treasure chest decay & balanced fishing exp
             var harmony = new Harmony(ModManifest.UniqueID);
             FishingChestPatches.Apply(harmony);
+            FishingExpPatches.Apply(harmony);
 
             // Asset hooks for fish price balancing
             helper.Events.Content.AssetRequested += FishPriceBalancer.OnAssetRequested;
@@ -84,6 +85,12 @@ namespace BetterFishing
             AddBool(configMenu, "enable-fishing-chest-buff", () => Config.EnableFishingChestBuff, v => Config.EnableFishingChestBuff = v);
             AddFloat(configMenu, "fishing-chest-decay-rate", () => Config.FishingChestDecayRate, v => Config.FishingChestDecayRate = v, 0.10f, 0.99f, 0.01f);
             AddFloat(configMenu, "golden-chest-decay-rate", () => Config.GoldenChestDecayRate, v => Config.GoldenChestDecayRate = v, 0.10f, 0.99f, 0.01f);
+
+            // Section 6: Fishing Experience Settings
+            AddSection(configMenu, "fishing-exp");
+            AddBool(configMenu, "enable-fishing-exp-balancing", () => Config.EnableFishingExpBalancing, v => Config.EnableFishingExpBalancing = v);
+            AddInt(configMenu, "apex-fish-exp-bonus", () => Config.ApexFishExpBonus, v => Config.ApexFishExpBonus = v, 0, 100);
+            AddInt(configMenu, "legendary-fish-exp-bonus", () => Config.LegendaryFishExpBonus, v => Config.LegendaryFishExpBonus = v, 0, 300);
         }
 
         private void AddSection(IGenericModConfigMenuApi menu, string sectionKey)
