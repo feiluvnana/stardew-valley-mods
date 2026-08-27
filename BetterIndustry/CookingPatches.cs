@@ -274,7 +274,7 @@ namespace BetterIndustry
             List<IInventory>? materialContainers,
             out (double Normal, double Silver, double Gold, double Iridium) rates)
         {
-            rates = (35.0, 30.0, 20.0, 15.0);
+            rates = (40.0, 30.0, 20.0, 10.0);
             var plans = new List<ConsumptionPlan>();
             double totalWeightNormal = 0.0;
             double totalWeightSilver = 0.0;
@@ -411,22 +411,12 @@ namespace BetterIndustry
 
         /// <summary>
         /// Returns the 4-level weight distribution (Normal, Silver, Gold, Iridium) contributed by an ingredient.
-        /// Every produce ingredient contributes 40% to its own tier, 30% to lowest remaining, 20% to 2nd highest, and 10% to highest.
-        /// Store-bought non-quality staples contribute (35%, 30%, 20%, 15%) from Normal to Iridium.
+        /// Every ingredient contributes 40% to its own tier, 30% to lowest remaining, 20% to 2nd highest, and 10% to highest.
+        /// Store-bought non-quality staples and regular 0-star produce contribute (40%, 30%, 20%, 10%) from Normal to Iridium.
         /// </summary>
         private static (double Normal, double Silver, double Gold, double Iridium) GetIngredientWeights(Item item)
         {
-            if (item == null)
-                return (35.0, 30.0, 20.0, 15.0);
-
-            // Store-bought non-quality staples (Flour, Sugar, Oil, Vinegar, Rice)
-            if (IsNonQualityStaple(item))
-            {
-                return (35.0, 30.0, 20.0, 15.0);
-            }
-
-            // Regular 0-star produce
-            if (item.Quality == 0)
+            if (item == null || IsNonQualityStaple(item) || item.Quality == 0)
             {
                 return (40.0, 30.0, 20.0, 10.0);
             }
