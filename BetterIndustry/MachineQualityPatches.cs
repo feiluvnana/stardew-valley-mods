@@ -78,11 +78,11 @@ namespace BetterIndustry
                 if (machine != null && (machine.ItemId == "163" || machine.QualifiedItemId == "(BC)163"))
                     return;
 
-                // Determine base probabilities using Symmetrical 15% Matrix:
-                // Normal (0⭐)  -> 85% Normal, 15% Silver,  0% Gold,  0% Iridium
-                // Silver (1⭐)  -> 15% Normal, 70% Silver, 15% Gold,  0% Iridium
-                // Gold (2⭐)    ->  0% Normal, 15% Silver, 70% Gold, 15% Iridium
-                // Iridium (4⭐) ->  0% Normal,  0% Silver, 85% Gold, 15% Iridium
+                // Determine base probabilities using 40/30/20/10 Matrix (identical to Cooking):
+                // Normal (0⭐)  -> 40% Normal, 30% Silver, 20% Gold, 10% Iridium
+                // Silver (1⭐)  -> 30% Normal, 40% Silver, 20% Gold, 10% Iridium
+                // Gold (2⭐)    -> 30% Normal, 20% Silver, 40% Gold, 10% Iridium
+                // Iridium (4⭐) -> 30% Normal, 20% Silver, 10% Gold, 40% Iridium
                 double rateNormal;
                 double rateSilver;
                 double rateGold;
@@ -93,20 +93,20 @@ namespace BetterIndustry
                 if (isLargeAnimalProduct)
                 {
                     // Large animal products (Large Milk, Large Eggs, Dinosaur Egg, Ostrich Egg)
-                    // guarantee at least Gold quality in vanilla.
-                    if (inputItem.Quality >= 2) // Gold or Iridium Large input
+                    // have a Gold-level floor
+                    if (inputItem.Quality >= 4) // Iridium Large input
                     {
-                        rateNormal = 0.0;
-                        rateSilver = 0.0;
-                        rateGold = 85.0;
-                        rateIridium = 15.0;
+                        rateNormal = 30.0;
+                        rateSilver = 20.0;
+                        rateGold = 10.0;
+                        rateIridium = 40.0;
                     }
-                    else // Normal or Silver Large input
+                    else // Normal, Silver, or Gold Large input
                     {
-                        rateNormal = 0.0;
-                        rateSilver = 0.0;
-                        rateGold = 100.0;
-                        rateIridium = 0.0;
+                        rateNormal = 30.0;
+                        rateSilver = 20.0;
+                        rateGold = 40.0;
+                        rateIridium = 10.0;
                     }
                 }
                 else
@@ -114,58 +114,52 @@ namespace BetterIndustry
                     switch (inputItem.Quality)
                     {
                         case 1: // Silver (1⭐)
-                            rateNormal = 15.0;
-                            rateSilver = 70.0;
-                            rateGold = 15.0;
-                            rateIridium = 0.0;
+                            rateNormal = 30.0;
+                            rateSilver = 40.0;
+                            rateGold = 20.0;
+                            rateIridium = 10.0;
                             break;
 
                         case 2: // Gold (2⭐)
-                            rateNormal = 0.0;
-                            rateSilver = 15.0;
-                            rateGold = 70.0;
-                            rateIridium = 15.0;
+                            rateNormal = 30.0;
+                            rateSilver = 20.0;
+                            rateGold = 40.0;
+                            rateIridium = 10.0;
                             break;
 
                         case 4: // Iridium (4⭐)
-                            rateNormal = 0.0;
-                            rateSilver = 0.0;
-                            rateGold = 85.0;
-                            rateIridium = 15.0;
+                            rateNormal = 30.0;
+                            rateSilver = 20.0;
+                            rateGold = 10.0;
+                            rateIridium = 40.0;
                             break;
 
                         default: // Normal (0⭐)
-                            rateNormal = 85.0;
-                            rateSilver = 15.0;
-                            rateGold = 0.0;
-                            rateIridium = 0.0;
+                            rateNormal = 40.0;
+                            rateSilver = 30.0;
+                            rateGold = 20.0;
+                            rateIridium = 10.0;
                             break;
                     }
                 }
 
-                // Apply Daily Luck influence if enabled
+                // Apply Daily Luck influence if enabled (identical to Cooking)
                 if (Config.ApplyDailyLuckToMachines)
                 {
                     double dailyLuck = who?.DailyLuck ?? Game1.player.DailyLuck;
-                    // Luck shift between -5% and +5%
-                    double shift = dailyLuck * 50.0;
-                    if (Math.Abs(shift) > 0.01)
+                    double luckShift = dailyLuck * 100.0;
+                    if (Math.Abs(luckShift) > 0.001)
                     {
-                        if (rateIridium > 0)
-                        {
-                            rateIridium = Math.Max(0.0, rateIridium + shift);
-                            rateGold = Math.Max(0.0, rateGold - shift);
-                        }
-                        else if (rateGold > 0)
-                        {
-                            rateGold = Math.Max(0.0, rateGold + shift);
-                            rateSilver = Math.Max(0.0, rateSilver - shift);
-                        }
-                        else
-                        {
-                            rateSilver = Math.Max(0.0, rateSilver + shift);
-                            rateNormal = Math.Max(0.0, rateNormal - shift);
-                        }
+                        double shift = 0.50 * luckShift;
+                        rateIridium += shift;
+                        rateGold += shift;
+                        rateSilver -= shift;
+                        rateNormal -= shift;
+
+                        rateNormal = Math.Max(0.0, rateNormal);
+                        rateSilver = Math.Max(0.0, rateSilver);
+                        rateGold = Math.Max(0.0, rateGold);
+                        rateIridium = Math.Max(0.0, rateIridium);
 
                         double sum = rateNormal + rateSilver + rateGold + rateIridium;
                         if (sum > 0)
