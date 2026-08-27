@@ -98,8 +98,10 @@ In vanilla, artisan machines strip all star quality (Silver, Gold, Iridium) from
 * Kegging an **Iridium Starfruit** gives high odds for **Gold (10%)** or **Instant Iridium (40%)**.
 * Non-iridium outputs placed into a Cellar Cask require significantly less aging time to reach Iridium, creating perfect harmony with Cask Aging!
 
-### 🐄 Animal Product Perks
-* **Large Milk / Large Egg / Dinosaur Egg / Ostrich Egg**: Grants a Gold-tier baseline (Normal/Silver/Gold $\rightarrow$ 40% Gold; Iridium $\rightarrow$ 40% Iridium).
+### 🐄 Animal Product Perks (Qi Seasoning Quality Floor)
+* **Large Milk / Large Egg / Dinosaur Egg / Ostrich Egg**: Functions identically to **Qi Seasoning**, collapsing all Normal and Silver weights directly into Gold quality (0% Normal, 0% Silver):
+  * **Regular, Silver, or Gold Large Input**: **90% Gold**, **10% Iridium**.
+  * **Iridium Large Input**: **60% Gold**, **40% Iridium**.
 
 ---
 

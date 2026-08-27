@@ -88,59 +88,45 @@ namespace BetterIndustry
                 double rateGold;
                 double rateIridium;
 
-                bool isLargeAnimalProduct = IsLargeAnimalProduct(inputItem);
-
-                if (isLargeAnimalProduct)
+                switch (inputItem.Quality)
                 {
-                    // Large animal products (Large Milk, Large Eggs, Dinosaur Egg, Ostrich Egg)
-                    // have a Gold-level floor
-                    if (inputItem.Quality >= 4) // Iridium Large input
-                    {
+                    case 1: // Silver (1⭐)
                         rateNormal = 30.0;
-                        rateSilver = 20.0;
-                        rateGold = 10.0;
-                        rateIridium = 40.0;
-                    }
-                    else // Normal, Silver, or Gold Large input
-                    {
+                        rateSilver = 40.0;
+                        rateGold = 20.0;
+                        rateIridium = 10.0;
+                        break;
+
+                    case 2: // Gold (2⭐)
                         rateNormal = 30.0;
                         rateSilver = 20.0;
                         rateGold = 40.0;
                         rateIridium = 10.0;
-                    }
+                        break;
+
+                    case 4: // Iridium (4⭐)
+                        rateNormal = 30.0;
+                        rateSilver = 20.0;
+                        rateGold = 10.0;
+                        rateIridium = 40.0;
+                        break;
+
+                    default: // Normal (0⭐)
+                        rateNormal = 40.0;
+                        rateSilver = 30.0;
+                        rateGold = 20.0;
+                        rateIridium = 10.0;
+                        break;
                 }
-                else
+
+                // Large animal products act like Qi Seasoning: guarantee at least Gold tier floor
+                // by shifting all Normal and Silver weights directly to Gold (0% Normal, 0% Silver).
+                bool isLargeAnimalProduct = IsLargeAnimalProduct(inputItem);
+                if (isLargeAnimalProduct)
                 {
-                    switch (inputItem.Quality)
-                    {
-                        case 1: // Silver (1⭐)
-                            rateNormal = 30.0;
-                            rateSilver = 40.0;
-                            rateGold = 20.0;
-                            rateIridium = 10.0;
-                            break;
-
-                        case 2: // Gold (2⭐)
-                            rateNormal = 30.0;
-                            rateSilver = 20.0;
-                            rateGold = 40.0;
-                            rateIridium = 10.0;
-                            break;
-
-                        case 4: // Iridium (4⭐)
-                            rateNormal = 30.0;
-                            rateSilver = 20.0;
-                            rateGold = 10.0;
-                            rateIridium = 40.0;
-                            break;
-
-                        default: // Normal (0⭐)
-                            rateNormal = 40.0;
-                            rateSilver = 30.0;
-                            rateGold = 20.0;
-                            rateIridium = 10.0;
-                            break;
-                    }
+                    rateGold += rateNormal + rateSilver;
+                    rateNormal = 0.0;
+                    rateSilver = 0.0;
                 }
 
                 // Apply Daily Luck influence if enabled (identical to Cooking)
