@@ -39,26 +39,41 @@ In vanilla, cooking always creates normal (0-star) dishes regardless of whether 
 * Ensures every cooked meal sells for at least its raw ingredient sum multiplied by `CookingProfitMargin` (default **1.25x** / **+25% profit**):
   $$\text{Cooked Meal Price} = \max\left(\text{Vanilla Price},\; \sum \text{Raw Ingredient Values} \times \text{CookingProfitMargin}\right)$$
 
-### 2. Ingredient Quality Inheritance & Star Levels
-* Dynamically calculates the cooked meal's star rating from the average quality of consumed produce ingredients:
-  $$Q_{avg} = \frac{\sum (\text{Quality}_i \times \text{Count}_i)}{\text{Quality-Eligible Ingredients Count}}$$
-* **Smart Produce Protection:** Non-quality store-bought staples (Wheat Flour, Sugar, Oil, Vinegar, Rice) are automatically filtered out from the denominator so they **never dilute** the star rating of your farm's crops, fish, and artisan ingredients!
-  * *Example:* 1 Iridium Tomato (4) + 1 Wheat Flour (staple) $\rightarrow$ **Iridium Spaghetti (4)**!
-  * *Example:* 1 Iridium Egg (4) + 1 Sugar (staple) + 1 Flour (staple) $\rightarrow$ **Iridium Chocolate Cake (4)**!
+### 2. 4-Level Weight-Based Quality System
+Every consumed ingredient adds a $(40\%, 30\%, 20\%, 10\%)$ weight distribution across all 4 quality star levels. The total accumulated weights form the probability distribution for rolling the dish's star quality.
 
-| Average Ingredient Quality ($Q_{avg}$) | Dish Quality | Sell Value | Energy & Health Scaling | Active Buff Bonus | Duration Multiplier |
-| :---: | :---: | :---: | :---: | :---: | :---: |
-| $Q_{avg} < 0.75$ | **Regular (0)** | $1.00\times$ | $1.0\times$ ($2.5\times$ Edibility) | Base | $1.0\times$ |
-| $0.75 \le Q_{avg} < 2.0$ | **Silver (⭐)** | $1.25\times$ | $1.4\times$ ($3.5\times$ Edibility) | $+1$ to active stats | $1.5\times$ |
-| $2.0 \le Q_{avg} < 3.5$ | **Gold (⭐⭐)** | $1.50\times$ | $1.8\times$ ($4.5\times$ Edibility) | $+1$ to active stats | $1.5\times$ |
-| $Q_{avg} \ge 3.5$ | **Iridium (⭐⭐⭐⭐)** | $2.00\times$ | $2.6\times$ ($6.5\times$ Edibility) | $+2$ to active stats | $2.0\times$ |
+| Ingredient Quality / Type | Normal (0⭐) | Silver (1⭐) | Gold (2⭐) | Iridium (4⭐) | Total Weight |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **Store-bought / No-quality Items** *(Flour, Sugar, Oil, etc.)* | **40%** | **30%** | **20%** | **10%** | 100% |
+| **Regular Ingredient (0⭐)** | **40%** *(own)* | **30%** *(Silver)* | **20%** *(Gold)* | **10%** *(Iridium)* | 100% |
+| **Silver Ingredient (1⭐)** | **30%** *(Normal)* | **40%** *(own)* | **20%** *(Gold)* | **10%** *(Iridium)* | 100% |
+| **Gold Ingredient (2⭐)** | **30%** *(Normal)* | **20%** *(Silver)* | **40%** *(own)* | **10%** *(Iridium)* | 100% |
+| **Iridium Ingredient (4⭐)** | **30%** *(Normal)* | **20%** *(Silver)* | **10%** *(Gold)* | **40%** *(own)* | 100% |
 
-### 3. Enhanced Qi Seasoning Synergy
-* **Regular (0) / Silver (1) $\rightarrow$ Gold (2)** (Vanilla standard guaranteed)
-* **Gold (2) $\rightarrow$ Iridium (4)** (Allows players to reach master-tier Iridium dishes when seasoning Gold-quality meals!)
-* **Iridium (4) $\rightarrow$ Iridium (4)**
+### 3. 🍀 Daily Luck Influence
+Daily Luck dynamically shifts the final star rates:
+$$\text{Luck Shift} = \text{DailyLuck} \times 100\% \quad (\text{e.g. } +10\% \text{ on very lucky days})$$
+* **Iridium & Gold Rates:** $\mathrel{+}= 0.50 \times \text{Luck Shift}$
+* **Normal & Silver Rates:** $\mathrel{-}= 0.50 \times \text{Luck Shift}$
 
-### 4. Smart Ingredient Priority
+### 4. ✨ Qi Seasoning Transformation
+When **Qi Seasoning** is consumed during cooking:
+* **All Normal and Silver weights turn directly into Gold:**
+  $$\text{Rate}_{\text{Gold, Seasoned}} = \text{Rate}_{\text{Gold}} + \text{Rate}_{\text{Normal}} + \text{Rate}_{\text{Silver}}$$
+  $$\text{Rate}_{\text{Normal, Seasoned}} = \mathbf{0\%},\quad \text{Rate}_{\text{Silver, Seasoned}} = \mathbf{0\%}$$
+* **Iridium rate remains unchanged:**
+  $$\text{Rate}_{\text{Iridium, Seasoned}} = \text{Rate}_{\text{Iridium}}$$
+
+### 5. 💰 Star Tier Scaling Rates
+
+| Dish Star Tier | Sell Value Multiplier | Energy & Health Rate | Active Stat Buffs | Buff Duration Rate |
+| :---: | :---: | :---: | :---: | :---: |
+| **Regular (0⭐)** | $1.00\times$ (Base $+25\%$ margin) | $1.00\times$ ($2.5\times$ Edibility) | Base | $1.0\times$ |
+| **Silver (1⭐)** | $1.25\times$ ($+25\%$ bonus) | $1.40\times$ ($3.5\times$ Edibility) | $+1$ to active stats | $1.5\times$ |
+| **Gold (2⭐)** | $1.50\times$ ($+50\%$ bonus) | $1.80\times$ ($4.5\times$ Edibility) | $+1$ to active stats | $1.5\times$ |
+| **Iridium (4⭐)** | $2.00\times$ ($+100\%$ bonus) | $2.60\times$ ($6.5\times$ Edibility) | **$+2$ to active stats** | **$2.0\times$ duration** |
+
+### 6. Smart Ingredient Priority
 * Configure `IngredientQualityPriority` in GMCM to automatically select:
   * `HighestQualityFirst` (Default): Uses your highest-quality crops to create premium food.
   * `LowestQualityFirst`: Preserves top-quality crops and consumes lower-tier ingredients first.

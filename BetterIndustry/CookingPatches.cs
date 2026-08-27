@@ -133,25 +133,41 @@ namespace BetterIndustry
                 if (!recipe.doesFarmerHaveIngredientsInInventory(containerContents))
                     return false;
 
-                // Determine ingredients to consume and calculate average quality
-                var plans = PlanIngredientConsumption(recipe, ____materialContainers, out double avgQuality);
+                // Determine ingredients to consume and calculate rates
+                var plans = PlanIngredientConsumption(recipe, ____materialContainers, out var rates);
                 if (plans == null)
                     return true; // Fallback to vanilla if planning fails
 
-                // Map average quality to base quality tier:
-                // >= 3.5 -> Iridium (4)
-                // >= 2.0 -> Gold (2)
-                // >= 0.75 -> Silver (1)
-                // < 0.75 -> Regular (0)
-                int calculatedQuality = 0;
-                if (avgQuality >= 3.5)
-                    calculatedQuality = 4;
-                else if (avgQuality >= 2.0)
-                    calculatedQuality = 2;
-                else if (avgQuality >= 0.75)
-                    calculatedQuality = 1;
-                else
-                    calculatedQuality = 0;
+                double rateNormal = rates.Normal;
+                double rateSilver = rates.Silver;
+                double rateGold = rates.Gold;
+                double rateIridium = rates.Iridium;
+
+                // Apply Daily Luck influence (DailyLuck ranges from -0.10 to +0.10, up to +0.125)
+                double dailyLuck = Game1.player.DailyLuck;
+                double luckShift = dailyLuck * 100.0;
+                if (Math.Abs(luckShift) > 0.001)
+                {
+                    double shift = 0.50 * luckShift;
+                    rateIridium += shift;
+                    rateGold += shift;
+                    rateSilver -= shift;
+                    rateNormal -= shift;
+
+                    rateNormal = Math.Max(0.0, rateNormal);
+                    rateSilver = Math.Max(0.0, rateSilver);
+                    rateGold = Math.Max(0.0, rateGold);
+                    rateIridium = Math.Max(0.0, rateIridium);
+
+                    double sum = rateNormal + rateSilver + rateGold + rateIridium;
+                    if (sum > 0)
+                    {
+                        rateNormal = (rateNormal / sum) * 100.0;
+                        rateSilver = (rateSilver / sum) * 100.0;
+                        rateGold = (rateGold / sum) * 100.0;
+                        rateIridium = (rateIridium / sum) * 100.0;
+                    }
+                }
 
                 // Check Qi Seasoning (917)
                 List<KeyValuePair<string, int>>? seasoningList = null;
@@ -159,15 +175,30 @@ namespace BetterIndustry
                 if (CraftingRecipe.DoesFarmerHaveAdditionalIngredientsInInventory(testList, containerContents))
                 {
                     seasoningList = testList;
-                    // Qi Seasoning promotes quality by +1 tier:
-                    // Regular (0) -> Gold (2) [Vanilla]
-                    // Silver (1)  -> Gold (2)
-                    // Gold (2)    -> Iridium (4)!
-                    // Iridium (4) -> Iridium (4)
-                    if (calculatedQuality == 0 || calculatedQuality == 1)
-                        calculatedQuality = 2;
-                    else if (calculatedQuality >= 2)
-                        calculatedQuality = 4;
+                    // Qi Seasoning turns all Normal and Silver weights directly to Gold, while Iridium remains unchanged.
+                    rateGold += rateNormal + rateSilver;
+                    rateNormal = 0.0;
+                    rateSilver = 0.0;
+                }
+
+                // Roll final quality tier based on cumulative rates
+                double roll = Game1.random.NextDouble() * 100.0;
+                int calculatedQuality = 0;
+                if (roll < rateIridium)
+                {
+                    calculatedQuality = 4; // Iridium
+                }
+                else if (roll < rateIridium + rateGold)
+                {
+                    calculatedQuality = 2; // Gold
+                }
+                else if (roll < rateIridium + rateGold + rateSilver)
+                {
+                    calculatedQuality = 1; // Silver
+                }
+                else
+                {
+                    calculatedQuality = 0; // Regular
                 }
 
                 // Create the crafted item
@@ -236,19 +267,20 @@ namespace BetterIndustry
         /// <summary>
         /// Plans which ingredient items to consume from player inventory and fridge containers,
         /// sorting candidates by the configured IngredientQualityPriority.
-        /// Non-quality culinary staples (Flour, Sugar, Oil, Vinegar, Rice) are excluded from the
-        /// quality denominator so they don't dilute the star rating of farm produce.
+        /// Accumulates the 4-level weight contribution across all consumed ingredients.
         /// </summary>
         private static List<ConsumptionPlan>? PlanIngredientConsumption(
             CraftingRecipe recipe,
             List<IInventory>? materialContainers,
-            out double averageQuality)
+            out (double Normal, double Silver, double Gold, double Iridium) rates)
         {
-            averageQuality = 0.0;
+            rates = (40.0, 30.0, 20.0, 10.0);
             var plans = new List<ConsumptionPlan>();
-            int totalQualityPoints = 0;
-            int qualityEligibleCount = 0;
-            int fallbackTotalCount = 0;
+            double totalWeightNormal = 0.0;
+            double totalWeightSilver = 0.0;
+            double totalWeightGold = 0.0;
+            double totalWeightIridium = 0.0;
+            double totalWeightSum = 0.0;
 
             // Gather all available items from player inventory and material containers
             // Snapshot current available stack counts to avoid over-allocating
@@ -346,13 +378,12 @@ namespace BetterIndustry
                     slotRemaining[(cand.ContainerIndex, cand.SlotIndex)] -= take;
                     remainingNeeded -= take;
 
-                    totalQualityPoints += cand.Quality * take;
-                    fallbackTotalCount += take;
-
-                    if (!IsNonQualityStaple(cand.Item))
-                    {
-                        qualityEligibleCount += take;
-                    }
+                    var (wNorm, wSil, wGold, wIri) = GetIngredientWeights(cand.Item);
+                    totalWeightNormal += wNorm * take;
+                    totalWeightSilver += wSil * take;
+                    totalWeightGold += wGold * take;
+                    totalWeightIridium += wIri * take;
+                    totalWeightSum += 100.0 * take;
 
                     if (remainingNeeded <= 0)
                         break;
@@ -365,21 +396,47 @@ namespace BetterIndustry
                 }
             }
 
-            if (qualityEligibleCount > 0)
+            if (totalWeightSum > 0)
             {
-                averageQuality = (double)totalQualityPoints / qualityEligibleCount;
-            }
-            else if (fallbackTotalCount > 0)
-            {
-                averageQuality = (double)totalQualityPoints / fallbackTotalCount;
+                rates = (
+                    (totalWeightNormal / totalWeightSum) * 100.0,
+                    (totalWeightSilver / totalWeightSum) * 100.0,
+                    (totalWeightGold / totalWeightSum) * 100.0,
+                    (totalWeightIridium / totalWeightSum) * 100.0
+                );
             }
 
             return plans;
         }
 
         /// <summary>
+        /// Returns the 4-level weight distribution (Normal, Silver, Gold, Iridium) contributed by an ingredient.
+        /// Every ingredient contributes 40% to its own tier, 30% to lowest remaining, 20% to 2nd highest, and 10% to highest.
+        /// Store-bought non-quality staples contribute (40%, 30%, 20%, 10%) from Normal to Iridium.
+        /// </summary>
+        private static (double Normal, double Silver, double Gold, double Iridium) GetIngredientWeights(Item item)
+        {
+            if (item == null)
+                return (40.0, 30.0, 20.0, 10.0);
+
+            // Store-bought items or regular 0-star produce
+            if (IsNonQualityStaple(item) || item.Quality == 0)
+            {
+                return (40.0, 30.0, 20.0, 10.0);
+            }
+
+            return item.Quality switch
+            {
+                1 => (30.0, 40.0, 20.0, 10.0), // Silver (1⭐)
+                2 => (30.0, 20.0, 40.0, 10.0), // Gold (2⭐)
+                4 => (30.0, 20.0, 10.0, 40.0), // Iridium (4⭐)
+                _ => (40.0, 30.0, 20.0, 10.0)
+            };
+        }
+
+        /// <summary>
         /// Determines whether an item is a non-quality cooking staple (e.g. Flour, Sugar, Oil, Vinegar, Rice)
-        /// that cannot naturally have star quality, so it does not dilute the star rating of farm produce.
+        /// that cannot naturally have star quality.
         /// </summary>
         private static bool IsNonQualityStaple(Item item)
         {
