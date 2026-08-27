@@ -249,7 +249,6 @@ namespace BetterChest
             AddBool(configMenu, "enable-custom-rewards", () => Config.EnableCustomRewards, v => Config.EnableCustomRewards = v);
             AddBool(configMenu, "exclude-cosmetics", () => Config.ExcludeCosmetics, v => Config.ExcludeCosmetics = v);
             AddBool(configMenu, "enable-depth-scaling", () => Config.EnableDepthScaling, v => Config.EnableDepthScaling = v);
-            AddBool(configMenu, "scale-legendary-by-depth", () => Config.ScaleLegendaryByDepth, v => Config.ScaleLegendaryByDepth = v);
 
             // Progression & Gatekeeping Section
             AddSection(configMenu, "progression-gatekeeping");
@@ -326,6 +325,7 @@ namespace BetterChest
             // Detailed Item Feature Toggles
             AddSection(configMenu, "item-toggles");
             AddBool(configMenu, "enable-fertilizers", () => Config.EnableFertilizers, v => Config.EnableFertilizers = v);
+            AddBool(configMenu, "enable-machines", () => Config.EnableMachines, v => Config.EnableMachines = v);
             AddBool(configMenu, "enable-auto-petter", () => Config.EnableAutoPetter, v => Config.EnableAutoPetter = v);
             AddBool(configMenu, "enable-radioactive-items", () => Config.EnableRadioactiveItems, v => Config.EnableRadioactiveItems = v);
             AddBool(configMenu, "enable-iridium-items", () => Config.EnableIridiumItems, v => Config.EnableIridiumItems = v);

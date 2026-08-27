@@ -30,10 +30,8 @@ namespace BetterChest
         public bool EnableCustomRewards { get; set; } = true;
         /// <summary>When custom rewards are off, strip clothing/hats/decor ("cosmetics") from vanilla chests instead.</summary>
         public bool ExcludeCosmetics { get; set; } = true;
-        /// <summary>Scale roll counts and legendary odds by how deep in Skull Cavern the chest is.</summary>
+        /// <summary>Scale roll counts and stack multipliers by how deep in Skull Cavern the chest is.</summary>
         public bool EnableDepthScaling { get; set; } = true;
-        /// <summary>Grow the Legendary category weight linearly with depth (10% at floor 1 up to 100% at floor 100).</summary>
-        public bool ScaleLegendaryByDepth { get; set; } = true;
 
         // Decaying Multi-Rolls (1st and 2nd roll guaranteed 100%, each next roll has decreasing chance - Max 8 rolls)
         /// <summary>Upper limit of loot rolls per standard deep-floor (50+) chest.</summary>
@@ -153,6 +151,8 @@ namespace BetterChest
         public bool EnableStardropTea { get; set; } = true;
         /// <summary>Fertilizers (Hyper Speed-Gro, Deluxe Fertilizer, etc.) may drop from chests.</summary>
         public bool EnableFertilizers { get; set; } = true;
+        /// <summary>Farming & mining machines (Auto-Grabber, Seed Maker, Crystalarium) may drop from chests.</summary>
+        public bool EnableMachines { get; set; } = true;
         /// <summary>Sprinklers and related gear (Iridium Sprinkler, Pressure Nozzle, Enricher) may drop from chests.</summary>
         public bool EnableSprinklers { get; set; } = true;
         /// <summary>Rare/expensive seeds may drop from chests.</summary>

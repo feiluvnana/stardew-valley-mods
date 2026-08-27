@@ -143,6 +143,8 @@ namespace BetterChest
             new("(O)486", LootCategory.Agriculture, 5, 15, 18.0, c => c.EnableAgricultureCategory && c.EnableRareSeeds),        // Starfruit Seeds
             new("(O)920", LootCategory.Agriculture, 10, 25, 18.0, c => c.EnableAgricultureCategory && c.EnableFertilizers && (!c.GatekeepQiItems || ProgressionHelper.IsQiRoomUnlocked())),     // Deluxe Retaining Soil
             new("(O)645", LootCategory.Agriculture, 1, 2, 18.0, c => c.EnableAgricultureCategory && c.EnableSprinklers, false), // Iridium Sprinkler (No Mult)
+            new("(BC)165", LootCategory.Agriculture, 1, 1, 12.0, c => c.EnableAgricultureCategory && c.EnableMachines && (!c.GatekeepMasteryItems || ProgressionHelper.GetFarmingLevel() >= 9), false), // Auto-Grabber
+            new("(BC)25", LootCategory.Agriculture, 1, 1, 10.0, c => c.EnableAgricultureCategory && c.EnableMachines && (!c.GatekeepMasteryItems || ProgressionHelper.GetFarmingLevel() >= 9), false),  // Seed Maker
             new("(O)805", LootCategory.Agriculture, 10, 20, 15.0, c => c.EnableAgricultureCategory && c.EnableFertilizers),     // Tree Fertilizer
             new("(O)915", LootCategory.Agriculture, 1, 2, 12.0, c => c.EnableAgricultureCategory && c.EnableSprinklers && (!c.GatekeepQiItems || ProgressionHelper.IsQiRoomUnlocked())),        // Pressure Nozzle (Mult Allowed)
             new("(O)913", LootCategory.Agriculture, 1, 2, 12.0, c => c.EnableAgricultureCategory && c.EnableSprinklers && (!c.GatekeepQiItems || ProgressionHelper.IsQiRoomUnlocked())),        // Enricher (Mult Allowed)
@@ -158,7 +160,8 @@ namespace BetterChest
             new("(O)337", LootCategory.Mining, 2, 6, 22.0, c => c.EnableMiningCategory && c.EnableIridiumItems),        // Iridium Bar (Balanced)
             new("(O)910", LootCategory.Mining, 2, 4, 20.0, c => c.EnableMiningCategory && c.EnableRadioactiveItems && (!c.GatekeepRadioactiveItems || ProgressionHelper.IsQiRoomUnlocked())),     // Radioactive Bar (Balanced)
             new("(O)382", LootCategory.Mining, 35, 90, 24.0, c => c.EnableMiningCategory && c.EnableCoal),               // Coal (New)
-            new("(O)848", LootCategory.Mining, 6, 16, 20.0, c => c.EnableMiningCategory && (!c.GatekeepIslandItems || ProgressionHelper.IsIslandUnlocked())),                                // Cinder Shard
+            new("(BC)21", LootCategory.Mining, 1, 1, 12.0, c => c.EnableMiningCategory && c.EnableMachines && (!c.GatekeepMasteryItems || ProgressionHelper.GetMiningLevel() >= 9), false),       // Crystalarium
+            new("(O)848", LootCategory.Mining, 6, 16, 20.0, c => c.EnableMiningCategory && (!c.GatekeepIslandItems || ProgressionHelper.IsVolcanoShortcutUnlocked())),                                // Cinder Shard (Volcano Shortcut Gatekeep)
             new("(O)70", LootCategory.Mining, 3, 8, 20.0, c => c.EnableMiningCategory),                                  // Jade (Staircases)
             new("(O)72", LootCategory.Mining, 3, 8, 18.0, c => c.EnableMiningCategory),                                  // Diamond
             new("(O)Book_Mining", LootCategory.Mining, 1, 1, 8.0, c => c.EnableMiningCategory, false),           // Mining Monthly
@@ -214,7 +217,7 @@ namespace BetterChest
             new("(O)749", LootCategory.Lootboxes, 10, 25, 28.0, c => c.EnableLootboxCategory && c.EnableOmniGeodes),    // Omni Geode
             new("(O)MysteryBox", LootCategory.Lootboxes, 3, 10, 25.0, c => c.EnableLootboxCategory && c.EnableMysteryBoxes && (!c.GatekeepMysteryBoxes || ProgressionHelper.IsMysteryBoxUnlocked())),
             new("(O)275", LootCategory.Lootboxes, 3, 10, 25.0, c => c.EnableLootboxCategory && c.EnableArtifactTroves), // Artifact Trove
-            new("(O)GoldenMysteryBox", LootCategory.Lootboxes, 2, 5, 22.0, c => c.EnableLootboxCategory && c.EnableMysteryBoxes && (!c.GatekeepMasteryItems || ProgressionHelper.IsMasteryUnlocked("Combat")) && (!c.GatekeepMysteryBoxes || ProgressionHelper.IsMysteryBoxUnlocked())),
+            new("(O)GoldenMysteryBox", LootCategory.Lootboxes, 2, 5, 22.0, c => c.EnableLootboxCategory && c.EnableMysteryBoxes && (!c.GatekeepMasteryItems || ProgressionHelper.IsMasteryUnlocked("Foraging")) && (!c.GatekeepMysteryBoxes || ProgressionHelper.IsMysteryBoxUnlocked())),
             new("(O)CalicoEgg", LootCategory.Lootboxes, 15, 40, 22.0, c => c.EnableLootboxCategory && c.EnableCalicoEggs && (!c.GatekeepCalicoEggs || ProgressionHelper.IsDesertFestivalActive())),
             new("(O)TreasureTotem", LootCategory.Lootboxes, 2, 5, 18.0, c => c.EnableLootboxCategory && (!c.GatekeepMasteryItems || ProgressionHelper.IsMasteryUnlocked("Foraging")), false), // Treasure Totem (Buffed base stack, No Mult)
             new("(O)Book_Mystery", LootCategory.Lootboxes, 1, 1, 6.0, c => c.EnableLootboxCategory && (!c.GatekeepMysteryBoxes || ProgressionHelper.IsMysteryBoxUnlocked()), false), // Book of Mysteries
@@ -277,15 +280,6 @@ namespace BetterChest
             double comWeight = equalCategories ? 15.0 : config.CombatWeight;
             double forWeight = equalCategories ? 15.0 : config.ForagingWeight;
             double looWeight = equalCategories ? 15.0 : config.LootboxWeight;
-
-            // Scale Legendary weight linearly with depth if enabled (low at lower floors, full at floor 100)
-            if (!applySpecialBuff && (config.ScaleLegendaryByDepth || config.EnableDepthScaling))
-            {
-                // Linear scaling from floor 1 (10% of base weight) to floor 100 (100% of base weight)
-                // Math.Clamp keeps the factor inside [0.10, 1.0] no matter the depth.
-                double depthFactor = Math.Clamp(0.10 + 0.90 * ((relativeDepth - 1.0) / 99.0), 0.10, 1.0);
-                legWeight *= depthFactor;
-            }
 
             // Build active category list
             // A list of (enum, weight) tuples — only categories that still have eligible

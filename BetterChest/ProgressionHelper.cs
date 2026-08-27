@@ -257,5 +257,60 @@ namespace BetterChest
             // The game itself tracks this stat as you descend.
             return player.deepestMineLevel;
         }
+
+        /// <summary>
+        /// Checks if the Volcano Caldera exit shortcut on floor 10 has been unlocked with 5 Golden Walnuts.
+        /// </summary>
+        /// <returns>True if the Volcano Caldera shortcut is unlocked in this save.</returns>
+        public static bool IsVolcanoShortcutUnlocked()
+        {
+            if (Game1.MasterPlayer != null)
+            {
+                if (Game1.MasterPlayer.hasOrWillReceiveMail("CalderaShortcut") ||
+                    Game1.MasterPlayer.mailReceived.Contains("CalderaShortcut"))
+                {
+                    return true;
+                }
+            }
+
+            if (Game1.player != null)
+            {
+                if (Game1.player.hasOrWillReceiveMail("CalderaShortcut") ||
+                    Game1.player.mailReceived.Contains("CalderaShortcut"))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Gets the player's effective farming level.
+        /// </summary>
+        /// <returns>The highest farming level between local player and host.</returns>
+        public static int GetFarmingLevel()
+        {
+            int level = 0;
+            if (Game1.player != null)
+                level = Math.Max(level, Game1.player.FarmingLevel);
+            if (Game1.MasterPlayer != null)
+                level = Math.Max(level, Game1.MasterPlayer.FarmingLevel);
+            return level;
+        }
+
+        /// <summary>
+        /// Gets the player's effective mining level.
+        /// </summary>
+        /// <returns>The highest mining level between local player and host.</returns>
+        public static int GetMiningLevel()
+        {
+            int level = 0;
+            if (Game1.player != null)
+                level = Math.Max(level, Game1.player.MiningLevel);
+            if (Game1.MasterPlayer != null)
+                level = Math.Max(level, Game1.MasterPlayer.MiningLevel);
+            return level;
+        }
     }
 }
