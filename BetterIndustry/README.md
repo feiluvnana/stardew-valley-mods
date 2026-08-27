@@ -44,7 +44,7 @@ Every consumed ingredient adds a $(40\%, 30\%, 20\%, 10\%)$ weight distribution 
 
 | Ingredient Quality / Type | Normal (0⭐) | Silver (1⭐) | Gold (2⭐) | Iridium (4⭐) | Total Weight |
 | :--- | :---: | :---: | :---: | :---: | :---: |
-| **Store-bought / No-quality Items** *(Flour, Sugar, Oil, etc.)* | **40%** | **30%** | **20%** | **10%** | 100% |
+| **Store-bought / No-quality Items** *(Flour, Sugar, Oil, etc.)* | **35%** | **30%** | **20%** | **15%** | 100% |
 | **Regular Ingredient (0⭐)** | **40%** *(own)* | **30%** *(Silver)* | **20%** *(Gold)* | **10%** *(Iridium)* | 100% |
 | **Silver Ingredient (1⭐)** | **30%** *(Normal)* | **40%** *(own)* | **20%** *(Gold)* | **10%** *(Iridium)* | 100% |
 | **Gold Ingredient (2⭐)** | **30%** *(Normal)* | **20%** *(Silver)* | **40%** *(own)* | **10%** *(Iridium)* | 100% |
