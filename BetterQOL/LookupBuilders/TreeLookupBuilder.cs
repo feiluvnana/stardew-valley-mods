@@ -153,10 +153,9 @@ namespace BetterQOL
                     lookupSection.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.fruit-tree.fruit-count"), ModEntry.I18n.Get("lookup.fruit-tree.fruits-ready", new { count = fruitTreeInfo.FruitsOnTree }).ToString(), fruitTreeInfo.FruitsOnTree > 0 ? new Color(0, 140, 0) : Color.DarkSlateGray));
                     lookupSection.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.crop.harvest-seasons"), fruitTreeInfo.IsInSeason ? ModEntry.I18n.Get("hover.fruit-tree.in-season") : ModEntry.I18n.Get("hover.fruit-tree.out-of-season"), fruitTreeInfo.IsInSeason ? new Color(20, 110, 220) : Color.DarkSlateGray));
                 }
-                // GROWTH-SPACE CHECK: a fruit tree refuses to grow while any of the 8 tiles around
-                // it is occupied. Two nested "for" loops sweep every offset pair (i,j) from -1..+1 -
-                // the standard idiom for visiting a 3x3 grid around a point.
-                if (fruitTree.Location != null)
+                // GROWTH-SPACE CHECK: a growing fruit tree refuses to grow while any of the 8 tiles around
+                // it is occupied. Once mature, surroundings no longer block growth or quality in 1.6.
+                if (!fruitTreeInfo.IsMature && fruitTree.Location != null)
                 {
                     bool flag = false;
                     Vector2 tile = fruitTree.Tile;

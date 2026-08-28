@@ -176,9 +176,10 @@ namespace BetterChest
             // three nullable layers without nested if-statements.
             bool isTreasureRoom = netIsTreasureRoom?.GetValue()?.Value ?? false;
 
-            // Treasure rooms hold the reward chests; floor 220 is a milestone
-            // floor whose guaranteed chest we want even without a treasure room.
-            if (!isTreasureRoom && shaft.mineLevel != 220)
+            // Treasure rooms hold the reward chests; milestone floors (every 100 floors: 220, 320, 420, 520, etc.)
+            // are also tagged to support special milestone chests.
+            bool isMilestoneFloor = shaft.mineLevel > 120 && (shaft.mineLevel - 120) % 100 == 0;
+            if (!isTreasureRoom && !isMilestoneFloor)
                 return;
 
             // Objects is the map's tile-object table; .Pairs walks it like a

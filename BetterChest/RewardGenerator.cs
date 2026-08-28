@@ -322,7 +322,7 @@ namespace BetterChest
 
             if (applySpecialBuff)
             {
-                // Floor 100 Special Chest: Min 3 guaranteed rolls, up to Floor100MaxRolls (12)
+                // Floor 100 Special Chest: Min 3 guaranteed rolls, expected 4.5 items, up to Floor100MaxRolls (9)
                 minRolls = 3;
                 maxRolls = config.Floor100MaxRolls;
                 decayChances = new[]
@@ -335,10 +335,7 @@ namespace BetterChest
                     config.Floor100Roll6Chance,
                     config.Floor100Roll7Chance,
                     config.Floor100Roll8Chance,
-                    config.Floor100Roll9Chance,
-                    config.Floor100Roll10Chance,
-                    config.Floor100Roll11Chance,
-                    config.Floor100Roll12Chance
+                    config.Floor100Roll9Chance
                 };
             }
             else if (isShallowFloor)
@@ -356,7 +353,7 @@ namespace BetterChest
             }
             else
             {
-                // Standard deep floors (Floors 50+: Min 2 guaranteed rolls, max 8 rolls)
+                // Standard deep floors (Floors 50+: Min 2 guaranteed rolls, expected 3.0 items, max 6 rolls)
                 minRolls = 2;
                 maxRolls = config.MaxRolls;
                 decayChances = new[]
@@ -366,9 +363,7 @@ namespace BetterChest
                     config.Roll3Chance,
                     config.Roll4Chance,
                     config.Roll5Chance,
-                    config.Roll6Chance,
-                    config.Roll7Chance,
-                    config.Roll8Chance
+                    config.Roll6Chance
                 };
             }
 
@@ -387,20 +382,13 @@ namespace BetterChest
                 }
             }
 
-            // Stack multiplier rates
+            // Stack multiplier rates (Unified between regular and special chests)
             float x5Chance;
             float x4Chance;
             float x3Chance;
             float x2Chance;
 
-            if (applySpecialBuff)
-            {
-                x5Chance = config.Floor100QuintupleStackChance;
-                x4Chance = config.Floor100QuadrupleStackChance;
-                x3Chance = config.Floor100TripleStackChance;
-                x2Chance = config.Floor100DoubleStackChance;
-            }
-            else if (isShallowFloor)
+            if (isShallowFloor)
             {
                 // Shallow floors limit stack multiplier jackpot up to 2x
                 x5Chance = 0f;

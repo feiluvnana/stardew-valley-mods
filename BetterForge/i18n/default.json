@@ -15,6 +15,11 @@
   "config.show-messages.name": "Show HUD Notifications",
   "config.show-messages.tooltip": "Displays a notification banner upon rolling an upgrade or perfect tier.",
 
+  "menu.anvil.prompt": "Choose Anvil action for {{trinket}}:",
+  "menu.anvil.reforge": "Reforge Trinket ({{count}} Iridium Bars)",
+  "menu.anvil.ascend": "Prismatic Ascension ({{count}} Prismatic Shards)",
+  "menu.anvil.cancel": "Cancel",
+
   "message.cannot-both": "Cannot forge: You have both Iridium Bars and Prismatic Shards in your inventory. Keep only one type to choose an action.",
   "message.need-trinket-in-hand": "Hold a Trinket in hand and interact with the Anvil to upgrade or ascend.",
   "message.need-materials": "You need {{count}} Iridium Bars to upgrade, or 1 Prismatic Shard to ascend this trinket.",
@@ -48,8 +53,8 @@
   "ascension.frogegg.desc": "Swallowing monsters drops all loot, with a 45% chance to immediately reset swallow cooldown.",
   "ascension.fairybox.desc": "Fairy provides guaranteed baseline healing every pulse (even out of combat), heals nearby allies, and grants +1 Defense for 15 seconds.",
   "ascension.parrotegg.desc": "Doubles gold coin drops and grants a +35% chance for bonus monster loot drops upon defeat.",
-  "ascension.goldenspur.desc": "Increases Critical Strike Chance by +10%, and the critical speed boost provides +3 Attack.",
-  "ascension.magicquiver.desc": "Spectral arrows pierce through all enemies, and increases Critical Strike Chance by +15%.",
+  "ascension.goldenspur.desc": "Increases Critical Strike Chance by +5%, and the critical speed boost provides +3 Attack.",
+  "ascension.magicquiver.desc": "Spectral arrows pierce through up to 3 enemies and have a 25% Critical Strike Chance.",
   "ascension.icerod.desc": "Striking frozen enemies shatters the ice and triggers an ice blast (deals 30% Attack damage and slows nearby enemies).",
   "ascension.basiliskpaw.desc": "Reflects 50% incoming damage back to attackers, and attacks have a 20% chance to lifesteal (heal 3–8 HP)."
 }

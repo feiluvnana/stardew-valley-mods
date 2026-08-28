@@ -11,5 +11,8 @@
   "config.enable-winter.name": "Mở Lễ Hội Mùa Đông",
   "config.enable-winter.tooltip": "Mở rộng Lễ Hội Sa Mạc sang Mùa Đông.",
   "config.keep-eggs.name": "Giữ Lại Trứng Calico",
-  "config.keep-eggs.tooltip": "Giữ lại Trứng Calico trong hành trang giữa các mùa lễ hội thay vì bị xóa."
+  "config.keep-eggs.tooltip": "Giữ lại Trứng Calico trong hành trang giữa các mùa lễ hội thay vì bị xóa.",
+
+  "hud.festival-tomorrow": "Lễ Hội Sa Mạc Calico sẽ bắt đầu vào ngày mai! Các chuyến xe buýt đến Sa Mạc sẽ hoạt động suốt kỳ lễ hội.",
+  "hud.festival-today": "Lễ Hội Sa Mạc Calico đã chính thức bắt đầu tại Sa Mạc Calico hôm nay!"
 }

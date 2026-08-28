@@ -167,52 +167,47 @@ namespace BetterForge
             int totalIridiumRequired = stackSize * Config.IridiumBarCost; // cost scales per item in stack
             int totalShardsRequired = stackSize * 1;                      // ascension costs 1 shard each
 
-            // Case 1: Player has BOTH Iridium Bars and Prismatic Shards -> Prompt warning toast
-            // Ambiguous intent — refuse and ask the player to pick a currency.
-            if (iridiumCount >= totalIridiumRequired && shardCount >= totalShardsRequired)
+            // Case 1: Player has BOTH materials and can perform either action -> Present interactive dialogue choice
+            bool canReforge = iridiumCount >= totalIridiumRequired;
+            bool canAscend = shardCount >= totalShardsRequired && !TrinketAscensionLogic.IsAscended(trinket);
+
+            if (canReforge && canAscend)
             {
-                who.currentLocation?.playSound("cancel");
-                Game1.showRedMessage(ModEntry.I18n.Get("message.cannot-both"));
-                return false;
+                Response[] responses = new Response[]
+                {
+                    new Response("reforge", ModEntry.I18n.Get("menu.anvil.reforge", new { count = totalIridiumRequired })),
+                    new Response("ascend", ModEntry.I18n.Get("menu.anvil.ascend", new { count = totalShardsRequired })),
+                    new Response("cancel", ModEntry.I18n.Get("menu.anvil.cancel"))
+                };
+
+                who.currentLocation.createQuestionDialogue(
+                    ModEntry.I18n.Get("menu.anvil.prompt", new { trinket = trinket.DisplayName }),
+                    responses,
+                    (farmer, whichAnswer) =>
+                    {
+                        if (whichAnswer == "reforge")
+                        {
+                            PerformReforge(anvil, trinket, farmer, totalIridiumRequired);
+                        }
+                        else if (whichAnswer == "ascend")
+                        {
+                            PerformAscension(anvil, trinket, farmer, totalShardsRequired);
+                        }
+                    }
+                );
+                return true;
             }
 
-            // Case 2: Player has ONLY Iridium Bars -> Reforge / Level Up
-            if (iridiumCount >= totalIridiumRequired)
+            // Case 2: Player has ONLY Iridium Bars (or already ascended) -> Reforge / Level Up
+            if (canReforge)
             {
-                // Simulate the current roll first: a maxed trinket can't be reforged.
-                var eval = TrinketReforgeLogic.Evaluate(trinket.ItemId, trinket.generationSeed.Value);
-                if (eval.IsMaxRoll)
-                {
-                    who.currentLocation?.playSound("cancel");
-                    Game1.showRedMessage(ModEntry.I18n.Get("message.already-max-tier"));
-                    return false;
-                }
-
-                who.Items.ReduceId("(O)337", totalIridiumRequired); // take payment...
-                TrinketReforgeLogic.ProcessReforge(trinket, who, Config); // ...then upgrade
-
-                // Forge feedback: furnace+hammer sounds and sparks at the anvil tile.
-                who.currentLocation?.playSound("furnace");
-                who.currentLocation?.playSound("hammer");
-                Game1.createRadialDebris(who.currentLocation, 12, (int)anvil.TileLocation.X * 64 + 32, (int)anvil.TileLocation.Y * 64 + 32, 6, false);
-                return true;
+                return PerformReforge(anvil, trinket, who, totalIridiumRequired);
             }
 
             // Case 3: Player has ONLY Prismatic Shards -> Ascension
             if (shardCount >= totalShardsRequired)
             {
-                if (TrinketAscensionLogic.IsAscended(trinket))
-                {
-                    who.currentLocation?.playSound("cancel");
-                    Game1.showRedMessage(ModEntry.I18n.Get("message.already-ascended"));
-                    return false;
-                }
-
-                who.Items.ReduceId("(O)74", totalShardsRequired); // take payment
-                TrinketAscensionLogic.AscendTrinketDirect(trinket, who);
-
-                Game1.createRadialDebris(who.currentLocation, 12, (int)anvil.TileLocation.X * 64 + 32, (int)anvil.TileLocation.Y * 64 + 32, 8, false);
-                return true;
+                return PerformAscension(anvil, trinket, who, totalShardsRequired);
             }
 
             // Case 4: Not enough materials — explain precisely what's missing.
@@ -239,6 +234,41 @@ namespace BetterForge
                 Game1.showRedMessage(ModEntry.I18n.Get("message.need-materials", new { count = totalIridiumRequired }));
             }
             return false;
+        }
+
+        private static bool PerformReforge(StardewValley.Object anvil, Trinket trinket, Farmer who, int totalIridiumRequired)
+        {
+            var eval = TrinketReforgeLogic.Evaluate(trinket.ItemId, trinket.generationSeed.Value);
+            if (eval.IsMaxRoll)
+            {
+                who.currentLocation?.playSound("cancel");
+                Game1.showRedMessage(ModEntry.I18n.Get("message.already-max-tier"));
+                return false;
+            }
+
+            who.Items.ReduceId("(O)337", totalIridiumRequired);
+            TrinketReforgeLogic.ProcessReforge(trinket, who, Config);
+
+            who.currentLocation?.playSound("furnace");
+            who.currentLocation?.playSound("hammer");
+            Game1.createRadialDebris(who.currentLocation, 12, (int)anvil.TileLocation.X * 64 + 32, (int)anvil.TileLocation.Y * 64 + 32, 6, false);
+            return true;
+        }
+
+        private static bool PerformAscension(StardewValley.Object anvil, Trinket trinket, Farmer who, int totalShardsRequired)
+        {
+            if (TrinketAscensionLogic.IsAscended(trinket))
+            {
+                who.currentLocation?.playSound("cancel");
+                Game1.showRedMessage(ModEntry.I18n.Get("message.already-ascended"));
+                return false;
+            }
+
+            who.Items.ReduceId("(O)74", totalShardsRequired);
+            TrinketAscensionLogic.AscendTrinketDirect(trinket, who);
+
+            Game1.createRadialDebris(who.currentLocation, 12, (int)anvil.TileLocation.X * 64 + 32, (int)anvil.TileLocation.Y * 64 + 32, 8, false);
+            return true;
         }
 
         /// <summary>
@@ -444,8 +474,7 @@ namespace BetterForge
 
         /// <summary>
         /// Harmony prefix on GameLocation.damageMonster (every monster hit flows
-        /// through it). Boosts the incoming critChance variable when the attacker
-        /// wears an ascended Golden Spur or Magic Quiver.
+        /// through it). Boosts incoming critChance by +5% when the attacker wears an ascended Golden Spur.
         /// </summary>
         public static void GameLocation_damageMonster_Prefix(Farmer who, ref float critChance)
         {
@@ -453,12 +482,7 @@ namespace BetterForge
 
             if (TrinketAscensionLogic.HasAscendedTrinket(who, "spur") || TrinketAscensionLogic.HasAscendedTrinket(who, "goldenspur") || TrinketAscensionLogic.HasAscendedTrinket(who, "iridiumspur") || TrinketAscensionLogic.HasAscendedTrinket(who, "iridium"))
             {
-                critChance += 0.10f; // +10% Critical Strike Chance
-            }
-
-            if (TrinketAscensionLogic.HasAscendedTrinket(who, "quiver") || TrinketAscensionLogic.HasAscendedTrinket(who, "magicquiver"))
-            {
-                critChance += 0.15f; // +15% Critical Strike Chance
+                critChance += 0.05f; // +5% Critical Strike Chance
             }
         }
 
@@ -590,45 +614,56 @@ namespace BetterForge
         {
             if (__instance == null || location == null) return;
 
-            // 1. Magic Quiver Arrow: Multi-target sweeping piercing
+            // 1. Magic Quiver Arrow: Pierces up to 3 monsters with 25% arrow crit chance
             if (__instance is BasicProjectile bp && bp.projectileID.Value == 14)
             {
                 Farmer? farmer = bp.theOneWhoFiredMe.Get(location) as Farmer;
                 if (farmer != null && (TrinketAscensionLogic.HasAscendedTrinket(farmer, "quiver") || TrinketAscensionLogic.HasAscendedTrinket(farmer, "magicquiver")))
                 {
                     bp.ignoreCharacterCollisions.Value = true;
-                    bp.piercesLeft.Value = 99999;
+                    bp.piercesLeft.Value = 3;
 
                     Rectangle arrowBounds = bp.getBoundingBox();
                     var hitList = _arrowHitMonsters.GetOrCreateValue(bp); // per-arrow memory
 
-                    // Check overlap against every monster currently on this map.
+                    // Check overlap against monsters (up to 3 distinct hits)
                     for (int i = 0; i < location.characters.Count; i++)
                     {
+                        if (hitList.Count >= 3)
+                            break;
+
                         if (location.characters[i] is Monster monster && !monster.IsInvisible && arrowBounds.Intersects(monster.GetBoundingBox()))
                         {
                             // HashSet.Add returns false if already present: each monster
                             // is damaged at most ONCE per arrow pass.
                             if (hitList.Add(monster))
                             {
-                                int dmg = Math.Max(1, bp.damageToFarmer.Value);
-                                location.damageMonster(monster.GetBoundingBox(), dmg, dmg + 1, false, farmer, true);
-                                location.playSound("hitEnemy");
-                                Game1.createRadialDebris(location, 12, (int)monster.Position.X + 32, (int)monster.Position.Y + 32, 4, false);
+                                bool isCrit = Game1.random.NextDouble() < 0.25;
+                                int dmg = Math.Max(1, bp.damageToFarmer.Value) * (isCrit ? 2 : 1);
+                                if (isCrit)
+                                {
+                                    location.playSound("crit");
+                                }
+                                else
+                                {
+                                    location.playSound("hitEnemy");
+                                }
+                                location.damageMonster(monster.GetBoundingBox(), dmg, dmg + 1, isCrit, farmer, true);
+                                Game1.createRadialDebris(location, 12, (int)monster.Position.X + 32, (int)monster.Position.Y + 32, isCrit ? 6 : 4, false);
                             }
                         }
                     }
                 }
             }
 
-            // 2. Ice Rod Orb: Multi-target sweeping freeze with expanded hitbox
+            // 2. Ice Rod Orb: Multi-target sweeping freeze with expanded hitbox (Pierces up to 2 monsters)
             if (__instance is DebuffingProjectile dp && dp.debuff.Value == "frozen")
             {
                 Farmer? farmer = dp.theOneWhoFiredMe.Get(location) as Farmer;
                 if (farmer != null && (TrinketAscensionLogic.HasAscendedTrinket(farmer, "icerod") || TrinketAscensionLogic.HasAscendedTrinket(farmer, "iceorb")))
                 {
                     dp.ignoreCharacterCollisions.Value = true;
-                    dp.piercesLeft.Value = 99999;
+                    dp.piercesLeft.Value = 2;
 
                     // Inflate widens the rectangle by N px on all sides, making the
                     // sweeping orb slightly more forgiving than vanilla targeting.
@@ -638,6 +673,9 @@ namespace BetterForge
 
                     for (int i = 0; i < location.characters.Count; i++)
                     {
+                        if (hitList.Count >= 2)
+                            break;
+
                         if (location.characters[i] is Monster monster && !monster.IsInvisible && !monster.isInvincible() && orbBounds.Intersects(monster.GetBoundingBox()))
                         {
                             if (hitList.Add(monster)) // once per monster per orb

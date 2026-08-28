@@ -1,7 +1,7 @@
 {
   "Name": "BetterEvent",
   "Author": "feiluvnana",
-  "Version": "1.1.1",
+  "Version": "1.2.0",
   "Description": "Extends the Desert Festival to Summer, Fall, and Winter (Days 22-24).",
   "UniqueID": "feiluvnana.BetterEvent",
   "MinimumApiVersion": "4.0.0",

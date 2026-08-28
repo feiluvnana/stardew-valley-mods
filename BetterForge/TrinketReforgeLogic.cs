@@ -97,13 +97,12 @@ namespace BetterForge
                 case "fairybox":
                 {
                     eval.MaxTier = 5;
-                    // Cascading probability checks: each NextBool(x) is an independent
-                    // x-chance roll, tried from best tier down to the default level 1.
+                    // Cascading probability checks matching vanilla FairyBoxTrinketEffect.GenerateTrinketEffect()
                     int num = 1;
                     if (r.NextBool(0.45)) num = 2;
-                    else if (r.NextBool(0.25)) num = 3;
-                    else if (r.NextBool(0.125)) num = 4;
-                    else if (r.NextBool(0.0675)) num = 5;
+                    if (r.NextBool(0.25)) num = 3;
+                    if (r.NextBool(0.125)) num = 4;
+                    if (r.NextBool(0.0675)) num = 5;
 
                     eval.Tier = num;
                     eval.Score = (num - 1) / 4.0f;

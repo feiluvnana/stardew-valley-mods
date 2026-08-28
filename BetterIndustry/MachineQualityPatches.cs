@@ -78,11 +78,11 @@ namespace BetterIndustry
                 if (machine != null && (machine.ItemId == "163" || machine.QualifiedItemId == "(BC)163"))
                     return;
 
-                // Determine base probabilities using 40/30/20/10 Matrix (identical to Cooking):
-                // Normal (0⭐)  -> 40% Normal, 30% Silver, 20% Gold, 10% Iridium
-                // Silver (1⭐)  -> 30% Normal, 40% Silver, 20% Gold, 10% Iridium
-                // Gold (2⭐)    -> 30% Normal, 20% Silver, 40% Gold, 10% Iridium
-                // Iridium (4⭐) -> 30% Normal, 20% Silver, 10% Gold, 40% Iridium
+                // Quality-preserving distribution matrix:
+                // Normal (0⭐)  -> 65% Normal, 25% Silver, 10% Gold, 0% Iridium (Protects Cask progression)
+                // Silver (1⭐)  -> 15% Normal, 55% Silver, 25% Gold, 5% Iridium
+                // Gold (2⭐)    -> 0% Normal, 25% Silver, 55% Gold, 20% Iridium (Never drops to Normal)
+                // Iridium (4⭐) -> 0% Normal, 0% Silver, 35% Gold, 65% Iridium (Guarantees Gold+)
                 double rateNormal;
                 double rateSilver;
                 double rateGold;
@@ -91,31 +91,31 @@ namespace BetterIndustry
                 switch (inputItem.Quality)
                 {
                     case 1: // Silver (1⭐)
-                        rateNormal = 30.0;
-                        rateSilver = 40.0;
-                        rateGold = 20.0;
-                        rateIridium = 10.0;
+                        rateNormal = 15.0;
+                        rateSilver = 55.0;
+                        rateGold = 25.0;
+                        rateIridium = 5.0;
                         break;
 
                     case 2: // Gold (2⭐)
-                        rateNormal = 30.0;
-                        rateSilver = 20.0;
-                        rateGold = 40.0;
-                        rateIridium = 10.0;
+                        rateNormal = 0.0;
+                        rateSilver = 25.0;
+                        rateGold = 55.0;
+                        rateIridium = 20.0;
                         break;
 
                     case 4: // Iridium (4⭐)
-                        rateNormal = 30.0;
-                        rateSilver = 20.0;
-                        rateGold = 10.0;
-                        rateIridium = 40.0;
+                        rateNormal = 0.0;
+                        rateSilver = 0.0;
+                        rateGold = 35.0;
+                        rateIridium = 65.0;
                         break;
 
                     default: // Normal (0⭐)
-                        rateNormal = 40.0;
-                        rateSilver = 30.0;
-                        rateGold = 20.0;
-                        rateIridium = 10.0;
+                        rateNormal = 65.0;
+                        rateSilver = 25.0;
+                        rateGold = 10.0;
+                        rateIridium = 0.0;
                         break;
                 }
 

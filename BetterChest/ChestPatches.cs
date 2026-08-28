@@ -115,7 +115,8 @@ namespace BetterChest
                 // "?." only reads mineLevel if the cast succeeded;
                 // "??" falls back to 121 — the first Skull Cavern floor — otherwise.
                 int mineLevel = (__instance.Location as MineShaft)?.mineLevel ?? 121;
-                bool isSpecial = mineLevel == 220 || mineLevel == 320 || mineLevel == 420 || mineLevel == 520;
+                int relativeDepth = Math.Max(1, mineLevel > 120 ? mineLevel - 120 : mineLevel);
+                bool isSpecial = (relativeDepth % 100 == 0);
 
                 if (ModEntry.Config.EnableCustomRewards)
                 {

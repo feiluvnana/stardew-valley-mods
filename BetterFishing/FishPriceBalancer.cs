@@ -25,7 +25,7 @@ namespace BetterFishing
             "899", // Ms. Angler
             "163", // Legend
             "900", // Legend II
-            "162", // Glacierfish (Note: in vanilla data "162" or "Glacierfish")
+            "775", // Glacierfish
             "901", // Glacierfish Jr.
             "682", // Mutant Carp
             "902"  // Radioactive Carp
@@ -61,11 +61,10 @@ namespace BetterFishing
         /// </summary>
         private static readonly HashSet<string> IsolatedLocationFishIds = new(StringComparer.OrdinalIgnoreCase)
         {
-            "143", // Ghostfish
+            "156", // Ghostfish (Mines 20/60)
             "158", // Stonefish (Mines 20)
             "161", // Ice Pip (Mines 60)
             "162", // Lava Eel (Mines 100 / Caldera)
-            "700", // Lava Eel (alternative ID)
             "164", // Sandfish (Desert)
             "165", // Scorpion Carp (Desert)
             "682", // Mutant Carp (Sewers)
@@ -206,7 +205,7 @@ namespace BetterFishing
                     }
 
                     // D. Predictable deterministic species hash bonus (0% to +8%)
-                    if (Config.EnablePredictableHashBonus)
+                    if (Config.EnablePredictableHashBonus && !isLegendary)
                     {
                         int hashVal = Math.Abs(cleanFishId.GetHashCode()) % 9;
                         traitMultiplier += hashVal * 0.01f;

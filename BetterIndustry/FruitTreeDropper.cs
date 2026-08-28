@@ -45,15 +45,15 @@ namespace BetterIndustry
                 int threshold = Math.Max(1, Config.MaxFruitsBeforeDrop);
                 int dropped = 0;
 
-                // Game1.locations holds every map in the session (Farm, Town, interiors...).
-                foreach (GameLocation location in Game1.locations)
+                // Utility.ForEachLocation scans every map in the session including Greenhouse, Sheds, interiors, and Island
+                Utility.ForEachLocation(location =>
                 {
-                    // "?." only continues when the left side isn't null, avoiding a
-                    // NullReferenceException on sparse or unusual location entries.
-                    if (location?.terrainFeatures == null)
-                        continue;
-                    dropped += DropExcessFruit(location, threshold);
-                }
+                    if (location?.terrainFeatures != null)
+                    {
+                        dropped += DropExcessFruit(location, threshold);
+                    }
+                    return true;
+                });
 
                 // "$" marks an interpolated string: {dropped} is replaced at runtime.
                 // LogLevel.Trace writes only to the log file - invisible in normal play.
@@ -67,7 +67,7 @@ namespace BetterIndustry
         }
 
         /// <summary>
-        /// Drops all fruit from every qualifying fruit tree on one map.
+        /// Drops all fruit from every qualifying fruit tree on one map, ensuring fruit never drops into water.
         /// </summary>
         /// <param name="location">The map whose trees are scanned.</param>
         /// <param name="threshold">Fruit count that triggers the drop.</param>
@@ -97,20 +97,47 @@ namespace BetterIndustry
 
                 // Tiles are 64x64 pixels: tile coordinate * 64 gives pixels, and "+32"
                 // aims at the tile centre so debris bursts out of the trunk.
-                // Vector2 (imported from Microsoft.Xna.Framework at the top of this file)
-                // is a simple X/Y floating-point struct used for all world positions.
-                Vector2 origin = new Vector2(pair.Key.X * 64f + 32f, pair.Key.Y * 64f + 32f);
+                Vector2 treeTile = pair.Key;
+                Vector2 origin = new Vector2(treeTile.X * 64f + 32f, treeTile.Y * 64f + 32f);
+
+                // Collect safe non-water directions around the tree (0: Up, 1: Right, 2: Down, 3: Left)
+                // to prevent fruit from ever splashing into rivers, ponds, or oceans.
+                List<int> safeDirections = new List<int>(4);
+                Vector2[] targetOffsets = new Vector2[]
+                {
+                    new Vector2(treeTile.X, treeTile.Y - 1), // 0: Up
+                    new Vector2(treeTile.X + 1, treeTile.Y), // 1: Right
+                    new Vector2(treeTile.X, treeTile.Y + 1), // 2: Down
+                    new Vector2(treeTile.X - 1, treeTile.Y)  // 3: Left
+                };
+
+                for (int dir = 0; dir < 4; dir++)
+                {
+                    Vector2 target = targetOffsets[dir];
+                    if (!location.isWaterTile((int)target.X, (int)target.Y))
+                    {
+                        safeDirections.Add(dir);
+                    }
+                }
+
                 // ToArray() snapshots the list because we Clear() it below while still in
                 // this foreach - mutating a collection during iteration throws.
-                // "Item" is the game's base class for anything inventory-storable; tree
-                // fruits are held here as generic Item references.
                 foreach (Item fruit in fruits.ToArray())
                 {
                     if (fruit == null)
                         continue;
-                    // Spawns the item as bouncing debris. Next(4) rolls 0-3 to pick a
-                    // random fling direction; 'location' tells it which map to land on.
-                    Game1.createItemDebris(fruit, origin, Game1.random.Next(4), location);
+
+                    // If safe non-water directions exist, choose among them;
+                    // otherwise drop straight down at the tree's own rooted ground tile (-1).
+                    if (safeDirections.Count > 0)
+                    {
+                        int chosenDir = safeDirections[Game1.random.Next(safeDirections.Count)];
+                        Game1.createItemDebris(fruit, origin, chosenDir, location);
+                    }
+                    else
+                    {
+                        Game1.createItemDebris(fruit, origin, -1, location);
+                    }
                     dropped++;
                 }
                 fruits.Clear();

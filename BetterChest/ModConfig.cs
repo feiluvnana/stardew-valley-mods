@@ -33,71 +33,71 @@ namespace BetterChest
         /// <summary>Scale roll counts and stack multipliers by how deep in Skull Cavern the chest is.</summary>
         public bool EnableDepthScaling { get; set; } = true;
 
-        // Decaying Multi-Rolls (1st and 2nd roll guaranteed 100%, each next roll has decreasing chance - Max 8 rolls)
+        // Decaying Multi-Rolls (1st and 2nd roll guaranteed 100%, expected 3.0 items, max 6 rolls)
         /// <summary>Upper limit of loot rolls per standard deep-floor (50+) chest.</summary>
-        public int MaxRolls { get; set; } = 8;
+        public int MaxRolls { get; set; } = 6;
         /// <summary>Chance that a 2nd roll occurs after the first (part of the decaying roll chain).</summary>
         public float Roll2Chance { get; set; } = 1.00f;
         /// <summary>Chance that a 3rd roll occurs once two rolls have happened.</summary>
-        public float Roll3Chance { get; set; } = 0.80f;
+        public float Roll3Chance { get; set; } = 0.50f;
         /// <summary>Chance that a 4th roll occurs once three rolls have happened.</summary>
-        public float Roll4Chance { get; set; } = 0.65f;
+        public float Roll4Chance { get; set; } = 0.30f;
         /// <summary>Chance that a 5th roll occurs once four rolls have happened.</summary>
-        public float Roll5Chance { get; set; } = 0.50f;
+        public float Roll5Chance { get; set; } = 0.15f;
         /// <summary>Chance that a 6th roll occurs once five rolls have happened.</summary>
-        public float Roll6Chance { get; set; } = 0.35f;
+        public float Roll6Chance { get; set; } = 0.05f;
         /// <summary>Chance that a 7th roll occurs once six rolls have happened.</summary>
-        public float Roll7Chance { get; set; } = 0.20f;
+        public float Roll7Chance { get; set; } = 0.00f;
         /// <summary>Chance that an 8th roll occurs once seven rolls have happened.</summary>
-        public float Roll8Chance { get; set; } = 0.10f;
+        public float Roll8Chance { get; set; } = 0.00f;
 
-        // Stack Multipliers (Jackpot critical procs on stackable items - Regular Chests, Expected 1.5x Multiplier)
-        /// <summary>"Jackpot" chance to multiply a rolled item's stack size by 2.</summary>
-        public float DoubleStackChance { get; set; } = 0.15f;
-        /// <summary>Jackpot chance to multiply a rolled item's stack size by 3.</summary>
-        public float TripleStackChance { get; set; } = 0.10f;
-        /// <summary>Jackpot chance to multiply a rolled item's stack size by 4.</summary>
-        public float QuadrupleStackChance { get; set; } = 0.05f;
-        /// <summary>Jackpot chance to multiply a rolled item's stack size by 5.</summary>
-        public float QuintupleStackChance { get; set; } = 0.0f;
+        // Stack Multipliers (Jackpot critical procs on stackable items - Unified across regular and special chests)
+        /// <summary>"Jackpot" chance to multiply a rolled item's stack size by 2 (default: 20%).</summary>
+        public float DoubleStackChance { get; set; } = 0.20f;
+        /// <summary>Jackpot chance to multiply a rolled item's stack size by 3 (default: 8%).</summary>
+        public float TripleStackChance { get; set; } = 0.08f;
+        /// <summary>Jackpot chance to multiply a rolled item's stack size by 4 (default: 3%).</summary>
+        public float QuadrupleStackChance { get; set; } = 0.03f;
+        /// <summary>Jackpot chance to multiply a rolled item's stack size by 5 (default: 1%).</summary>
+        public float QuintupleStackChance { get; set; } = 0.01f;
 
-        // Floor 100 Special Chest Buff Settings (Expected ~5.0 items, Expected 3.0x Multiplier)
+        // Floor 100 Special Chest Buff Settings (Min 3 guaranteed, expected 4.5 items, max 9 rolls)
         /// <summary>Give milestone floors' special chests (220/320/420/520) supercharged loot rolls.</summary>
         public bool EnableFloor100Buff { get; set; } = true;
         /// <summary>Force all seven loot categories to equal weight for special-chest rolls.</summary>
         public bool Floor100AllCategoriesEqual { get; set; } = true;
         /// <summary>Maximum number of rolls a special floor-100-style chest can contain.</summary>
-        public int Floor100MaxRolls { get; set; } = 12;
+        public int Floor100MaxRolls { get; set; } = 9;
         /// <summary>Special chest: chance that a 2nd roll occurs (decaying chain).</summary>
-        public float Floor100Roll2Chance { get; set; } = 0.94f;
+        public float Floor100Roll2Chance { get; set; } = 1.00f;
         /// <summary>Special chest: chance that a 3rd roll occurs.</summary>
-        public float Floor100Roll3Chance { get; set; } = 0.91f;
+        public float Floor100Roll3Chance { get; set; } = 1.00f;
         /// <summary>Special chest: chance that a 4th roll occurs.</summary>
-        public float Floor100Roll4Chance { get; set; } = 0.86f;
+        public float Floor100Roll4Chance { get; set; } = 0.60f;
         /// <summary>Special chest: chance that a 5th roll occurs.</summary>
-        public float Floor100Roll5Chance { get; set; } = 0.79f;
+        public float Floor100Roll5Chance { get; set; } = 0.40f;
         /// <summary>Special chest: chance that a 6th roll occurs.</summary>
-        public float Floor100Roll6Chance { get; set; } = 0.71f;
+        public float Floor100Roll6Chance { get; set; } = 0.25f;
         /// <summary>Special chest: chance that a 7th roll occurs.</summary>
-        public float Floor100Roll7Chance { get; set; } = 0.63f;
+        public float Floor100Roll7Chance { get; set; } = 0.15f;
         /// <summary>Special chest: chance that an 8th roll occurs.</summary>
-        public float Floor100Roll8Chance { get; set; } = 0.53f;
+        public float Floor100Roll8Chance { get; set; } = 0.07f;
         /// <summary>Special chest: chance that a 9th roll occurs.</summary>
-        public float Floor100Roll9Chance { get; set; } = 0.42f;
+        public float Floor100Roll9Chance { get; set; } = 0.03f;
         /// <summary>Special chest: chance that a 10th roll occurs.</summary>
-        public float Floor100Roll10Chance { get; set; } = 0.30f;
+        public float Floor100Roll10Chance { get; set; } = 0.00f;
         /// <summary>Special chest: chance that an 11th roll occurs.</summary>
-        public float Floor100Roll11Chance { get; set; } = 0.18f;
+        public float Floor100Roll11Chance { get; set; } = 0.00f;
         /// <summary>Special chest: chance that a 12th roll occurs.</summary>
-        public float Floor100Roll12Chance { get; set; } = 0.05f;
+        public float Floor100Roll12Chance { get; set; } = 0.00f;
         /// <summary>Special chest: jackpot chance for a x2 stack multiplier.</summary>
         public float Floor100DoubleStackChance { get; set; } = 0.20f;
         /// <summary>Special chest: jackpot chance for a x3 stack multiplier.</summary>
-        public float Floor100TripleStackChance { get; set; } = 0.25f;
+        public float Floor100TripleStackChance { get; set; } = 0.08f;
         /// <summary>Special chest: jackpot chance for a x4 stack multiplier.</summary>
-        public float Floor100QuadrupleStackChance { get; set; } = 0.10f;
+        public float Floor100QuadrupleStackChance { get; set; } = 0.03f;
         /// <summary>Special chest: jackpot chance for a x5 stack multiplier.</summary>
-        public float Floor100QuintupleStackChance { get; set; } = 0.05f;
+        public float Floor100QuintupleStackChance { get; set; } = 0.01f;
 
         // Category Weights (Equal 15.0 each, ~14.285% chance per category across all 7 categories)
         // NOTE the switch to type "double": doubles store bigger, more precise

@@ -222,14 +222,28 @@ namespace BetterIndustry
                 }
                 else
                 {
-                    if (___heldItem.Name != crafted.Name || !___heldItem.getOne().canStackWith(crafted.getOne()) || ___heldItem.Stack + recipe.numberProducedPerCraft - 1 >= ___heldItem.maximumStackSize())
+                    if (___heldItem.Name == crafted.Name && ___heldItem.getOne().canStackWith(crafted.getOne()) && ___heldItem.Stack + recipe.numberProducedPerCraft - 1 < ___heldItem.maximumStackSize())
                     {
-                        return false;
+                        ___heldItem.Stack += recipe.numberProducedPerCraft;
+                        ExecuteConsumption(plans, ____materialContainers);
+                        if (playSound)
+                            Game1.playSound("coin");
                     }
-                    ___heldItem.Stack += recipe.numberProducedPerCraft;
-                    ExecuteConsumption(plans, ____materialContainers);
-                    if (playSound)
-                        Game1.playSound("coin");
+                    else
+                    {
+                        // If items cannot stack (e.g. star quality mismatch), auto-deposit the currently held item into inventory
+                        if (Game1.player.addItemToInventoryBool(___heldItem))
+                        {
+                            ExecuteConsumption(plans, ____materialContainers);
+                            ___heldItem = crafted;
+                            if (playSound)
+                                Game1.playSound("coin");
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    }
                 }
 
                 // Consume Qi Seasoning if used

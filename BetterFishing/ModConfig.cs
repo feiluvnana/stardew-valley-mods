@@ -22,7 +22,7 @@ namespace BetterFishing
         public float MidTierFactor { get; set; } = 25.0f;
 
         /// <summary>Apex scaling factor for high-tier difficulty curve above D=50.</summary>
-        public float ApexFactor { get; set; } = 0.91252f;
+        public float ApexFactor { get; set; } = 0.9293f;
 
         /// <summary>Apex power exponent for high-tier difficulty curve.</summary>
         public float ApexExponent { get; set; } = 4.34f;
@@ -81,11 +81,11 @@ namespace BetterFishing
         /// <summary>Enable the decaying-roll enhancement for fishing treasure chests.</summary>
         public bool EnableFishingChestBuff { get; set; } = true;
 
-        /// <summary>Probability decay multiplier for regular fishing treasure chest rolls (vanilla default is 0.40; mod default is 0.60).</summary>
-        public float FishingChestDecayRate { get; set; } = 0.60f;
+        /// <summary>Probability decay multiplier for regular fishing treasure chest rolls (vanilla default is 0.40; mod default is 0.45).</summary>
+        public float FishingChestDecayRate { get; set; } = 0.45f;
 
-        /// <summary>Probability decay multiplier for 1.6 golden fishing treasure chest rolls (vanilla default is 0.60; mod default is 0.80).</summary>
-        public float GoldenChestDecayRate { get; set; } = 0.80f;
+        /// <summary>Probability decay multiplier for 1.6 golden fishing treasure chest rolls (vanilla default is 0.60; mod default is 0.60).</summary>
+        public float GoldenChestDecayRate { get; set; } = 0.60f;
 
         // =====================================================================
         // === 6. FISHING EXPERIENCE (EXP) SETTINGS                          ===

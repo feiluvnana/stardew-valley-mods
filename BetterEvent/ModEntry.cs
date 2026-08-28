@@ -109,22 +109,10 @@ namespace BetterEvent
                         // an actual save/world exists right now, and Game1 is
                         // the game's global-state hub class.
                         Season currentSeason = Context.IsWorldReady ? Game1.season : Season.Spring;
-                        if (currentSeason == Season.Spring)
+                        if (IsSeasonEnabled(currentSeason))
                         {
-                            // Never alter vanilla Spring Desert Festival (always Spring 15-17)
-                            festival.Season = Season.Spring;
-                            festival.StartDay = 15;
-                            festival.EndDay = 17;
-                        }
-                        else if (IsSeasonEnabled(currentSeason))
-                        {
-                            // BetterEvent festival days for Summer, Fall, Winter
                             festival.Season = currentSeason;
-                            // Math.Clamp(value, min, max) pins a number into range:
-                            // the start day must be a valid day (1..28)...
                             int start = Math.Clamp(Config.FestivalStartDay, 1, 28);
-                            // ...and the end day can never come BEFORE the start
-                            // (its clamp minimum IS `start`), avoiding nonsense ranges.
                             int end = Math.Clamp(Config.FestivalEndDay, start, 28);
                             festival.StartDay = start;
                             festival.EndDay = end;
@@ -173,6 +161,20 @@ namespace BetterEvent
             if (Game1.dayOfMonth == 1)
             {
                 Helper.GameContent.InvalidateCache("Data/PassiveFestivals");
+            }
+
+            // Morning festival reminders for active seasons (Summer, Fall, Winter, Spring)
+            if (IsSeasonEnabled(Game1.season))
+            {
+                int startDay = Math.Clamp(Config.FestivalStartDay, 1, 28);
+                if (Game1.dayOfMonth == startDay - 1)
+                {
+                    Game1.showGlobalMessage(I18n.Get("hud.festival-tomorrow"));
+                }
+                else if (Game1.dayOfMonth == startDay)
+                {
+                    Game1.showGlobalMessage(I18n.Get("hud.festival-today"));
+                }
             }
         }
 

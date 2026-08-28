@@ -255,33 +255,28 @@ namespace BetterQOL
 					num += item2.Stack;
 				}
 			}
-			foreach (GameLocation location in Game1.locations)
+			Utility.ForEachLocation(location =>
 			{
 				if (location == null)
-				{
-					continue;
-				}
+					return true;
+
 				foreach (SObject value in location.objects.Values)
 				{
-					Chest val = (Chest)(object)((value is Chest) ? value : null);
-					if (val == null || val.Items == null)
+					if (value is Chest chest && chest.Items != null)
 					{
-						continue;
-					}
-					foreach (Item item3 in val.Items)
-					{
-						if (item3 != null && (item3.ItemId == itemId || item3.QualifiedItemId == qualifiedItemId))
+						foreach (Item item3 in chest.Items)
 						{
-							num2 += item3.Stack;
+							if (item3 != null && (item3.ItemId == itemId || item3.QualifiedItemId == qualifiedItemId))
+							{
+								num2 += item3.Stack;
+							}
 						}
 					}
 				}
-				// The farmhouse fridge is a special chest that isn't in location.objects,
-				// so it gets its own scan.
-				FarmHouse val2 = (FarmHouse)(object)((location is FarmHouse) ? location : null);
-				if (val2 != null && ((NetFieldBase<Chest, NetRef<Chest>>)(object)val2.fridge).Value != null && ((NetFieldBase<Chest, NetRef<Chest>>)(object)val2.fridge).Value.Items != null)
+
+				if (location is FarmHouse farmHouse && farmHouse.fridge?.Value?.Items != null)
 				{
-					foreach (Item item4 in ((NetFieldBase<Chest, NetRef<Chest>>)(object)val2.fridge).Value.Items)
+					foreach (Item item4 in farmHouse.fridge.Value.Items)
 					{
 						if (item4 != null && (item4.ItemId == itemId || item4.QualifiedItemId == qualifiedItemId))
 						{
@@ -289,33 +284,9 @@ namespace BetterQOL
 						}
 					}
 				}
-				if (location.buildings.Count <= 0)
-				{
-					continue;
-				}
-				foreach (Building building in location.buildings)
-				{
-					if (((NetFieldBase<GameLocation, NetRef<GameLocation>>)(object)building.indoors).Value == null)
-					{
-						continue;
-					}
-					foreach (SObject value2 in ((NetFieldBase<GameLocation, NetRef<GameLocation>>)(object)building.indoors).Value.objects.Values)
-					{
-						Chest val3 = (Chest)(object)((value2 is Chest) ? value2 : null);
-						if (val3 == null || val3.Items == null)
-						{
-							continue;
-						}
-						foreach (Item item5 in val3.Items)
-						{
-							if (item5 != null && (item5.ItemId == itemId || item5.QualifiedItemId == qualifiedItemId))
-							{
-								num2 += item5.Stack;
-							}
-						}
-					}
-				}
-			}
+
+				return true;
+			});
 		}
 		catch
 		{

@@ -1,7 +1,7 @@
 {
   "Name": "BetterFurniture",
   "Author": "feiluvnana",
-  "Version": "1.0.0",
+  "Version": "1.0.1",
   "Description": "Adds better and larger furniture to Stardew Valley, including a spacious 4x4 King Size Bed.",
   "UniqueID": "feiluvnana.BetterFurniture",
   "EntryDll": "BetterFurniture.dll",

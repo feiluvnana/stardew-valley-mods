@@ -552,20 +552,18 @@ namespace BetterFurniture
                     }
                 }
 
-                // Part 2: fix furniture already PLACED in every game location.
-                if (Game1.locations != null)
+                // Part 2: fix furniture already PLACED in every game location and interior.
+                Utility.ForEachLocation(location =>
                 {
-                    foreach (GameLocation location in Game1.locations)
+                    if (location?.furniture != null)
                     {
-                        if (location != null)
+                        foreach (Furniture furniture in location.furniture)
                         {
-                            foreach (Furniture furniture in location.furniture)
-                            {
-                                SyncFurnitureType(furniture);
-                            }
+                            SyncFurnitureType(furniture);
                         }
                     }
-                }
+                    return true;
+                });
             }
             catch (Exception ex)
             {
