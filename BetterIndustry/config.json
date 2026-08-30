@@ -7,7 +7,6 @@
   "IridiumBuffDurationMultiplier": 2.0,
   "EnableMeadFix": true,
   "EnableMachineQuality": true,
-  "ApplyDailyLuckToMachines": true,
   "EnableQualityPreserving": true,
   "EnableTruffleOilFix": true,
   "TruffleOilMultiplier": 1.5,
@@ -20,6 +19,6 @@
   "EnableMillArtisanCategory": true,
   "EnableMillQualityMatrix": true,
   "WheatFlourBasePrice": 90,
-  "SugarBasePrice": 80,
+  "SugarBasePrice": 50,
   "RiceBasePrice": 140
 }

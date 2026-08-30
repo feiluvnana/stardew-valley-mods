@@ -63,8 +63,8 @@ namespace BetterFishing
         // =====================================================================
         // === 4. LEGENDARY & SIGNATURE BONUSES                              ===
         // =====================================================================
-        /// <summary>Dedicated prize multiplier bonus for all Legendary fish (+100% / 2x prize, default: 1.00).</summary>
-        public float LegendaryFishMultiplierBonus { get; set; } = 1.00f;
+        /// <summary>Dedicated prize multiplier bonus for all Legendary fish (default: 0.00f; Legend anchored at 5,000g).</summary>
+        public float LegendaryFishMultiplierBonus { get; set; } = 0.00f;
 
         /// <summary>Enable deterministic species hash bonus (0% to +8% based on ItemId).</summary>
         public bool EnablePredictableHashBonus { get; set; } = true;

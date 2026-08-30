@@ -46,14 +46,14 @@ namespace BetterIndustry
         public float IridiumBuffDurationMultiplier { get; set; } = 2.0f;
 
         // ---------------- Artisan Goods Balancing ----------------
-        /// <summary>Whether mead retains the input flower honey type and 2.0x price scaling.</summary>
+        /// <summary>Whether mead retains the input flower honey type and price scaling.</summary>
         public bool EnableMeadFix { get; set; } = true;
 
-        /// <summary>Whether artisan machines use the balanced Option 2 Quarter-Step quality matrix (75/25 & 50/25) based on input quality.</summary>
-        public bool EnableMachineQuality { get; set; } = true;
+        /// <summary>Price multiplier for Flower Honey Mead relative to input honey (default: 1.35x).</summary>
+        public float FlowerMeadMultiplier { get; set; } = 1.35f;
 
-        /// <summary>Whether Daily Luck slightly shifts machine quality rolls toward higher star tiers.</summary>
-        public bool ApplyDailyLuckToMachines { get; set; } = true;
+        /// <summary>Whether artisan machines use the balanced 60/25/15 quality matrix (Normal, Silver, Gold, 0% Iridium) based on input quality.</summary>
+        public bool EnableMachineQuality { get; set; } = true;
 
         /// <summary>Legacy alias for EnableMachineQuality.</summary>
         [System.Text.Json.Serialization.JsonIgnore]
@@ -66,8 +66,11 @@ namespace BetterIndustry
         /// <summary>Whether Truffle Oil price and quality scale with the input Truffle.</summary>
         public bool EnableTruffleOilFix { get; set; } = true;
 
-        /// <summary>Price multiplier for Truffle Oil relative to the input Truffle value (default 1.5x).</summary>
+        /// <summary>Price multiplier for Truffle Oil relative to base Truffle value (default 1.5x -> 937g base / 1,967g Gold Artisan).</summary>
         public float TruffleOilMultiplier { get; set; } = 1.5f;
+
+        /// <summary>Whether Cooking Oil receives the Artisan Goods category (-26) for the +40% Artisan profession bonus.</summary>
+        public bool EnableCookingOilArtisanCategory { get; set; } = true;
 
         /// <summary>Whether Vegetable Juice sell price is buffed with an enhanced multiplier.</summary>
         public bool EnableJuiceBuff { get; set; } = true;
@@ -81,12 +84,32 @@ namespace BetterIndustry
         /// <summary>Whether Casks can age additional artisan goods such as Vegetable Juice.</summary>
         public bool EnableExpandedAging { get; set; } = true;
 
-        // ---------------- Fruit Tree Automation ----------------
+        // ---------------- Fruit Tree Balancing & Automation ----------------
         /// <summary>Whether fruit automatically falls to the ground when a mature fruit tree reaches the configured fruit count.</summary>
         public bool EnableAutoFruitDrop { get; set; } = true;
 
         /// <summary>Number of fruit on a tree that triggers the auto-drop (default 3, the vanilla maximum).</summary>
         public int MaxFruitsBeforeDrop { get; set; } = 3;
+
+        /// <summary>Whether fruit tree fruit base prices are rebalanced for guaranteed positive Year-1 ROI.</summary>
+        public bool EnableFruitTreeRebalance { get; set; } = true;
+
+        // ---------------- Minerals & Monster Loot Balancing ----------------
+        /// <summary>Whether the 41 geode minerals and 4 foraged minerals are rebalanced for consistent cracking profits.</summary>
+        public bool EnableMineralPriceRebalance { get; set; } = true;
+
+        /// <summary>Whether mid/late game monster loot (Solar/Void Essence, Squid Ink, Bone Fragment) sell prices are rebalanced.</summary>
+        public bool EnableMonsterLootRebalance { get; set; } = true;
+
+        // ---------------- Tree Tapper Productivity ----------------
+        /// <summary>Whether Tree Tappers have multi-harvest yield chances (2x/3x syrups).</summary>
+        public bool EnableTapperMultiYield { get; set; } = true;
+
+        /// <summary>Chance of double syrup harvest from Standard Tappers (default: 0.35 / 35%).</summary>
+        public float StandardTapperDoubleChance { get; set; } = 0.35f;
+
+        /// <summary>Chance of triple syrup harvest from Heavy Tappers (default: 0.20 / 20%, 100% 2x is guaranteed).</summary>
+        public float HeavyTapperTripleChance { get; set; } = 0.20f;
 
         // ---------------- Artisanal Milling ----------------
         /// <summary>Whether milled goods (Wheat Flour, Sugar, Rice) have their base prices rebalanced.</summary>
@@ -95,14 +118,14 @@ namespace BetterIndustry
         /// <summary>Whether milled goods receive the Artisan Goods category (-26) for the +40% Artisan profession bonus.</summary>
         public bool EnableMillArtisanCategory { get; set; } = true;
 
-        /// <summary>Whether the Mill preserves grain quality into output goods via the Option 2 matrix.</summary>
+        /// <summary>Whether the Mill preserves grain quality into output goods via the 60/25/15 matrix.</summary>
         public bool EnableMillQualityMatrix { get; set; } = true;
 
         /// <summary>Base sell price for Wheat Flour (default 90g).</summary>
         public int WheatFlourBasePrice { get; set; } = 90;
 
-        /// <summary>Base sell price for Sugar (default 80g).</summary>
-        public int SugarBasePrice { get; set; } = 80;
+        /// <summary>Base sell price for Sugar (vanilla default 50g).</summary>
+        public int SugarBasePrice { get; set; } = 50;
 
         /// <summary>Base sell price for Rice (default 140g).</summary>
         public int RiceBasePrice { get; set; } = 140;

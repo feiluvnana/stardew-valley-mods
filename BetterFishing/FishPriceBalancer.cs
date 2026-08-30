@@ -218,6 +218,12 @@ namespace BetterFishing
                     if (finalPrice < 5)
                         finalPrice = 5;
 
+                    // Legend & Legend II anchor guarantee (strictly 5,000g base)
+                    if (cleanFishId is "163" or "900" || string.Equals(parts[0], "Legend", StringComparison.OrdinalIgnoreCase))
+                    {
+                        finalPrice = 5000;
+                    }
+
                     // Apply to Data/Objects dictionary
                     if (objectData.TryGetValue(cleanFishId, out var objData) || objectData.TryGetValue(rawFishId, out objData))
                     {

@@ -115,8 +115,8 @@ When a stackable item (ores, coal, bombs, seeds, fertilizers, geodes) rolls, it 
 | **Mining (~14.285%)** | **Iridium Ore** | `(O)386` | 10 – 25 | 25.0 | ✅ Yes | None |
 | | **Mega Bomb** | `(O)288` | 5 – 15 | 25.0 | ✅ Yes | None |
 | | **Radioactive Ore** | `(O)909` | 5 – 15 | 22.0 | ✅ Yes | Qi's Walnut Room |
-| | **Iridium Bar** | `(O)337` | 2 – 6 | 22.0 | ✅ Yes | None |
-| | **Radioactive Bar** | `(O)910` | 2 – 4 | 20.0 | ✅ Yes | Qi's Walnut Room |
+| | **Iridium Bar** | `(O)337` | 2 – 4 | 22.0 | ❌ No | None |
+| | **Radioactive Bar** | `(O)910` | 1 – 3 | 20.0 | ❌ No | Qi's Walnut Room |
 | | **Coal** | `(O)382` | 35 – 90 | 24.0 | ✅ Yes | None |
 | | **Crystalarium** | `(BC)21` | 1 | 12.0 | ❌ No | Mining Level $\ge 9$ |
 | | **Cinder Shard** | `(O)848` | 6 – 16 | 20.0 | ✅ Yes | Volcano Caldera Shortcut |

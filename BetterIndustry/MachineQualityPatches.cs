@@ -7,7 +7,7 @@ namespace BetterIndustry
 {
     /// <summary>
     /// Harmony patches that apply the balanced Option 2 Quarter-Step quality matrix
-    /// (75/25 & 50/25) to outputs produced by artisan machines in Stardew Valley 1.6.
+    /// (75/25 & 50/25) to artisan machines and multi-harvest yields to Tree Tappers.
     /// </summary>
     public static class MachineQualityPatches
     {
@@ -15,13 +15,14 @@ namespace BetterIndustry
         private static IMonitor Monitor => ModEntry.ModMonitor;
 
         /// <summary>
-        /// Applies the Harmony patch on MachineDataUtility.GetOutputItem.
+        /// Applies the Harmony patches on MachineDataUtility.GetOutputItem and Object.checkForAction.
         /// </summary>
         /// <param name="harmony">Harmony instance.</param>
         public static void Apply(Harmony harmony)
         {
             try
             {
+                // 1. Hook MachineDataUtility.GetOutputItem for Option 2 quality matrix
                 var method = AccessTools.Method(
                     typeof(MachineDataUtility),
                     nameof(MachineDataUtility.GetOutputItem),
@@ -48,10 +49,63 @@ namespace BetterIndustry
                 {
                     Monitor.Log("Could not locate MachineDataUtility.GetOutputItem for machine quality balancing.", LogLevel.Warn);
                 }
+
+                // 2. Hook Object.checkForAction for Tree Tapper multi-harvest yields
+                var checkAction = AccessTools.Method(
+                    typeof(StardewValley.Object),
+                    nameof(StardewValley.Object.checkForAction),
+                    new[] { typeof(Farmer), typeof(bool) }
+                );
+
+                if (checkAction != null)
+                {
+                    harmony.Patch(
+                        original: checkAction,
+                        prefix: new HarmonyMethod(typeof(MachineQualityPatches), nameof(CheckForAction_Prefix))
+                    );
+                    Monitor.Log("Hooked Object.checkForAction for Tapper multi-harvest yields successfully.", LogLevel.Trace);
+                }
             }
             catch (Exception ex)
             {
                 Monitor.Log($"Failed to apply MachineQualityPatches: {ex}", LogLevel.Error);
+            }
+        }
+
+        /// <summary>
+        /// Prefix on Object.checkForAction: rolls multi-harvest yield stacks on ready Tree Tappers.
+        /// </summary>
+        public static void CheckForAction_Prefix(StardewValley.Object __instance, Farmer who, bool justCheckingForActivity)
+        {
+            if (justCheckingForActivity || !Config.EnableTapperMultiYield || __instance == null || who == null)
+                return;
+
+            try
+            {
+                if (__instance.readyForHarvest.Value && __instance.heldObject.Value != null)
+                {
+                    // Standard Tapper: 35% chance for 2x yield
+                    if (__instance.ItemId == "105" || __instance.QualifiedItemId == "(BC)105" || __instance.Name.Contains("Tapper", StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (__instance.ItemId != "264" && __instance.QualifiedItemId != "(BC)264" && !__instance.Name.Contains("Heavy", StringComparison.OrdinalIgnoreCase))
+                        {
+                            if (Game1.random.NextDouble() <= Config.StandardTapperDoubleChance)
+                            {
+                                __instance.heldObject.Value.Stack = 2;
+                            }
+                        }
+                    }
+
+                    // Heavy Tapper: 100% 2x yield, 20% chance for 3x yield
+                    if (__instance.ItemId == "264" || __instance.QualifiedItemId == "(BC)264" || __instance.Name.Contains("Heavy Tapper", StringComparison.OrdinalIgnoreCase))
+                    {
+                        __instance.heldObject.Value.Stack = Game1.random.NextDouble() <= Config.HeavyTapperTripleChance ? 3 : 2;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Monitor.Log($"Error in Tapper CheckForAction_Prefix: {ex}", LogLevel.Trace);
             }
         }
 
@@ -78,99 +132,54 @@ namespace BetterIndustry
                 if (machine != null && (machine.ItemId == "163" || machine.QualifiedItemId == "(BC)163"))
                     return;
 
-                // Quality-preserving distribution matrix:
-                // Normal (0⭐)  -> 65% Normal, 25% Silver, 10% Gold, 0% Iridium (Protects Cask progression)
-                // Silver (1⭐)  -> 15% Normal, 55% Silver, 25% Gold, 5% Iridium
-                // Gold (2⭐)    -> 0% Normal, 25% Silver, 55% Gold, 20% Iridium (Never drops to Normal)
-                // Iridium (4⭐) -> 0% Normal, 0% Silver, 35% Gold, 65% Iridium (Guarantees Gold+)
-                double rateNormal;
+                // Quality-preserving distribution matrix (60/25/15 with 0% Iridium floor):
+                // Normal (0⭐)  -> 60% Normal, 25% Silver, 15% Gold
+                // Silver (1⭐)  -> 25% Normal, 60% Silver, 15% Gold
+                // Gold (2⭐)    -> 15% Normal, 25% Silver, 60% Gold
+                // Iridium (4⭐) ->  0% Normal, 25% Silver, 75% Gold (Never Iridium from machines)
                 double rateSilver;
                 double rateGold;
-                double rateIridium;
 
                 switch (inputItem.Quality)
                 {
                     case 1: // Silver (1⭐)
-                        rateNormal = 15.0;
-                        rateSilver = 55.0;
-                        rateGold = 25.0;
-                        rateIridium = 5.0;
+                        rateSilver = 60.0;
+                        rateGold = 15.0;
                         break;
 
                     case 2: // Gold (2⭐)
-                        rateNormal = 0.0;
                         rateSilver = 25.0;
-                        rateGold = 55.0;
-                        rateIridium = 20.0;
+                        rateGold = 60.0;
                         break;
 
                     case 4: // Iridium (4⭐)
-                        rateNormal = 0.0;
-                        rateSilver = 0.0;
-                        rateGold = 35.0;
-                        rateIridium = 65.0;
+                        rateSilver = 25.0;
+                        rateGold = 75.0;
                         break;
 
                     default: // Normal (0⭐)
-                        rateNormal = 65.0;
                         rateSilver = 25.0;
-                        rateGold = 10.0;
-                        rateIridium = 0.0;
+                        rateGold = 15.0;
                         break;
                 }
 
-                // Large animal products act like Qi Seasoning: guarantee at least Gold tier floor
-                // by shifting all Normal and Silver weights directly to Gold (0% Normal, 0% Silver).
+                // Large animal products act like Qi Seasoning: guarantee at least Gold tier floor (100% Gold)
                 bool isLargeAnimalProduct = IsLargeAnimalProduct(inputItem);
                 if (isLargeAnimalProduct)
                 {
-                    rateGold += rateNormal + rateSilver;
-                    rateNormal = 0.0;
+                    rateGold = 100.0;
                     rateSilver = 0.0;
                 }
 
-                // Apply Daily Luck influence if enabled (identical to Cooking)
-                if (Config.ApplyDailyLuckToMachines)
-                {
-                    double dailyLuck = who?.DailyLuck ?? Game1.player.DailyLuck;
-                    double luckShift = dailyLuck * 100.0;
-                    if (Math.Abs(luckShift) > 0.001)
-                    {
-                        double shift = 0.50 * luckShift;
-                        rateIridium += shift;
-                        rateGold += shift;
-                        rateSilver -= shift;
-                        rateNormal -= shift;
-
-                        rateNormal = Math.Max(0.0, rateNormal);
-                        rateSilver = Math.Max(0.0, rateSilver);
-                        rateGold = Math.Max(0.0, rateGold);
-                        rateIridium = Math.Max(0.0, rateIridium);
-
-                        double sum = rateNormal + rateSilver + rateGold + rateIridium;
-                        if (sum > 0)
-                        {
-                            rateNormal = (rateNormal / sum) * 100.0;
-                            rateSilver = (rateSilver / sum) * 100.0;
-                            rateGold = (rateGold / sum) * 100.0;
-                            rateIridium = (rateIridium / sum) * 100.0;
-                        }
-                    }
-                }
-
-                // Roll quality from probability bands
+                // Roll quality from probability bands (0% Iridium)
                 double roll = Game1.random.NextDouble() * 100.0;
                 int quality;
 
-                if (roll < rateIridium)
-                {
-                    quality = 4; // Iridium
-                }
-                else if (roll < rateIridium + rateGold)
+                if (roll < rateGold)
                 {
                     quality = 2; // Gold
                 }
-                else if (roll < rateIridium + rateGold + rateSilver)
+                else if (roll < rateGold + rateSilver)
                 {
                     quality = 1; // Silver
                 }

@@ -157,8 +157,8 @@ namespace BetterChest
             new("(O)386", LootCategory.Mining, 10, 25, 25.0, c => c.EnableMiningCategory && c.EnableIridiumItems),       // Iridium Ore
             new("(O)288", LootCategory.Mining, 5, 15, 25.0, c => c.EnableMiningCategory && c.EnableBombs),               // Mega Bomb
             new("(O)909", LootCategory.Mining, 5, 15, 22.0, c => c.EnableMiningCategory && c.EnableRadioactiveItems && (!c.GatekeepRadioactiveItems || ProgressionHelper.IsQiRoomUnlocked())),    // Radioactive Ore
-            new("(O)337", LootCategory.Mining, 2, 6, 22.0, c => c.EnableMiningCategory && c.EnableIridiumItems),        // Iridium Bar (Balanced)
-            new("(O)910", LootCategory.Mining, 2, 4, 20.0, c => c.EnableMiningCategory && c.EnableRadioactiveItems && (!c.GatekeepRadioactiveItems || ProgressionHelper.IsQiRoomUnlocked())),     // Radioactive Bar (Balanced)
+            new("(O)337", LootCategory.Mining, 2, 4, 22.0, c => c.EnableMiningCategory && c.EnableIridiumItems, false),        // Iridium Bar (Fixed Stack, No Multiplier)
+            new("(O)910", LootCategory.Mining, 1, 3, 20.0, c => c.EnableMiningCategory && c.EnableRadioactiveItems && (!c.GatekeepRadioactiveItems || ProgressionHelper.IsQiRoomUnlocked()), false),     // Radioactive Bar (Fixed Stack, No Multiplier)
             new("(O)382", LootCategory.Mining, 35, 90, 24.0, c => c.EnableMiningCategory && c.EnableCoal),               // Coal (New)
             new("(BC)21", LootCategory.Mining, 1, 1, 12.0, c => c.EnableMiningCategory && c.EnableMachines && (!c.GatekeepMasteryItems || ProgressionHelper.GetMiningLevel() >= 9), false),       // Crystalarium
             new("(O)848", LootCategory.Mining, 6, 16, 20.0, c => c.EnableMiningCategory && (!c.GatekeepIslandItems || ProgressionHelper.IsVolcanoShortcutUnlocked())),                                // Cinder Shard (Volcano Shortcut Gatekeep)

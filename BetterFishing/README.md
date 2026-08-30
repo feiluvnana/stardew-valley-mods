@@ -26,13 +26,13 @@ $$P_{\text{base}}(D) = F + c_1 \cdot D + c_2 \cdot \left(\frac{D}{50}\right)^2 +
 * **Single season exclusive**: **$+2.0\%$** (e.g. Salmon, Lingcod)
 * **Small / Isolated location**: **$+2.0\%$** (Secret Woods, Mines, Witch's Swamp, Sewers, Desert, Submarine, Pirate Cove, Caldera)
 
-### 4. 👑 Legendary Prize Multiplier & Signature
-* **$+100.0\%$ ($2\times$) Dedicated Legendary Multiplier**: Legendary fish feel like monumental trophies.
+### 4. 👑 Legendary Fish Vanilla Anchor & Signature
+* **5,000g Exact Legend Base Anchor**: Legend (`(O)163`) base price is strictly preserved at vanilla **5,000g** (Smoked Iridium Legend = 28,000g Artisan).
 * **Deterministic Species Signature (0% to +8%)**: Predictable species trait variance derived from Item ID.
 * **100% Native Compatibility**: Overwrites `Data/Objects` at `Late` priority, meaning the **Price Catalogue** power book, tooltips, Fish Smokers ($2\times$), Roe ($30 + P/2$), and Aged Roe ($2\times \text{Roe}$) update seamlessly with zero conflicts.
 
 ### 5. 🎁 Decaying Multi-Roll Fishing Treasure Chests
-* Migrated from *BetterChest*: replaces vanilla hardcoded decay multipliers (`0.40f` $\rightarrow$ `0.60f` for standard chests; `0.60f` $\rightarrow$ `0.80f` for 1.6 golden chests) for rewarding, vanilla-faithful multi-rolls.
+* Migrated from *BetterChest*: replaces vanilla hardcoded decay multipliers (`0.40f` $\rightarrow$ `0.45f` for standard chests; `0.60f` $\rightarrow$ `0.60f` for 1.6 golden chests) for rewarding, vanilla-faithful multi-rolls.
 
 ### 6. 🧠 Targeted Fishing Experience (EXP) Balancing
 * **100% Vanilla EXP for Standard Fish ($D < 85$)**: Preserves vanilla experience progression exactly for common and mid-tier fish (Carp 8 EXP, Catfish 28 EXP, etc.).
@@ -62,13 +62,13 @@ All options can be configured in-game via **Generic Mod Config Menu** or in `con
 | `BaseFloor` | `20.0` | Base price floor before difficulty scaling. |
 | `LinearFactor` | `0.80` | Linear difficulty multiplier. |
 | `MidTierFactor` | `25.0` | Mid-tier quadratic factor ((D/50)^2). |
-| `ApexFactor` | `0.91252` | Apex scaling factor for D > 50. |
+| `ApexFactor` | `0.9293` | Apex scaling factor for D > 50. |
 | `ApexExponent` | `4.34` | Exponential power for D > 50. |
-| `LegendaryFishMultiplierBonus` | `1.00` | Legendary prize multiplier (+100%). |
+| `LegendaryFishMultiplierBonus` | `0.00` | Legendary prize multiplier bonus (Legend anchored strictly at 5,000g). |
 | `EnablePredictableHashBonus` | `true` | Enables deterministic 0%–8% species hash bonus. |
 | `EnableFishingChestBuff` | `true` | Enable decaying-roll enhancement for treasure chests. |
-| `FishingChestDecayRate` | `0.60` | Roll probability decay for standard chests (vanilla 0.40). |
-| `GoldenChestDecayRate` | `0.80` | Roll probability decay for golden chests (vanilla 0.60). |
+| `FishingChestDecayRate` | `0.45` | Roll probability decay for standard chests. |
+| `GoldenChestDecayRate` | `0.60` | Roll probability decay for golden chests. |
 | `EnableFishingExpBalancing` | `true` | Enables targeted fishing experience balancing. |
 | `ApexFishExpBonus` | `15` | Bonus EXP for hard non-legendary fish (D >= 85). |
 | `LegendaryFishExpBonus` | `60` | Bonus EXP for Legendary fish catches. |

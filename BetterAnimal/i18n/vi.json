@@ -10,7 +10,7 @@
   "config.enable-duck-feather-loom.tooltip": "Cho phép đưa Lông vịt vào Khung cửi để dệt thành Vải lông vũ cao cấp.",
 
   "config.section.rabbits": "Cài Đặt Năng Suất Thỏ",
-  "config.enable-rabbit-cooldown-reduction.name": "Giảm Nửa Thời Gian Thu Hoạch Thỏ",
+  "config.enable-rabbit-cooldown-reduction.name": "Giảm Thời Gian Thu Hoạch Thỏ",
   "config.enable-rabbit-cooldown-reduction.tooltip": "Giảm thời gian chờ thu hoạch thỏ từ 4 ngày xuống còn 2 ngày (bằng với vịt và dê).",
   "config.rabbit-days-to-produce.name": "Số Ngày Thu Hoạch Thỏ",
   "config.rabbit-days-to-produce.tooltip": "Số ngày để thỏ sản xuất một đợt vật phẩm (mặc định: 2 ngày).",
@@ -18,12 +18,40 @@
   "config.enable-rabbit-multi-drop.tooltip": "Thỏ có tim cao (>= 3 tim) có cơ hội sản xuất thêm lông len hoặc chân thỏ may mắn.",
   "config.rabbit-multi-drop-chance.name": "Tỉ Lệ Thu Hoạch Bội Số",
   "config.rabbit-multi-drop-chance.tooltip": "Xác suất nhận thêm vật phẩm thưởng cho thỏ thân thiết (mặc định: 0.35 = 35%).",
-  "config.enable-rabbit-foot-rebalance.name": "Tái Cân Bằng Giá Chân Thỏ",
-  "config.enable-rabbit-foot-rebalance.tooltip": "Tái cân bằng giá bán cơ bản cho Chân Thỏ trong Data/Objects.",
-  "config.rabbit-foot-base-price.name": "Giá Cơ Bản Chân Thỏ",
-  "config.rabbit-foot-base-price.tooltip": "Giá bán cơ bản của Chân Thỏ trước khi tính sao và kỹ năng Người chăn nuôi (mặc định: 850g; 1,020g Chăn nuôi / 1,700g Iridium).",
 
   "config.section.sheep": "Cài Đặt Cừu & Lông Cừu",
   "config.enable-sheep-daily-shear.name": "Cắt Lông Hàng Ngày Khi Đạt Max Tim",
-  "config.enable-sheep-daily-shear.tooltip": "Cho phép cắt lông cừu mỗi ngày một lần khi cừu đạt đủ 5 tim tình cảm."
+  "config.enable-sheep-daily-shear.tooltip": "Cho phép cắt lông cừu mỗi ngày một lần khi cừu đạt đủ 5 tim tình cảm.",
+
+  "config.section.dinosaurs": "Cài Đặt Năng Suất Khủng Long",
+  "config.enable-dinosaur-cooldown-reduction.name": "Giảm Thời Gian Đẻ Trứng Khủng Long",
+  "config.enable-dinosaur-cooldown-reduction.tooltip": "Giảm thời gian đẻ trứng của Khủng Long từ 7 ngày xuống còn 3 ngày.",
+  "config.dinosaur-days-to-produce.name": "Số Ngày Đẻ Trứng Khủng Long",
+  "config.dinosaur-days-to-produce.tooltip": "Số ngày để Khủng Long đẻ một quả trứng (mặc định: 3 ngày).",
+  "config.enable-dinosaur-multi-drop.name": "Bật Đẻ Trứng Kép Cho Khủng Long",
+  "config.enable-dinosaur-multi-drop.tooltip": "Khủng Long thân thiết (>= 4 tim) có cơ hội đẻ thêm quả trứng thứ hai.",
+  "config.dinosaur-multi-drop-chance.name": "Tỉ Lệ Đẻ Trứng Kép",
+  "config.dinosaur-multi-drop-chance.tooltip": "Xác suất đẻ thêm trứng ở mức tim cao (mặc định: 0.25 = 25%).",
+
+  "config.section.goats": "Cài Đặt Năng Suất Dê",
+  "config.enable-goat-multi-drop.name": "Bật Thu Hoạch Sữa Dê Bội Số",
+  "config.enable-goat-multi-drop.tooltip": "Dê thân thiết (>= 4 tim) có cơ hội cho thêm một bình sữa khi vắt sữa.",
+  "config.goat-multi-drop-chance.name": "Tỉ Lệ Cho Thêm Sữa Dê",
+  "config.goat-multi-drop-chance.tooltip": "Xác suất cho thêm sữa dê ở mức tim cao (mặc định: 0.35 = 35%).",
+
+  "config.section.void-chickens": "Cài Đặt Gà Hư Vô",
+  "config.enable-void-chicken-multi-drop.name": "Bật Rơi Trứng Kép Gà Hư Vô",
+  "config.enable-void-chicken-multi-drop.tooltip": "Gà Hư Vô thân thiết (>= 4 tim) có cơ hội đẻ thêm quả trứng hư vô thứ hai.",
+  "config.void-chicken-multi-drop-chance.name": "Tỉ Lệ Đẻ Trứng Kép",
+  "config.void-chicken-multi-drop-chance.tooltip": "Xác suất đẻ thêm trứng hư vô ở mức tim cao (mặc định: 0.25 = 25%).",
+
+  "config.section.slime-hutch": "Cài Đặt Chuồng Slime",
+  "config.enable-slime-ranching-balancing.name": "Bật Cân Bằng Chuồng Slime",
+  "config.enable-slime-ranching-balancing.tooltip": "Tăng giới hạn bóng slime xuất hiện mỗi ngày và tăng số lượng slime rơi ra khi làm vỡ bóng slime.",
+  "config.slime-hutch-max-balls.name": "Số Bóng Slime Tối Đa Mỗi Ngày",
+  "config.slime-hutch-max-balls.tooltip": "Số lượng bóng Slime tối đa có thể xuất hiện hàng ngày trong Chuồng Slime (mặc định: 6).",
+  "config.enable-slime-egg-press-multi-yield.name": "Bật Sản Xuất Trứng Kép Máy Ép Slime",
+  "config.enable-slime-egg-press-multi-yield.tooltip": "Cho cơ hội máy ép trứng Slime tạo ra 2 quả trứng cùng lúc khi hoàn tất.",
+  "config.slime-egg-press-double-chance.name": "Tỉ Lệ Ép Ra 2 Trứng Slime",
+  "config.slime-egg-press-double-chance.tooltip": "Xác suất nhận được 2 quả trứng từ máy ép Slime (mặc định: 0.25 = 25%)."
 }

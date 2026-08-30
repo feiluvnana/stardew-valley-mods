@@ -143,42 +143,17 @@ namespace BetterIndustry
                 double rateGold = rates.Gold;
                 double rateIridium = rates.Iridium;
 
-                // Apply Daily Luck influence (DailyLuck ranges from -0.10 to +0.10, up to +0.125)
-                double dailyLuck = Game1.player.DailyLuck;
-                double luckShift = dailyLuck * 100.0;
-                if (Math.Abs(luckShift) > 0.001)
-                {
-                    double shift = 0.50 * luckShift;
-                    rateIridium += shift;
-                    rateGold += shift;
-                    rateSilver -= shift;
-                    rateNormal -= shift;
-
-                    rateNormal = Math.Max(0.0, rateNormal);
-                    rateSilver = Math.Max(0.0, rateSilver);
-                    rateGold = Math.Max(0.0, rateGold);
-                    rateIridium = Math.Max(0.0, rateIridium);
-
-                    double sum = rateNormal + rateSilver + rateGold + rateIridium;
-                    if (sum > 0)
-                    {
-                        rateNormal = (rateNormal / sum) * 100.0;
-                        rateSilver = (rateSilver / sum) * 100.0;
-                        rateGold = (rateGold / sum) * 100.0;
-                        rateIridium = (rateIridium / sum) * 100.0;
-                    }
-                }
-
                 // Check Qi Seasoning (917)
                 List<KeyValuePair<string, int>>? seasoningList = null;
                 var testList = new List<KeyValuePair<string, int>> { new("917", 1) };
                 if (CraftingRecipe.DoesFarmerHaveAdditionalIngredientsInInventory(testList, containerContents))
                 {
                     seasoningList = testList;
-                    // Qi Seasoning turns all Normal and Silver weights directly to Gold, while Iridium remains unchanged.
+                    // Qi Seasoning turns all Normal and Silver weights directly to Gold (100% Gold floor).
                     rateGold += rateNormal + rateSilver;
                     rateNormal = 0.0;
                     rateSilver = 0.0;
+                    rateIridium = 0.0;
                 }
 
                 // Roll final quality tier based on cumulative rates
@@ -288,7 +263,7 @@ namespace BetterIndustry
             List<IInventory>? materialContainers,
             out (double Normal, double Silver, double Gold, double Iridium) rates)
         {
-            rates = (40.0, 30.0, 20.0, 10.0);
+            rates = (60.0, 25.0, 15.0, 0.0);
             var plans = new List<ConsumptionPlan>();
             double totalWeightNormal = 0.0;
             double totalWeightSilver = 0.0;
@@ -425,22 +400,21 @@ namespace BetterIndustry
 
         /// <summary>
         /// Returns the 4-level weight distribution (Normal, Silver, Gold, Iridium) contributed by an ingredient.
-        /// Every ingredient contributes 40% to its own tier, 30% to lowest remaining, 20% to 2nd highest, and 10% to highest.
-        /// Store-bought non-quality staples and regular 0-star produce contribute (40%, 30%, 20%, 10%) from Normal to Iridium.
+        /// Follows the deterministic 60/25/15 quality matrix with 0% Iridium output.
         /// </summary>
         private static (double Normal, double Silver, double Gold, double Iridium) GetIngredientWeights(Item item)
         {
             if (item == null || IsNonQualityStaple(item) || item.Quality == 0)
             {
-                return (40.0, 30.0, 20.0, 10.0);
+                return (60.0, 25.0, 15.0, 0.0);
             }
 
             return item.Quality switch
             {
-                1 => (30.0, 40.0, 20.0, 10.0), // Silver (1⭐)
-                2 => (30.0, 20.0, 40.0, 10.0), // Gold (2⭐)
-                4 => (30.0, 20.0, 10.0, 40.0), // Iridium (4⭐)
-                _ => (40.0, 30.0, 20.0, 10.0)
+                1 => (25.0, 60.0, 15.0, 0.0), // Silver (1⭐)
+                2 => (15.0, 25.0, 60.0, 0.0), // Gold (2⭐)
+                4 => (0.0, 25.0, 75.0, 0.0),  // Iridium (4⭐) -> Max Gold
+                _ => (60.0, 25.0, 15.0, 0.0)
             };
         }
 

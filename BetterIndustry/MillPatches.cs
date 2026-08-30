@@ -102,83 +102,42 @@ namespace BetterIndustry
                     int totalUnitsToRoll = item.Stack;
                     int inputQuality = item.Quality;
 
-                    // Calculate quality distribution for this input quality
-                    double rateNormal;
+                    // Calculate quality distribution for this input quality (60/25/15 with 0% Iridium)
                     double rateSilver;
                     double rateGold;
-                    double rateIridium;
 
                     switch (inputQuality)
                     {
                         case 1: // Silver (1⭐)
-                            rateNormal = 15.0;
-                            rateSilver = 55.0;
-                            rateGold = 25.0;
-                            rateIridium = 5.0;
+                            rateSilver = 60.0;
+                            rateGold = 15.0;
                             break;
 
                         case 2: // Gold (2⭐)
-                            rateNormal = 0.0;
                             rateSilver = 25.0;
-                            rateGold = 55.0;
-                            rateIridium = 20.0;
+                            rateGold = 60.0;
                             break;
 
                         case 4: // Iridium (4⭐)
-                            rateNormal = 0.0;
-                            rateSilver = 0.0;
-                            rateGold = 35.0;
-                            rateIridium = 65.0;
+                            rateSilver = 25.0;
+                            rateGold = 75.0;
                             break;
 
                         default: // Normal (0⭐)
-                            rateNormal = 65.0;
                             rateSilver = 25.0;
-                            rateGold = 10.0;
-                            rateIridium = 0.0;
+                            rateGold = 15.0;
                             break;
                     }
 
-                    // Apply Daily Luck influence
-                    if (Config.ApplyDailyLuckToMachines)
-                    {
-                        double dailyLuck = Game1.player?.DailyLuck ?? 0.0;
-                        double luckShift = dailyLuck * 100.0;
-                        if (Math.Abs(luckShift) > 0.001)
-                        {
-                            double shift = 0.50 * luckShift;
-                            rateIridium += shift;
-                            rateGold += shift;
-                            rateSilver -= shift;
-                            rateNormal -= shift;
-
-                            rateNormal = Math.Max(0.0, rateNormal);
-                            rateSilver = Math.Max(0.0, rateSilver);
-                            rateGold = Math.Max(0.0, rateGold);
-                            rateIridium = Math.Max(0.0, rateIridium);
-
-                            double sum = rateNormal + rateSilver + rateGold + rateIridium;
-                            if (sum > 0)
-                            {
-                                rateNormal = (rateNormal / sum) * 100.0;
-                                rateSilver = (rateSilver / sum) * 100.0;
-                                rateGold = (rateGold / sum) * 100.0;
-                                rateIridium = (rateIridium / sum) * 100.0;
-                            }
-                        }
-                    }
-
-                    // Process each unit and roll output quality
+                    // Process each unit and roll output quality (0% Iridium)
                     for (int i = 0; i < totalUnitsToRoll; i++)
                     {
                         double roll = Game1.random.NextDouble() * 100.0;
                         int outputQuality;
 
-                        if (roll < rateIridium)
-                            outputQuality = 4;
-                        else if (roll < rateIridium + rateGold)
+                        if (roll < rateGold)
                             outputQuality = 2;
-                        else if (roll < rateIridium + rateGold + rateSilver)
+                        else if (roll < rateGold + rateSilver)
                             outputQuality = 1;
                         else
                             outputQuality = 0;

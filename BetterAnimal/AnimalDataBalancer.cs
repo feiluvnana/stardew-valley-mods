@@ -3,12 +3,11 @@ using StardewModdingAPI.Events;
 using StardewValley.GameData;
 using StardewValley.GameData.FarmAnimals;
 using StardewValley.GameData.Machines;
-using StardewValley.GameData.Objects;
 
 namespace BetterAnimal
 {
     /// <summary>
-    /// Manages data edits for Data/FarmAnimals, Data/Objects, and Data/Machines (Loom).
+    /// Manages data edits for Data/FarmAnimals and Data/Machines (Loom).
     /// </summary>
     public static class AnimalDataBalancer
     {
@@ -35,21 +34,6 @@ namespace BetterAnimal
                     }
                 }, AssetEditPriority.Late);
             }
-            else if (e.NameWithoutLocale.IsEquivalentTo("Data/Objects"))
-            {
-                e.Edit(asset =>
-                {
-                    try
-                    {
-                        var data = asset.AsDictionary<string, ObjectData>().Data;
-                        ApplyObjectEdits(data);
-                    }
-                    catch (Exception ex)
-                    {
-                        Monitor.Log($"Error applying object edits in AnimalDataBalancer: {ex}", LogLevel.Error);
-                    }
-                }, AssetEditPriority.Late);
-            }
             else if (e.NameWithoutLocale.IsEquivalentTo("Data/Machines"))
             {
                 e.Edit(asset =>
@@ -68,35 +52,24 @@ namespace BetterAnimal
         }
 
         /// <summary>
-        /// Edits Data/FarmAnimals: reduces rabbit production cooldown.
+        /// Edits Data/FarmAnimals: reduces rabbit and dinosaur production cooldowns.
         /// </summary>
         private static void ApplyFarmAnimalEdits(IDictionary<string, FarmAnimalData> data)
         {
-            if (!Config.EnableRabbitCooldownReduction)
-                return;
-
-            if (data.TryGetValue("Rabbit", out var rabbitData))
+            if (Config.EnableRabbitCooldownReduction && data.TryGetValue("Rabbit", out var rabbitData))
             {
                 rabbitData.DaysToProduce = Config.RabbitDaysToProduce;
             }
-        }
 
-        /// <summary>
-        /// Edits Data/Objects: rebalances base sell price for Rabbit's Foot.
-        /// </summary>
-        private static void ApplyObjectEdits(IDictionary<string, ObjectData> data)
-        {
-            if (!Config.EnableRabbitFootRebalance)
-                return;
-
-            if (data.TryGetValue("446", out var footData) || data.TryGetValue("(O)446", out footData))
+            if (Config.EnableDinosaurCooldownReduction && data.TryGetValue("Dinosaur", out var dinoData))
             {
-                footData.Price = Config.RabbitFootBasePrice;
+                dinoData.DaysToProduce = Config.DinosaurDaysToProduce;
             }
         }
 
         /// <summary>
-        /// Edits Data/Machines: adds a Loom recipe allowing Duck Feathers to be spun into luxury Down Cloth.
+        /// Edits Data/Machines: adds a Loom recipe allowing Duck Feathers to be spun into luxury Down Cloth
+        /// based on base feather value (250g * 1.5 = 375g base) without double-dipping.
         /// </summary>
         private static void ApplyLoomEdits(IDictionary<string, MachineData> data)
         {
@@ -141,13 +114,12 @@ namespace BetterAnimal
                         new()
                         {
                             ItemId = "(O)428",
-                            CopyPrice = true,
                             PriceModifiers = new List<QuantityModifier>
                             {
                                 new()
                                 {
-                                    Modification = QuantityModifier.ModificationType.Multiply,
-                                    Amount = 2.5f
+                                    Modification = QuantityModifier.ModificationType.Set,
+                                    Amount = 375
                                 }
                             }
                         }

@@ -146,6 +146,8 @@ namespace BetterIndustry
             configMenu.AddPageLink(ModManifest, "artisan", () => I18n.Get("config.section.artisan"));
             configMenu.AddPageLink(ModManifest, "milling", () => I18n.Get("config.section.milling"));
             configMenu.AddPageLink(ModManifest, "fruittree", () => I18n.Get("config.section.fruittree"));
+            configMenu.AddPageLink(ModManifest, "minerals", () => I18n.Get("config.section.minerals"));
+            configMenu.AddPageLink(ModManifest, "tappers", () => I18n.Get("config.section.tappers"));
 
             // ---------------- Sub-Page 1: Cooking & Food Quality ----------------
             configMenu.AddPage(
@@ -225,20 +227,23 @@ namespace BetterIndustry
                 setValue: value => Config.EnableMeadFix = value
             );
 
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.flower-mead-multiplier.name"),
+                tooltip: () => I18n.Get("config.flower-mead-multiplier.tooltip"),
+                getValue: () => Config.FlowerMeadMultiplier,
+                setValue: value => Config.FlowerMeadMultiplier = value,
+                min: 0.5f,
+                max: 3.0f,
+                interval: 0.05f
+            );
+
             configMenu.AddBoolOption(
                 mod: ModManifest,
                 name: () => I18n.Get("config.machine-quality.name"),
                 tooltip: () => I18n.Get("config.machine-quality.tooltip"),
                 getValue: () => Config.EnableMachineQuality,
                 setValue: value => Config.EnableMachineQuality = value
-            );
-
-            configMenu.AddBoolOption(
-                mod: ModManifest,
-                name: () => I18n.Get("config.machine-luck.name"),
-                tooltip: () => I18n.Get("config.machine-luck.tooltip"),
-                getValue: () => Config.ApplyDailyLuckToMachines,
-                setValue: value => Config.ApplyDailyLuckToMachines = value
             );
 
             configMenu.AddBoolOption(
@@ -258,6 +263,14 @@ namespace BetterIndustry
                 min: 1.0f,
                 max: 3.0f,
                 interval: 0.05f
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.cooking-oil-artisan-category.name"),
+                tooltip: () => I18n.Get("config.cooking-oil-artisan-category.tooltip"),
+                getValue: () => Config.EnableCookingOilArtisanCategory,
+                setValue: value => Config.EnableCookingOilArtisanCategory = value
             );
 
             configMenu.AddBoolOption(
@@ -287,11 +300,19 @@ namespace BetterIndustry
                 setValue: value => Config.EnableExpandedAging = value
             );
 
-            // ---------------- Sub-Page 3: Fruit Tree Automation ----------------
+            // ---------------- Sub-Page 3: Fruit Tree Balancing & Automation ----------------
             configMenu.AddPage(
                 mod: ModManifest,
                 pageId: "fruittree",
                 pageTitle: () => I18n.Get("config.section.fruittree")
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.enable-fruit-tree-rebalance.name"),
+                tooltip: () => I18n.Get("config.enable-fruit-tree-rebalance.tooltip"),
+                getValue: () => Config.EnableFruitTreeRebalance,
+                setValue: value => Config.EnableFruitTreeRebalance = value
             );
 
             configMenu.AddBoolOption(
@@ -375,6 +396,66 @@ namespace BetterIndustry
                 min: 20,
                 max: 500,
                 interval: 5
+            );
+
+            // ---------------- Sub-Page 5: Minerals & Monster Loot ----------------
+            configMenu.AddPage(
+                mod: ModManifest,
+                pageId: "minerals",
+                pageTitle: () => I18n.Get("config.section.minerals")
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.enable-mineral-rebalance.name"),
+                tooltip: () => I18n.Get("config.enable-mineral-rebalance.tooltip"),
+                getValue: () => Config.EnableMineralPriceRebalance,
+                setValue: value => Config.EnableMineralPriceRebalance = value
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.enable-monster-loot-rebalance.name"),
+                tooltip: () => I18n.Get("config.enable-monster-loot-rebalance.tooltip"),
+                getValue: () => Config.EnableMonsterLootRebalance,
+                setValue: value => Config.EnableMonsterLootRebalance = value
+            );
+
+            // ---------------- Sub-Page 6: Tree Tapper Productivity ----------------
+            configMenu.AddPage(
+                mod: ModManifest,
+                pageId: "tappers",
+                pageTitle: () => I18n.Get("config.section.tappers")
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.enable-tapper-multi-yield.name"),
+                tooltip: () => I18n.Get("config.enable-tapper-multi-yield.tooltip"),
+                getValue: () => Config.EnableTapperMultiYield,
+                setValue: value => Config.EnableTapperMultiYield = value
+            );
+
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.standard-tapper-double-chance.name"),
+                tooltip: () => I18n.Get("config.standard-tapper-double-chance.tooltip"),
+                getValue: () => Config.StandardTapperDoubleChance,
+                setValue: value => Config.StandardTapperDoubleChance = value,
+                min: 0.05f,
+                max: 1.0f,
+                interval: 0.05f
+            );
+
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.heavy-tapper-triple-chance.name"),
+                tooltip: () => I18n.Get("config.heavy-tapper-triple-chance.tooltip"),
+                getValue: () => Config.HeavyTapperTripleChance,
+                setValue: value => Config.HeavyTapperTripleChance = value,
+                min: 0.05f,
+                max: 1.0f,
+                interval: 0.05f
             );
         }
 

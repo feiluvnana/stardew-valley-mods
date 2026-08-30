@@ -59,6 +59,10 @@ namespace BetterAnimal
             configMenu.AddPageLink(ModManifest, "ducks", () => I18n.Get("config.section.ducks"));
             configMenu.AddPageLink(ModManifest, "rabbits", () => I18n.Get("config.section.rabbits"));
             configMenu.AddPageLink(ModManifest, "sheep", () => I18n.Get("config.section.sheep"));
+            configMenu.AddPageLink(ModManifest, "dinosaurs", () => I18n.Get("config.section.dinosaurs"));
+            configMenu.AddPageLink(ModManifest, "goats", () => I18n.Get("config.section.goats"));
+            configMenu.AddPageLink(ModManifest, "void_chickens", () => I18n.Get("config.section.void-chickens"));
+            configMenu.AddPageLink(ModManifest, "slime_hutch", () => I18n.Get("config.section.slime-hutch"));
 
             // ---------------- Sub-Page 1: Duck Balance ----------------
             configMenu.AddPage(ModManifest, "ducks", () => I18n.Get("config.section.ducks"));
@@ -140,25 +144,6 @@ namespace BetterAnimal
                 interval: 0.05f
             );
 
-            configMenu.AddBoolOption(
-                mod: ModManifest,
-                name: () => I18n.Get("config.enable-rabbit-foot-rebalance.name"),
-                tooltip: () => I18n.Get("config.enable-rabbit-foot-rebalance.tooltip"),
-                getValue: () => Config.EnableRabbitFootRebalance,
-                setValue: value => Config.EnableRabbitFootRebalance = value
-            );
-
-            configMenu.AddNumberOption(
-                mod: ModManifest,
-                name: () => I18n.Get("config.rabbit-foot-base-price.name"),
-                tooltip: () => I18n.Get("config.rabbit-foot-base-price.tooltip"),
-                getValue: () => Config.RabbitFootBasePrice,
-                setValue: value => Config.RabbitFootBasePrice = value,
-                min: 200,
-                max: 3000,
-                interval: 25
-            );
-
             // ---------------- Sub-Page 3: Sheep & Wool ----------------
             configMenu.AddPage(ModManifest, "sheep", () => I18n.Get("config.section.sheep"));
             configMenu.AddBoolOption(
@@ -168,12 +153,133 @@ namespace BetterAnimal
                 getValue: () => Config.EnableSheepDailyShearAtMaxHearts,
                 setValue: value => Config.EnableSheepDailyShearAtMaxHearts = value
             );
+
+            // ---------------- Sub-Page 4: Dinosaur Productivity ----------------
+            configMenu.AddPage(ModManifest, "dinosaurs", () => I18n.Get("config.section.dinosaurs"));
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.enable-dinosaur-cooldown-reduction.name"),
+                tooltip: () => I18n.Get("config.enable-dinosaur-cooldown-reduction.tooltip"),
+                getValue: () => Config.EnableDinosaurCooldownReduction,
+                setValue: value => Config.EnableDinosaurCooldownReduction = value
+            );
+
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.dinosaur-days-to-produce.name"),
+                tooltip: () => I18n.Get("config.dinosaur-days-to-produce.tooltip"),
+                getValue: () => Config.DinosaurDaysToProduce,
+                setValue: value => Config.DinosaurDaysToProduce = value,
+                min: 1,
+                max: 7,
+                interval: 1
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.enable-dinosaur-multi-drop.name"),
+                tooltip: () => I18n.Get("config.enable-dinosaur-multi-drop.tooltip"),
+                getValue: () => Config.EnableDinosaurMultiDrop,
+                setValue: value => Config.EnableDinosaurMultiDrop = value
+            );
+
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.dinosaur-multi-drop-chance.name"),
+                tooltip: () => I18n.Get("config.dinosaur-multi-drop-chance.tooltip"),
+                getValue: () => Config.DinosaurMultiDropChance,
+                setValue: value => Config.DinosaurMultiDropChance = value,
+                min: 0.05f,
+                max: 1.0f,
+                interval: 0.05f
+            );
+
+            // ---------------- Sub-Page 5: Goat Productivity ----------------
+            configMenu.AddPage(ModManifest, "goats", () => I18n.Get("config.section.goats"));
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.enable-goat-multi-drop.name"),
+                tooltip: () => I18n.Get("config.enable-goat-multi-drop.tooltip"),
+                getValue: () => Config.EnableGoatMultiDrop,
+                setValue: value => Config.EnableGoatMultiDrop = value
+            );
+
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.goat-multi-drop-chance.name"),
+                tooltip: () => I18n.Get("config.goat-multi-drop-chance.tooltip"),
+                getValue: () => Config.GoatMultiDropChance,
+                setValue: value => Config.GoatMultiDropChance = value,
+                min: 0.05f,
+                max: 1.0f,
+                interval: 0.05f
+            );
+
+            // ---------------- Sub-Page 6: Void Chicken Productivity ----------------
+            configMenu.AddPage(ModManifest, "void_chickens", () => I18n.Get("config.section.void-chickens"));
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.enable-void-chicken-multi-drop.name"),
+                tooltip: () => I18n.Get("config.enable-void-chicken-multi-drop.tooltip"),
+                getValue: () => Config.EnableVoidChickenMultiDrop,
+                setValue: value => Config.EnableVoidChickenMultiDrop = value
+            );
+
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.void-chicken-multi-drop-chance.name"),
+                tooltip: () => I18n.Get("config.void-chicken-multi-drop-chance.tooltip"),
+                getValue: () => Config.VoidChickenMultiDropChance,
+                setValue: value => Config.VoidChickenMultiDropChance = value,
+                min: 0.05f,
+                max: 1.0f,
+                interval: 0.05f
+            );
+
+            // ---------------- Sub-Page 7: Slime Hutch ----------------
+            configMenu.AddPage(ModManifest, "slime_hutch", () => I18n.Get("config.section.slime-hutch"));
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.enable-slime-ranching-balancing.name"),
+                tooltip: () => I18n.Get("config.enable-slime-ranching-balancing.tooltip"),
+                getValue: () => Config.EnableSlimeRanchingBalancing,
+                setValue: value => Config.EnableSlimeRanchingBalancing = value
+            );
+
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.slime-hutch-max-balls.name"),
+                tooltip: () => I18n.Get("config.slime-hutch-max-balls.tooltip"),
+                getValue: () => Config.SlimeHutchMaxBalls,
+                setValue: value => Config.SlimeHutchMaxBalls = value,
+                min: 4,
+                max: 12,
+                interval: 1
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.enable-slime-egg-press-multi-yield.name"),
+                tooltip: () => I18n.Get("config.enable-slime-egg-press-multi-yield.tooltip"),
+                getValue: () => Config.EnableSlimeEggPressMultiYield,
+                setValue: value => Config.EnableSlimeEggPressMultiYield = value
+            );
+
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.slime-egg-press-double-chance.name"),
+                tooltip: () => I18n.Get("config.slime-egg-press-double-chance.tooltip"),
+                getValue: () => Config.SlimeEggPressDoubleChance,
+                setValue: value => Config.SlimeEggPressDoubleChance = value,
+                min: 0.05f,
+                max: 1.0f,
+                interval: 0.05f
+            );
         }
 
         private void InvalidateAssetCaches()
         {
             Helper.GameContent.InvalidateCache("Data/FarmAnimals");
-            Helper.GameContent.InvalidateCache("Data/Objects");
             Helper.GameContent.InvalidateCache("Data/Machines");
         }
     }
