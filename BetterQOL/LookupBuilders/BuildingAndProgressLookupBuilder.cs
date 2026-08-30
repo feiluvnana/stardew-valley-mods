@@ -2238,14 +2238,22 @@ namespace BetterQOL
 						string dispName = itemData?.DisplayName;
 						if (string.IsNullOrEmpty(dispName) && int.TryParse(text3, out int catId) && catId < 0)
 						{
-							dispName = catId switch
+							if (catId == -1)
 							{
-								-4 => ModEntry.I18n.Get("lookup.category.any-fish").ToString(),
-								-5 => ModEntry.I18n.Get("lookup.category.any-egg").ToString(),
-								-6 => ModEntry.I18n.Get("lookup.category.any-milk").ToString(),
-								-2 => ModEntry.I18n.Get("lookup.category.any-gem").ToString(),
-								_ => ModEntry.I18n.Get("lookup.category.any-item").ToString()
-							};
+								itemData = ItemRegistry.GetData("(O)348");
+								dispName = itemData?.DisplayName ?? "Wine";
+							}
+							else
+							{
+								dispName = catId switch
+								{
+									-4 => ModEntry.I18n.Get("lookup.category.any-fish").ToString(),
+									-5 => ModEntry.I18n.Get("lookup.category.any-egg").ToString(),
+									-6 => ModEntry.I18n.Get("lookup.category.any-milk").ToString(),
+									-2 => ModEntry.I18n.Get("lookup.category.any-gem").ToString(),
+									_ => ModEntry.I18n.Get("lookup.category.any-item").ToString()
+								};
+							}
 						}
 
 						if (!string.IsNullOrEmpty(dispName) && !list.Any((LookupLink l) => l.Text.StartsWith(dispName)))

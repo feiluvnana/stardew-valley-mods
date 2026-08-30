@@ -3072,23 +3072,8 @@ namespace BetterQOL
 						}
 						string text = array3[num4];
 						int num5 = (int.TryParse(array3[num4 + 2], out var result3) ? result3 : 0);
-						int num6;
-						if (!(text == item.ItemId) && !(text == item.QualifiedItemId))
-						{
-							SObject val = (SObject)(object)((item is SObject) ? item : null);
-							num6 = ((val != null && (text == ((Item)val).ParentSheetIndex.ToString() || text == ((Item)val).ItemId)) ? 1 : 0);
-						}
-						else
-						{
-							num6 = 1;
-						}
-						bool flag = (byte)num6 != 0;
-						// Negative ingredient ids mean "any item of that Category"
-						// (e.g. -77 for "any vegetable"), so compare categories too.
-						bool flag2 = int.TryParse(text, out var result4) && result4 < 0 && item.Category == result4;
-						// The bundle may demand a minimum quality (field [num4 + 2]).
-						bool flag3 = item.Quality >= num5;
-						if (((flag | flag2) & flag3) && !list.Contains(item2))
+
+						if (MenuTooltipPatch.IsBundleIngredientMatch(item, text, num5) && !list.Contains(item2))
 						{
 							list.Add(item2);
 						}

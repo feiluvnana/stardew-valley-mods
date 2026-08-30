@@ -254,15 +254,7 @@ namespace BetterQOL
                                 string reqId = reqParts[reqIndex];
                                 int reqMinQuality = int.TryParse(reqParts[reqIndex + 2], out int q) ? q : 0;
 
-                                bool idMatch = reqId == item.ItemId ||
-                                               reqId == item.QualifiedItemId ||
-                                               (item is StardewValley.Object obj && (reqId == obj.ParentSheetIndex.ToString() || reqId == obj.ItemId));
-                                // Negative numeric ids represent item CATEGORIES (e.g. "-4" = all fish),
-                                // letting a single requirement accept any qualifying member of that category.
-                                bool catMatch = int.TryParse(reqId, out int cat) && cat < 0 && item.Category == cat;
-                                bool qualityMatch = item.Quality >= reqMinQuality;
-
-                                if ((idMatch || catMatch) && qualityMatch)
+                                if (IsBundleIngredientMatch(item, reqId, reqMinQuality))
                                 {
                                     if (!results.Contains(bundleName))
                                     {
@@ -278,6 +270,57 @@ namespace BetterQOL
             // bundles) so building a tooltip can never crash the game.
             catch { }
             return results;
+        }
+
+        /// <summary>
+        /// Accurately checks whether a candidate item satisfies a bundle ingredient requirement.
+        /// Prevents string-ID items (which have ParentSheetIndex == -1) from falsely matching "-1" (Missing Bundle Wine slot).
+        /// </summary>
+        public static bool IsBundleIngredientMatch(Item item, string reqId, int reqMinQuality)
+        {
+            if (item == null || string.IsNullOrWhiteSpace(reqId))
+                return false;
+
+            // 1. Minimum quality requirement check
+            if (item.Quality < reqMinQuality)
+                return false;
+
+            // 2. Special case: reqId == "-1" in Data/Bundles represents The Missing Bundle's Silver+ Wine slot
+            if (reqId == "-1")
+            {
+                if (item is StardewValley.Object obj)
+                {
+                    if (obj.QualifiedItemId == "(O)348" || obj.ItemId == "348" || obj.preserve.Value == StardewValley.Object.PreserveType.Wine)
+                        return true;
+                    if (obj.Category == StardewValley.Object.artisanGoodsCategory && obj.Name.EndsWith("Wine", StringComparison.OrdinalIgnoreCase))
+                        return true;
+                }
+                return false;
+            }
+
+            // 3. Exact ItemId or QualifiedItemId match
+            if (reqId == item.ItemId || reqId == item.QualifiedItemId)
+                return true;
+
+            // 4. Object ParentSheetIndex match (ONLY if positive integer, avoiding -1 string-item collisions)
+            if (item is StardewValley.Object sObj && sObj.ParentSheetIndex > 0 && reqId == sObj.ParentSheetIndex.ToString())
+                return true;
+
+            // 5. Category matching: valid category IDs are negative integers (< -1, e.g. -4 = Fish, -5 = Egg, -6 = Milk, etc.)
+            if (int.TryParse(reqId, out int catId) && catId < -1)
+            {
+                // Jellies (River Jelly, Sea Jelly, Cave Jelly) share FishCategory (-4) but are not bundle fish
+                if (catId == StardewValley.Object.FishCategory)
+                {
+                    if (item.ItemId is "RiverJelly" or "SeaJelly" or "CaveJelly" || item.QualifiedItemId is "(O)RiverJelly" or "(O)SeaJelly" or "(O)CaveJelly")
+                        return false;
+                }
+
+                if (item.Category == catId)
+                    return true;
+            }
+
+            return false;
         }
     }
 }
