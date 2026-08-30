@@ -207,7 +207,11 @@ namespace BetterFishing
                     // D. Predictable deterministic species hash bonus (0% to +8%)
                     if (Config.EnablePredictableHashBonus && !isLegendary)
                     {
-                        int hashVal = Math.Abs(cleanFishId.GetHashCode()) % 9;
+                        // Deterministic hash: .NET 6 randomizes GetHashCode() per process
+                        int deterministicHash = 0;
+                        foreach (char c in cleanFishId)
+                            deterministicHash = deterministicHash * 31 + c;
+                        int hashVal = Math.Abs(deterministicHash) % 9;
                         traitMultiplier += hashVal * 0.01f;
                     }
 

@@ -151,5 +151,21 @@
   "config.enable-omni-geodes.name": "Bật Hốc Tinh Toàn Năng",
   "config.enable-omni-geodes.tooltip": "Cho phép Hốc tinh toàn năng xuất hiện.",
   "config.enable-calico-eggs.name": "Bật Trứng Calico",
-  "config.enable-calico-eggs.tooltip": "Cho phép Trứng Calico xuất hiện."
+  "config.enable-calico-eggs.tooltip": "Cho phép Trứng Calico xuất hiện.",
+  "config.enable-prismatic-shard.name": "Bật Mảnh Ngũ Sắc",
+  "config.enable-prismatic-shard.tooltip": "Cho phép Mảnh Ngũ Sắc xuất hiện.",
+  "config.enable-magic-rock-candy.name": "Bật Kẹo Đá Ma Thuật",
+  "config.enable-magic-rock-candy.tooltip": "Cho phép Kẹo Đá Ma Thuật xuất hiện.",
+  "config.enable-golden-animal-cracker.name": "Bật Bánh Quy Động Vật Vàng",
+  "config.enable-golden-animal-cracker.tooltip": "Cho phép Bánh Quy Động Vật Vàng xuất hiện.",
+  "config.enable-galaxy-soul.name": "Bật Linh Hồn Thiên Hà",
+  "config.enable-galaxy-soul.tooltip": "Cho phép Linh Hồn Thiên Hà xuất hiện.",
+  "config.enable-prize-ticket.name": "Bật Vé Đổi Thưởng",
+  "config.enable-prize-ticket.tooltip": "Cho phép Vé Đổi Thưởng xuất hiện.",
+  "config.enable-stardrop-tea.name": "Bật Trà Stardrop",
+  "config.enable-stardrop-tea.tooltip": "Cho phép Trà Stardrop xuất hiện.",
+  "config.enable-sprinklers.name": "Bật Vòi Phun Nước",
+  "config.enable-sprinklers.tooltip": "Cho phép Vòi Phun Nước xuất hiện.",
+  "config.enable-artifact-troves.name": "Bật Rương Cổ Vật",
+  "config.enable-artifact-troves.tooltip": "Cho phép Rương Cổ Vật xuất hiện."
 }

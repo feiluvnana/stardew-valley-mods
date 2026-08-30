@@ -147,11 +147,15 @@ namespace BetterChest
                     }
 
                     // If filtering emptied the chest entirely, guarantee a consolation prize.
+                    if (__instance.modData.ContainsKey("BetterChest.Looted"))
+                        return;
+
                     if (__instance.Items.Count == 0)
                     {
                         Item fallback = ItemRegistry.Create("(O)337", Game1.random.Next(3, 8)); // 3-7x Iridium Bar
                         __instance.addItem(fallback);
                     }
+                    __instance.modData["BetterChest.Looted"] = "true";
                 }
 
                 // Mark this player/chest pair as done so the prefix does nothing next time.

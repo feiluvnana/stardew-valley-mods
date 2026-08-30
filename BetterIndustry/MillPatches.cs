@@ -156,9 +156,24 @@ namespace BetterIndustry
                     }
                 }
 
-                // Clear input chest as items have been milled
-                inputChest.Items.Clear();
-                return false; // Skip vanilla dayUpdate for Mill to prevent duplicate processing
+                // Remove only the items that were successfully processed
+                foreach (Item processed in itemsToProcess)
+                {
+                    if (processed != null)
+                    {
+                        string pid = processed.ItemId;
+                        string pqid = processed.QualifiedItemId;
+                        // Only remove items this mod actually processed (Wheat, Beet, Unmilled Rice)
+                        if (pid == "262" || pqid == "(O)262" ||
+                            pid == "284" || pqid == "(O)284" ||
+                            pid == "271" || pqid == "(O)271")
+                        {
+                            inputChest.Items.Remove(processed);
+                        }
+                    }
+                }
+                // Return true to let vanilla handle any remaining unrecognized items
+                return true;
             }
             catch (Exception ex)
             {

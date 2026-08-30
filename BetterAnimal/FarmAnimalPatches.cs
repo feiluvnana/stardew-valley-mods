@@ -34,6 +34,7 @@ namespace BetterAnimal
                 {
                     harmony.Patch(
                         original: animalDayUpdate,
+                        prefix: new HarmonyMethod(typeof(FarmAnimalPatches), nameof(DayUpdate_Prefix)),
                         postfix: new HarmonyMethod(typeof(FarmAnimalPatches), nameof(DayUpdate_Postfix))
                     );
                     Monitor.Log("Hooked FarmAnimal.dayUpdate successfully.", LogLevel.Trace);
@@ -58,7 +59,7 @@ namespace BetterAnimal
                 var removeAction = AccessTools.Method(
                     typeof(StardewValley.Object),
                     nameof(StardewValley.Object.performRemoveAction),
-                    new[] { typeof(GameLocation) }
+                    new[] { typeof(Vector2), typeof(GameLocation) }
                 );
                 if (removeAction != null)
                 {
@@ -98,11 +99,16 @@ namespace BetterAnimal
             }
         }
 
+        public static void DayUpdate_Prefix(FarmAnimal __instance, out (string produce, int quality) __state)
+        {
+            __state = (__instance.currentProduce?.Value ?? string.Empty, __instance.produceQuality?.Value ?? 0);
+        }
+
         /// <summary>
         /// Postfix on FarmAnimal.dayUpdate: evaluates produce and grants multi-drops for
         /// ducks, rabbits, goats, dinosaurs, void chickens, and daily wool for happy sheep.
         /// </summary>
-        public static void DayUpdate_Postfix(FarmAnimal __instance, GameLocation environtment)
+        public static void DayUpdate_Postfix(FarmAnimal __instance, GameLocation environtment, (string produce, int quality) __state)
         {
             if (__instance == null)
                 return;
@@ -111,7 +117,7 @@ namespace BetterAnimal
             {
                 string animalType = __instance.type?.Value ?? string.Empty;
                 int hearts = __instance.friendshipTowardFarmer.Value / 200;
-                string currentProduce = __instance.currentProduce?.Value ?? string.Empty;
+                string currentProduce = __state.produce;
 
                 // 1. Duck Dual Drop: When a high-friendship duck rolls a Feather, grant the Duck Egg as well
                 if (Config.EnableDuckDualDrop && animalType.Contains("Duck", StringComparison.OrdinalIgnoreCase))
@@ -122,7 +128,7 @@ namespace BetterAnimal
                         double rollChance = hearts >= 5 ? Config.DuckDualDropChance : (Config.DuckDualDropChance * 0.75);
                         if (Game1.random.NextDouble() <= rollChance)
                         {
-                            int quality = __instance.produceQuality?.Value ?? 0;
+                            int quality = __state.quality;
                             SpawnProduce(__instance, "442", quality); // Duck Egg (442)
                             Monitor.Log($"BetterAnimal: High-friendship duck '{__instance.Name}' dropped bonus Duck Egg alongside Duck Feather.", LogLevel.Trace);
                         }
@@ -137,7 +143,7 @@ namespace BetterAnimal
                         if (Game1.random.NextDouble() <= Config.RabbitMultiDropChance)
                         {
                             string bonusItemId = (Game1.random.NextDouble() < (0.15 + (hearts * 0.05))) ? "446" : "440";
-                            int quality = __instance.produceQuality?.Value ?? 0;
+                            int quality = __state.quality;
                             SpawnProduce(__instance, bonusItemId, quality);
                             Monitor.Log($"BetterAnimal: Rabbit '{__instance.Name}' produced bonus item ID '{bonusItemId}'.", LogLevel.Trace);
                         }
@@ -152,7 +158,7 @@ namespace BetterAnimal
                     {
                         if (Game1.random.NextDouble() <= Config.GoatMultiDropChance)
                         {
-                            int quality = __instance.produceQuality?.Value ?? 0;
+                            int quality = __state.quality;
                             SpawnProduce(__instance, currentProduce, quality);
                             Monitor.Log($"BetterAnimal: Goat '{__instance.Name}' produced bonus Goat Milk.", LogLevel.Trace);
                         }
@@ -167,7 +173,7 @@ namespace BetterAnimal
                     {
                         if (Game1.random.NextDouble() <= Config.DinosaurMultiDropChance)
                         {
-                            int quality = __instance.produceQuality?.Value ?? 0;
+                            int quality = __state.quality;
                             SpawnProduce(__instance, "107", quality);
                             Monitor.Log($"BetterAnimal: Dinosaur '{__instance.Name}' laid a bonus Dinosaur Egg.", LogLevel.Trace);
                         }
@@ -182,7 +188,7 @@ namespace BetterAnimal
                     {
                         if (Game1.random.NextDouble() <= Config.VoidChickenMultiDropChance)
                         {
-                            int quality = __instance.produceQuality?.Value ?? 0;
+                            int quality = __state.quality;
                             SpawnProduce(__instance, "305", quality);
                             Monitor.Log($"BetterAnimal: Void Chicken '{__instance.Name}' laid a bonus Void Egg.", LogLevel.Trace);
                         }
@@ -194,7 +200,7 @@ namespace BetterAnimal
                 {
                     if (hearts >= 5)
                     {
-                        __instance.daysSinceLastLay.Value = 1;
+                        __instance.daysSinceLastLay.Value = 2; // Sheep daysToLay is 3 in vanilla; set to 3-1=2 so next dayUpdate produces wool
                     }
                 }
             }
@@ -257,7 +263,7 @@ namespace BetterAnimal
         /// <summary>
         /// Postfix on Object.performRemoveAction: drops bonus raw slimes when popping a Slime Ball.
         /// </summary>
-        public static void PerformRemoveAction_Postfix(StardewValley.Object __instance, GameLocation location)
+        public static void PerformRemoveAction_Postfix(StardewValley.Object __instance, Vector2 tileLocation, GameLocation location)
         {
             if (!Config.EnableSlimeRanchingBalancing || __instance == null || location == null)
                 return;
@@ -267,7 +273,7 @@ namespace BetterAnimal
                 if (__instance.ItemId == "56" || __instance.QualifiedItemId == "(BC)56")
                 {
                     // Spawn an extra 10 raw slimes (yielding ~20-30 total per ball)
-                    Game1.createMultipleObjectDebris("(O)766", (int)__instance.TileLocation.X, (int)__instance.TileLocation.Y, 10, location);
+                    Game1.createMultipleObjectDebris("(O)766", (int)tileLocation.X, (int)tileLocation.Y, 10, location);
                 }
             }
             catch (Exception ex)
@@ -321,13 +327,14 @@ namespace BetterAnimal
             {
                 Quality = quality
             };
+            obj.IsSpawnedObject = true;
 
             if (animal.home?.indoors?.Value is AnimalHouse animalHouse)
             {
                 // 1. Try depositing into an Auto-Grabber inside the building
                 foreach (var placement in animalHouse.Objects.Values)
                 {
-                    if (placement is Chest grabber && (placement.ItemId == "165" || placement.QualifiedItemId == "(BC)165" || placement.Name.Contains("Auto-Grabber")))
+                    if (placement.QualifiedItemId == "(BC)165" && placement.heldObject.Value is Chest grabber)
                     {
                         Item? remaining = grabber.addItem(obj);
                         if (remaining == null)
@@ -341,6 +348,7 @@ namespace BetterAnimal
 
                 if (!animalHouse.Objects.ContainsKey(originTile))
                 {
+                    obj.TileLocation = originTile;
                     animalHouse.Objects.Add(originTile, obj);
                     return;
                 }
@@ -352,7 +360,8 @@ namespace BetterAnimal
                     {
                         Vector2 candidate = new(originTile.X + dx, originTile.Y + dy);
                         if (animalHouse.isTileOnMap(candidate) && !animalHouse.Objects.ContainsKey(candidate))
-                            {
+                        {
+                            obj.TileLocation = candidate;
                             animalHouse.Objects.Add(candidate, obj);
                             return;
                         }

@@ -93,16 +93,8 @@ namespace BetterFishing
             if (location == null)
                 return false;
 
-            if (location is StardewValley.Locations.Beach)
-                return true;
-
-            string name = location.Name ?? "";
-            return name.StartsWith("Beach", StringComparison.OrdinalIgnoreCase) ||
-                   name.StartsWith("IslandSouth", StringComparison.OrdinalIgnoreCase) ||
-                   name.StartsWith("IslandEast", StringComparison.OrdinalIgnoreCase) ||
-                   name.StartsWith("IslandWest", StringComparison.OrdinalIgnoreCase) ||
-                   name.StartsWith("IslandSouthEast", StringComparison.OrdinalIgnoreCase) ||
-                   name.Equals("PirateCove", StringComparison.OrdinalIgnoreCase);
+            // Use vanilla API to correctly handle all locations including Beach Farm
+            return location.catchOceanCrabPotFishFromThisSpot(x, y);
         }
 
         private static string GetRandomOceanCatch(Random r, bool deluxeBait)

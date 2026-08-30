@@ -519,7 +519,7 @@ namespace BetterForge
 
             // 4. Parrot Egg: 2x Gold Coins & 35% Chance for Extra Loot Drop
             // "Health <= damageAmount" predicts the killing blow.
-            if ((monster.Health <= 0 || monster.Health <= damageAmount) && trinketId.Contains("parrot") && TrinketAscensionLogic.IsAscended(__instance))
+            if (monster.Health <= 0 && trinketId.Contains("parrot") && TrinketAscensionLogic.IsAscended(__instance))
             {
                 farmer.Money += 25 + Game1.random.Next(25); // bonus 25-49 g
                 Game1.playSound("money");
@@ -648,7 +648,7 @@ namespace BetterForge
                                 {
                                     location.playSound("hitEnemy");
                                 }
-                                location.damageMonster(monster.GetBoundingBox(), dmg, dmg + 1, isCrit, farmer, true);
+                                location.damageMonster(monster.GetBoundingBox(), dmg, dmg + 1, false, farmer, true);
                                 Game1.createRadialDebris(location, 12, (int)monster.Position.X + 32, (int)monster.Position.Y + 32, isCrit ? 6 : 4, false);
                             }
                         }

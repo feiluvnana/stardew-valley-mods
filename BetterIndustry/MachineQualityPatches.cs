@@ -89,7 +89,7 @@ namespace BetterIndustry
                     {
                         if (__instance.ItemId != "264" && __instance.QualifiedItemId != "(BC)264" && !__instance.Name.Contains("Heavy", StringComparison.OrdinalIgnoreCase))
                         {
-                            if (Game1.random.NextDouble() <= Config.StandardTapperDoubleChance)
+                            if (__instance.heldObject.Value.Stack == 1 && Game1.random.NextDouble() <= Config.StandardTapperDoubleChance)
                             {
                                 __instance.heldObject.Value.Stack = 2;
                             }

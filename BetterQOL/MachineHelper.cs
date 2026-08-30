@@ -142,7 +142,7 @@ namespace BetterQOL
             // Plain chests shouldn't get a machine tooltip, BUT the Auto-Grabber is
             // internally a chest subclass, so it's exempted by id/name checks.
             // StringComparison.OrdinalIgnoreCase makes name tests case-insensitive.
-            if (obj is Chest chest && !chest.QualifiedItemId.Contains("165") && !chest.Name.Contains("Auto-Grabber", StringComparison.OrdinalIgnoreCase))
+            if (obj is Chest chest && chest.QualifiedItemId != "(BC)165" && !chest.Name.Contains("Auto-Grabber", StringComparison.OrdinalIgnoreCase))
             {
                 return null;
             }
@@ -161,7 +161,7 @@ namespace BetterQOL
             // Check special machines
             // Vanilla identifies some odd devices inconsistently, so each check tries
             // BOTH an id fragment AND the display name as a fallback ("||" = OR).
-            bool isAutoGrabber = qualifiedId.Contains("165") || name.Contains("Auto-Grabber", StringComparison.OrdinalIgnoreCase);
+            bool isAutoGrabber = qualifiedId == "(BC)165" || name.Contains("Auto-Grabber", StringComparison.OrdinalIgnoreCase);
             bool isCoffeeMaker = qualifiedId.Contains("246") || name.Contains("Coffee Maker", StringComparison.OrdinalIgnoreCase);
             bool isWorkbench = qualifiedId.Contains("208") || name.Contains("Workbench", StringComparison.OrdinalIgnoreCase);
             bool isSewingMachine = qualifiedId.Contains("247") || qualifiedId.Contains("SewingMachine", StringComparison.OrdinalIgnoreCase) || name.Contains("Sewing Machine", StringComparison.OrdinalIgnoreCase);

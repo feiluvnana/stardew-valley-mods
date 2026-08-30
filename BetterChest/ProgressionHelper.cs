@@ -172,8 +172,8 @@ namespace BetterChest
                 // interpolation ($"...{i}") builds names like "hasClaimedMastery_2".
                 for (int i = 0; i < 5; i++)
                 {
-                    if (player.mailReceived.Contains($"hasClaimedMastery_{i}") ||
-                        player.hasOrWillReceiveMail($"hasClaimedMastery_{i}"))
+                    if (player.mailReceived.Contains($"mastery_{i}") ||
+                        player.hasOrWillReceiveMail($"mastery_{i}"))
                     {
                         return true;
                     }
@@ -200,8 +200,8 @@ namespace BetterChest
 
             if (skillIndex >= 0)
             {
-                return player.mailReceived.Contains($"hasClaimedMastery_{skillIndex}") ||
-                       player.hasOrWillReceiveMail($"hasClaimedMastery_{skillIndex}");
+                return player.mailReceived.Contains($"mastery_{skillIndex}") ||
+                       player.hasOrWillReceiveMail($"mastery_{skillIndex}");
             }
 
             return false;

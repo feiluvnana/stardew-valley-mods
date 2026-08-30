@@ -335,7 +335,10 @@ namespace BetterChest
                     config.Floor100Roll6Chance,
                     config.Floor100Roll7Chance,
                     config.Floor100Roll8Chance,
-                    config.Floor100Roll9Chance
+                    config.Floor100Roll9Chance,
+                    config.Floor100Roll10Chance,
+                    config.Floor100Roll11Chance,
+                    config.Floor100Roll12Chance
                 };
             }
             else if (isShallowFloor)
@@ -363,7 +366,9 @@ namespace BetterChest
                     config.Roll3Chance,
                     config.Roll4Chance,
                     config.Roll5Chance,
-                    config.Roll6Chance
+                    config.Roll6Chance,
+                    config.Roll7Chance,
+                    config.Roll8Chance
                 };
             }
 

@@ -291,6 +291,29 @@ namespace BetterForge
         /// <returns>The winning generation seed that was applied.</returns>
         public static int ProcessReforge(Trinket trinket, Farmer who, ModConfig config)
         {
+            // When PreventDowngrades is off, simply reroll once without any upgrade protection
+            if (!config.PreventDowngrades)
+            {
+                int randomSeed = Game1.random.Next();
+                trinket.RerollStats(randomSeed);
+                ResetCachedDescription(trinket, who);
+
+                var eval = Evaluate(trinket.ItemId, randomSeed);
+                if (config.ShowReforgeSuccessMessage)
+                {
+                    if (eval.IsMaxRoll)
+                    {
+                        Game1.addHUDMessage(new HUDMessage(ModEntry.I18n.Get("hud.reforge-perfect", new { item = trinket.DisplayName }), 1));
+                        who.currentLocation.playSound("yoba");
+                    }
+                    else
+                    {
+                        Game1.addHUDMessage(new HUDMessage(ModEntry.I18n.Get("hud.reforge-upgrade", new { item = trinket.DisplayName, tier = eval.Tier, maxTier = eval.MaxTier }), 1));
+                    }
+                }
+                return randomSeed;
+            }
+
             // Grade what the trinket currently has, so we know the bar to beat.
             int currentSeed = trinket.generationSeed.Value;
             var currentEval = Evaluate(trinket.ItemId, currentSeed);

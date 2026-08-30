@@ -99,7 +99,7 @@ namespace BetterIndustry
                     // 1. Flower Honey Mead Fix
                     if (Config.EnableMeadFix && IsMeadOutput(rule, output))
                     {
-                        output.PreserveId = "DROP_IN_PRESERVE_ID";
+                        output.PreserveId = "DROP_IN_ID";
                         output.CopyPrice = true;
                         output.PriceModifiers = new List<QuantityModifier>
                         {

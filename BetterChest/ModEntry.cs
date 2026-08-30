@@ -346,6 +346,14 @@ namespace BetterChest
             AddBool(configMenu, "enable-mystery-boxes", () => Config.EnableMysteryBoxes, v => Config.EnableMysteryBoxes = v);
             AddBool(configMenu, "enable-omni-geodes", () => Config.EnableOmniGeodes, v => Config.EnableOmniGeodes = v);
             AddBool(configMenu, "enable-calico-eggs", () => Config.EnableCalicoEggs, v => Config.EnableCalicoEggs = v);
+            AddBool(configMenu, "enable-prismatic-shard", () => Config.EnablePrismaticShard, v => Config.EnablePrismaticShard = v);
+            AddBool(configMenu, "enable-magic-rock-candy", () => Config.EnableMagicRockCandy, v => Config.EnableMagicRockCandy = v);
+            AddBool(configMenu, "enable-golden-animal-cracker", () => Config.EnableGoldenAnimalCracker, v => Config.EnableGoldenAnimalCracker = v);
+            AddBool(configMenu, "enable-galaxy-soul", () => Config.EnableGalaxySoul, v => Config.EnableGalaxySoul = v);
+            AddBool(configMenu, "enable-prize-ticket", () => Config.EnablePrizeTicket, v => Config.EnablePrizeTicket = v);
+            AddBool(configMenu, "enable-stardrop-tea", () => Config.EnableStardropTea, v => Config.EnableStardropTea = v);
+            AddBool(configMenu, "enable-sprinklers", () => Config.EnableSprinklers, v => Config.EnableSprinklers = v);
+            AddBool(configMenu, "enable-artifact-troves", () => Config.EnableArtifactTroves, v => Config.EnableArtifactTroves = v);
         }
 
         // =====================================================================

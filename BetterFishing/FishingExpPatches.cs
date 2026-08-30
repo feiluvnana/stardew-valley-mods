@@ -81,12 +81,15 @@ namespace BetterFishing
             if (isBossFishIndex == -1) isBossFishIndex = 9;
             if (fishIdIndex == -1) fishIdIndex = 1;
 
+            bool patched = false;
             for (int i = 0; i < codes.Count; i++)
             {
-                // Match ldc.i4.3 followed by div (calculating fishDifficulty / 3)
-                if (i + 1 < codes.Count &&
+                // Match ldarg fishDifficulty followed by ldc.i4.3 followed by div
+                if (!patched && i + 1 < codes.Count &&
                     codes[i].opcode == OpCodes.Ldc_I4_3 &&
-                    codes[i + 1].opcode == OpCodes.Div)
+                    codes[i + 1].opcode == OpCodes.Div &&
+                    i > 0 && codes[i - 1].opcode == OpCodes.Ldarg_S &&
+                    codes[i - 1].operand is byte argIdx && argIdx == 4) // fishDifficulty is arg 4 (index 3 + 1 for 'this')
                 {
                     // Replace ldc.i4.3 with ldarg for isBossFish
                     codes[i].opcode = OpCodes.Ldarg_S;
@@ -99,11 +102,14 @@ namespace BetterFishing
                     codes[i + 2].opcode = OpCodes.Call;
                     codes[i + 2].operand = AccessTools.Method(typeof(FishingExpPatches), nameof(ComputeDifficultyExp));
 
+                    patched = true;
                     i += 2;
-                    continue;
                 }
+            }
 
-                yield return codes[i];
+            foreach (var code in codes)
+            {
+                yield return code;
             }
         }
 

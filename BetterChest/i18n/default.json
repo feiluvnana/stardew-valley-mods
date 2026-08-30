@@ -151,5 +151,21 @@
   "config.enable-omni-geodes.name": "Enable Omni Geodes",
   "config.enable-omni-geodes.tooltip": "Allow Omni Geodes to appear.",
   "config.enable-calico-eggs.name": "Enable Calico Eggs",
-  "config.enable-calico-eggs.tooltip": "Allow Calico Eggs to appear."
+  "config.enable-calico-eggs.tooltip": "Allow Calico Eggs to appear.",
+  "config.enable-prismatic-shard.name": "Enable Prismatic Shard",
+  "config.enable-prismatic-shard.tooltip": "Allow Prismatic Shards to appear.",
+  "config.enable-magic-rock-candy.name": "Enable Magic Rock Candy",
+  "config.enable-magic-rock-candy.tooltip": "Allow Magic Rock Candy to appear.",
+  "config.enable-golden-animal-cracker.name": "Enable Golden Animal Cracker",
+  "config.enable-golden-animal-cracker.tooltip": "Allow Golden Animal Crackers to appear.",
+  "config.enable-galaxy-soul.name": "Enable Galaxy Soul",
+  "config.enable-galaxy-soul.tooltip": "Allow Galaxy Souls to appear.",
+  "config.enable-prize-ticket.name": "Enable Prize Ticket",
+  "config.enable-prize-ticket.tooltip": "Allow Prize Tickets to appear.",
+  "config.enable-stardrop-tea.name": "Enable Stardrop Tea",
+  "config.enable-stardrop-tea.tooltip": "Allow Stardrop Tea to appear.",
+  "config.enable-sprinklers.name": "Enable Sprinklers",
+  "config.enable-sprinklers.tooltip": "Allow Sprinklers to appear.",
+  "config.enable-artifact-troves.name": "Enable Artifact Troves",
+  "config.enable-artifact-troves.tooltip": "Allow Artifact Troves to appear."
 }

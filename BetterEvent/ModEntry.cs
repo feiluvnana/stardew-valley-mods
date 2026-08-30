@@ -10,6 +10,8 @@ using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.GameData;
 using Common;
+using System;
+using System.Linq;
 
 namespace BetterEvent
 {
@@ -20,6 +22,7 @@ namespace BetterEvent
     /// </summary>
     public class ModEntry : Mod
     {
+        private int _savedCalicoEggCount = 0;
         /// <summary>User settings loaded once from config.json.</summary>
         /// <remarks>
         /// All three members below are `static`: attached to the CLASS rather
@@ -155,7 +158,23 @@ namespace BetterEvent
                 Game1.player.team.itemsToRemoveOvernight.Remove("(O)CalicoEgg");
             }
 
+            if (Config.KeepEggs && _savedCalicoEggCount > 0)
+            {
+                int currentCount = Game1.player.Items
+                    .Where(i => i != null && (i.ItemId == "CalicoEgg" || i.QualifiedItemId == "(O)CalicoEgg"))
+                    .Sum(i => i.Stack);
+                int lost = _savedCalicoEggCount - currentCount;
+                if (lost > 0)
+                {
+                    var eggs = ItemRegistry.Create("(O)CalicoEgg", lost);
+                    Game1.player.addItemToInventory(eggs);
+                    Monitor.Log($"BetterEvent: Restored {lost} Calico Eggs that were removed overnight.", LogLevel.Info);
+                }
+                _savedCalicoEggCount = 0;
+            }
+
             // Invalidate cache on 1st day of month (season transition)
+            // Note: The primary invalidation happens in OnDayEnding (Day 28). This is kept as a backup.
             // New month = new season: force the festival data to regenerate so
             // the extended festival appears in whichever season just began.
             if (Game1.dayOfMonth == 1)
@@ -164,9 +183,9 @@ namespace BetterEvent
             }
 
             // Morning festival reminders for active seasons (Summer, Fall, Winter, Spring)
+            int startDay = Math.Clamp(Config.FestivalStartDay, 1, 28);
             if (IsSeasonEnabled(Game1.season))
             {
-                int startDay = Math.Clamp(Config.FestivalStartDay, 1, 28);
                 if (Game1.dayOfMonth == startDay - 1)
                 {
                     Game1.showGlobalMessage(I18n.Get("hud.festival-tomorrow"));
@@ -174,6 +193,23 @@ namespace BetterEvent
                 else if (Game1.dayOfMonth == startDay)
                 {
                     Game1.showGlobalMessage(I18n.Get("hud.festival-today"));
+                }
+            }
+            
+            if (startDay == 1 && Game1.dayOfMonth == 28)
+            {
+                // Check if next season has the festival enabled
+                Season nextSeason = Game1.season switch
+                {
+                    Season.Spring => Season.Summer,
+                    Season.Summer => Season.Fall,
+                    Season.Fall => Season.Winter,
+                    Season.Winter => Season.Spring,
+                    _ => Game1.season
+                };
+                if (IsSeasonEnabled(nextSeason))
+                {
+                    Game1.showGlobalMessage(I18n.Get("hud.festival-tomorrow"));
                 }
             }
         }
@@ -184,11 +220,23 @@ namespace BetterEvent
         /// </summary>
         private void OnDayEnding(object? sender, DayEndingEventArgs e)
         {
+            if (Config.KeepEggs)
+            {
+                _savedCalicoEggCount = Game1.player.Items
+                    .Where(i => i != null && (i.ItemId == "CalicoEgg" || i.QualifiedItemId == "(O)CalicoEgg"))
+                    .Sum(i => i.Stack);
+            }
+
             // Same defensive chain and dual-id removal as OnDayStarted above.
             if (Config.KeepEggs && Game1.player?.team?.itemsToRemoveOvernight != null)
             {
                 Game1.player.team.itemsToRemoveOvernight.Remove("CalicoEgg");
                 Game1.player.team.itemsToRemoveOvernight.Remove("(O)CalicoEgg");
+            }
+            
+            if (Game1.dayOfMonth == 28)
+            {
+                Helper.GameContent.InvalidateCache("Data/PassiveFestivals");
             }
         }
 
