@@ -69,5 +69,13 @@
   "config.enable-crab-pot-trash-reduction.name": "Enable Trash Reduction",
   "config.enable-crab-pot-trash-reduction.tooltip": "Significantly nerfs crab pot trash rates by rerolling trash catches into valid local shellfish.",
   "config.crab-pot-trash-reroll-chance.name": "Trash Reroll Chance",
-  "config.crab-pot-trash-reroll-chance.tooltip": "Probability of converting a trash roll into a genuine shellfish catch (default: 0.65 / 65%, dropping trash rates from ~38% to ~13%)."
+  "config.crab-pot-trash-reroll-chance.tooltip": "Probability of converting a trash roll into a genuine shellfish catch (default: 0.65 / 65%, dropping trash rates from ~38% to ~13%).",
+
+  "config.section.fish-ponds": "Fish Ponds & Aquaculture Settings",
+  "config.enable-fish-pond-quality.name": "Enable Fish Pond Quality",
+  "config.enable-fish-pond-quality.tooltip": "Enables star quality (Silver, Gold, Iridium) on Roe produced by Fish Ponds based on pond population and daily luck.",
+  "config.enable-caviar-rebalance.name": "Enable Caviar Rebalance",
+  "config.enable-caviar-rebalance.tooltip": "Rebalances base sell price for Sturgeon Caviar in Data/Objects.",
+  "config.caviar-base-price.name": "Caviar Base Price",
+  "config.caviar-base-price.tooltip": "Base sell price for Caviar before Artisan and star quality multipliers (default: 800g; 1,120g Artisan / 2,240g Iridium Artisan)."
 }

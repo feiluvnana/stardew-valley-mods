@@ -1,0 +1,13 @@
+{
+  "EnableDuckDualDrop": true,
+  "DuckDualDropMinHearts": 4,
+  "DuckDualDropChance": 1.0,
+  "EnableDuckFeatherLoom": true,
+  "EnableRabbitCooldownReduction": true,
+  "RabbitDaysToProduce": 2,
+  "EnableRabbitMultiDrop": true,
+  "RabbitMultiDropChance": 0.35,
+  "EnableRabbitFootRebalance": true,
+  "RabbitFootBasePrice": 850,
+  "EnableSheepDailyShearAtMaxHearts": true
+}

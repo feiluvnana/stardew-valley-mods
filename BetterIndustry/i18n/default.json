@@ -40,6 +40,20 @@
   "config.auto-fruit-drop.name": "Auto-Falling Fruit",
   "config.auto-fruit-drop.tooltip": "When a mature fruit tree holds the configured number of fruit, all of its fruit automatically falls to the ground overnight.",
   "config.fruit-drop-threshold.name": "Fruit Drop Threshold",
-  "config.fruit-drop-threshold.tooltip": "Number of fruit on a tree that triggers the auto-drop (default 3, the vanilla maximum)."
+  "config.fruit-drop-threshold.tooltip": "Number of fruit on a tree that triggers the auto-drop (default 3, the vanilla maximum).",
+
+  "config.section.milling": "Artisanal Milling Options",
+  "config.enable-mill-balancing.name": "Enable Milling Price Balance",
+  "config.enable-mill-balancing.tooltip": "Rebalances base sell prices for milled goods (Wheat Flour 90g, Sugar 80g, Rice 140g) to ensure viable agricultural processing.",
+  "config.enable-mill-artisan-category.name": "Artisan Category for Milled Goods",
+  "config.enable-mill-artisan-category.tooltip": "Assigns the Artisan Goods category (-26) to Wheat Flour, Sugar, and Rice so they benefit from the +40% Artisan profession bonus.",
+  "config.enable-mill-quality-matrix.name": "Milling Star Quality Matrix",
+  "config.enable-mill-quality-matrix.tooltip": "Enables the 40/30/20/10 quality preservation matrix for the Mill, allowing high-quality grains to produce Silver, Gold, and Iridium flour, sugar, and rice.",
+  "config.wheat-flour-base-price.name": "Wheat Flour Base Price",
+  "config.wheat-flour-base-price.tooltip": "Base sell price for Wheat Flour before quality and Artisan multipliers (default 90g).",
+  "config.sugar-base-price.name": "Sugar Base Price",
+  "config.sugar-base-price.tooltip": "Base sell price for Sugar before quality and Artisan multipliers (default 80g).",
+  "config.rice-base-price.name": "Rice Base Price",
+  "config.rice-base-price.tooltip": "Base sell price for Milled Rice before quality and Artisan multipliers (default 140g)."
 }
 

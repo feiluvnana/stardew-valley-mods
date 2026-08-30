@@ -12,8 +12,9 @@
 5. [Module 5: Vegetable Juice Buff](#-module-5-vegetable-juice-buff)
 6. [Module 6: Expanded Cask Aging](#-module-6-expanded-cask-aging)
 7. [Module 7: Fruit Tree Automation](#-module-7-fruit-tree-automation)
-8. [⚙️ Configuration (GMCM & config.json)](#️-configuration-gmcm--configjson)
-9. [🛠️ Building & Installation](#️-building--installation)
+8. [Module 8: Artisanal Milling & Grain Rebalance](#-module-8-artisanal-milling--grain-rebalance)
+9. [⚙️ Configuration (GMCM & config.json)](#️-configuration-gmcm--configjson)
+10. [🛠️ Building & Installation](#️-building--installation)
 
 ---
 
@@ -151,6 +152,17 @@ Mature fruit trees will automatically drop their ripe fruit onto the ground over
 
 ---
 
+## 🌾 Module 8: Artisanal Milling & Grain Rebalance
+
+In vanilla, the Mill is a low-margin chore building: Wheat Flour, Sugar, and Rice sell for pocket change, are excluded from the Artisan Goods profession (+40%), and strip all crop quality stars.
+
+### Features
+* **🏷️ Artisan Goods Tagging:** Assigns the Artisan Goods category (`-26`) to Wheat Flour, Sugar, and Rice so they benefit from the **+40% Artisan profession bonus**.
+* **💰 Rebalanced Base Sell Prices:** Wheat Flour (**90g**), Sugar (**80g**), and Milled Rice (**140g**).
+* **⭐ Star Quality Retention:** Processing Silver, Gold, or Iridium Wheat, Beet, or Unmilled Rice in the Mill preserves star quality into output goods via the Option 2 $40/30/20/10$ matrix!
+
+---
+
 ## ⚙️ Configuration (GMCM & config.json)
 
 ```json
@@ -170,7 +182,13 @@ Mature fruit trees will automatically drop their ripe fruit onto the ground over
   "JuiceMultiplier": 2.75,
   "EnableExpandedAging": true,
   "EnableAutoFruitDrop": true,
-  "MaxFruitsBeforeDrop": 3
+  "MaxFruitsBeforeDrop": 3,
+  "EnableMillBalancing": true,
+  "EnableMillArtisanCategory": true,
+  "EnableMillQualityMatrix": true,
+  "WheatFlourBasePrice": 90,
+  "SugarBasePrice": 80,
+  "RiceBasePrice": 140
 }
 ```
 
@@ -192,6 +210,12 @@ Mature fruit trees will automatically drop their ripe fruit onto the ground over
 | **Artisan** | `EnableExpandedAging` | `true` | bool | Allows Casks to age additional artisan goods (Vegetable Juice). |
 | **Fruit Tree** | `EnableAutoFruitDrop` | `true` | bool | Auto-drops fruit overnight when tree reaches threshold. |
 | **Fruit Tree** | `MaxFruitsBeforeDrop` | `3` | `1` – `10` (`1`) | Number of fruit on tree that triggers auto-drop. |
+| **Milling** | `EnableMillBalancing` | `true` | bool | Enables rebalanced base sell prices for milled goods. |
+| **Milling** | `EnableMillArtisanCategory` | `true` | bool | Assigns Artisan Goods category (-26) for the +40% Artisan profession bonus. |
+| **Milling** | `EnableMillQualityMatrix` | `true` | bool | Enables 40/30/20/10 quality retention matrix for grains milled in the Mill. |
+| **Milling** | `WheatFlourBasePrice` | `90` | `20` – `300` (`5`) | Base sell price for Wheat Flour (90g base / 126g Artisan). |
+| **Milling** | `SugarBasePrice` | `80` | `20` – `300` (`5`) | Base sell price for Sugar (80g base / 112g Artisan). |
+| **Milling** | `RiceBasePrice` | `140` | `20` – `500` (`5`) | Base sell price for Milled Rice (140g base / 196g Artisan). |
 
 ---
 

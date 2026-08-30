@@ -69,5 +69,13 @@
   "config.enable-crab-pot-trash-reduction.name": "Bật Giảm Tỉ Lệ Rác Lồng Bẫy",
   "config.enable-crab-pot-trash-reduction.tooltip": "Giảm mạnh tỉ lệ xuất hiện rác trong lồng bẫy bằng cách chuyển đổi ngẫu nhiên rác thành thủy sản hợp lệ của vùng nước đó.",
   "config.crab-pot-trash-reroll-chance.name": "Tỉ Lệ Chuyển Đổi Rác",
-  "config.crab-pot-trash-reroll-chance.tooltip": "Xác suất chuyển đổi một lần dính rác thành thủy sản thật (mặc định: 0.65 / 65%, kéo tỉ lệ rác từ ~38% xuống chỉ còn ~13%)."
+  "config.crab-pot-trash-reroll-chance.tooltip": "Xác suất chuyển đổi một lần dính rác thành thủy sản thật (mặc định: 0.65 / 65%, kéo tỉ lệ rác từ ~38% xuống chỉ còn ~13%).",
+
+  "config.section.fish-ponds": "Cài Đặt Ao Nuôi Cá & Thủy Sản",
+  "config.enable-fish-pond-quality.name": "Bật Phẩm Chất Trứng Cá Ao",
+  "config.enable-fish-pond-quality.tooltip": "Bật phẩm chất sao (Bạc, Vàng, Iridium) cho Trứng cá sản sinh từ Ao nuôi dựa theo số lượng cá và may mắn hàng ngày.",
+  "config.enable-caviar-rebalance.name": "Bật Tái Cân Bằng Trứng Cá Tầm Caviar",
+  "config.enable-caviar-rebalance.tooltip": "Tái cân bằng giá bán cơ bản cho Trứng cá tầm Caviar trong Data/Objects.",
+  "config.caviar-base-price.name": "Giá Cơ Bản Trứng Cá Caviar",
+  "config.caviar-base-price.tooltip": "Giá bán cơ bản cho Caviar trước khi áp dụng hệ số Nghệ nhân và phẩm chất sao (mặc định: 800g; 1,120g Nghệ nhân / 2,240g Iridium)."
 }

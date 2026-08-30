@@ -1,0 +1,29 @@
+{
+  "config.section.ducks": "Duck Balance Settings",
+  "config.enable-duck-dual-drop.name": "Enable Duck Dual Drop",
+  "config.enable-duck-dual-drop.tooltip": "When a high-friendship duck produces a Duck Feather, it also drops its regular Duck Egg, eliminating the feather revenue loss.",
+  "config.duck-dual-drop-min-hearts.name": "Dual Drop Min Hearts",
+  "config.duck-dual-drop-min-hearts.tooltip": "Minimum friendship hearts required before a duck can drop both an egg and feather together (default: 4 hearts).",
+  "config.duck-dual-drop-chance.name": "Dual Drop Chance",
+  "config.duck-dual-drop-chance.tooltip": "Probability of dropping an egg alongside a feather at 5 friendship hearts (default: 1.0 = 100% guarantee).",
+  "config.enable-duck-feather-loom.name": "Enable Loom Down Cloth",
+  "config.enable-duck-feather-loom.tooltip": "Allows Duck Feathers to be processed in the Loom into luxury Down Cloth.",
+
+  "config.section.rabbits": "Rabbit Productivity Settings",
+  "config.enable-rabbit-cooldown-reduction.name": "Halve Rabbit Cooldown",
+  "config.enable-rabbit-cooldown-reduction.tooltip": "Reduces rabbit harvest cooldown from 4 days to 2 days (matching ducks and goats).",
+  "config.rabbit-days-to-produce.name": "Rabbit Days To Produce",
+  "config.rabbit-days-to-produce.tooltip": "Number of days required between rabbit produce drops (default: 2).",
+  "config.enable-rabbit-multi-drop.name": "Enable Rabbit Multi-Drop",
+  "config.enable-rabbit-multi-drop.tooltip": "Grants high-friendship rabbits (3+ hearts) a chance to produce bonus wool or lucky feet.",
+  "config.rabbit-multi-drop-chance.name": "Multi-Drop Chance",
+  "config.rabbit-multi-drop-chance.tooltip": "Probability of bonus produce for high-friendship rabbits (default: 0.35 = 35%).",
+  "config.enable-rabbit-foot-rebalance.name": "Rebalance Rabbit's Foot Price",
+  "config.enable-rabbit-foot-rebalance.tooltip": "Rebalances base sell price for Rabbit's Foot in Data/Objects.",
+  "config.rabbit-foot-base-price.name": "Rabbit's Foot Base Price",
+  "config.rabbit-foot-base-price.tooltip": "Base sell price for Rabbit's Foot before quality and Rancher bonuses (default: 850g; 1,020g Rancher / 1,700g Iridium).",
+
+  "config.section.sheep": "Sheep & Wool Settings",
+  "config.enable-sheep-daily-shear.name": "Daily Shearing at Max Hearts",
+  "config.enable-sheep-daily-shear.tooltip": "Allows sheep to be sheared every single day once they reach 5 friendship hearts."
+}

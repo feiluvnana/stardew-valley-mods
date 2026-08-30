@@ -40,6 +40,20 @@
   "config.auto-fruit-drop.name": "Trái Tự Động Rơi Xuống",
   "config.auto-fruit-drop.tooltip": "Khi cây ăn trái trưởng thành đạt đủ số quả theo ngưỡng, toàn bộ quả sẽ tự động rơi xuống đất qua đêm.",
   "config.fruit-drop-threshold.name": "Ngưỡng Số Quả Rơi",
-  "config.fruit-drop-threshold.tooltip": "Số quả trên cây để kích hoạt rơi tự động (mặc định 3, mức tối đa gốc của trò chơi)."
+  "config.fruit-drop-threshold.tooltip": "Số quả trên cây để kích hoạt rơi tự động (mặc định 3, mức tối đa gốc của trò chơi).",
+
+  "config.section.milling": "Tùy Chọn Cối Xay Ngũ Cốc",
+  "config.enable-mill-balancing.name": "Cân Bằng Giá Sản Phẩm Xay",
+  "config.enable-mill-balancing.tooltip": "Tái cân bằng giá bán cơ bản cho các sản phẩm từ cối xay (Bột mì 90g, Đường 80g, Gạo 140g) giúp chế biến nông sản đạt lợi nhuận hấp dẫn.",
+  "config.enable-mill-artisan-category.name": "Phân Loại Hàng Thủ Công",
+  "config.enable-mill-artisan-category.tooltip": "Gán nhãn Hàng thủ công (-26) cho Bột mì, Đường và Gạo để được hưởng lợi thế +40% giá bán từ nghề Nghệ nhân.",
+  "config.enable-mill-quality-matrix.name": "Ma Trận Sao Cho Cối Xay",
+  "config.enable-mill-quality-matrix.tooltip": "Bật ma trận giữ sao chất lượng 40/30/20/10 cho Cối xay, giúp nông sản chất lượng cao xay ra Bột mì, Đường và Gạo phẩm chất Bạc, Vàng, Iridium.",
+  "config.wheat-flour-base-price.name": "Giá Cơ Bản Bột Mì",
+  "config.wheat-flour-base-price.tooltip": "Giá bán cơ bản của Bột mì trước khi áp dụng hệ số sao và Nghệ nhân (mặc định 90g).",
+  "config.sugar-base-price.name": "Giá Cơ Bản Đường",
+  "config.sugar-base-price.tooltip": "Giá bán cơ bản của Đường trước khi áp dụng hệ số sao và Nghệ nhân (mặc định 80g).",
+  "config.rice-base-price.name": "Giá Cơ Bản Gạo",
+  "config.rice-base-price.tooltip": "Giá bán cơ bản của Gạo trước khi áp dụng hệ số sao và Nghệ nhân (mặc định 140g)."
 }
 

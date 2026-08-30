@@ -50,6 +50,7 @@
 //                       methods, so no attribute targeting is required here.
 // =============================================================================
 using StardewModdingAPI;
+using StardewModdingAPI.Utilities;
 
 namespace Common
 {
@@ -130,5 +131,24 @@ namespace Common
         /// keyboard, mouse, and controller inputs alike.
         /// </remarks>
         void AddKeybind(IManifest mod, Func<SButton> getValue, Action<SButton> setValue, Func<string> name, Func<string>? tooltip = null, string? fieldId = null);
+
+        /// <summary>Adds a keybind list picker bound to a KeybindList setting.</summary>
+        /// <remarks>
+        /// KeybindList supports multi-key combos, chords, or single keys.
+        /// </remarks>
+        void AddKeybindList(IManifest mod, Func<KeybindList> getValue, Action<KeybindList> setValue, Func<string> name, Func<string>? tooltip = null, string? fieldId = null);
+
+        /// <summary>Starts a new sub-page. Pass null or empty string for the main page.</summary>
+        /// <param name="mod">The mod's manifest.</param>
+        /// <param name="pageId">The unique ID of the page (e.g. "blacksmith").</param>
+        /// <param name="pageTitle">The title displayed at the top of the sub-page.</param>
+        void AddPage(IManifest mod, string pageId, Func<string>? pageTitle = null);
+
+        /// <summary>Adds a button/link on the current page to navigate to another sub-page.</summary>
+        /// <param name="mod">The mod's manifest.</param>
+        /// <param name="pageId">The target page ID to switch to when clicked.</param>
+        /// <param name="text">The link text to display.</param>
+        /// <param name="tooltip">Optional hover tooltip for the link.</param>
+        void AddPageLink(IManifest mod, string pageId, Func<string> text, Func<string>? tooltip = null);
     }
 }

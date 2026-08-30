@@ -151,13 +151,15 @@ namespace BetterForge
                 }
             );
 
-            // Section 1: Weapon & Tool Enchanting Options
-            // Each AddBoolOption/AddNumberOption binds one config property to a
-            // menu control. "getValue"/"setValue" are read/written live by GMCM,
-            // and name/tooltip lambdas fetch translated text at display time.
-            configMenu.AddSectionTitle(
+            // Sub-page Navigation Links on Root Page
+            configMenu.AddPageLink(ModManifest, "enchanting", () => I18n.Get("config.section.enchanting"));
+            configMenu.AddPageLink(ModManifest, "reforging", () => I18n.Get("config.section.reforging"));
+
+            // ---------------- Sub-Page 1: Weapon & Tool Enchanting Options ----------------
+            configMenu.AddPage(
                 mod: ModManifest,
-                text: () => I18n.Get("config.section.enchanting")
+                pageId: "enchanting",
+                pageTitle: () => I18n.Get("config.section.enchanting")
             );
 
             configMenu.AddBoolOption(
@@ -176,10 +178,11 @@ namespace BetterForge
                 setValue: value => Config.RandomizeEnchantmentSeed = value
             );
 
-            // Section 2: Trinket Reforging & Anvil Options
-            configMenu.AddSectionTitle(
+            // ---------------- Sub-Page 2: Trinket Reforging & Anvil Options ----------------
+            configMenu.AddPage(
                 mod: ModManifest,
-                text: () => I18n.Get("config.section.reforging")
+                pageId: "reforging",
+                pageTitle: () => I18n.Get("config.section.reforging")
             );
 
             configMenu.AddBoolOption(

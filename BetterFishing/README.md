@@ -45,6 +45,10 @@ $$P_{\text{base}}(D) = F + c_1 \cdot D + c_2 \cdot \left(\frac{D}{50}\right)^2 +
 * **💰 Rebalanced Base Sell Prices**: Lobster (200g), Crab (150g), Crayfish (110g), Snail & Oyster (95g), Shrimp (90g), Cockle & Clam (75g), Mussel (55g), Periwinkle (45g).
 * **🧠 Tiered Harvest Experience**: Lobster (24 EXP), Crab (16 EXP), Delicacies (12 EXP), Shellfish (8 EXP), Trash (5 EXP).
 
+### 8. 🐟 Fish Pond Aquaculture & Luxury Caviar
+* **⭐ Star Quality Inheritance**: Fish Ponds dynamically award **Silver, Gold, or Iridium quality** to Roe based on pond population tier (up to 40% Gold / 25% Iridium at capacity 10) and Daily Luck.
+* **👑 Caviar Rebalance**: Sturgeon Caviar base price rebalanced from 500g to **800g base** (**1,120g Artisan / 2,240g Iridium Artisan**), turning Fish Ponds into genuine high-tier luxury estates.
+
 ---
 
 ## ⚙️ Configuration (GMCM)
@@ -72,3 +76,6 @@ All options can be configured in-game via **Generic Mod Config Menu** or in `con
 | `EnableCrabPotExpBalancing` | `true` | Enables tiered harvest experience for crab pots. |
 | `EnableCrabPotTrashReduction` | `true` | Enables crab pot trash chance reduction. |
 | `CrabPotTrashRerollChance` | `0.65` | Probability of converting trash into genuine shellfish (default: 65%). |
+| `EnableFishPondQuality` | `true` | Enables star quality for Fish Pond roe outputs based on population. |
+| `EnableCaviarRebalance` | `true` | Enables base price rebalancing for Sturgeon Caviar. |
+| `CaviarBasePrice` | `800` | Base sell price for Sturgeon Caviar (800g base / 1,120g Artisan). |

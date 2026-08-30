@@ -1,4 +1,5 @@
 using StardewModdingAPI;
+using StardewModdingAPI.Utilities;
 
 // ModConfig holds every user-facing setting for BetterQOL.
 // SMAPI serializes this plain class to/from the mod's config.json automatically,
@@ -86,6 +87,9 @@ namespace BetterQOL
         /// <summary>Whether to show Museum donation status in inventory/menu tooltips.</summary>
         public bool ShowMuseumNeedOnHover { get; set; } = true;
 
+        /// <summary>Whether to show exact XP, remaining XP, and progress percentage when hovering over skills in the Skills page.</summary>
+        public bool ShowExactExperienceInSkillsPage { get; set; } = true;
+
         // SButton is SMAPI's cross-device enum: one type covers keyboard keys, mouse
         // buttons, and controller buttons (so a single setting can serve all inputs).
         /// <summary>Optional key to hold to show hover tooltips (default None: always shows on hover).</summary>
@@ -124,5 +128,86 @@ namespace BetterQOL
 
         /// <summary>Whether to display Museum donation progress in the World Overview.</summary>
         public bool ShowMuseumProgress { get; set; } = true;
+
+        // ---------------- Object & Environment Transparency ----------------
+        /// <summary>Master toggle to enable or disable all dynamic object transparency features.</summary>
+        public bool EnableTransparency { get; set; } = true;
+
+        // Buildings
+        /// <summary>Whether to apply custom transparency to player-constructed farm buildings.</summary>
+        public bool EnableBuildingTransparency { get; set; } = true;
+        /// <summary>Whether building transparency only activates when the player is behind (above) the building.</summary>
+        public bool BuildingBelowPlayerOnly { get; set; } = true;
+        /// <summary>Tile distance around the player for building transparency activation.</summary>
+        public int BuildingTileDistance { get; set; } = 3;
+        /// <summary>Minimum opacity for transparent buildings (0.0 to 1.0).</summary>
+        public float BuildingMinimumOpacity { get; set; } = 0.4f;
+
+        // Bushes
+        /// <summary>Whether to apply custom transparency to bushes.</summary>
+        public bool EnableBushTransparency { get; set; } = true;
+        /// <summary>Whether bush transparency only activates when the player is behind (above) the bush.</summary>
+        public bool BushBelowPlayerOnly { get; set; } = true;
+        /// <summary>Tile distance around the player for bush transparency activation.</summary>
+        public int BushTileDistance { get; set; } = 5;
+        /// <summary>Minimum opacity for transparent bushes (0.0 to 1.0).</summary>
+        public float BushMinimumOpacity { get; set; } = 0.4f;
+
+        // Trees & Fruit Trees
+        /// <summary>Whether to apply custom transparency to full-grown wild trees and fruit trees.</summary>
+        public bool EnableTreeTransparency { get; set; } = true;
+        /// <summary>Whether tree transparency only activates when the player is behind (above) the tree.</summary>
+        public bool TreeBelowPlayerOnly { get; set; } = true;
+        /// <summary>Tile distance around the player for tree canopy transparency activation.</summary>
+        public int TreeTileDistance { get; set; } = 5;
+        /// <summary>Minimum opacity for transparent tree canopies (0.0 to 1.0).</summary>
+        public float TreeMinimumOpacity { get; set; } = 0.1f;
+
+        // Grass
+        /// <summary>Whether to apply custom transparency to tall grass.</summary>
+        public bool EnableGrassTransparency { get; set; } = true;
+        /// <summary>Whether grass transparency only activates when the player is behind (above) the grass.</summary>
+        public bool GrassBelowPlayerOnly { get; set; } = false;
+        /// <summary>Tile distance around the player for grass transparency activation.</summary>
+        public int GrassTileDistance { get; set; } = 3;
+        /// <summary>Minimum opacity for transparent grass (0.0 to 1.0).</summary>
+        public float GrassMinimumOpacity { get; set; } = 0.3f;
+
+        // Crops
+        /// <summary>Whether to apply custom transparency to crops in dirt and garden pots.</summary>
+        public bool EnableCropTransparency { get; set; } = false;
+        /// <summary>Whether crop transparency only activates when the player is behind (above) the crop.</summary>
+        public bool CropBelowPlayerOnly { get; set; } = false;
+        /// <summary>Tile distance around the player for crop transparency activation.</summary>
+        public int CropTileDistance { get; set; } = 3;
+        /// <summary>Minimum opacity for transparent crops (0.0 to 1.0).</summary>
+        public float CropMinimumOpacity { get; set; } = 0.4f;
+
+        // Objects (forage, stones, weeds, twigs)
+        /// <summary>Whether to apply custom transparency to small forage items, stones, weeds, and debris.</summary>
+        public bool EnableObjectTransparency { get; set; } = false;
+        /// <summary>Whether object transparency only activates when the player is behind (above) the object.</summary>
+        public bool ObjectBelowPlayerOnly { get; set; } = true;
+        /// <summary>Tile distance around the player for object transparency activation.</summary>
+        public int ObjectTileDistance { get; set; } = 3;
+        /// <summary>Minimum opacity for transparent objects (0.0 to 1.0).</summary>
+        public float ObjectMinimumOpacity { get; set; } = 0.4f;
+
+        // Big Craftables (machines, scarecrows, chests)
+        /// <summary>Whether to apply custom transparency to craftable machines, scarecrows, and placables.</summary>
+        public bool EnableCraftableTransparency { get; set; } = false;
+        /// <summary>Whether craftable transparency only activates when the player is behind (above) the craftable.</summary>
+        public bool CraftableBelowPlayerOnly { get; set; } = true;
+        /// <summary>Tile distance around the player for craftable transparency activation.</summary>
+        public int CraftableTileDistance { get; set; } = 3;
+        /// <summary>Minimum opacity for transparent craftables (0.0 to 1.0).</summary>
+        public float CraftableMinimumOpacity { get; set; } = 0.4f;
+
+        // Transparency Keybinds
+        /// <summary>Keybind to temporarily disable custom transparency and revert to vanilla rendering.</summary>
+        public KeybindList DisableTransparencyKey { get; set; } = new();
+
+        /// <summary>Keybind to force maximum transparency on all affected objects.</summary>
+        public KeybindList FullTransparencyKey { get; set; } = new();
     }
 }

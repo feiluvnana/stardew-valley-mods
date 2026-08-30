@@ -1,0 +1,29 @@
+{
+  "config.section.ducks": "Cài Đặt Cân Bằng Vịt",
+  "config.enable-duck-dual-drop.name": "Bật Rơi Kép Cho Vịt",
+  "config.enable-duck-dual-drop.tooltip": "Khi vịt có tim tình bạn cao rụng Lông vịt, nó sẽ rụng kèm cả Trứng vịt thông thường, loại bỏ hoàn toàn sự thâm hụt thu nhập của lông vịt.",
+  "config.duck-dual-drop-min-hearts.name": "Số Tim Tối Thiểu Rơi Kép",
+  "config.duck-dual-drop-min-hearts.tooltip": "Số tim tình bạn tối thiểu để vịt có thể rụng cả trứng và lông cùng một lúc (mặc định: 4 tim).",
+  "config.duck-dual-drop-chance.name": "Tỉ Lệ Rơi Kép",
+  "config.duck-dual-drop-chance.tooltip": "Xác suất rơi kèm trứng khi có lông vịt ở mức 5 tim (mặc định: 1.0 = đảm bảo 100%).",
+  "config.enable-duck-feather-loom.name": "Bật Dệt Vải Lông Vịt",
+  "config.enable-duck-feather-loom.tooltip": "Cho phép đưa Lông vịt vào Khung cửi để dệt thành Vải lông vũ cao cấp.",
+
+  "config.section.rabbits": "Cài Đặt Năng Suất Thỏ",
+  "config.enable-rabbit-cooldown-reduction.name": "Giảm Nửa Thời Gian Thu Hoạch Thỏ",
+  "config.enable-rabbit-cooldown-reduction.tooltip": "Giảm thời gian chờ thu hoạch thỏ từ 4 ngày xuống còn 2 ngày (bằng với vịt và dê).",
+  "config.rabbit-days-to-produce.name": "Số Ngày Thu Hoạch Thỏ",
+  "config.rabbit-days-to-produce.tooltip": "Số ngày để thỏ sản xuất một đợt vật phẩm (mặc định: 2 ngày).",
+  "config.enable-rabbit-multi-drop.name": "Bật Thu Hoạch Bội Số Thỏ",
+  "config.enable-rabbit-multi-drop.tooltip": "Thỏ có tim cao (>= 3 tim) có cơ hội sản xuất thêm lông len hoặc chân thỏ may mắn.",
+  "config.rabbit-multi-drop-chance.name": "Tỉ Lệ Thu Hoạch Bội Số",
+  "config.rabbit-multi-drop-chance.tooltip": "Xác suất nhận thêm vật phẩm thưởng cho thỏ thân thiết (mặc định: 0.35 = 35%).",
+  "config.enable-rabbit-foot-rebalance.name": "Tái Cân Bằng Giá Chân Thỏ",
+  "config.enable-rabbit-foot-rebalance.tooltip": "Tái cân bằng giá bán cơ bản cho Chân Thỏ trong Data/Objects.",
+  "config.rabbit-foot-base-price.name": "Giá Cơ Bản Chân Thỏ",
+  "config.rabbit-foot-base-price.tooltip": "Giá bán cơ bản của Chân Thỏ trước khi tính sao và kỹ năng Người chăn nuôi (mặc định: 850g; 1,020g Chăn nuôi / 1,700g Iridium).",
+
+  "config.section.sheep": "Cài Đặt Cừu & Lông Cừu",
+  "config.enable-sheep-daily-shear.name": "Cắt Lông Hàng Ngày Khi Đạt Max Tim",
+  "config.enable-sheep-daily-shear.tooltip": "Cho phép cắt lông cừu mỗi ngày một lần khi cừu đạt đủ 5 tim tình cảm."
+}

@@ -129,5 +129,17 @@ namespace BetterFishing
         public int CrabExp { get; set; } = 16;
         public int Tier2CrabPotExp { get; set; } = 12;
         public int Tier1CrabPotExp { get; set; } = 8;
+
+        // =====================================================================
+        // === 8. FISH POND & AQUACULTURE SETTINGS                           ===
+        // =====================================================================
+        /// <summary>Enable star quality calculation (Silver, Gold, Iridium) for Fish Pond outputs based on population tier and luck.</summary>
+        public bool EnableFishPondQuality { get; set; } = true;
+
+        /// <summary>Enable Caviar base sell price rebalancing in Data/Objects.</summary>
+        public bool EnableCaviarRebalance { get; set; } = true;
+
+        /// <summary>Base sell price for Caviar (default: 800g; 1,120g Artisan / 2,240g Iridium Artisan).</summary>
+        public int CaviarBasePrice { get; set; } = 800;
     }
 }

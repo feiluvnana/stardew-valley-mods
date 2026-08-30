@@ -6,6 +6,8 @@
   "EnableEnhancedFoodBuffs": true,
   "IridiumBuffDurationMultiplier": 2.0,
   "EnableMeadFix": true,
+  "EnableMachineQuality": true,
+  "ApplyDailyLuckToMachines": true,
   "EnableQualityPreserving": true,
   "EnableTruffleOilFix": true,
   "TruffleOilMultiplier": 1.5,
@@ -13,5 +15,11 @@
   "JuiceMultiplier": 2.75,
   "EnableExpandedAging": true,
   "EnableAutoFruitDrop": true,
-  "MaxFruitsBeforeDrop": 3
+  "MaxFruitsBeforeDrop": 3,
+  "EnableMillBalancing": true,
+  "EnableMillArtisanCategory": true,
+  "EnableMillQualityMatrix": true,
+  "WheatFlourBasePrice": 90,
+  "SugarBasePrice": 80,
+  "RiceBasePrice": 140
 }

@@ -2,7 +2,7 @@
   <PropertyGroup>
     <AssemblyName>BetterForge</AssemblyName>
     <RootNamespace>BetterForge</RootNamespace>
-    <Version>1.1.1</Version>
+    <Version>1.1.2</Version>
     <EnableHarmony>true</EnableHarmony>
   </PropertyGroup>
 </Project>

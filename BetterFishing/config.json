@@ -41,5 +41,8 @@
   "LobsterExp": 24,
   "CrabExp": 16,
   "Tier2CrabPotExp": 12,
-  "Tier1CrabPotExp": 8
+  "Tier1CrabPotExp": 8,
+  "EnableFishPondQuality": true,
+  "EnableCaviarRebalance": true,
+  "CaviarBasePrice": 800
 }

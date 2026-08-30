@@ -1,7 +1,7 @@
 {
   "Name": "BetterForge",
   "Author": "feiluvnana",
-  "Version": "1.1.1",
+  "Version": "1.1.2",
   "Description": "Enhances the Volcano Forge, Mini-Forge, and Anvil with fair uniform enchantments, smart trinket reforging, prismatic ascension, and custom UI.",
   "UniqueID": "feiluvnana.BetterForge",
   "EntryDll": "BetterForge.dll",

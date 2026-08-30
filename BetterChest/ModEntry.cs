@@ -245,14 +245,23 @@ namespace BetterChest
             // saved. The wrapper helpers at the bottom of this file explain
             // that pattern in detail.
 
-            // General Section
+            // General Section (Root Page)
             AddSection(configMenu, "general");
             AddBool(configMenu, "enable-custom-rewards", () => Config.EnableCustomRewards, v => Config.EnableCustomRewards = v);
             AddBool(configMenu, "exclude-cosmetics", () => Config.ExcludeCosmetics, v => Config.ExcludeCosmetics = v);
             AddBool(configMenu, "enable-depth-scaling", () => Config.EnableDepthScaling, v => Config.EnableDepthScaling = v);
 
-            // Progression & Gatekeeping Section
-            AddSection(configMenu, "progression-gatekeeping");
+            // Sub-page Navigation Links on Root Page
+            AddPageLink(configMenu, "progression-gatekeeping", "progression-gatekeeping");
+            AddPageLink(configMenu, "decaying-rolls", "decaying-rolls");
+            AddPageLink(configMenu, "stack-multipliers", "stack-multipliers");
+            AddPageLink(configMenu, "floor-100-buffs", "floor-100-buffs");
+            AddPageLink(configMenu, "category-weights", "category-weights");
+            AddPageLink(configMenu, "category-toggles", "category-toggles");
+            AddPageLink(configMenu, "item-toggles", "item-toggles");
+
+            // Progression & Gatekeeping Sub-Page
+            AddPage(configMenu, "progression-gatekeeping", "progression-gatekeeping");
             AddBool(configMenu, "gatekeep-mastery-items", () => Config.GatekeepMasteryItems, v => Config.GatekeepMasteryItems = v);
             AddBool(configMenu, "gatekeep-island-items", () => Config.GatekeepIslandItems, v => Config.GatekeepIslandItems = v);
             AddBool(configMenu, "gatekeep-qi-items", () => Config.GatekeepQiItems, v => Config.GatekeepQiItems = v);
@@ -261,8 +270,8 @@ namespace BetterChest
             AddBool(configMenu, "gatekeep-radioactive-items", () => Config.GatekeepRadioactiveItems, v => Config.GatekeepRadioactiveItems = v);
             AddBool(configMenu, "gatekeep-auto-petter", () => Config.GatekeepAutoPetter, v => Config.GatekeepAutoPetter = v);
 
-            // Decaying Multi-Roll Section (Regular Chests)
-            AddSection(configMenu, "decaying-rolls");
+            // Decaying Multi-Roll Sub-Page (Regular Chests)
+            AddPage(configMenu, "decaying-rolls", "decaying-rolls");
             AddInt(configMenu, "max-rolls", () => Config.MaxRolls, v => Config.MaxRolls = v, 1, 8);
             AddFloat(configMenu, "roll-2-chance", () => Config.Roll2Chance, v => Config.Roll2Chance = v);
             AddFloat(configMenu, "roll-3-chance", () => Config.Roll3Chance, v => Config.Roll3Chance = v);
@@ -272,15 +281,15 @@ namespace BetterChest
             AddFloat(configMenu, "roll-7-chance", () => Config.Roll7Chance, v => Config.Roll7Chance = v);
             AddFloat(configMenu, "roll-8-chance", () => Config.Roll8Chance, v => Config.Roll8Chance = v);
 
-            // Stack Multipliers Section (Regular Chests)
-            AddSection(configMenu, "stack-multipliers");
+            // Stack Multipliers Sub-Page (Regular Chests)
+            AddPage(configMenu, "stack-multipliers", "stack-multipliers");
             AddFloat(configMenu, "double-stack-chance", () => Config.DoubleStackChance, v => Config.DoubleStackChance = v);
             AddFloat(configMenu, "triple-stack-chance", () => Config.TripleStackChance, v => Config.TripleStackChance = v);
             AddFloat(configMenu, "quadruple-stack-chance", () => Config.QuadrupleStackChance, v => Config.QuadrupleStackChance = v);
             AddFloat(configMenu, "quintuple-stack-chance", () => Config.QuintupleStackChance, v => Config.QuintupleStackChance = v);
 
-            // Floor 100 Special Chest Buff Section
-            AddSection(configMenu, "floor-100-buffs");
+            // Floor 100 Special Chest Buff Sub-Page
+            AddPage(configMenu, "floor-100-buffs", "floor-100-buffs");
             AddBool(configMenu, "enable-floor-100-buff", () => Config.EnableFloor100Buff, v => Config.EnableFloor100Buff = v);
             AddBool(configMenu, "floor-100-all-categories-equal", () => Config.Floor100AllCategoriesEqual, v => Config.Floor100AllCategoriesEqual = v);
             AddInt(configMenu, "floor-100-max-rolls", () => Config.Floor100MaxRolls, v => Config.Floor100MaxRolls = v, 1, 12);
@@ -300,11 +309,8 @@ namespace BetterChest
             AddFloat(configMenu, "floor-100-quadruple-stack", () => Config.Floor100QuadrupleStackChance, v => Config.Floor100QuadrupleStackChance = v);
             AddFloat(configMenu, "floor-100-quintuple-stack", () => Config.Floor100QuintupleStackChance, v => Config.Floor100QuintupleStackChance = v);
 
-            // Category Weights Section
-            AddSection(configMenu, "category-weights");
-            // "(float)" is a CAST: an explicit conversion of the double property
-            // to float, which GMCM sliders require. Trailing numbers = the
-            // slider's minimum, maximum, and step size.
+            // Category Weights Sub-Page
+            AddPage(configMenu, "category-weights", "category-weights");
             AddFloat(configMenu, "legendary-weight", () => (float)Config.LegendaryWeight, v => Config.LegendaryWeight = v, 0f, 100f, 1f);
             AddFloat(configMenu, "agriculture-weight", () => (float)Config.AgricultureWeight, v => Config.AgricultureWeight = v, 0f, 100f, 1f);
             AddFloat(configMenu, "mining-weight", () => (float)Config.MiningWeight, v => Config.MiningWeight = v, 0f, 100f, 1f);
@@ -313,8 +319,8 @@ namespace BetterChest
             AddFloat(configMenu, "foraging-weight", () => (float)Config.ForagingWeight, v => Config.ForagingWeight = v, 0f, 100f, 1f);
             AddFloat(configMenu, "lootbox-weight", () => (float)Config.LootboxWeight, v => Config.LootboxWeight = v, 0f, 100f, 1f);
 
-            // Category Toggles
-            AddSection(configMenu, "category-toggles");
+            // Category Toggles Sub-Page
+            AddPage(configMenu, "category-toggles", "category-toggles");
             AddBool(configMenu, "enable-legendary-category", () => Config.EnableLegendaryCategory, v => Config.EnableLegendaryCategory = v);
             AddBool(configMenu, "enable-agriculture-category", () => Config.EnableAgricultureCategory, v => Config.EnableAgricultureCategory = v);
             AddBool(configMenu, "enable-mining-category", () => Config.EnableMiningCategory, v => Config.EnableMiningCategory = v);
@@ -323,8 +329,8 @@ namespace BetterChest
             AddBool(configMenu, "enable-foraging-category", () => Config.EnableForagingCategory, v => Config.EnableForagingCategory = v);
             AddBool(configMenu, "enable-lootbox-category", () => Config.EnableLootboxCategory, v => Config.EnableLootboxCategory = v);
 
-            // Detailed Item Feature Toggles
-            AddSection(configMenu, "item-toggles");
+            // Detailed Item Feature Toggles Sub-Page
+            AddPage(configMenu, "item-toggles", "item-toggles");
             AddBool(configMenu, "enable-fertilizers", () => Config.EnableFertilizers, v => Config.EnableFertilizers = v);
             AddBool(configMenu, "enable-machines", () => Config.EnableMachines, v => Config.EnableMachines = v);
             AddBool(configMenu, "enable-auto-petter", () => Config.EnableAutoPetter, v => Config.EnableAutoPetter = v);
@@ -356,6 +362,24 @@ namespace BetterChest
         //   * Named arguments ("min: min") pass parameters by name for clarity.
         //   * Optional parameters ("int interval = 1") may be omitted by callers.
         // =====================================================================
+
+        /// <summary>Adds a navigation link on the current page to another sub-page.</summary>
+        /// <param name="menu">The GMCM api instance.</param>
+        /// <param name="pageId">The target page ID to switch to when clicked.</param>
+        /// <param name="sectionKey">Final segment of the heading's translation key.</param>
+        private void AddPageLink(IGenericModConfigMenuApi menu, string pageId, string sectionKey)
+        {
+            menu.AddPageLink(mod: ModManifest, pageId: pageId, text: () => I18n.Get($"config.section.{sectionKey}"));
+        }
+
+        /// <summary>Starts a new sub-page with a translated title.</summary>
+        /// <param name="menu">The GMCM api instance.</param>
+        /// <param name="pageId">The unique ID for the sub-page.</param>
+        /// <param name="sectionKey">Final segment of the heading's translation key.</param>
+        private void AddPage(IGenericModConfigMenuApi menu, string pageId, string sectionKey)
+        {
+            menu.AddPage(mod: ModManifest, pageId: pageId, pageTitle: () => I18n.Get($"config.section.{sectionKey}"));
+        }
 
         /// <summary>Adds one translated section-heading row separating option groups.</summary>
         /// <param name="menu">The GMCM api instance obtained in OnGameLaunched.</param>

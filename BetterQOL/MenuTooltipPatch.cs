@@ -122,9 +122,19 @@ namespace BetterQOL
             if (config.ShowBundleNeedOnHover)
             {
                 var bundles = GetNeededBundles(item);
-                if (bundles.Count > 0)
+                if (bundles.Count == 1)
                 {
-                    lines.Add(ModEntry.I18n.Get("hover.item.bundle-needed", new { bundles = string.Join(", ", bundles) }));
+                    string singleText = ModEntry.I18n.Get("hover.item.bundle-needed-single", new { bundle = bundles[0] }).ToString();
+                    lines.Add(Game1.parseText(singleText, Game1.smallFont, 200));
+                }
+                else if (bundles.Count > 1)
+                {
+                    lines.Add(ModEntry.I18n.Get("hover.item.bundle-needed-header").ToString());
+                    foreach (var bundle in bundles)
+                    {
+                        string entryText = ModEntry.I18n.Get("hover.item.bundle-needed-entry", new { bundle }).ToString();
+                        lines.Add(Game1.parseText(entryText, Game1.smallFont, 200));
+                    }
                 }
             }
 
@@ -149,11 +159,13 @@ namespace BetterQOL
 
                     if (!isDonated)
                     {
-                        lines.Add(ModEntry.I18n.Get("hover.item.museum-needed"));
+                        string neededText = ModEntry.I18n.Get("hover.item.museum-needed").ToString();
+                        lines.Add(Game1.parseText(neededText, Game1.smallFont, 200));
                     }
                     else
                     {
-                        lines.Add(ModEntry.I18n.Get("hover.item.museum-donated"));
+                        string donatedText = ModEntry.I18n.Get("hover.item.museum-donated").ToString();
+                        lines.Add(Game1.parseText(donatedText, Game1.smallFont, 200));
                     }
                 }
             }

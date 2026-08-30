@@ -1,4 +1,4 @@
-MODS := BetterChest BetterForge BetterFurniture BetterIndustry BetterMap BetterQOL BetterEvent
+MODS := BetterChest BetterFishing BetterForge BetterFurniture BetterIndustry BetterMap BetterQOL BetterEvent BetterAnimal
 
 VERBS := all help build rebuild clean
 

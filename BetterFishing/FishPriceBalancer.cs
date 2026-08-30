@@ -238,11 +238,31 @@ namespace BetterFishing
                 // Apply Crab Pot price balancing
                 ApplyCrabPotPrices(objectData);
 
-                Monitor.Log($"BetterFishing: Evaluated and updated prices for {modifiedCount} fish species & crab pot catches.", LogLevel.Trace);
+                // Apply Caviar price balancing
+                ApplyCaviarPrice(objectData);
+
+                Monitor.Log($"BetterFishing: Evaluated and updated prices for {modifiedCount} fish species, crab pot catches & caviar.", LogLevel.Trace);
             }
             catch (Exception ex)
             {
                 Monitor.Log($"Error applying fish price balancing in BetterFishing: {ex}", LogLevel.Error);
+            }
+        }
+
+        /// <summary>
+        /// Applies rebalanced base sell price for Caviar (Item ID 445).
+        /// </summary>
+        private static void ApplyCaviarPrice(IDictionary<string, ObjectData> objectData)
+        {
+            if (!Config.EnableCaviarRebalance)
+                return;
+
+            if (objectData.TryGetValue("445", out var objData) || objectData.TryGetValue("(O)445", out objData))
+            {
+                if (Config.PreventNerf && Config.CaviarBasePrice < objData.Price)
+                    return;
+
+                objData.Price = Config.CaviarBasePrice;
             }
         }
 

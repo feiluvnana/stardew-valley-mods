@@ -4,6 +4,7 @@ using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.GameData.Machines;
 using Common;
+using BetterQOL.Transparency;
 
 // ModEntry is the "front door" every SMAPI mod must have. When Stardew Valley
 // starts, the SMAPI mod loader finds this class, creates one instance of it, and
@@ -63,11 +64,14 @@ namespace BetterQOL
             // shared instance (stack-size overrides, in-menu tooltip additions, ...).
             StackablePatches.Apply(harmony, Monitor);
             MenuTooltipPatch.Apply(harmony, Monitor);
+            SkillsPagePatch.Apply(harmony, Monitor);
+            TransparencyPatches.Apply(harmony, Monitor, helper);
 
             // Features that don't need Harmony are initialized directly with SMAPI
-            // services instead (an event-driven overlay and a custom menu button).
+            // services instead (an event-driven overlay, custom menu button, and transparency manager).
             GeodeMenuHandler.Initialize(helper, Monitor);
             HoverInfoOverlay.Initialize(helper, Monitor);
+            TransparencyManager.Initialize(helper, Monitor);
 
             // EVENTS: in C#, "+=" SUBSCRIBES a method to an event - like plugging it
             // into a doorbell. Whenever SMAPI "rings" (a button is pressed, an asset
@@ -78,7 +82,7 @@ namespace BetterQOL
             helper.Events.Content.AssetRequested += OnAssetRequested;
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
 
-            Monitor.Log("BetterQOL initialized successfully: Extended Stackable limits, Geode Cracking overhaul, Hover Information, and Lookup Anything are active.", LogLevel.Debug);
+            Monitor.Log("BetterQOL initialized successfully: Extended Stackable limits, Geode Cracking overhaul, Hover Information, Lookup Anything, and Object Transparency are active.", LogLevel.Debug);
         }
 
         /// <summary>
@@ -218,20 +222,27 @@ namespace BetterQOL
                     Config = new ModConfig();
                     Helper.WriteConfig(Config);
                     InvalidateAssetCaches();
+                    TransparencyManager.ClearCache();
                 },
                 save: () =>
                 {
                     // Save button: persist the (possibly edited) config to config.json.
                     Helper.WriteConfig(Config);
                     InvalidateAssetCaches();
+                    TransparencyManager.ClearCache();
                 }
             );
 
-            // ---------------- Section 1: Blacksmith Geode Cracking ----------------
-            configMenu.AddSectionTitle(
-                mod: ModManifest,
-                text: () => I18n.Get("config.section.blacksmith")
-            );
+            // Sub-page Navigation Links on Root Page
+            configMenu.AddPageLink(ModManifest, "blacksmith", () => I18n.Get("config.section.blacksmith"));
+            configMenu.AddPageLink(ModManifest, "farm-machines", () => I18n.Get("config.section.farm-machines"));
+            configMenu.AddPageLink(ModManifest, "stackable", () => I18n.Get("config.section.stackable"));
+            configMenu.AddPageLink(ModManifest, "hover-info", () => I18n.Get("config.section.hover-info"));
+            configMenu.AddPageLink(ModManifest, "lookup-anything", () => I18n.Get("config.section.lookup-anything"));
+            configMenu.AddPageLink(ModManifest, "transparency", () => I18n.Get("config.section.transparency"));
+
+            // ---------------- Sub-Page 1: Blacksmith Geode Cracking ----------------
+            configMenu.AddPage(ModManifest, "blacksmith", () => I18n.Get("config.section.blacksmith"));
 
             configMenu.AddBoolOption(
                 mod: ModManifest,
@@ -270,10 +281,11 @@ namespace BetterQOL
                 setValue: value => Config.ShowSummaryToast = value
             );
 
-            // ---------------- Section 2: Farm Machine Options ----------------
-            configMenu.AddSectionTitle(
+            // ---------------- Sub-Page 2: Farm Machine Options ----------------
+            configMenu.AddPage(
                 mod: ModManifest,
-                text: () => I18n.Get("config.section.farm-machines")
+                pageId: "farm-machines",
+                pageTitle: () => I18n.Get("config.section.farm-machines")
             );
 
             // The two machine toggles below can't use the simple one-line setter:
@@ -303,10 +315,11 @@ namespace BetterQOL
                 }
             );
 
-            // ---------------- Section 3: Item Stacking Options ----------------
-            configMenu.AddSectionTitle(
+            // ---------------- Sub-Page 3: Item Stacking Options ----------------
+            configMenu.AddPage(
                 mod: ModManifest,
-                text: () => I18n.Get("config.section.stackable")
+                pageId: "stackable",
+                pageTitle: () => I18n.Get("config.section.stackable")
             );
 
             configMenu.AddNumberOption(
@@ -367,10 +380,11 @@ namespace BetterQOL
                 setValue: value => Config.EnableBootsStacking = value
             );
 
-            // ---------------- Section 4: Hover Information & Timers (UI Info Suite 2 Style) ----------------
-            configMenu.AddSectionTitle(
+            // ---------------- Sub-Page 4: Hover Information & Timers (UI Info Suite 2 Style) ----------------
+            configMenu.AddPage(
                 mod: ModManifest,
-                text: () => I18n.Get("config.section.hover-info")
+                pageId: "hover-info",
+                pageTitle: () => I18n.Get("config.section.hover-info")
             );
 
             configMenu.AddBoolOption(
@@ -453,6 +467,14 @@ namespace BetterQOL
                 setValue: value => Config.ShowMuseumNeedOnHover = value
             );
 
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.show-exact-experience-in-skills-page.name"),
+                tooltip: () => I18n.Get("config.show-exact-experience-in-skills-page.tooltip"),
+                getValue: () => Config.ShowExactExperienceInSkillsPage,
+                setValue: value => Config.ShowExactExperienceInSkillsPage = value
+            );
+
             // Keybind option: lets the player bind any keyboard/controller button.
             configMenu.AddKeybind(
                 mod: ModManifest,
@@ -462,10 +484,11 @@ namespace BetterQOL
                 setValue: value => Config.HoverHotkey = value
             );
 
-            // ---------------- Section 5: Lookup Anything ----------------
-            configMenu.AddSectionTitle(
+            // ---------------- Sub-Page 5: Lookup Anything ----------------
+            configMenu.AddPage(
                 mod: ModManifest,
-                text: () => I18n.Get("config.section.lookup-anything")
+                pageId: "lookup-anything",
+                pageTitle: () => I18n.Get("config.section.lookup-anything")
             );
 
             configMenu.AddBoolOption(
@@ -554,6 +577,351 @@ namespace BetterQOL
                 tooltip: () => I18n.Get("config.show-museum-progress.tooltip"),
                 getValue: () => Config.ShowMuseumProgress,
                 setValue: value => Config.ShowMuseumProgress = value
+            );
+
+            // ---------------- Sub-Page 6: Dynamic Object Transparency ----------------
+            configMenu.AddPage(
+                mod: ModManifest,
+                pageId: "transparency",
+                pageTitle: () => I18n.Get("config.section.transparency")
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.enable-transparency.name"),
+                tooltip: () => I18n.Get("config.enable-transparency.tooltip"),
+                getValue: () => Config.EnableTransparency,
+                setValue: value => Config.EnableTransparency = value
+            );
+
+            // Buildings
+            configMenu.AddSectionTitle(
+                mod: ModManifest,
+                text: () => I18n.Get("config.section.transparency-buildings")
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.enable-building-transparency.name"),
+                tooltip: () => I18n.Get("config.enable-building-transparency.tooltip"),
+                getValue: () => Config.EnableBuildingTransparency,
+                setValue: value => Config.EnableBuildingTransparency = value
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.building-below-player-only.name"),
+                tooltip: () => I18n.Get("config.building-below-player-only.tooltip"),
+                getValue: () => Config.BuildingBelowPlayerOnly,
+                setValue: value => Config.BuildingBelowPlayerOnly = value
+            );
+
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.building-tile-distance.name"),
+                tooltip: () => I18n.Get("config.building-tile-distance.tooltip"),
+                getValue: () => Config.BuildingTileDistance,
+                setValue: value => Config.BuildingTileDistance = value,
+                min: 1,
+                max: 20,
+                interval: 1
+            );
+
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.building-minimum-opacity.name"),
+                tooltip: () => I18n.Get("config.building-minimum-opacity.tooltip"),
+                getValue: () => Config.BuildingMinimumOpacity,
+                setValue: value => Config.BuildingMinimumOpacity = value,
+                min: 0.0f,
+                max: 1.0f,
+                interval: 0.01f
+            );
+
+            // Bushes
+            configMenu.AddSectionTitle(
+                mod: ModManifest,
+                text: () => I18n.Get("config.section.transparency-bushes")
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.enable-bush-transparency.name"),
+                tooltip: () => I18n.Get("config.enable-bush-transparency.tooltip"),
+                getValue: () => Config.EnableBushTransparency,
+                setValue: value => Config.EnableBushTransparency = value
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.bush-below-player-only.name"),
+                tooltip: () => I18n.Get("config.bush-below-player-only.tooltip"),
+                getValue: () => Config.BushBelowPlayerOnly,
+                setValue: value => Config.BushBelowPlayerOnly = value
+            );
+
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.bush-tile-distance.name"),
+                tooltip: () => I18n.Get("config.bush-tile-distance.tooltip"),
+                getValue: () => Config.BushTileDistance,
+                setValue: value => Config.BushTileDistance = value,
+                min: 1,
+                max: 20,
+                interval: 1
+            );
+
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.bush-minimum-opacity.name"),
+                tooltip: () => I18n.Get("config.bush-minimum-opacity.tooltip"),
+                getValue: () => Config.BushMinimumOpacity,
+                setValue: value => Config.BushMinimumOpacity = value,
+                min: 0.0f,
+                max: 1.0f,
+                interval: 0.01f
+            );
+
+            // Trees
+            configMenu.AddSectionTitle(
+                mod: ModManifest,
+                text: () => I18n.Get("config.section.transparency-trees")
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.enable-tree-transparency.name"),
+                tooltip: () => I18n.Get("config.enable-tree-transparency.tooltip"),
+                getValue: () => Config.EnableTreeTransparency,
+                setValue: value => Config.EnableTreeTransparency = value
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.tree-below-player-only.name"),
+                tooltip: () => I18n.Get("config.tree-below-player-only.tooltip"),
+                getValue: () => Config.TreeBelowPlayerOnly,
+                setValue: value => Config.TreeBelowPlayerOnly = value
+            );
+
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.tree-tile-distance.name"),
+                tooltip: () => I18n.Get("config.tree-tile-distance.tooltip"),
+                getValue: () => Config.TreeTileDistance,
+                setValue: value => Config.TreeTileDistance = value,
+                min: 1,
+                max: 20,
+                interval: 1
+            );
+
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.tree-minimum-opacity.name"),
+                tooltip: () => I18n.Get("config.tree-minimum-opacity.tooltip"),
+                getValue: () => Config.TreeMinimumOpacity,
+                setValue: value => Config.TreeMinimumOpacity = value,
+                min: 0.0f,
+                max: 1.0f,
+                interval: 0.01f
+            );
+
+            // Grass
+            configMenu.AddSectionTitle(
+                mod: ModManifest,
+                text: () => I18n.Get("config.section.transparency-grass")
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.enable-grass-transparency.name"),
+                tooltip: () => I18n.Get("config.enable-grass-transparency.tooltip"),
+                getValue: () => Config.EnableGrassTransparency,
+                setValue: value => Config.EnableGrassTransparency = value
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.grass-below-player-only.name"),
+                tooltip: () => I18n.Get("config.grass-below-player-only.tooltip"),
+                getValue: () => Config.GrassBelowPlayerOnly,
+                setValue: value => Config.GrassBelowPlayerOnly = value
+            );
+
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.grass-tile-distance.name"),
+                tooltip: () => I18n.Get("config.grass-tile-distance.tooltip"),
+                getValue: () => Config.GrassTileDistance,
+                setValue: value => Config.GrassTileDistance = value,
+                min: 1,
+                max: 20,
+                interval: 1
+            );
+
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.grass-minimum-opacity.name"),
+                tooltip: () => I18n.Get("config.grass-minimum-opacity.tooltip"),
+                getValue: () => Config.GrassMinimumOpacity,
+                setValue: value => Config.GrassMinimumOpacity = value,
+                min: 0.0f,
+                max: 1.0f,
+                interval: 0.01f
+            );
+
+            // Crops
+            configMenu.AddSectionTitle(
+                mod: ModManifest,
+                text: () => I18n.Get("config.section.transparency-crops")
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.enable-crop-transparency.name"),
+                tooltip: () => I18n.Get("config.enable-crop-transparency.tooltip"),
+                getValue: () => Config.EnableCropTransparency,
+                setValue: value => Config.EnableCropTransparency = value
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.crop-below-player-only.name"),
+                tooltip: () => I18n.Get("config.crop-below-player-only.tooltip"),
+                getValue: () => Config.CropBelowPlayerOnly,
+                setValue: value => Config.CropBelowPlayerOnly = value
+            );
+
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.crop-tile-distance.name"),
+                tooltip: () => I18n.Get("config.crop-tile-distance.tooltip"),
+                getValue: () => Config.CropTileDistance,
+                setValue: value => Config.CropTileDistance = value,
+                min: 1,
+                max: 20,
+                interval: 1
+            );
+
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.crop-minimum-opacity.name"),
+                tooltip: () => I18n.Get("config.crop-minimum-opacity.tooltip"),
+                getValue: () => Config.CropMinimumOpacity,
+                setValue: value => Config.CropMinimumOpacity = value,
+                min: 0.0f,
+                max: 1.0f,
+                interval: 0.01f
+            );
+
+            // Objects (weeds, stones, twigs, forage)
+            configMenu.AddSectionTitle(
+                mod: ModManifest,
+                text: () => I18n.Get("config.section.transparency-objects")
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.enable-object-transparency.name"),
+                tooltip: () => I18n.Get("config.enable-object-transparency.tooltip"),
+                getValue: () => Config.EnableObjectTransparency,
+                setValue: value => Config.EnableObjectTransparency = value
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.object-below-player-only.name"),
+                tooltip: () => I18n.Get("config.object-below-player-only.tooltip"),
+                getValue: () => Config.ObjectBelowPlayerOnly,
+                setValue: value => Config.ObjectBelowPlayerOnly = value
+            );
+
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.object-tile-distance.name"),
+                tooltip: () => I18n.Get("config.object-tile-distance.tooltip"),
+                getValue: () => Config.ObjectTileDistance,
+                setValue: value => Config.ObjectTileDistance = value,
+                min: 1,
+                max: 20,
+                interval: 1
+            );
+
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.object-minimum-opacity.name"),
+                tooltip: () => I18n.Get("config.object-minimum-opacity.tooltip"),
+                getValue: () => Config.ObjectMinimumOpacity,
+                setValue: value => Config.ObjectMinimumOpacity = value,
+                min: 0.0f,
+                max: 1.0f,
+                interval: 0.01f
+            );
+
+            // Big Craftables (machines, scarecrows, chests)
+            configMenu.AddSectionTitle(
+                mod: ModManifest,
+                text: () => I18n.Get("config.section.transparency-craftables")
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.enable-craftable-transparency.name"),
+                tooltip: () => I18n.Get("config.enable-craftable-transparency.tooltip"),
+                getValue: () => Config.EnableCraftableTransparency,
+                setValue: value => Config.EnableCraftableTransparency = value
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.craftable-below-player-only.name"),
+                tooltip: () => I18n.Get("config.craftable-below-player-only.tooltip"),
+                getValue: () => Config.CraftableBelowPlayerOnly,
+                setValue: value => Config.CraftableBelowPlayerOnly = value
+            );
+
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.craftable-tile-distance.name"),
+                tooltip: () => I18n.Get("config.craftable-tile-distance.tooltip"),
+                getValue: () => Config.CraftableTileDistance,
+                setValue: value => Config.CraftableTileDistance = value,
+                min: 1,
+                max: 20,
+                interval: 1
+            );
+
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.craftable-minimum-opacity.name"),
+                tooltip: () => I18n.Get("config.craftable-minimum-opacity.tooltip"),
+                getValue: () => Config.CraftableMinimumOpacity,
+                setValue: value => Config.CraftableMinimumOpacity = value,
+                min: 0.0f,
+                max: 1.0f,
+                interval: 0.01f
+            );
+
+            // Transparency Keybinds
+            configMenu.AddSectionTitle(
+                mod: ModManifest,
+                text: () => I18n.Get("config.section.transparency-keybinds")
+            );
+
+            configMenu.AddKeybindList(
+                mod: ModManifest,
+                name: () => I18n.Get("config.disable-transparency-key.name"),
+                tooltip: () => I18n.Get("config.disable-transparency-key.tooltip"),
+                getValue: () => Config.DisableTransparencyKey,
+                setValue: value => Config.DisableTransparencyKey = value
+            );
+
+            configMenu.AddKeybindList(
+                mod: ModManifest,
+                name: () => I18n.Get("config.full-transparency-key.name"),
+                tooltip: () => I18n.Get("config.full-transparency-key.tooltip"),
+                getValue: () => Config.FullTransparencyKey,
+                setValue: value => Config.FullTransparencyKey = value
             );
         }
 

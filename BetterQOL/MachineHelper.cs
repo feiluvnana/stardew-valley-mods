@@ -132,17 +132,17 @@ namespace BetterQOL
                 return GetCrabPotInfo(crabPot);
             }
 
+            // Fences, indoor pots, scarecrows, forage, and spawned ground objects are never machines
+            if (obj is Fence || obj is IndoorPot || obj.IsScarecrow() || obj.isForage() || obj.IsSpawnedObject)
+            {
+                return null;
+            }
+
             // Check if it's a Chest (containers, not machines, unless Auto-Grabber)
             // Plain chests shouldn't get a machine tooltip, BUT the Auto-Grabber is
             // internally a chest subclass, so it's exempted by id/name checks.
             // StringComparison.OrdinalIgnoreCase makes name tests case-insensitive.
             if (obj is Chest chest && !chest.QualifiedItemId.Contains("165") && !chest.Name.Contains("Auto-Grabber", StringComparison.OrdinalIgnoreCase))
-            {
-                return null;
-            }
-
-            // Check if it's a Scarecrow
-            if (obj.IsScarecrow())
             {
                 return null;
             }
@@ -169,10 +169,10 @@ namespace BetterQOL
             bool isMiniForge = qualifiedId.Contains("MiniForge", StringComparison.OrdinalIgnoreCase) || name.Contains("Mini-Forge", StringComparison.OrdinalIgnoreCase);
             bool isStatue = qualifiedId.Contains("160") || qualifiedId.Contains("StatueOf", StringComparison.OrdinalIgnoreCase) || name.Contains("Statue of", StringComparison.OrdinalIgnoreCase);
 
-            // "Is this worth showing a tooltip at all?" True when ANY condition holds:
-            // it has machine data, matched a special case above, holds an item, is
-            // counting down, or is ready for harvest. This multi-line chain of "||"
-            // is ONE boolean expression split across lines purely for readability.
+            // A machine MUST either:
+            // 1. Have valid MachineData in Data/Machines (vanilla & modded data-driven machines)
+            // 2. Be one of the known special machine devices checked above
+            // 3. Be a placed BigCraftable that currently holds an active item or is ready for harvest (fallback for legacy modded machines)
             bool isKnownMachine = machineData != null
                                || isAutoGrabber
                                || isCoffeeMaker
@@ -181,14 +181,12 @@ namespace BetterQOL
                                || isAnvil
                                || isMiniForge
                                || isStatue
-                               || obj.heldObject.Value != null
-                               || obj.MinutesUntilReady > 0
-                               || obj.readyForHarvest.Value;
+                               || (obj.bigCraftable.Value && (obj.heldObject.Value != null || obj.readyForHarvest.Value));
 
             if (!isKnownMachine)
             {
-                // If it's a generic bigCraftable that has no machine data and not a known machine, skip
-                // Pure decorations (tables, torches...) land here: no tooltip for them.
+                // If it's not a known machine and has no machine data, skip completely.
+                // Pure decorations (tables, torches...), twigs, stones, weeds, etc. land here: no tooltip for them.
                 return null;
             }
 

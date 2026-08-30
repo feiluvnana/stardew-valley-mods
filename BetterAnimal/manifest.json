@@ -1,0 +1,10 @@
+{
+  "Name": "BetterAnimal",
+  "Author": "feiluvnana",
+  "Version": "1.0.0",
+  "Description": "Comprehensive animal husbandry and small livestock rebalance for Stardew Valley 1.6+. Solves the Duck Feather penalty with high-friendship dual drops, halves rabbit cooldown, adds multi-drop yields, and enables luxury loom down cloth processing.",
+  "UniqueID": "feiluvnana.BetterAnimal",
+  "EntryDll": "BetterAnimal.dll",
+  "MinimumApiVersion": "4.0.0",
+  "UpdateKeys": []
+}

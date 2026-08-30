@@ -583,6 +583,7 @@ namespace BetterQOL
 		})).ToString(), (Color?)new Color(180, 100, 0)));
 		lookupSection6.Fields.Add(new LookupField((ModEntry.I18n.Get("lookup.farmer.daily-luck")), $"{farmer.DailyLuck:F3}", (Color?)((farmer.DailyLuck >= 0.0) ? new Color(0, 140, 0) : new Color(200, 60, 20))));
 		lookupSubject.Sections.Add(lookupSection6);
+		lookupSubject.Sections.Add(BuildSkillsAndMasterySection());
 		return lookupSubject;
 		// A "local function": a method declared inside another method. It can use the
 		// gearLinks list above directly (a "closure" over the surrounding variables).
@@ -1956,14 +1957,15 @@ namespace BetterQOL
 		int foragingLevel = Game1.player.ForagingLevel;
 		int fishingLevel = Game1.player.FishingLevel;
 		int combatLevel = Game1.player.CombatLevel;
-		lookupSection.Fields.Add(new LookupField((ModEntry.I18n.Get("lookup.skills.levels-label")), ((object)ModEntry.I18n.Get("lookup.skills.levels-breakdown", (object)new
-		{
-			farming = farmingLevel,
-			mining = miningLevel,
-			foraging = foragingLevel,
-			fishing = fishingLevel,
-			combat = combatLevel
-		})).ToString(), (Color?)new Color(0, 140, 0)));
+
+		int[] expPerLevel = SkillsPagePatch.ExpPointsPerLevel;
+
+		AddSkillProgressField(lookupSection, Farmer.farmingSkill, farmingLevel, ModEntry.I18n.Get("lookup.skills.farming").ToString(), expPerLevel);
+		AddSkillProgressField(lookupSection, Farmer.miningSkill, miningLevel, ModEntry.I18n.Get("lookup.skills.mining").ToString(), expPerLevel);
+		AddSkillProgressField(lookupSection, Farmer.foragingSkill, foragingLevel, ModEntry.I18n.Get("lookup.skills.foraging").ToString(), expPerLevel);
+		AddSkillProgressField(lookupSection, Farmer.fishingSkill, fishingLevel, ModEntry.I18n.Get("lookup.skills.fishing").ToString(), expPerLevel);
+		AddSkillProgressField(lookupSection, Farmer.combatSkill, combatLevel, ModEntry.I18n.Get("lookup.skills.combat").ToString(), expPerLevel);
+
 		try
 		{
 			// Mastery unlocks only when the five skills total 50 levels (10 each);
@@ -1993,6 +1995,32 @@ namespace BetterQOL
 		{
 		}
 		return lookupSection;
+	}
+
+	/// <summary>Adds a detailed skill progress line with exact current XP and next level target.</summary>
+	private static void AddSkillProgressField(LookupSection section, int skillIndex, int effectiveLevel, string skillLabel, int[] expPerLevel)
+	{
+		int curXp = Game1.player.experiencePoints.Length > skillIndex ? Game1.player.experiencePoints[skillIndex] : 0;
+		int baseLevel = Game1.player.GetUnmodifiedSkillLevel(skillIndex);
+
+		if (baseLevel < 10)
+		{
+			int nextLevel = baseLevel + 1;
+			int nextXp = expPerLevel[Math.Clamp(baseLevel, 0, expPerLevel.Length - 1)];
+			int prevXp = baseLevel > 0 ? expPerLevel[baseLevel - 1] : 0;
+			int needed = Math.Max(0, nextXp - curXp);
+			float pct = Math.Clamp((float)(curXp - prevXp) / Math.Max(1, nextXp - prevXp) * 100f, 0f, 100f);
+
+			string buffStr = effectiveLevel > baseLevel ? $" (+{effectiveLevel - baseLevel})" : "";
+			string text = $"{baseLevel}{buffStr} ({curXp:N0} / {nextXp:N0} XP, {needed:N0} to Lvl {nextLevel} [{pct:0.0}%])";
+			section.Fields.Add(new LookupField("• " + skillLabel, text, (Color?)new Color(0, 140, 0)));
+		}
+		else
+		{
+			string buffStr = effectiveLevel > 10 ? $" (+{effectiveLevel - 10})" : "";
+			string text = $"10{buffStr} ({curXp:N0} XP — Max Level ✓)";
+			section.Fields.Add(new LookupField("• " + skillLabel, text, (Color?)new Color(180, 50, 180)));
+		}
 	}
 
 	/// <summary>Ginger Island progress: golden walnuts found (goal 130) and island unlocks.</summary>

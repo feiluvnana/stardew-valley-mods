@@ -9,13 +9,14 @@ using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley.GameData;
 using StardewValley.GameData.Machines;
+using StardewValley.GameData.Objects;
 
 namespace BetterIndustry
 {
     /// <summary>
     /// Applies BetterIndustry's machine tweaks to the "Data/Machines" asset:
     /// flower-mead 2.0x pricing, vegetable juice buff, truffle-oil price scaling,
-    /// and expanded cask aging for vegetable juice.
+    /// expanded cask aging for vegetable juice, and milled goods artisan tagging.
     /// </summary>
     public static class ArtisanBalancer
     {
@@ -24,28 +25,43 @@ namespace BetterIndustry
 
         /// <summary>
         /// SMAPI event handler fired while ANY game asset loads. Filters for
-        /// "Data/Machines" and queues our edits.
+        /// "Data/Machines" and "Data/Objects" to apply balance edits.
         /// </summary>
         public static void OnAssetRequested(object? sender, AssetRequestedEventArgs e)
         {
-            if (!e.NameWithoutLocale.IsEquivalentTo("Data/Machines"))
-                return;
-
-            e.Edit(asset =>
+            if (e.NameWithoutLocale.IsEquivalentTo("Data/Machines"))
             {
-                try
+                e.Edit(asset =>
                 {
-                    var data = asset.AsDictionary<string, MachineData>().Data;
+                    try
+                    {
+                        var data = asset.AsDictionary<string, MachineData>().Data;
 
-                    ApplyKegEdits(data);
-                    ApplyOilMakerEdits(data);
-                    ApplyCaskEdits(data);
-                }
-                catch (Exception ex)
+                        ApplyKegEdits(data);
+                        ApplyOilMakerEdits(data);
+                        ApplyCaskEdits(data);
+                    }
+                    catch (Exception ex)
+                    {
+                        Monitor.Log($"Error applying machine balance in ArtisanBalancer: {ex}", LogLevel.Error);
+                    }
+                }, AssetEditPriority.Late);
+            }
+            else if (e.NameWithoutLocale.IsEquivalentTo("Data/Objects"))
+            {
+                e.Edit(asset =>
                 {
-                    Monitor.Log($"Error applying machine balance in ArtisanBalancer: {ex}", LogLevel.Error);
-                }
-            }, AssetEditPriority.Late);
+                    try
+                    {
+                        var data = asset.AsDictionary<string, ObjectData>().Data;
+                        ApplyMilledGoodsEdits(data);
+                    }
+                    catch (Exception ex)
+                    {
+                        Monitor.Log($"Error applying milled goods edits in ArtisanBalancer: {ex}", LogLevel.Error);
+                    }
+                }, AssetEditPriority.Late);
+            }
         }
 
         /// <summary>
@@ -211,6 +227,35 @@ namespace BetterIndustry
                 };
 
                 cask.OutputRules.Add(juiceRule);
+            }
+        }
+
+        /// <summary>
+        /// Milled goods adjustments: assigns Artisan Goods category (-26) and rebalances base sell prices.
+        /// </summary>
+        private static void ApplyMilledGoodsEdits(IDictionary<string, ObjectData> data)
+        {
+            var milledItems = new[]
+            {
+                (Id: "246", Price: Config.WheatFlourBasePrice), // Wheat Flour
+                (Id: "245", Price: Config.SugarBasePrice),      // Sugar
+                (Id: "423", Price: Config.RiceBasePrice)        // Rice
+            };
+
+            foreach (var (id, price) in milledItems)
+            {
+                if (data.TryGetValue(id, out var objData) || data.TryGetValue($"(O){id}", out objData))
+                {
+                    if (Config.EnableMillArtisanCategory)
+                    {
+                        objData.Category = StardewValley.Object.artisanGoodsCategory; // -26
+                    }
+
+                    if (Config.EnableMillBalancing)
+                    {
+                        objData.Price = price;
+                    }
+                }
             }
         }
     }

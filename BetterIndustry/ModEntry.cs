@@ -81,6 +81,7 @@ namespace BetterIndustry
             var harmony = new HarmonyLib.Harmony(ModManifest.UniqueID);
             CookingPatches.Apply(harmony);
             MachineQualityPatches.Apply(harmony);
+            MillPatches.Apply(harmony);
 
             // Game Loop Events
             // GameLaunched: fires once the game finished booting (right moment to query
@@ -90,7 +91,7 @@ namespace BetterIndustry
 
             // Announce successful startup. "$" marks an interpolated string (text with
             // embedded {values}), and LogLevel.Debug prints to the SMAPI console/log.
-            Monitor.Log("BetterIndustry loaded successfully: Artisan Goods and Cooking Balance are active.", LogLevel.Debug);
+            Monitor.Log("BetterIndustry loaded successfully: Artisan Goods, Milling and Cooking Balance are active.", LogLevel.Debug);
         }
 
         /// <summary>
@@ -140,10 +141,17 @@ namespace BetterIndustry
             // CURRENT value into the menu, a setter lambda writing the chosen value back
             // into Config, and (for numbers) min/max/interval slider bounds.
             // I18n.Get(...) pulls localized display text from the i18n folder's json files.
-            // ---------------- Section 1: Cooking & Food Quality ----------------
-            configMenu.AddSectionTitle(
+            // Sub-page Navigation Links on Root Page
+            configMenu.AddPageLink(ModManifest, "cooking", () => I18n.Get("config.section.cooking"));
+            configMenu.AddPageLink(ModManifest, "artisan", () => I18n.Get("config.section.artisan"));
+            configMenu.AddPageLink(ModManifest, "milling", () => I18n.Get("config.section.milling"));
+            configMenu.AddPageLink(ModManifest, "fruittree", () => I18n.Get("config.section.fruittree"));
+
+            // ---------------- Sub-Page 1: Cooking & Food Quality ----------------
+            configMenu.AddPage(
                 mod: ModManifest,
-                text: () => I18n.Get("config.section.cooking")
+                pageId: "cooking",
+                pageTitle: () => I18n.Get("config.section.cooking")
             );
 
             configMenu.AddBoolOption(
@@ -202,10 +210,11 @@ namespace BetterIndustry
                 interval: 0.05f
             );
 
-            // ---------------- Section 2: Artisan Goods ----------------
-            configMenu.AddSectionTitle(
+            // ---------------- Sub-Page 2: Artisan Goods ----------------
+            configMenu.AddPage(
                 mod: ModManifest,
-                text: () => I18n.Get("config.section.artisan")
+                pageId: "artisan",
+                pageTitle: () => I18n.Get("config.section.artisan")
             );
 
             configMenu.AddBoolOption(
@@ -278,10 +287,11 @@ namespace BetterIndustry
                 setValue: value => Config.EnableExpandedAging = value
             );
 
-            // ---------------- Section 3: Fruit Tree Automation ----------------
-            configMenu.AddSectionTitle(
+            // ---------------- Sub-Page 3: Fruit Tree Automation ----------------
+            configMenu.AddPage(
                 mod: ModManifest,
-                text: () => I18n.Get("config.section.fruittree")
+                pageId: "fruittree",
+                pageTitle: () => I18n.Get("config.section.fruittree")
             );
 
             configMenu.AddBoolOption(
@@ -301,6 +311,70 @@ namespace BetterIndustry
                 min: 1,
                 max: 10,
                 interval: 1
+            );
+
+            // ---------------- Sub-Page 4: Artisanal Milling ----------------
+            configMenu.AddPage(
+                mod: ModManifest,
+                pageId: "milling",
+                pageTitle: () => I18n.Get("config.section.milling")
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.enable-mill-balancing.name"),
+                tooltip: () => I18n.Get("config.enable-mill-balancing.tooltip"),
+                getValue: () => Config.EnableMillBalancing,
+                setValue: value => Config.EnableMillBalancing = value
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.enable-mill-artisan-category.name"),
+                tooltip: () => I18n.Get("config.enable-mill-artisan-category.tooltip"),
+                getValue: () => Config.EnableMillArtisanCategory,
+                setValue: value => Config.EnableMillArtisanCategory = value
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.enable-mill-quality-matrix.name"),
+                tooltip: () => I18n.Get("config.enable-mill-quality-matrix.tooltip"),
+                getValue: () => Config.EnableMillQualityMatrix,
+                setValue: value => Config.EnableMillQualityMatrix = value
+            );
+
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.wheat-flour-base-price.name"),
+                tooltip: () => I18n.Get("config.wheat-flour-base-price.tooltip"),
+                getValue: () => Config.WheatFlourBasePrice,
+                setValue: value => Config.WheatFlourBasePrice = value,
+                min: 20,
+                max: 300,
+                interval: 5
+            );
+
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.sugar-base-price.name"),
+                tooltip: () => I18n.Get("config.sugar-base-price.tooltip"),
+                getValue: () => Config.SugarBasePrice,
+                setValue: value => Config.SugarBasePrice = value,
+                min: 20,
+                max: 300,
+                interval: 5
+            );
+
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.rice-base-price.name"),
+                tooltip: () => I18n.Get("config.rice-base-price.tooltip"),
+                getValue: () => Config.RiceBasePrice,
+                setValue: value => Config.RiceBasePrice = value,
+                min: 20,
+                max: 500,
+                interval: 5
             );
         }
 

@@ -87,6 +87,25 @@ namespace BetterIndustry
 
         /// <summary>Number of fruit on a tree that triggers the auto-drop (default 3, the vanilla maximum).</summary>
         public int MaxFruitsBeforeDrop { get; set; } = 3;
+
+        // ---------------- Artisanal Milling ----------------
+        /// <summary>Whether milled goods (Wheat Flour, Sugar, Rice) have their base prices rebalanced.</summary>
+        public bool EnableMillBalancing { get; set; } = true;
+
+        /// <summary>Whether milled goods receive the Artisan Goods category (-26) for the +40% Artisan profession bonus.</summary>
+        public bool EnableMillArtisanCategory { get; set; } = true;
+
+        /// <summary>Whether the Mill preserves grain quality into output goods via the Option 2 matrix.</summary>
+        public bool EnableMillQualityMatrix { get; set; } = true;
+
+        /// <summary>Base sell price for Wheat Flour (default 90g).</summary>
+        public int WheatFlourBasePrice { get; set; } = 90;
+
+        /// <summary>Base sell price for Sugar (default 80g).</summary>
+        public int SugarBasePrice { get; set; } = 80;
+
+        /// <summary>Base sell price for Rice (default 140g).</summary>
+        public int RiceBasePrice { get; set; } = 140;
     }
 }
 
