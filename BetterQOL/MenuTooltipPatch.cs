@@ -153,7 +153,6 @@ namespace BetterQOL
                     bool isDonated = Game1.netWorldState.Value.MuseumPieces.Values.Any(v =>
                         v == item.ItemId ||
                         v == item.QualifiedItemId ||
-                        (item is StardewValley.Object sObj && v == sObj.ParentSheetIndex.ToString()) ||
                         v == $"(O){item.ItemId}"
                     );
 
@@ -336,10 +335,6 @@ namespace BetterQOL
                 return true;
 
             if (reqId == item.ItemId || reqId == item.QualifiedItemId || "(O)" + reqId == item.QualifiedItemId)
-                return true;
-
-            // 4. Object ParentSheetIndex match if positive integer
-            if (obj.ParentSheetIndex > 0 && reqId == obj.ParentSheetIndex.ToString())
                 return true;
 
             return false;

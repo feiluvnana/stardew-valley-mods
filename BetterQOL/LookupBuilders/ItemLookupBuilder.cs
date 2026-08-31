@@ -178,21 +178,9 @@ namespace BetterQOL
 			{
 				bool flag = ((IEnumerable<string>)(object)((NetDictionary<Vector2, string, NetString, SerializableDictionary<Vector2, string>, NetVector2Dictionary<string, NetString>>)(object)((NetFieldBase<NetWorldState, NetRef<NetWorldState>>)(object)Game1.netWorldState).Value.MuseumPieces).Values).Any(delegate(string v)
 				{
-					int result;
-					if (!(v == item.ItemId) && !(v == item.QualifiedItemId))
-					{
-						Item obj4 = item;
-						SObject val3 = (SObject)(object)((obj4 is SObject) ? obj4 : null);
-						if (val3 == null || !(v == ((Item)val3).ParentSheetIndex.ToString()))
-						{
-							result = ((v == "(O)" + item.ItemId) ? 1 : 0);
-							goto IL_0069;
-						}
-					}
-					result = 1;
-					goto IL_0069;
-					IL_0069:
-					return (byte)result != 0;
+					if (v == item.ItemId || v == item.QualifiedItemId || v == "(O)" + item.ItemId)
+						return true;
+					return false;
 				});
 				lookupSection2.Fields.Add(new LookupField((ModEntry.I18n.Get("lookup.item.museum")), (flag ? ModEntry.I18n.Get("lookup.item.museum-donated") : ModEntry.I18n.Get("lookup.item.museum-needed")), (Color?)(flag ? new Color(0, 140, 0) : new Color(200, 60, 20))));
 			}
