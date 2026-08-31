@@ -44,7 +44,7 @@ namespace BetterFishing
         /// Postfix on FishPond.dayUpdate: evaluates newly produced output and assigns star quality (Silver, Gold, Iridium)
         /// based on pond population tier and daily luck.
         /// </summary>
-        public static void DayUpdate_Postfix(FishPond __instance, int dayOfMonth)
+        public static void DayUpdate_Postfix(FishPond __instance)
         {
             if (!Config.EnableFishPondQuality || __instance == null)
                 return;
@@ -52,7 +52,7 @@ namespace BetterFishing
             try
             {
                 var outputItem = __instance.output.Value;
-                if (outputItem is not StardewValley.Object obj)
+                if (outputItem is not StardewValley.Object obj || !CanHaveQuality(obj))
                     return;
 
                 // Calculate quality based on occupants (1 to 10) and player daily luck
@@ -143,8 +143,23 @@ namespace BetterFishing
             }
             catch (Exception ex)
             {
-                Monitor.Log($"Error applying fish pond quality: {ex}", LogLevel.Trace);
+                Monitor.Log($"Error applying fish pond quality: {ex}", LogLevel.Error);
             }
+        }
+
+        private static bool CanHaveQuality(StardewValley.Object obj)
+        {
+            if (obj.QualifiedItemId is "(O)812" or "812" or "(O)814" or "814" or "(O)447" or "447")
+                return true; // Roe, Squid Ink, Aged Roe
+
+            return obj.Category is StardewValley.Object.FishCategory
+                or StardewValley.Object.EggCategory
+                or StardewValley.Object.MilkCategory
+                or StardewValley.Object.meatCategory
+                or StardewValley.Object.VegetableCategory
+                or StardewValley.Object.FruitsCategory
+                or StardewValley.Object.flowersCategory
+                or StardewValley.Object.GreensCategory;
         }
     }
 }

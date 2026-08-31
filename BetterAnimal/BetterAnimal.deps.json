@@ -6,7 +6,7 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v6.0": {
-      "BetterAnimal/1.1.1": {
+      "BetterAnimal/1.1.3": {
         "runtime": {
           "BetterAnimal.dll": {}
         }
@@ -14,7 +14,7 @@
     }
   },
   "libraries": {
-    "BetterAnimal/1.1.1": {
+    "BetterAnimal/1.1.3": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

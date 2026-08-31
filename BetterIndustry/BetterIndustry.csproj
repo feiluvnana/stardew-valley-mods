@@ -2,7 +2,7 @@
   <PropertyGroup>
     <AssemblyName>BetterIndustry</AssemblyName>
     <RootNamespace>BetterIndustry</RootNamespace>
-    <Version>2.6.2</Version>
+    <Version>2.6.4</Version>
     <EnableHarmony>true</EnableHarmony>
   </PropertyGroup>
 </Project>

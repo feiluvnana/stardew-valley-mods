@@ -149,11 +149,12 @@ namespace BetterIndustry
                 if (CraftingRecipe.DoesFarmerHaveAdditionalIngredientsInInventory(testList, containerContents))
                 {
                     seasoningList = testList;
-                    // Qi Seasoning turns all Normal and Silver weights directly to Gold (100% Gold floor).
-                    rateGold += rateNormal + rateSilver;
+                    // Qi Seasoning upgrades base quality: Silver/Normal shifts to Gold (guaranteeing >= Gold), and high tiers shift to Iridium!
+                    double iridiumBonus = Math.Min(rateGold, rateGold * 0.35);
+                    rateIridium = Math.Min(100.0, rateIridium + iridiumBonus);
+                    rateGold = Math.Max(0.0, 100.0 - rateIridium);
                     rateNormal = 0.0;
                     rateSilver = 0.0;
-                    rateIridium = 0.0;
                 }
 
                 // Roll final quality tier based on cumulative rates
@@ -400,7 +401,7 @@ namespace BetterIndustry
 
         /// <summary>
         /// Returns the 4-level weight distribution (Normal, Silver, Gold, Iridium) contributed by an ingredient.
-        /// Follows the deterministic 60/25/15 quality matrix with 0% Iridium output.
+        /// Follows the quality matrix with balanced Iridium yield from high-quality ingredients.
         /// </summary>
         private static (double Normal, double Silver, double Gold, double Iridium) GetIngredientWeights(Item item)
         {
@@ -411,9 +412,9 @@ namespace BetterIndustry
 
             return item.Quality switch
             {
-                1 => (25.0, 60.0, 15.0, 0.0), // Silver (1⭐)
-                2 => (15.0, 25.0, 60.0, 0.0), // Gold (2⭐)
-                4 => (0.0, 25.0, 75.0, 0.0),  // Iridium (4⭐) -> Max Gold
+                1 => (20.0, 55.0, 20.0, 5.0),  // Silver (1⭐)
+                2 => (10.0, 20.0, 55.0, 15.0), // Gold (2⭐)
+                4 => (0.0, 10.0, 55.0, 35.0),  // Iridium (4⭐) -> High Iridium chance
                 _ => (60.0, 25.0, 15.0, 0.0)
             };
         }

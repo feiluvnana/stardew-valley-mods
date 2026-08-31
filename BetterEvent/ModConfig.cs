@@ -40,18 +40,18 @@ namespace BetterEvent
 
         /// <summary>
         /// Day of the month each extended-season festival starts on
-        /// (e.g. 22 means it opens on the 22nd).
+        /// (e.g. 15 means it opens on the 15th).
         /// </summary>
         // Whole number 1..28; ModEntry clamps user input into that range
         // with Math.Clamp so an invalid value can never reach the game data.
-        public int FestivalStartDay { get; set; } = 22;
+        public int FestivalStartDay { get; set; } = 15;
 
         /// <summary>
         /// Day of the month each extended-season festival ends on (inclusive),
         /// paired with FestivalStartDay to define its length.
         /// </summary>
-        // Default 22..24 mirrors vanilla's three-day Spring layout;
+        // Default 15..17 mirrors vanilla's three-day Spring layout;
         // "inclusive" means the end day itself is still part of the festival.
-        public int FestivalEndDay { get; set; } = 24;
+        public int FestivalEndDay { get; set; } = 17;
     }
 }

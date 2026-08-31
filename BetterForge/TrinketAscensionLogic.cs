@@ -503,6 +503,10 @@ namespace BetterForge
 
             // Remove any spur buff still ticking so re-procs restart cleanly
             // instead of stacking multiple copies.
+            if (who.buffs.AppliedBuffs.ContainsKey("iridiumspur"))
+            {
+                who.buffs.Remove("iridiumspur");
+            }
             if (who.buffs.AppliedBuffs.ContainsKey("feiluvnana.BetterForge/SpurAttack"))
             {
                 who.buffs.Remove("feiluvnana.BetterForge/SpurAttack");
@@ -613,9 +617,8 @@ namespace BetterForge
                         nearbyMonster.takeDamage(explosionDamage, 0, 0, false, 1.0, "hitEnemy");
                         location.debris.Add(new Debris(explosionDamage, nearbyMonster.getStandingPosition(), Color.Cyan, 1f, nearbyMonster));
 
-                        // Frost slow: -2 movement speed and at least 1.2 s of stun.
-                        nearbyMonster.addedSpeed = -2;
-                        nearbyMonster.stunTime.Value = Math.Max(nearbyMonster.stunTime.Value, 1200);
+                        // Frost slow: stun wave and splash visual
+                        nearbyMonster.stunTime.Value = Math.Max(nearbyMonster.stunTime.Value, 1500);
                         Game1.createRadialDebris(location, 10, (int)nearbyMonster.Position.X + 32, (int)nearbyMonster.Position.Y + 32, 4, false);
                     }
                 }

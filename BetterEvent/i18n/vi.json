@@ -1,9 +1,9 @@
-﻿{
+{
     "config.section.festivals":  "Tùy Chọn Lễ Hội",
     "config.start-day.name":  "Ngày Bắt Đầu Lễ Hội",
-    "config.start-day.tooltip":  "Ngày trong tháng bắt đầu Lễ Hội Sa Mạc (mặc định: 22).",
+    "config.start-day.tooltip":  "Ngày trong tháng bắt đầu Lễ Hội Sa Mạc (mặc định: 15).",
     "config.end-day.name":  "Ngày Kết Thúc Lễ Hội",
-    "config.end-day.tooltip":  "Ngày trong tháng kết thúc Lễ Hội Sa Mạc (mặc định: 24).",
+    "config.end-day.tooltip":  "Ngày trong tháng kết thúc Lễ Hội Sa Mạc (mặc định: 17).",
     "config.enable-summer.name":  "Mở Lễ Hội Mùa Hè",
     "config.enable-summer.tooltip":  "Mở rộng Lễ Hội Sa Mạc sang Mùa Hè.",
     "config.enable-fall.name":  "Mở Lễ Hội Mùa Thu",

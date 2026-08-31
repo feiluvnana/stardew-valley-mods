@@ -49,7 +49,8 @@ namespace BetterFishing
                        fishName.Contains("Crimsonfish", StringComparison.OrdinalIgnoreCase) ||
                        fishName.Contains("Glacierfish", StringComparison.OrdinalIgnoreCase) ||
                        fishName.Contains("Angler", StringComparison.OrdinalIgnoreCase) ||
-                       fishName.Contains("Mutant Carp", StringComparison.OrdinalIgnoreCase);
+                       fishName.Contains("Mutant Carp", StringComparison.OrdinalIgnoreCase) ||
+                       fishName.Contains("Radioactive", StringComparison.OrdinalIgnoreCase);
             }
 
             return false;
@@ -187,7 +188,7 @@ namespace BetterFishing
                     }
 
                     // Small / Isolated location
-                    if (IsolatedLocationFishIds.Contains(cleanFishId) || IsolatedLocationFishIds.Contains(parts[0]))
+                    if (IsolatedLocationFishIds.Contains(cleanFishId))
                     {
                         traitMultiplier += Config.IsolatedLocationBonus;
                     }

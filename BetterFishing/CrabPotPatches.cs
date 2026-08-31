@@ -29,9 +29,10 @@ namespace BetterFishing
         {
             try
             {
-                // Patch DayUpdate to reduce trash rates
+                // Patch DayUpdate to reduce trash rates and preserve Deluxe Bait bonus
                 harmony.Patch(
                     original: AccessTools.Method(typeof(CrabPot), nameof(CrabPot.DayUpdate)),
+                    prefix: new HarmonyMethod(typeof(CrabPotPatches), nameof(DayUpdate_Prefix)),
                     postfix: new HarmonyMethod(typeof(CrabPotPatches), nameof(DayUpdate_Postfix))
                 );
 
@@ -50,11 +51,21 @@ namespace BetterFishing
             }
         }
 
+        public static void DayUpdate_Prefix(CrabPot __instance, out bool __state)
+        {
+            __state = false;
+            if (__instance?.bait?.Value != null)
+            {
+                string baitId = __instance.bait.Value.QualifiedItemId ?? __instance.bait.Value.ItemId;
+                __state = baitId is "(O)DeluxeBait" or "DeluxeBait" or "774" or "(O)774";
+            }
+        }
+
         /// <summary>
         /// Postfix on CrabPot.DayUpdate: intercepts trash generation and applies the trash reroll chance,
         /// converting trash catches into valid local fish and shellfish.
         /// </summary>
-        public static void DayUpdate_Postfix(CrabPot __instance)
+        public static void DayUpdate_Postfix(CrabPot __instance, bool __state)
         {
             try
             {
@@ -77,7 +88,7 @@ namespace BetterFishing
 
                 // Determine whether tile is ocean water or freshwater
                 bool isOcean = IsOceanTile(__instance.Location, (int)__instance.TileLocation.X, (int)__instance.TileLocation.Y);
-                bool hasDeluxeBait = __instance.bait.Value != null && (__instance.bait.Value.QualifiedItemId == "(O)DeluxeBait" || __instance.bait.Value.ItemId == "DeluxeBait");
+                bool hasDeluxeBait = __state;
 
                 string chosenFishId = isOcean ? GetRandomOceanCatch(r, hasDeluxeBait) : GetRandomFreshwaterCatch(r);
                 __instance.heldObject.Value = ItemRegistry.Create<StardewValley.Object>($"(O){chosenFishId}", 1);
@@ -150,31 +161,27 @@ namespace BetterFishing
             return "722"; // Periwinkle fallback
         }
 
-        // State holder to transfer held item info between prefix and postfix
-        [ThreadStatic]
-        private static string? _pendingHarvestItemId;
-
-        public static void CheckForAction_Prefix(CrabPot __instance, bool justCheckingForActivity)
+        public static void CheckForAction_Prefix(CrabPot __instance, bool justCheckingForActivity, out string? __state)
         {
-            _pendingHarvestItemId = null;
+            __state = null;
 
             if (!Config.EnableCrabPotExpBalancing || justCheckingForActivity)
                 return;
 
             if (__instance.heldObject.Value != null)
             {
-                _pendingHarvestItemId = __instance.heldObject.Value.ItemId;
+                __state = __instance.heldObject.Value.ItemId;
             }
         }
 
-        public static void CheckForAction_Postfix(CrabPot __instance, Farmer who, bool __result)
+        public static void CheckForAction_Postfix(CrabPot __instance, Farmer who, bool __result, string? __state)
         {
             try
             {
-                if (!__result || _pendingHarvestItemId == null || who == null)
+                if (!__result || __state == null || who == null)
                     return;
 
-                string cleanId = _pendingHarvestItemId.StartsWith("(O)") ? _pendingHarvestItemId[3..] : _pendingHarvestItemId;
+                string cleanId = __state.StartsWith("(O)") ? __state[3..] : __state;
                 int bonusExp = GetBonusExpForCatch(cleanId);
 
                 if (bonusExp > 0)
@@ -182,9 +189,9 @@ namespace BetterFishing
                     who.gainExperience(Farmer.fishingSkill, bonusExp);
                 }
             }
-            finally
+            catch (Exception ex)
             {
-                _pendingHarvestItemId = null;
+                Monitor.Log($"Error in CrabPot.CheckForAction_Postfix: {ex}", LogLevel.Error);
             }
         }
 

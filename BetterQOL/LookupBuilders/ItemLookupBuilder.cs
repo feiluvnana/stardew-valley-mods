@@ -785,18 +785,21 @@ namespace BetterQOL
 				value2 = ((object)ModEntry.I18n.Get("lookup.trinket.ice-rod.range")).ToString();
 				if (val != null)
 				{
-					// Random cooldown/freeze windows; a 5% roll makes it "perfect"
-					// (best fixed values instead of the random range).
-					float num5 = random.Next(3000, 5001);
-					int num6 = random.Next(2000, 4001);
-					bool flag = false;
-					if (random.NextDouble() < 0.05)
+					// Match vanilla SDV 1.6 IceOrbTrinketEffect RNG logic
+					bool isPerfect = random.NextBool(0.05);
+					float num5;
+					int num6;
+					if (isPerfect)
 					{
-						flag = true;
 						num5 = 3000f;
 						num6 = 4000;
 					}
-					string perfect = (flag ? ((object)ModEntry.I18n.Get("lookup.trinket.ice-rod.perfect-tag")).ToString() : "");
+					else
+					{
+						num6 = random.Next(2, 5) * 1000;
+						num5 = (float)random.Next(3, 6) * 1000f;
+					}
+					string perfect = (isPerfect ? ((object)ModEntry.I18n.Get("lookup.trinket.ice-rod.perfect-tag")).ToString() : "");
 					value = ((object)ModEntry.I18n.Get("lookup.trinket.ice-rod.current", (object)new
 					{
 						delay = $"{num5 / 1000f:0.0}",

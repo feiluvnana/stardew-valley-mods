@@ -1,5 +1,6 @@
 using HarmonyLib;
 using StardewModdingAPI;
+using StardewValley;
 using StardewValley.Tools;
 
 namespace BetterFishing
@@ -11,7 +12,7 @@ namespace BetterFishing
     public static class FishingExpPatches
     {
         /// <summary>
-        /// Applies the prefix patch to FishingRod.pullFishFromWater.
+        /// Applies the postfix patch to FishingRod.pullFishFromWater.
         /// </summary>
         public static void Apply(Harmony harmony)
         {
@@ -23,9 +24,9 @@ namespace BetterFishing
                 {
                     harmony.Patch(
                         original: targetMethod,
-                        prefix: new HarmonyMethod(typeof(FishingExpPatches), nameof(PullFishFromWater_Prefix))
+                        postfix: new HarmonyMethod(typeof(FishingExpPatches), nameof(PullFishFromWater_Postfix))
                     );
-                    ModEntry.ModMonitor.Log("Hooked FishingRod.pullFishFromWater with balanced EXP prefix.", LogLevel.Trace);
+                    ModEntry.ModMonitor.Log("Hooked FishingRod.pullFishFromWater with balanced EXP postfix.", LogLevel.Trace);
                 }
                 else
                 {
@@ -39,30 +40,33 @@ namespace BetterFishing
         }
 
         /// <summary>
-        /// Harmony Prefix for FishingRod.pullFishFromWater.
-        /// Adjusts fishDifficulty to provide balanced EXP bonus for apex (>=85) and legendary fish.
+        /// Harmony Postfix for FishingRod.pullFishFromWater.
+        /// Directly awards bonus EXP for apex (>=85) and legendary fish without side-effects on fishDifficulty.
         /// </summary>
-        public static void PullFishFromWater_Prefix(string fishId, ref int fishDifficulty, bool isBossFish)
+        public static void PullFishFromWater_Postfix(FishingRod __instance, string fishId, int fishDifficulty, bool isBossFish, bool fromFishPond)
         {
             try
             {
-                if (ModEntry.Config == null || !ModEntry.Config.EnableFishingExpBalancing)
+                if (fromFishPond || ModEntry.Config == null || !ModEntry.Config.EnableFishingExpBalancing)
+                    return;
+
+                Farmer who = __instance.getLastFarmerToUse();
+                if (who == null)
                     return;
 
                 if (isBossFish || FishPriceBalancer.IsLegendaryFish(fishId))
                 {
-                    fishDifficulty += ModEntry.Config.LegendaryFishExpBonus * 3;
+                    who.gainExperience(Farmer.fishingSkill, ModEntry.Config.LegendaryFishExpBonus);
                 }
                 else if (fishDifficulty >= 85)
                 {
-                    fishDifficulty += ModEntry.Config.ApexFishExpBonus * 3;
+                    who.gainExperience(Farmer.fishingSkill, ModEntry.Config.ApexFishExpBonus);
                 }
             }
             catch (Exception ex)
             {
-                ModEntry.ModMonitor.Log($"Error in FishingRod.pullFishFromWater prefix: {ex}", LogLevel.Error);
+                ModEntry.ModMonitor.Log($"Error in FishingRod.pullFishFromWater postfix: {ex}", LogLevel.Error);
             }
         }
     }
 }
-

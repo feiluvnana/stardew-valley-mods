@@ -107,6 +107,7 @@ namespace BetterQOL
                 {
                     Game1.netWorldState.Value.GoldenCoconutCracked = true;
                     treasure = ItemRegistry.Create("(O)73");
+                    Game1.stats.GeodesCracked++;
                 }
                 else
                 {

@@ -3,7 +3,7 @@
   "BaseFloor": 20.0,
   "LinearFactor": 0.8,
   "MidTierFactor": 25.0,
-  "ApexFactor": 0.91252,
+  "ApexFactor": 0.9293,
   "ApexExponent": 4.34,
   "SmoothMovementBonus": 0.02,
   "MixedMovementBonus": 0.03,

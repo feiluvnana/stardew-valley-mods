@@ -8,7 +8,6 @@
   "EnableMeadFix": true,
   "FlowerMeadMultiplier": 1.35,
   "EnableMachineQuality": true,
-  "EnableQualityPreserving": true,
   "EnableTruffleOilFix": true,
   "TruffleOilMultiplier": 1.5,
   "EnableCookingOilArtisanCategory": true,

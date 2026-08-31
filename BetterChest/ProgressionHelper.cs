@@ -172,7 +172,9 @@ namespace BetterChest
                 // interpolation ($"...{i}") builds names like "hasClaimedMastery_2".
                 for (int i = 0; i < 5; i++)
                 {
-                    if (player.mailReceived.Contains($"mastery_{i}") ||
+                    if (player.mailReceived.Contains($"Mastery_{i}") ||
+                        player.hasOrWillReceiveMail($"Mastery_{i}") ||
+                        player.mailReceived.Contains($"mastery_{i}") ||
                         player.hasOrWillReceiveMail($"mastery_{i}"))
                     {
                         return true;
@@ -200,7 +202,9 @@ namespace BetterChest
 
             if (skillIndex >= 0)
             {
-                return player.mailReceived.Contains($"mastery_{skillIndex}") ||
+                return player.mailReceived.Contains($"Mastery_{skillIndex}") ||
+                       player.hasOrWillReceiveMail($"Mastery_{skillIndex}") ||
+                       player.mailReceived.Contains($"mastery_{skillIndex}") ||
                        player.hasOrWillReceiveMail($"mastery_{skillIndex}");
             }
 
@@ -217,8 +221,8 @@ namespace BetterChest
             if (Utility.IsPassiveFestivalDay("DesertFestival"))
                 return true;
 
-            // Fallback: Spring 15-17
-            return Game1.currentSeason.Equals("spring", StringComparison.OrdinalIgnoreCase) && Game1.dayOfMonth >= 15 && Game1.dayOfMonth <= 17;
+            // Fallback for Desert Festival days (15-17)
+            return Game1.dayOfMonth >= 15 && Game1.dayOfMonth <= 17;
         }
 
         /// <summary>

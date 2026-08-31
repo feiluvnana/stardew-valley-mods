@@ -55,14 +55,6 @@ namespace BetterIndustry
         /// <summary>Whether artisan machines use the balanced 60/25/15 quality matrix (Normal, Silver, Gold, 0% Iridium) based on input quality.</summary>
         public bool EnableMachineQuality { get; set; } = true;
 
-        /// <summary>Legacy alias for EnableMachineQuality.</summary>
-        [System.Text.Json.Serialization.JsonIgnore]
-        public bool EnableQualityPreserving
-        {
-            get => EnableMachineQuality;
-            set => EnableMachineQuality = value;
-        }
-
         /// <summary>Whether Truffle Oil price and quality scale with the input Truffle.</summary>
         public bool EnableTruffleOilFix { get; set; } = true;
 

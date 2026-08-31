@@ -328,8 +328,8 @@ namespace BetterChest
                 decayChances = new[]
                 {
                     1.0f,
-                    1.0f,
-                    1.0f,
+                    config.Floor100Roll2Chance,
+                    config.Floor100Roll3Chance,
                     config.Floor100Roll4Chance,
                     config.Floor100Roll5Chance,
                     config.Floor100Roll6Chance,
@@ -362,7 +362,7 @@ namespace BetterChest
                 decayChances = new[]
                 {
                     1.0f,
-                    1.0f,
+                    config.Roll2Chance,
                     config.Roll3Chance,
                     config.Roll4Chance,
                     config.Roll5Chance,
@@ -387,13 +387,21 @@ namespace BetterChest
                 }
             }
 
-            // Stack multiplier rates (Unified between regular and special chests)
+            // Stack multiplier rates
             float x5Chance;
             float x4Chance;
             float x3Chance;
             float x2Chance;
 
-            if (isShallowFloor)
+            if (applySpecialBuff)
+            {
+                // Floor 100 Special chests use dedicated Floor100 stack chances
+                x5Chance = config.Floor100QuintupleStackChance;
+                x4Chance = config.Floor100QuadrupleStackChance;
+                x3Chance = config.Floor100TripleStackChance;
+                x2Chance = config.Floor100DoubleStackChance;
+            }
+            else if (isShallowFloor)
             {
                 // Shallow floors limit stack multiplier jackpot up to 2x
                 x5Chance = 0f;

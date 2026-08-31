@@ -188,6 +188,17 @@ namespace BetterAnimal
 
             configMenu.AddNumberOption(
                 mod: ModManifest,
+                name: () => I18n.Get("config.dinosaur-multi-drop-min-hearts.name"),
+                tooltip: () => I18n.Get("config.dinosaur-multi-drop-min-hearts.tooltip"),
+                getValue: () => Config.DinosaurMultiDropMinHearts,
+                setValue: value => Config.DinosaurMultiDropMinHearts = value,
+                min: 1,
+                max: 5,
+                interval: 1
+            );
+
+            configMenu.AddNumberOption(
+                mod: ModManifest,
                 name: () => I18n.Get("config.dinosaur-multi-drop-chance.name"),
                 tooltip: () => I18n.Get("config.dinosaur-multi-drop-chance.tooltip"),
                 getValue: () => Config.DinosaurMultiDropChance,
@@ -209,6 +220,17 @@ namespace BetterAnimal
 
             configMenu.AddNumberOption(
                 mod: ModManifest,
+                name: () => I18n.Get("config.goat-multi-drop-min-hearts.name"),
+                tooltip: () => I18n.Get("config.goat-multi-drop-min-hearts.tooltip"),
+                getValue: () => Config.GoatMultiDropMinHearts,
+                setValue: value => Config.GoatMultiDropMinHearts = value,
+                min: 1,
+                max: 5,
+                interval: 1
+            );
+
+            configMenu.AddNumberOption(
+                mod: ModManifest,
                 name: () => I18n.Get("config.goat-multi-drop-chance.name"),
                 tooltip: () => I18n.Get("config.goat-multi-drop-chance.tooltip"),
                 getValue: () => Config.GoatMultiDropChance,
@@ -226,6 +248,17 @@ namespace BetterAnimal
                 tooltip: () => I18n.Get("config.enable-void-chicken-multi-drop.tooltip"),
                 getValue: () => Config.EnableVoidChickenMultiDrop,
                 setValue: value => Config.EnableVoidChickenMultiDrop = value
+            );
+
+            configMenu.AddNumberOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.void-chicken-multi-drop-min-hearts.name"),
+                tooltip: () => I18n.Get("config.void-chicken-multi-drop-min-hearts.tooltip"),
+                getValue: () => Config.VoidChickenMultiDropMinHearts,
+                setValue: value => Config.VoidChickenMultiDropMinHearts = value,
+                min: 1,
+                max: 5,
+                interval: 1
             );
 
             configMenu.AddNumberOption(

@@ -84,22 +84,19 @@ namespace BetterIndustry
             {
                 if (__instance.readyForHarvest.Value && __instance.heldObject.Value != null)
                 {
-                    // Standard Tapper: 35% chance for 2x yield
-                    if (__instance.ItemId == "105" || __instance.QualifiedItemId == "(BC)105" || __instance.Name.Contains("Tapper", StringComparison.OrdinalIgnoreCase))
-                    {
-                        if (__instance.ItemId != "264" && __instance.QualifiedItemId != "(BC)264" && !__instance.Name.Contains("Heavy", StringComparison.OrdinalIgnoreCase))
-                        {
-                            if (__instance.heldObject.Value.Stack == 1 && Game1.random.NextDouble() <= Config.StandardTapperDoubleChance)
-                            {
-                                __instance.heldObject.Value.Stack = 2;
-                            }
-                        }
-                    }
+                    bool isHeavyTapper = __instance.ItemId == "264" || __instance.QualifiedItemId == "(BC)264" || __instance.Name.Contains("Heavy Tapper", StringComparison.OrdinalIgnoreCase);
+                    bool isStandardTapper = !isHeavyTapper && (__instance.ItemId == "105" || __instance.QualifiedItemId == "(BC)105" || __instance.Name.Contains("Tapper", StringComparison.OrdinalIgnoreCase));
 
-                    // Heavy Tapper: 100% 2x yield, 20% chance for 3x yield
-                    if (__instance.ItemId == "264" || __instance.QualifiedItemId == "(BC)264" || __instance.Name.Contains("Heavy Tapper", StringComparison.OrdinalIgnoreCase))
+                    if (isHeavyTapper)
                     {
-                        __instance.heldObject.Value.Stack = Game1.random.NextDouble() <= Config.HeavyTapperTripleChance ? 3 : 2;
+                        __instance.heldObject.Value.Stack = Game1.random.NextDouble() < Config.HeavyTapperTripleChance ? 3 : 2;
+                    }
+                    else if (isStandardTapper)
+                    {
+                        if (__instance.heldObject.Value.Stack == 1 && Game1.random.NextDouble() < Config.StandardTapperDoubleChance)
+                        {
+                            __instance.heldObject.Value.Stack = 2;
+                        }
                     }
                 }
             }

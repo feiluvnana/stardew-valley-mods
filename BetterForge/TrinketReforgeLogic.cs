@@ -179,19 +179,21 @@ namespace BetterForge
                 case "icerod":
                 {
                     eval.MaxTier = 5;
-                    // Ice Rod rolls two stats: attack delay (lower = better) and
-                    // freeze duration (higher = better). Next(3000, 5001) = 3000-5000.
-                    float delay = r.Next(3000, 5001);
-                    int freeze = r.Next(2000, 4001);
-                    bool isPerfect = false;
+                    // In vanilla SDV 1.6: IceOrbTrinketEffect checks NextBool(0.05) first,
+                    // then rolls duration = Next(2, 5) * 1000 and delay = Next(3, 6) * 1000f.
+                    bool isPerfect = r.NextBool(0.05);
+                    float delay;
+                    int freeze;
 
-                    // 5% chance to override with the "Perfect" roll: fastest delay
-                    // and longest freeze in one.
-                    if (r.NextDouble() < 0.05)
+                    if (isPerfect)
                     {
-                        isPerfect = true;
                         delay = 3000f;
                         freeze = 4000;
+                    }
+                    else
+                    {
+                        freeze = r.Next(2, 5) * 1000;
+                        delay = (float)r.Next(3, 6) * 1000f;
                     }
 
                     // Convert both stats to 0-1 subscores (shorter delay scores higher),
@@ -296,6 +298,7 @@ namespace BetterForge
             {
                 int randomSeed = Game1.random.Next();
                 trinket.RerollStats(randomSeed);
+                IncrementReforgeCount(trinket);
                 ResetCachedDescription(trinket, who);
 
                 var eval = Evaluate(trinket.ItemId, randomSeed);
@@ -367,6 +370,7 @@ namespace BetterForge
             // Commit the winning seed: RerollStats makes the game rebuild the
             // trinket's real stats from it, then we clear stale tooltips.
             trinket.RerollStats(bestSeed);
+            IncrementReforgeCount(trinket);
             ResetCachedDescription(trinket, who);
 
             var finalEval = Evaluate(trinket.ItemId, bestSeed);
@@ -390,6 +394,20 @@ namespace BetterForge
             }
 
             return bestSeed;
+        }
+
+        private static void IncrementReforgeCount(Trinket trinket)
+        {
+            int reforgeCount = 0;
+            if (trinket.modData.TryGetValue(ReforgeCountKey, out string? countStr) && int.TryParse(countStr, out int count))
+            {
+                reforgeCount = count;
+            }
+            else if (trinket.modData.TryGetValue(LegacyReforgeCountKey, out string? legCountStr) && int.TryParse(legCountStr, out int legCount))
+            {
+                reforgeCount = legCount;
+            }
+            trinket.modData[ReforgeCountKey] = (reforgeCount + 1).ToString();
         }
     }
 }

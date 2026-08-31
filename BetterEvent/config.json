@@ -1,8 +1,8 @@
 {
-  "EnableSummer": false,
-  "EnableFall": false,
+  "EnableSummer": true,
+  "EnableFall": true,
   "EnableWinter": true,
   "KeepEggs": true,
-  "FestivalStartDay": 22,
-  "FestivalEndDay": 24
+  "FestivalStartDay": 15,
+  "FestivalEndDay": 17
 }

@@ -56,10 +56,9 @@ namespace BetterAnimal
                 }
 
                 // 3. Hook Object.performRemoveAction (for Slime Ball pop bonus)
-                var removeAction = AccessTools.Method(
+                var removeAction = AccessTools.DeclaredMethod(
                     typeof(StardewValley.Object),
-                    nameof(StardewValley.Object.performRemoveAction),
-                    new[] { typeof(Vector2), typeof(GameLocation) }
+                    nameof(StardewValley.Object.performRemoveAction)
                 );
                 if (removeAction != null)
                 {
@@ -99,16 +98,28 @@ namespace BetterAnimal
             }
         }
 
-        public static void DayUpdate_Prefix(FarmAnimal __instance, out (string produce, int quality) __state)
+        public static void DayUpdate_Prefix(FarmAnimal __instance, out (string produce, int quality, int daysSinceLay, bool wasAdult) __state)
         {
-            __state = (__instance.currentProduce?.Value ?? string.Empty, __instance.produceQuality?.Value ?? 0);
+            if (__instance != null)
+            {
+                __state = (
+                    __instance.currentProduce?.Value ?? string.Empty,
+                    __instance.produceQuality?.Value ?? 0,
+                    __instance.daysSinceLastLay?.Value ?? 0,
+                    __instance.isAdult()
+                );
+            }
+            else
+            {
+                __state = (string.Empty, 0, 0, false);
+            }
         }
 
         /// <summary>
         /// Postfix on FarmAnimal.dayUpdate: evaluates produce and grants multi-drops for
         /// ducks, rabbits, goats, dinosaurs, void chickens, and daily wool for happy sheep.
         /// </summary>
-        public static void DayUpdate_Postfix(FarmAnimal __instance, GameLocation environment, (string produce, int quality) __state)
+        public static void DayUpdate_Postfix(FarmAnimal __instance, GameLocation environment, (string produce, int quality, int daysSinceLay, bool wasAdult) __state)
         {
             if (__instance == null)
                 return;
@@ -117,20 +128,30 @@ namespace BetterAnimal
             {
                 string animalType = __instance.type?.Value ?? string.Empty;
                 int hearts = __instance.friendshipTowardFarmer.Value / 200;
-                string currentProduce = __state.produce;
+                bool producedToday = (__instance.daysSinceLastLay.Value == 0 && __state.wasAdult) || !string.IsNullOrEmpty(__instance.currentProduce?.Value);
+                int quality = __instance.produceQuality?.Value ?? __state.quality;
 
-                // 1. Duck Dual Drop: When a high-friendship duck rolls a Feather, grant the Duck Egg as well
+                // 1. Duck Dual Drop: When a high-friendship duck lays/drops, grant bonus Duck Egg / Duck Feather
                 if (Config.EnableDuckDualDrop && animalType.Contains("Duck", StringComparison.OrdinalIgnoreCase))
                 {
-                    bool isDuckFeather = currentProduce is "444" or "(O)444" || currentProduce.Equals("DuckFeather", StringComparison.OrdinalIgnoreCase);
-                    if (isDuckFeather && hearts >= Config.DuckDualDropMinHearts)
+                    if (producedToday && hearts >= Config.DuckDualDropMinHearts)
                     {
-                        double rollChance = hearts >= 5 ? Config.DuckDualDropChance : (Config.DuckDualDropChance * 0.75);
-                        if (Game1.random.NextDouble() <= rollChance)
+                        string currentProduce = __instance.currentProduce?.Value ?? __state.produce;
+                        bool isFeather = currentProduce is "444" or "(O)444" || currentProduce.Contains("Feather", StringComparison.OrdinalIgnoreCase);
+
+                        if (isFeather)
                         {
-                            int quality = __state.quality;
-                            SpawnProduce(__instance, "442", quality); // Duck Egg (442)
-                            Monitor.Log($"BetterAnimal: High-friendship duck '{__instance.Name}' dropped bonus Duck Egg alongside Duck Feather.", LogLevel.Trace);
+                            SpawnProduce(__instance, "442", quality); // Drop bonus Duck Egg alongside feather
+                            Monitor.Log($"BetterAnimal: High-friendship duck '{__instance.Name}' dropped Duck Feather + bonus Duck Egg.", LogLevel.Trace);
+                        }
+                        else
+                        {
+                            double rollChance = hearts >= 5 ? Config.DuckDualDropChance : (Config.DuckDualDropChance * 0.75);
+                            if (Game1.random.NextDouble() < rollChance)
+                            {
+                                SpawnProduce(__instance, "444", quality); // Drop bonus Duck Feather
+                                Monitor.Log($"BetterAnimal: High-friendship duck '{__instance.Name}' produced bonus Duck Feather.", LogLevel.Trace);
+                            }
                         }
                     }
                 }
@@ -138,12 +159,11 @@ namespace BetterAnimal
                 // 2. Rabbit Multi-Drop: High-friendship rabbits have a chance to drop multiple wool or a lucky foot
                 if (Config.EnableRabbitMultiDrop && animalType.Contains("Rabbit", StringComparison.OrdinalIgnoreCase))
                 {
-                    if (!string.IsNullOrEmpty(currentProduce) && hearts >= 3)
+                    if (producedToday && hearts >= 3)
                     {
-                        if (Game1.random.NextDouble() <= Config.RabbitMultiDropChance)
+                        if (Game1.random.NextDouble() < Config.RabbitMultiDropChance)
                         {
                             string bonusItemId = (Game1.random.NextDouble() < (0.15 + (hearts * 0.05))) ? "446" : "440";
-                            int quality = __state.quality;
                             SpawnProduce(__instance, bonusItemId, quality);
                             Monitor.Log($"BetterAnimal: Rabbit '{__instance.Name}' produced bonus item ID '{bonusItemId}'.", LogLevel.Trace);
                         }
@@ -153,12 +173,12 @@ namespace BetterAnimal
                 // 3. Goat Multi-Milk: High-friendship goats have a chance to produce bonus goat milk
                 if (Config.EnableGoatMultiDrop && animalType.Contains("Goat", StringComparison.OrdinalIgnoreCase))
                 {
+                    string currentProduce = __instance.currentProduce?.Value ?? __state.produce;
                     bool isGoatMilk = currentProduce is "436" or "(O)436" or "438" or "(O)438" || currentProduce.Contains("GoatMilk", StringComparison.OrdinalIgnoreCase);
-                    if (isGoatMilk && hearts >= Config.GoatMultiDropMinHearts)
+                    if (producedToday && isGoatMilk && hearts >= Config.GoatMultiDropMinHearts)
                     {
-                        if (Game1.random.NextDouble() <= Config.GoatMultiDropChance)
+                        if (Game1.random.NextDouble() < Config.GoatMultiDropChance)
                         {
-                            int quality = __state.quality;
                             SpawnProduce(__instance, currentProduce, quality);
                             Monitor.Log($"BetterAnimal: Goat '{__instance.Name}' produced bonus Goat Milk.", LogLevel.Trace);
                         }
@@ -168,12 +188,10 @@ namespace BetterAnimal
                 // 4. Dinosaur Multi-Egg: High-friendship dinosaurs have a chance to lay a bonus second egg
                 if (Config.EnableDinosaurMultiDrop && animalType.Contains("Dino", StringComparison.OrdinalIgnoreCase))
                 {
-                    bool isDinoEgg = currentProduce is "107" or "(O)107" || currentProduce.Contains("DinosaurEgg", StringComparison.OrdinalIgnoreCase);
-                    if (isDinoEgg && hearts >= Config.DinosaurMultiDropMinHearts)
+                    if (producedToday && hearts >= Config.DinosaurMultiDropMinHearts)
                     {
-                        if (Game1.random.NextDouble() <= Config.DinosaurMultiDropChance)
+                        if (Game1.random.NextDouble() < Config.DinosaurMultiDropChance)
                         {
-                            int quality = __state.quality;
                             SpawnProduce(__instance, "107", quality);
                             Monitor.Log($"BetterAnimal: Dinosaur '{__instance.Name}' laid a bonus Dinosaur Egg.", LogLevel.Trace);
                         }
@@ -183,12 +201,10 @@ namespace BetterAnimal
                 // 5. Void Chicken Multi-Egg: High-friendship void chickens have a chance to lay a bonus second void egg
                 if (Config.EnableVoidChickenMultiDrop && animalType.Contains("Void", StringComparison.OrdinalIgnoreCase))
                 {
-                    bool isVoidEgg = currentProduce is "305" or "(O)305" || currentProduce.Contains("VoidEgg", StringComparison.OrdinalIgnoreCase);
-                    if (isVoidEgg && hearts >= Config.VoidChickenMultiDropMinHearts)
+                    if (producedToday && hearts >= Config.VoidChickenMultiDropMinHearts)
                     {
-                        if (Game1.random.NextDouble() <= Config.VoidChickenMultiDropChance)
+                        if (Game1.random.NextDouble() < Config.VoidChickenMultiDropChance)
                         {
-                            int quality = __state.quality;
                             SpawnProduce(__instance, "305", quality);
                             Monitor.Log($"BetterAnimal: Void Chicken '{__instance.Name}' laid a bonus Void Egg.", LogLevel.Trace);
                         }
@@ -206,12 +222,12 @@ namespace BetterAnimal
             }
             catch (Exception ex)
             {
-                Monitor.Log($"Error in FarmAnimalPatches DayUpdate_Postfix: {ex}", LogLevel.Trace);
+                Monitor.Log($"Error in FarmAnimalPatches DayUpdate_Postfix: {ex}", LogLevel.Error);
             }
         }
 
         /// <summary>
-        /// Postfix on SlimeHutch.DayUpdate: enhances daily slime ball spawn capacity up to SlimeHutchMaxBalls.
+        /// Postfix on SlimeHutch.dayUpdate: enhances daily slime ball spawn capacity up to SlimeHutchMaxBalls.
         /// </summary>
         public static void SlimeHutch_DayUpdate_Postfix(SlimeHutch __instance)
         {
@@ -229,7 +245,7 @@ namespace BetterAnimal
                 }
 
                 int targetBalls = Config.SlimeHutchMaxBalls;
-                if (currentBalls >= targetBalls || __instance.characters.Count < 10)
+                if (currentBalls >= targetBalls || __instance.characters.Count < 5)
                     return;
 
                 int extraNeeded = targetBalls - currentBalls;
@@ -243,9 +259,13 @@ namespace BetterAnimal
 
                     if (__instance.isTileOnMap(tile) && !__instance.Objects.ContainsKey(tile) && __instance.CanItemBePlacedHere(tile))
                     {
-                        var slimeBall = new StardewValley.Object(tile, "56");
-                        __instance.Objects.Add(tile, slimeBall);
-                        spawned++;
+                        var slimeBall = ItemRegistry.Create<StardewValley.Object>("(BC)56");
+                        if (slimeBall != null)
+                        {
+                            slimeBall.TileLocation = tile;
+                            __instance.Objects.Add(tile, slimeBall);
+                            spawned++;
+                        }
                     }
                 }
 
@@ -256,16 +276,16 @@ namespace BetterAnimal
             }
             catch (Exception ex)
             {
-                Monitor.Log($"Error in SlimeHutch_DayUpdate_Postfix: {ex}", LogLevel.Trace);
+                Monitor.Log($"Error in SlimeHutch_DayUpdate_Postfix: {ex}", LogLevel.Error);
             }
         }
 
         /// <summary>
         /// Postfix on Object.performRemoveAction: drops bonus raw slimes when popping a Slime Ball.
         /// </summary>
-        public static void PerformRemoveAction_Postfix(StardewValley.Object __instance, Vector2 tileLocation, GameLocation location)
+        public static void PerformRemoveAction_Postfix(StardewValley.Object __instance)
         {
-            if (!Config.EnableSlimeRanchingBalancing || __instance == null || location == null)
+            if (!Config.EnableSlimeRanchingBalancing || __instance == null || __instance.Location == null)
                 return;
 
             try
@@ -273,12 +293,12 @@ namespace BetterAnimal
                 if (__instance.ItemId == "56" || __instance.QualifiedItemId == "(BC)56")
                 {
                     // Spawn an extra 10 raw slimes (yielding ~20-30 total per ball)
-                    Game1.createMultipleObjectDebris("(O)766", (int)tileLocation.X, (int)tileLocation.Y, 10, location);
+                    Game1.createMultipleObjectDebris("(O)766", (int)__instance.TileLocation.X, (int)__instance.TileLocation.Y, 10, __instance.Location);
                 }
             }
             catch (Exception ex)
             {
-                Monitor.Log($"Error in PerformRemoveAction_Postfix: {ex}", LogLevel.Trace);
+                Monitor.Log($"Error in PerformRemoveAction_Postfix: {ex}", LogLevel.Error);
             }
         }
 
@@ -301,7 +321,7 @@ namespace BetterAnimal
             {
                 if (machine.ItemId == "158" || machine.QualifiedItemId == "(BC)158" || machine.Name.Contains("Egg-Press", StringComparison.OrdinalIgnoreCase))
                 {
-                    if (Game1.random.NextDouble() <= Config.SlimeEggPressDoubleChance)
+                    if (Game1.random.NextDouble() < Config.SlimeEggPressDoubleChance)
                     {
                         __result.Stack = Math.Min(__result.Stack * 2, 999);
                         Monitor.Log("BetterAnimal: Slime Egg-Press produced 2x Slime Eggs.", LogLevel.Trace);
@@ -310,7 +330,7 @@ namespace BetterAnimal
             }
             catch (Exception ex)
             {
-                Monitor.Log($"Error in GetOutputItem_Postfix for Slime Egg-Press: {ex}", LogLevel.Trace);
+                Monitor.Log($"Error in GetOutputItem_Postfix for Slime Egg-Press: {ex}", LogLevel.Error);
             }
         }
 

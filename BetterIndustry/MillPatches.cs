@@ -133,22 +133,28 @@ namespace BetterIndustry
                             break;
                     }
 
-                    // Process each unit and roll output quality (0% Iridium)
+                    // Roll output qualities and aggregate into stacked batches
+                    int countGold = 0;
+                    int countSilver = 0;
+                    int countNormal = 0;
+
                     for (int i = 0; i < totalUnitsToRoll; i++)
                     {
                         double roll = Game1.random.NextDouble() * 100.0;
-                        int outputQuality;
-
                         if (roll < rateGold)
-                            outputQuality = 2;
+                            countGold++;
                         else if (roll < rateGold + rateSilver)
-                            outputQuality = 1;
+                            countSilver++;
                         else
-                            outputQuality = 0;
+                            countNormal++;
+                    }
 
-                        var outputObj = new StardewValley.Object(outputId, yieldMultiplier)
+                    void AddMillOutput(int units, int quality)
+                    {
+                        if (units <= 0) return;
+                        var outputObj = new StardewValley.Object(outputId, units * yieldMultiplier)
                         {
-                            Quality = outputQuality
+                            Quality = quality
                         };
 
                         if (Config.EnableMillArtisanCategory)
@@ -156,28 +162,41 @@ namespace BetterIndustry
                             outputObj.Category = StardewValley.Object.artisanGoodsCategory;
                         }
 
-                        outputChest.addItem(outputObj);
+                        Item? leftovers = outputChest.addItem(outputObj);
+                        if (leftovers != null && leftovers.Stack > 0)
+                        {
+                            // If output chest is completely full, refund uncrafted input back into inputChest
+                            int refundUnits = (int)Math.Ceiling((double)leftovers.Stack / yieldMultiplier);
+                            var refund = new StardewValley.Object(item.ItemId, refundUnits) { Quality = item.Quality };
+                            inputChest.addItem(refund);
+                        }
                     }
+
+                    AddMillOutput(countNormal, 0);
+                    AddMillOutput(countSilver, 1);
+                    AddMillOutput(countGold, 2);
                 }
 
-                // Remove only the items that were successfully processed
-                foreach (Item processed in itemsToProcess)
+                // Remove processed items from input chest
+                inputChest.clearNulls();
+                for (int i = inputChest.Items.Count - 1; i >= 0; i--)
                 {
+                    Item processed = inputChest.Items[i];
                     if (processed != null)
                     {
                         string pid = processed.ItemId;
                         string pqid = processed.QualifiedItemId;
                         // Only remove items this mod actually processed (Wheat, Beet, Unmilled Rice)
-                        if (pid == "262" || pqid == "(O)262" ||
-                            pid == "284" || pqid == "(O)284" ||
-                            pid == "271" || pqid == "(O)271")
+                        if (pid is "262" or "284" or "271" || pqid is "(O)262" or "(O)284" or "(O)271")
                         {
-                            inputChest.Items.Remove(processed);
+                            inputChest.Items.RemoveAt(i);
                         }
                     }
                 }
-                // Return true to let vanilla handle any remaining unrecognized items
-                return true;
+                inputChest.clearNulls();
+
+                // Return false to prevent vanilla Mill from double-processing grains
+                return false;
             }
             catch (Exception ex)
             {

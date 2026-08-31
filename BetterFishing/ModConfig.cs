@@ -63,8 +63,8 @@ namespace BetterFishing
         // =====================================================================
         // === 4. LEGENDARY & SIGNATURE BONUSES                              ===
         // =====================================================================
-        /// <summary>Dedicated prize multiplier bonus for all Legendary fish (default: 0.00f; Legend anchored at 5,000g).</summary>
-        public float LegendaryFishMultiplierBonus { get; set; } = 0.00f;
+        /// <summary>Dedicated prize multiplier bonus for all Legendary fish (default: +100%; Legend anchored at 5,000g).</summary>
+        public float LegendaryFishMultiplierBonus { get; set; } = 1.00f;
 
         /// <summary>Enable deterministic species hash bonus (0% to +8% based on ItemId).</summary>
         public bool EnablePredictableHashBonus { get; set; } = true;
@@ -81,11 +81,11 @@ namespace BetterFishing
         /// <summary>Enable the decaying-roll enhancement for fishing treasure chests.</summary>
         public bool EnableFishingChestBuff { get; set; } = true;
 
-        /// <summary>Probability decay multiplier for regular fishing treasure chest rolls (vanilla default is 0.40; mod default is 0.45).</summary>
-        public float FishingChestDecayRate { get; set; } = 0.45f;
+        /// <summary>Probability decay multiplier for regular fishing treasure chest rolls (vanilla default is 0.40; mod default is 0.60).</summary>
+        public float FishingChestDecayRate { get; set; } = 0.60f;
 
-        /// <summary>Probability decay multiplier for 1.6 golden fishing treasure chest rolls (vanilla default is 0.60; mod default is 0.60).</summary>
-        public float GoldenChestDecayRate { get; set; } = 0.60f;
+        /// <summary>Probability decay multiplier for 1.6 golden fishing treasure chest rolls (vanilla default is 0.60; mod default is 0.80).</summary>
+        public float GoldenChestDecayRate { get; set; } = 0.80f;
 
         // =====================================================================
         // === 6. FISHING EXPERIENCE (EXP) SETTINGS                          ===

@@ -158,7 +158,7 @@ namespace BetterEvent
                 Game1.player.team.itemsToRemoveOvernight.Remove("(O)CalicoEgg");
             }
 
-            if (Config.KeepEggs && _savedCalicoEggCount > 0)
+            if (Config.KeepEggs && _savedCalicoEggCount > 0 && Game1.player?.Items != null)
             {
                 int currentCount = Game1.player.Items
                     .Where(i => i != null && (i.ItemId == "CalicoEgg" || i.QualifiedItemId == "(O)CalicoEgg"))
@@ -167,7 +167,11 @@ namespace BetterEvent
                 if (lost > 0)
                 {
                     var eggs = ItemRegistry.Create("(O)CalicoEgg", lost);
-                    Game1.player.addItemToInventory(eggs);
+                    Item? overflow = Game1.player.addItemToInventory(eggs);
+                    if (overflow != null && overflow.Stack > 0)
+                    {
+                        Game1.createItemDebris(overflow, new Microsoft.Xna.Framework.Vector2(Game1.player.StandingPixel.X, Game1.player.StandingPixel.Y), -1, Game1.player.currentLocation);
+                    }
                     Monitor.Log($"BetterEvent: Restored {lost} Calico Eggs that were removed overnight.", LogLevel.Info);
                 }
                 _savedCalicoEggCount = 0;
@@ -186,7 +190,7 @@ namespace BetterEvent
             int startDay = Math.Clamp(Config.FestivalStartDay, 1, 28);
             if (IsSeasonEnabled(Game1.season))
             {
-                if (Game1.dayOfMonth == startDay - 1)
+                if (startDay > 1 && Game1.dayOfMonth == startDay - 1)
                 {
                     Game1.showGlobalMessage(I18n.Get("hud.festival-tomorrow"));
                 }

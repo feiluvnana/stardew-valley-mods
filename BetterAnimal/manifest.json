@@ -1,7 +1,7 @@
 {
-  "Name": "BetterAnimal",
+  "Name": "Better Animal",
   "Author": "feiluvnana",
-  "Version": "1.1.1",
+  "Version": "1.1.3",
   "Description": "Comprehensive animal husbandry and small livestock rebalance for Stardew Valley 1.6+. Solves the Duck Feather penalty with high-friendship dual drops, halves rabbit cooldown, adds multi-drop yields, dinosaur 3-day cycle, goat/void multi-drops, and slime hutch scaling.",
   "UniqueID": "feiluvnana.BetterAnimal",
   "EntryDll": "BetterAnimal.dll",

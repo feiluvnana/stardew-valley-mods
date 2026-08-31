@@ -6,7 +6,7 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v6.0": {
-      "BetterFishing/1.2.1": {
+      "BetterFishing/1.2.3": {
         "runtime": {
           "BetterFishing.dll": {}
         }
@@ -14,7 +14,7 @@
     }
   },
   "libraries": {
-    "BetterFishing/1.2.1": {
+    "BetterFishing/1.2.3": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
