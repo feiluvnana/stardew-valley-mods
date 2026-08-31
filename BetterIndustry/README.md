@@ -39,7 +39,11 @@
 ---
 
 ## ⭐ Module 3: Quality-Preserving Artisan Machines & Cooking Oil
-* **60/25/15 Matrix:** Machines preserve star quality (Normal, Silver, Gold, 0% Iridium) across Kegs, Jars, Cheese Presses, Looms, Dehydrators, and Smokers.
+* **Strict Quality Step-Down Matrix:** Machines preserve and step down star quality (0% Iridium) across artisan machines (Kegs, Jars, Cheese Presses, Looms, Dehydrators, Fish Smokers):
+  * **Normal (0⭐) Input**: 100% Normal output (0 free star upgrades).
+  * **Silver (1⭐) Input**: 70% Normal, 30% Silver, 0% Gold.
+  * **Gold (2⭐) Input**: 40% Normal, 45% Silver, 15% Gold.
+  * **Iridium (4⭐) Input**: 20% Normal, 50% Silver, 30% Gold.
 * **🛢️ Cooking Oil Artisan Tag:** Assigns category **`-26` (`Artisan Goods`)** to Cooking Oil (`(O)247`) so it benefits from the **+40% Artisan profession**, scaling through star tiers (140g–280g Artisan).
 
 ---
@@ -97,7 +101,7 @@ Strict early-game protection: Bug Meat (8g), Slime (5g), and Bat Wing (15g) are 
 
 ## 🌾 Module 10: Artisanal Milling & Grain Rebalance
 * **Artisan Category (`-26`):** Wheat Flour (**90g**), Sugar (**50g**), and Rice (**140g**) benefit from the +40% Artisan bonus.
-* **Quality Retention:** Preserves crop star quality into milled goods via the 60/25/15 matrix.
+* **Quality Retention:** Preserves crop star quality into milled goods via the Strict Quality Step-Down matrix.
 
 ---
 
@@ -111,7 +115,7 @@ Strict early-game protection: Bug Meat (8g), Slime (5g), and Bat Wing (15g) are 
 | `EnableEnhancedFoodBuffs` | `true` | Grants +2 to stats for Iridium meals. |
 | `EnableMeadFix` | `true` | Preserves flower honey type when brewing mead. |
 | `FlowerMeadMultiplier` | `1.35` | Multiplier for Flower Honey Mead relative to honey (default: 1.35x). |
-| `EnableMachineQuality` | `true` | Enables 60/25/15 machine quality matrix (0% Iridium). |
+| `EnableMachineQuality` | `true` | Enables Strict Quality Step-Down machine quality matrix (0% Iridium). |
 | `EnableTruffleOilFix` | `true` | Truffle Oil scales to 937g base / 1,967g Gold Artisan. |
 | `EnableCookingOilArtisanCategory` | `true` | Assigns Artisan category (-26) to Cooking Oil. |
 | `EnableJuiceBuff` | `true` | Buffs Vegetable Juice multiplier in Kegs (2.75x). |
@@ -125,7 +129,7 @@ Strict early-game protection: Bug Meat (8g), Slime (5g), and Bat Wing (15g) are 
 | `HeavyTapperTripleChance` | `0.20` | Chance of 3x yield from Heavy Tappers (20%, 2x is guaranteed). |
 | `EnableMillBalancing` | `true` | Rebalances milled goods prices. |
 | `EnableMillArtisanCategory` | `true` | Assigns Artisan category (-26) to milled goods. |
-| `EnableMillQualityMatrix` | `true` | Enables 60/25/15 quality matrix for the Mill. |
+| `EnableMillQualityMatrix` | `true` | Enables quality matrix for the Mill. |
 | `SugarBasePrice` | `50` | Base sell price for Sugar (vanilla default 50g). |
 
 ---

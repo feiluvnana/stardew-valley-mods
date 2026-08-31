@@ -108,7 +108,7 @@ namespace BetterAnimal
         /// Postfix on FarmAnimal.dayUpdate: evaluates produce and grants multi-drops for
         /// ducks, rabbits, goats, dinosaurs, void chickens, and daily wool for happy sheep.
         /// </summary>
-        public static void DayUpdate_Postfix(FarmAnimal __instance, GameLocation environtment, (string produce, int quality) __state)
+        public static void DayUpdate_Postfix(FarmAnimal __instance, GameLocation environment, (string produce, int quality) __state)
         {
             if (__instance == null)
                 return;

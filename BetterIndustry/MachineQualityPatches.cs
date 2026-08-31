@@ -132,38 +132,42 @@ namespace BetterIndustry
                 if (machine != null && (machine.ItemId == "163" || machine.QualifiedItemId == "(BC)163"))
                     return;
 
-                // Quality-preserving distribution matrix (60/25/15 with 0% Iridium floor):
-                // Normal (0⭐)  -> 60% Normal, 25% Silver, 15% Gold
-                // Silver (1⭐)  -> 25% Normal, 60% Silver, 15% Gold
-                // Gold (2⭐)    -> 15% Normal, 25% Silver, 60% Gold
-                // Iridium (4⭐) ->  0% Normal, 25% Silver, 75% Gold (Never Iridium from machines)
+                // Restrict quality preservation strictly to Artisan Goods (Category -26) from eligible artisan machines
+                if (!IsEligibleArtisanProduct(__result, machine))
+                    return;
+
+                // Model A: Strict Quality Step-Down distribution matrix (0% Iridium from machines):
+                // Normal (0⭐)  -> 100% Normal, 0% Silver, 0% Gold (No free upgrades)
+                // Silver (1⭐)  ->  70% Normal, 30% Silver, 0% Gold
+                // Gold (2⭐)    ->  40% Normal, 45% Silver, 15% Gold
+                // Iridium (4⭐) ->  20% Normal, 50% Silver, 30% Gold
                 double rateSilver;
                 double rateGold;
 
                 switch (inputItem.Quality)
                 {
                     case 1: // Silver (1⭐)
-                        rateSilver = 60.0;
-                        rateGold = 15.0;
+                        rateSilver = 30.0;
+                        rateGold = 0.0;
                         break;
 
                     case 2: // Gold (2⭐)
-                        rateSilver = 25.0;
-                        rateGold = 60.0;
+                        rateSilver = 45.0;
+                        rateGold = 15.0;
                         break;
 
                     case 4: // Iridium (4⭐)
-                        rateSilver = 25.0;
-                        rateGold = 75.0;
+                        rateSilver = 50.0;
+                        rateGold = 30.0;
                         break;
 
                     default: // Normal (0⭐)
-                        rateSilver = 25.0;
-                        rateGold = 15.0;
+                        rateSilver = 0.0;
+                        rateGold = 0.0;
                         break;
                 }
 
-                // Large animal products act like Qi Seasoning: guarantee at least Gold tier floor (100% Gold)
+                // Large animal products (Large Milk, Large Egg) preserve vanilla guaranteed Gold tier output
                 bool isLargeAnimalProduct = IsLargeAnimalProduct(inputItem);
                 if (isLargeAnimalProduct)
                 {
@@ -197,7 +201,7 @@ namespace BetterIndustry
         }
 
         /// <summary>
-        /// Checks if an input item is a large or high-tier animal product that guarantees at least Gold quality.
+        /// Checks if an input item is a vanilla Large animal product (Large Milk, Large Egg) that guarantees Gold quality.
         /// </summary>
         private static bool IsLargeAnimalProduct(Item item)
         {
@@ -206,15 +210,70 @@ namespace BetterIndustry
             string id = item.ItemId;
             string qid = item.QualifiedItemId;
 
-            return id is "186" or "438" or "174" or "182" or "107" or "289" or "442"
-                || qid is "(O)186" or "(O)438" or "(O)174" or "(O)182" or "(O)107" or "(O)289" or "(O)442"
+            return id is "186" or "438" or "174" or "182"
+                || qid is "(O)186" or "(O)438" or "(O)174" or "(O)182"
                 || string.Equals(id, "LargeMilk", StringComparison.OrdinalIgnoreCase)
                 || string.Equals(id, "LargeGoatMilk", StringComparison.OrdinalIgnoreCase)
                 || string.Equals(id, "LargeEgg", StringComparison.OrdinalIgnoreCase)
-                || string.Equals(id, "LargeBrownEgg", StringComparison.OrdinalIgnoreCase)
-                || string.Equals(id, "DinosaurEgg", StringComparison.OrdinalIgnoreCase)
-                || string.Equals(id, "OstrichEgg", StringComparison.OrdinalIgnoreCase)
-                || string.Equals(id, "DuckEgg", StringComparison.OrdinalIgnoreCase);
+                || string.Equals(id, "LargeBrownEgg", StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
+        /// Determines whether an output item and machine represent a valid Artisan Good processing pipeline.
+        /// Excludes non-artisan machines (furnaces, kilns, seed makers, recyclers, bone mills, geode crushers, etc.)
+        /// and non-artisan item categories (metal bars, seeds, coal, fertilizer, minerals, ores, batteries, bait, etc.).
+        /// </summary>
+        private static bool IsEligibleArtisanProduct(Item result, StardewValley.Object machine)
+        {
+            if (result == null || machine == null)
+                return false;
+
+            string mId = machine.ItemId;
+            string mQid = machine.QualifiedItemId;
+            string mName = machine.Name ?? string.Empty;
+
+            // 1. Explicitly exclude non-artisan machines
+            if (mId is "13" or "182" or "25" or "20" or "90" or "114" or "9" or "231" or "211" or "154" or "156" or "158" or "21" or "246" or "105" or "264"
+                || mQid is "(BC)13" or "(BC)182" or "(BC)25" or "(BC)20" or "(BC)90" or "(BC)114" or "(BC)9" or "(BC)231" or "(BC)211" or "(BC)154" or "(BC)156" or "(BC)158" or "(BC)21" or "(BC)246" or "(BC)105" or "(BC)264"
+                || string.Equals(mId, "HeavyFurnace", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(mQid, "(BC)HeavyFurnace", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(mId, "BaitMaker", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(mQid, "(BC)BaitMaker", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(mId, "DeluxeWormBin", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(mQid, "(BC)DeluxeWormBin", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(mId, "MushroomLog", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(mQid, "(BC)MushroomLog", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(mId, "MiniForge", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(mQid, "(BC)MiniForge", StringComparison.OrdinalIgnoreCase)
+                || mName.Contains("Furnace", StringComparison.OrdinalIgnoreCase)
+                || mName.Contains("Seed Maker", StringComparison.OrdinalIgnoreCase)
+                || mName.Contains("Recycling", StringComparison.OrdinalIgnoreCase)
+                || mName.Contains("Kiln", StringComparison.OrdinalIgnoreCase)
+                || mName.Contains("Bone Mill", StringComparison.OrdinalIgnoreCase)
+                || mName.Contains("Geode", StringComparison.OrdinalIgnoreCase)
+                || mName.Contains("Solar Panel", StringComparison.OrdinalIgnoreCase)
+                || mName.Contains("Lightning Rod", StringComparison.OrdinalIgnoreCase)
+                || mName.Contains("Wood Chipper", StringComparison.OrdinalIgnoreCase)
+                || mName.Contains("Bait", StringComparison.OrdinalIgnoreCase)
+                || mName.Contains("Worm", StringComparison.OrdinalIgnoreCase)
+                || mName.Contains("Slime", StringComparison.OrdinalIgnoreCase)
+                || mName.Contains("Crystalarium", StringComparison.OrdinalIgnoreCase)
+                || mName.Contains("Coffee Maker", StringComparison.OrdinalIgnoreCase)
+                || mName.Contains("Statue", StringComparison.OrdinalIgnoreCase)
+                || mName.Contains("Mushroom Log", StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            // 2. Output item must belong to Artisan Goods category (-26)
+            if (result.Category == StardewValley.Object.artisanGoodsCategory)
+                return true;
+
+            // 3. Optional: Cooking Oil if configured as artisan good
+            if (Config.EnableCookingOilArtisanCategory && (result.ItemId == "247" || result.QualifiedItemId == "(O)247"))
+                return true;
+
+            return false;
         }
     }
 }

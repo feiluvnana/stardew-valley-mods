@@ -102,30 +102,34 @@ namespace BetterIndustry
                     int totalUnitsToRoll = item.Stack;
                     int inputQuality = item.Quality;
 
-                    // Calculate quality distribution for this input quality (60/25/15 with 0% Iridium)
+                    // Calculate quality distribution for this input quality (Model A: Strict Quality Step-Down, 0% Iridium)
+                    // Normal (0⭐)  -> 100% Normal, 0% Silver, 0% Gold (No free upgrades)
+                    // Silver (1⭐)  ->  70% Normal, 30% Silver, 0% Gold
+                    // Gold (2⭐)    ->  40% Normal, 45% Silver, 15% Gold
+                    // Iridium (4⭐) ->  20% Normal, 50% Silver, 30% Gold
                     double rateSilver;
                     double rateGold;
 
                     switch (inputQuality)
                     {
                         case 1: // Silver (1⭐)
-                            rateSilver = 60.0;
-                            rateGold = 15.0;
+                            rateSilver = 30.0;
+                            rateGold = 0.0;
                             break;
 
                         case 2: // Gold (2⭐)
-                            rateSilver = 25.0;
-                            rateGold = 60.0;
+                            rateSilver = 45.0;
+                            rateGold = 15.0;
                             break;
 
                         case 4: // Iridium (4⭐)
-                            rateSilver = 25.0;
-                            rateGold = 75.0;
+                            rateSilver = 50.0;
+                            rateGold = 30.0;
                             break;
 
                         default: // Normal (0⭐)
-                            rateSilver = 25.0;
-                            rateGold = 15.0;
+                            rateSilver = 0.0;
+                            rateGold = 0.0;
                             break;
                     }
 
