@@ -239,6 +239,9 @@ namespace BetterChest
                 save: () => Helper.WriteConfig(Config)
             );
 
+            // Mod description on Root Page
+            configMenu.AddParagraph(ModManifest, () => I18n.Get("mod.description"));
+
             // From here on, every Add* call adds one menu row. Note they receive
             // GETTER/SETTER DELEGATES (Func<...>/Action<...>) instead of plain
             // values — GMCM evaluates them live whenever the page is drawn or

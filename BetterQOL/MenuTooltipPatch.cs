@@ -178,17 +178,31 @@ namespace BetterQOL
         /// </summary>
         /// <param name="item">Candidate ingredient.</param>
         /// <returns>Friendly names of matching unfinished bundles (empty when none / CC finished).</returns>
-        private static List<string> GetNeededBundles(Item item)
+        public static List<string> GetNeededBundles(Item item)
         {
             var results = new List<string>();
             try
             {
-                // Nothing to report once the Community Center route is done or the player chose JojaMart.
-                if (Game1.player.hasCompletedCommunityCenter() || Game1.MasterPlayer.mailReceived.Contains("JojaMember"))
+                if (item == null)
                     return results;
 
-                // Raw asset shape: key "AreaName/index", value "/"-separated fields
-                // (short name at [0], ingredient list at [2], required count at [4], localized name at [5] or [6]).
+                // Bundle requirements are only standard Objects (not BigCraftables, Tools, Weapons, Hats, Furniture, etc.)
+                if (item is not StardewValley.Object sObj || sObj.bigCraftable.Value)
+                    return results;
+
+                bool isCCComplete = Game1.player.hasCompletedCommunityCenter();
+                bool isJojaMember = Game1.MasterPlayer.mailReceived.Contains("JojaMember");
+                bool isMovieTheaterBuilt = Utility.doesMasterPlayerHaveMailReceivedButNotMailForTomorrow("ccMovieTheater") ||
+                                           Utility.doesMasterPlayerHaveMailReceivedButNotMailForTomorrow("ccMovieTheaterJoja");
+
+                // If Joja route was chosen, standard CC bundles are closed, and Joja uses gold purchase for Movie Theater (no bundles).
+                if (isJojaMember)
+                    return results;
+
+                // If Movie Theater is already built, even The Missing Bundle is complete.
+                if (isMovieTheaterBuilt)
+                    return results;
+
                 var bundleData = DataLoader.Bundles(Game1.content);
                 if (bundleData == null || Game1.netWorldState.Value.Bundles == null)
                     return results;
@@ -202,10 +216,25 @@ namespace BetterQOL
 
                 foreach (var kvp in bundleData)
                 {
-                    string bundleKey = kvp.Key; // e.g. "Pantry/0"
+                    string bundleKey = kvp.Key; // e.g. "Pantry/0" or "Abandoned Joja Mart/36"
                     string[] keyParts = bundleKey.Split('/');
-                    // int.TryParse + 'out' parses AND outputs the number in one statement.
                     if (keyParts.Length < 2 || !int.TryParse(keyParts[1], out int bundleId))
+                        continue;
+
+                    string areaName = keyParts[0];
+
+                    // Skip Vault bundles because they are pure gold donations directly in the CC interface
+                    if (areaName.Equals("Vault", StringComparison.OrdinalIgnoreCase))
+                        continue;
+
+                    bool isMissingBundle = areaName.Equals("Abandoned Joja Mart", StringComparison.OrdinalIgnoreCase) || bundleId == 36;
+
+                    // If Community Center is complete, ONLY The Missing Bundle (Abandoned JojaMart) can be active
+                    if (isCCComplete && !isMissingBundle)
+                        continue;
+
+                    // If Community Center is NOT complete, The Missing Bundle is not active yet
+                    if (!isCCComplete && isMissingBundle)
                         continue;
 
                     string bundleValue = kvp.Value;
@@ -230,13 +259,9 @@ namespace BetterQOL
 
                     string[] reqParts = parts[2].Split(' ');
 
-                    // World state stores one bool per ingredient slot (true = already donated);
-                    // TryGetValue both looks up and outputs the array via 'out'.
                     if (Game1.netWorldState.Value.Bundles.TryGetValue(bundleId, out bool[] ingredientSlots))
                     {
-                        // The required-count field is optional; fall back to total slot count.
                         int itemsRequired = parts.Length > 4 && int.TryParse(parts[4], out int req) ? req : ingredientSlots.Length;
-                        // LINQ Count(b => b): lambda predicate counts how many slots are filled.
                         int filledCount = ingredientSlots.Count(b => b);
                         if (filledCount >= itemsRequired)
                             continue; // Bundle already finished
@@ -245,8 +270,6 @@ namespace BetterQOL
                         {
                             if (!ingredientSlots[k]) // Slot not filled yet
                             {
-                                // Each ingredient takes 3 space-separated tokens: itemId, stack, minQuality,
-                                // so slot k's data starts at index k * 3.
                                 int reqIndex = k * 3;
                                 if (reqIndex + 2 >= reqParts.Length)
                                     break;
@@ -266,59 +289,58 @@ namespace BetterQOL
                     }
                 }
             }
-            // Empty catch: deliberately swallow parse oddities (e.g. malformed custom
-            // bundles) so building a tooltip can never crash the game.
             catch { }
             return results;
         }
 
         /// <summary>
         /// Accurately checks whether a candidate item satisfies a bundle ingredient requirement.
-        /// Prevents string-ID items (which have ParentSheetIndex == -1) from falsely matching "-1" (Missing Bundle Wine slot).
+        /// Strict matching against item quality, qualified item ID, object category, and SDV 1.6 exceptions.
         /// </summary>
         public static bool IsBundleIngredientMatch(Item item, string reqId, int reqMinQuality)
         {
             if (item == null || string.IsNullOrWhiteSpace(reqId))
                 return false;
 
+            // Only standard Stardew Valley Objects can be bundle ingredients
+            if (item is not StardewValley.Object obj || obj.bigCraftable.Value)
+                return false;
+
             // 1. Minimum quality requirement check
             if (item.Quality < reqMinQuality)
                 return false;
 
-            // 2. Special case: reqId == "-1" in Data/Bundles represents The Missing Bundle's Silver+ Wine slot
-            if (reqId == "-1")
+            // 2. Category matching (negative integer ID, e.g. -4 = Fish, -5 = Egg, -6 = Milk, etc.)
+            if (int.TryParse(reqId, out int catId) && catId < 0)
             {
-                if (item is StardewValley.Object obj)
-                {
-                    if (obj.QualifiedItemId == "(O)348" || obj.ItemId == "348" || obj.preserve.Value == StardewValley.Object.PreserveType.Wine)
-                        return true;
-                    if (obj.Category == StardewValley.Object.artisanGoodsCategory && obj.Name.EndsWith("Wine", StringComparison.OrdinalIgnoreCase))
-                        return true;
-                }
-                return false;
-            }
+                // Vanilla special exception: Dinosaur Egg ((O)107, category -2) counts as Egg (category -5)
+                if (catId == -5 && (item.QualifiedItemId == "(O)107" || item.ItemId == "107"))
+                    return true;
 
-            // 3. Exact ItemId or QualifiedItemId match
-            if (reqId == item.ItemId || reqId == item.QualifiedItemId)
-                return true;
-
-            // 4. Object ParentSheetIndex match (ONLY if positive integer, avoiding -1 string-item collisions)
-            if (item is StardewValley.Object sObj && sObj.ParentSheetIndex > 0 && reqId == sObj.ParentSheetIndex.ToString())
-                return true;
-
-            // 5. Category matching: valid category IDs are negative integers (< -1, e.g. -4 = Fish, -5 = Egg, -6 = Milk, etc.)
-            if (int.TryParse(reqId, out int catId) && catId < -1)
-            {
-                // Jellies (River Jelly, Sea Jelly, Cave Jelly) share FishCategory (-4) but are not bundle fish
+                // River Jelly, Sea Jelly, Cave Jelly share FishCategory (-4) but cannot be deposited in fish bundles
                 if (catId == StardewValley.Object.FishCategory)
                 {
-                    if (item.ItemId is "RiverJelly" or "SeaJelly" or "CaveJelly" || item.QualifiedItemId is "(O)RiverJelly" or "(O)SeaJelly" or "(O)CaveJelly")
+                    if (item.ItemId is "RiverJelly" or "SeaJelly" or "CaveJelly" ||
+                        item.QualifiedItemId is "(O)RiverJelly" or "(O)SeaJelly" or "(O)CaveJelly")
                         return false;
                 }
 
                 if (item.Category == catId)
                     return true;
+
+                return false;
             }
+
+            // 3. Exact ItemId or QualifiedItemId match (or ItemRegistry lookup)
+            if (ItemRegistry.HasItemId(item, reqId))
+                return true;
+
+            if (reqId == item.ItemId || reqId == item.QualifiedItemId || "(O)" + reqId == item.QualifiedItemId)
+                return true;
+
+            // 4. Object ParentSheetIndex match if positive integer
+            if (obj.ParentSheetIndex > 0 && reqId == obj.ParentSheetIndex.ToString())
+                return true;
 
             return false;
         }

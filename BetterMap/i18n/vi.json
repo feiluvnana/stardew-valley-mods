@@ -1,10 +1,11 @@
-{
-  "gmcm.section.ginger_island.title": "Tùy chỉnh Nông trại Đảo Gừng",
-  "gmcm.section.ginger_island.description": "Cấu hình dọn dẹp và xóa chướng ngại vật trên Nông trại Đảo Gừng.",
-  "gmcm.remove_farm_driftwood_barrier.name": "Xóa hàng rào gỗ mục & đống gỗ Nông trại",
-  "gmcm.remove_farm_driftwood_barrier.tooltip": "Xóa hàng rào gỗ mục ngang và các đống gỗ chắn giữa lối đi phía trên và khu vực trồng trọt trên Nông trại Đảo Gừng (Đảo Tây).",
-  "gmcm.section.farmhouse.title": "Tùy chỉnh Nhà ở",
-  "gmcm.section.farmhouse.description": "Cấu hình mở rộng cửa ra vào nhà ở.",
-  "gmcm.widen_house_exit.name": "Cửa ra vào nhà ở rộng 3x1",
-  "gmcm.widen_house_exit.tooltip": "Mở rộng cửa ra vào nhà ở thành 3 ô ngang cho tất cả các cấp độ Nhà chính và Nhà Đảo Gừng, giúp ra khỏi nhà dễ dàng và thoải mái."
+﻿{
+    "gmcm.section.ginger_island.title":  "Tùy chỉnh Nông trại Đảo Gừng",
+    "gmcm.section.ginger_island.description":  "Cấu hình dọn dẹp và xóa chướng ngại vật trên Nông trại Đảo Gừng.",
+    "gmcm.remove_farm_driftwood_barrier.name":  "Xóa hàng rào gỗ mục \u0026 đống gỗ Nông trại",
+    "gmcm.remove_farm_driftwood_barrier.tooltip":  "Xóa hàng rào gỗ mục ngang và các đống gỗ chắn giữa lối đi phía trên và khu vực trồng trọt trên Nông trại Đảo Gừng (Đảo Tây).",
+    "gmcm.section.farmhouse.title":  "Tùy chỉnh Nhà ở",
+    "gmcm.section.farmhouse.description":  "Cấu hình mở rộng cửa ra vào nhà ở.",
+    "gmcm.widen_house_exit.name":  "Cửa ra vào nhà ở rộng 3x1",
+    "gmcm.widen_house_exit.tooltip":  "Mở rộng cửa ra vào nhà ở thành 3 ô ngang cho tất cả các cấp độ Nhà chính và Nhà Đảo Gừng, giúp ra khỏi nhà dễ dàng và thoải mái.",
+    "mod.description":  "Nâng cấp bản đồ Stardew Valley: mở rộng toàn bộ lối ra vào Nhà chính thành 3 ô và dọn sạch hàng rào gỗ dạt, khúc gỗ mục trên Đảo Gừng."
 }

@@ -24,10 +24,17 @@ Hover over any interactive tile, entity, or inventory item to inspect live data 
 * **⚙️ Processing Machines:** Displays output product name and icon, remaining processing time (`2h 30m` / `1d 4h`), and exact clock completion time (`Today at 4:20 PM` / `Tomorrow at 9:00 AM`). Highlights finished machines with `★ Ready to Collect!`. *(Non-machine debris like tree branches and stones are strictly filtered out).*
 * **🍷 Casks:** Displays aging stage, days to next star quality (`Aging: Gold in 12 days`), and total days to Iridium quality.
 * **🦀 Crab Pots:** Displays bait type, overnight readiness, and caught items.
-* **🍎 Fruit Trees:** Displays maturation countdown (`Maturing in 12 days`), ready fruit count (`3/3 fruits`), fruit quality, and seasonal production status.
-* **🌲 Wild Trees & Bushes:** Displays growth stage (`Stage 4/5`), moss availability (`Has Moss ✓`), tapper status, and Tea Bush harvest windows.
+* **🍎 Fruit Trees:** Displays maturation countdown (`Maturing in 12 days`), ready fruit count (`3/3 fruits`), fruit quality, seasonal production status, and **Axe chops required** to fell the tree / clear the stump (`8 Axe Chops (Trunk: 5, Stump: 3)`).
+* **🌲 Wild Trees & Bushes:** Displays growth stage (`Stage 4/5`), moss availability (`Has Moss ✓`), tapper status, Tea Bush harvest windows, and **Axe chops required** to fell the tree / clear the stump based on player's Axe tier (`8 Axe Chops (Trunk: 5, Stump: 3)`).
+* **🪓 Debris & Resource Clumps:** Hovering over ground debris displays the exact tool hits needed to break/chop them using the player's tools:
+  * **Stones & Ore Nodes:** Pickaxe hits required (`1 Pickaxe Hit`, `4 Pickaxe Hits` for Iron Node, `Requires Steel Pickaxe` for Iridium Node).
+  * **Twigs & Wood:** Axe chops required (`1 Axe Chop`).
+  * **Weeds:** Hits required (`1 Hit (Any Tool)`).
+  * **Large Stumps & Hollow Logs:** Axe chops required (`7 Axe Chops (Copper Axe)`, `Requires Steel Axe`).
+  * **Meteorites & Boulders:** Pickaxe hits required (`7 Pickaxe Hits (Gold Pickaxe)`, `Requires Steel Pickaxe`).
 * **🐄 Farm Animals & Pets:** Displays daily petting status (`Petted today ✓` / `Needs petting ✗`), friendship hearts (`5.0 / 5.0 ♥`), happiness, and ready produce.
 * **🎒 Inventory & Menu Items:** Displays individual and stack sell prices, clean wrapped/bulleted **Community Center bundle requirements**, and **Museum donation status**.
+* **🌤️ Weather & Season HUD Icons:** Hovering over the weather icon in the top-right clock widget displays the current weather condition, detailed description, and tomorrow's forecast. Hovering over the season icon displays the current season, year, day progress (`Day 15 of 28`), remaining days, and the upcoming season.
 
 ---
 

@@ -272,6 +272,9 @@ namespace BetterEvent
                 }
             );
 
+            // Mod description on Root Page
+            configMenu.AddParagraph(ModManifest, () => I18n.Get("mod.description"));
+
             // Heading for the whole page's option group.
             configMenu.AddSectionTitle(
                 mod: ModManifest,

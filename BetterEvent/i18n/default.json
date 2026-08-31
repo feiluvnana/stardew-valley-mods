@@ -1,18 +1,18 @@
-{
-  "config.section.festivals": "Festival Options",
-  "config.start-day.name": "Festival Start Day",
-  "config.start-day.tooltip": "The day of the month when the Desert Festival begins (default: 22).",
-  "config.end-day.name": "Festival End Day",
-  "config.end-day.tooltip": "The day of the month when the Desert Festival ends (default: 24).",
-  "config.enable-summer.name": "Enable Summer Festival",
-  "config.enable-summer.tooltip": "Extend Desert Festival to Summer.",
-  "config.enable-fall.name": "Enable Fall Festival",
-  "config.enable-fall.tooltip": "Extend Desert Festival to Fall.",
-  "config.enable-winter.name": "Enable Winter Festival",
-  "config.enable-winter.tooltip": "Extend Desert Festival to Winter.",
-  "config.keep-eggs.name": "Keep Calico Eggs",
-  "config.keep-eggs.tooltip": "Keep Calico Eggs in inventory between festival seasons.",
-
-  "hud.festival-tomorrow": "The Calico Desert Festival begins tomorrow! Buses to the Desert will run throughout the festival.",
-  "hud.festival-today": "The Calico Desert Festival has begun in the Calico Desert today!"
+﻿{
+    "config.section.festivals":  "Festival Options",
+    "config.start-day.name":  "Festival Start Day",
+    "config.start-day.tooltip":  "The day of the month when the Desert Festival begins (default: 22).",
+    "config.end-day.name":  "Festival End Day",
+    "config.end-day.tooltip":  "The day of the month when the Desert Festival ends (default: 24).",
+    "config.enable-summer.name":  "Enable Summer Festival",
+    "config.enable-summer.tooltip":  "Extend Desert Festival to Summer.",
+    "config.enable-fall.name":  "Enable Fall Festival",
+    "config.enable-fall.tooltip":  "Extend Desert Festival to Fall.",
+    "config.enable-winter.name":  "Enable Winter Festival",
+    "config.enable-winter.tooltip":  "Extend Desert Festival to Winter.",
+    "config.keep-eggs.name":  "Keep Calico Eggs",
+    "config.keep-eggs.tooltip":  "Keep Calico Eggs in inventory between festival seasons.",
+    "hud.festival-tomorrow":  "The Calico Desert Festival begins tomorrow! Buses to the Desert will run throughout the festival.",
+    "hud.festival-today":  "The Calico Desert Festival has begun in the Calico Desert today!",
+    "mod.description":  "Extends the Desert Festival across Summer, Fall, and Winter (15th–17th), and preserves Calico Eggs across seasons."
 }

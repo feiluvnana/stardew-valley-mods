@@ -1,18 +1,18 @@
-{
-  "config.section.festivals": "Tùy Chọn Lễ Hội",
-  "config.start-day.name": "Ngày Bắt Đầu Lễ Hội",
-  "config.start-day.tooltip": "Ngày trong tháng bắt đầu Lễ Hội Sa Mạc (mặc định: 22).",
-  "config.end-day.name": "Ngày Kết Thúc Lễ Hội",
-  "config.end-day.tooltip": "Ngày trong tháng kết thúc Lễ Hội Sa Mạc (mặc định: 24).",
-  "config.enable-summer.name": "Mở Lễ Hội Mùa Hè",
-  "config.enable-summer.tooltip": "Mở rộng Lễ Hội Sa Mạc sang Mùa Hè.",
-  "config.enable-fall.name": "Mở Lễ Hội Mùa Thu",
-  "config.enable-fall.tooltip": "Mở rộng Lễ Hội Sa Mạc sang Mùa Thu.",
-  "config.enable-winter.name": "Mở Lễ Hội Mùa Đông",
-  "config.enable-winter.tooltip": "Mở rộng Lễ Hội Sa Mạc sang Mùa Đông.",
-  "config.keep-eggs.name": "Giữ Lại Trứng Calico",
-  "config.keep-eggs.tooltip": "Giữ lại Trứng Calico trong hành trang giữa các mùa lễ hội thay vì bị xóa.",
-
-  "hud.festival-tomorrow": "Lễ Hội Sa Mạc Calico sẽ bắt đầu vào ngày mai! Các chuyến xe buýt đến Sa Mạc sẽ hoạt động suốt kỳ lễ hội.",
-  "hud.festival-today": "Lễ Hội Sa Mạc Calico đã chính thức bắt đầu tại Sa Mạc Calico hôm nay!"
+﻿{
+    "config.section.festivals":  "Tùy Chọn Lễ Hội",
+    "config.start-day.name":  "Ngày Bắt Đầu Lễ Hội",
+    "config.start-day.tooltip":  "Ngày trong tháng bắt đầu Lễ Hội Sa Mạc (mặc định: 22).",
+    "config.end-day.name":  "Ngày Kết Thúc Lễ Hội",
+    "config.end-day.tooltip":  "Ngày trong tháng kết thúc Lễ Hội Sa Mạc (mặc định: 24).",
+    "config.enable-summer.name":  "Mở Lễ Hội Mùa Hè",
+    "config.enable-summer.tooltip":  "Mở rộng Lễ Hội Sa Mạc sang Mùa Hè.",
+    "config.enable-fall.name":  "Mở Lễ Hội Mùa Thu",
+    "config.enable-fall.tooltip":  "Mở rộng Lễ Hội Sa Mạc sang Mùa Thu.",
+    "config.enable-winter.name":  "Mở Lễ Hội Mùa Đông",
+    "config.enable-winter.tooltip":  "Mở rộng Lễ Hội Sa Mạc sang Mùa Đông.",
+    "config.keep-eggs.name":  "Giữ Lại Trứng Calico",
+    "config.keep-eggs.tooltip":  "Giữ lại Trứng Calico trong hành trang giữa các mùa lễ hội thay vì bị xóa.",
+    "hud.festival-tomorrow":  "Lễ Hội Sa Mạc Calico sẽ bắt đầu vào ngày mai! Các chuyến xe buýt đến Sa Mạc sẽ hoạt động suốt kỳ lễ hội.",
+    "hud.festival-today":  "Lễ Hội Sa Mạc Calico đã chính thức bắt đầu tại Sa Mạc Calico hôm nay!",
+    "mod.description":  "Mở rộng Lễ hội Sa mạc xuyên suốt Mùa Hè, Mùa Thu và Mùa Đông (ngày 15-17), đồng thời bảo toàn Trứng Calico qua các mùa."
 }

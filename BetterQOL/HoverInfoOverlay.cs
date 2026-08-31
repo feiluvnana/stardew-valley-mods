@@ -100,6 +100,10 @@ namespace BetterQOL
             if (Config.HoverHotkey != SButton.None && !Helper.Input.IsDown(Config.HoverHotkey))
                 return;
 
+            // Do not show in-world tooltips when mouse is over top-right clock/money box
+            if (Game1.dayTimeMoneyBox != null && Game1.dayTimeMoneyBox.isWithinBounds(Game1.getMouseX(), Game1.getMouseY()))
+                return;
+
             // SMAPI's cursor exposes three coordinate flavors at once:
             //   Tile                 - grid square under the mouse (floats; keys into dictionaries)
             //   GetScaledScreenPixels - zoom-adjusted UI pixel point (where to DRAW our box)
@@ -150,6 +154,15 @@ namespace BetterQOL
                         tooltip = BuildMachineTooltip(machineInfo);
                     }
                 }
+
+                if (tooltip == null && Config.EnableDebrisHover)
+                {
+                    var debrisInfo = DebrisHelper.GetDebrisInfo(obj);
+                    if (debrisInfo != null)
+                    {
+                        tooltip = BuildDebrisTooltip(debrisInfo);
+                    }
+                }
             }
 
             // 2. Check Terrain Features (Crops in HoeDirt, Fruit Trees, Wild Trees, Bushes, Giant Crops)
@@ -193,6 +206,23 @@ namespace BetterQOL
                     {
                         tooltip = BuildBushTooltip(largeBush);
                         break;
+                    }
+                }
+            }
+
+            // 4. Check Resource Clumps (Large Stumps, Hollow Logs, Meteorites, Boulders)
+            if (tooltip == null && Config.EnableDebrisHover && location.resourceClumps.Count > 0)
+            {
+                foreach (var clump in location.resourceClumps)
+                {
+                    if (clump != null && clump.getBoundingBox().Contains((int)absolutePixels.X, (int)absolutePixels.Y))
+                    {
+                        var clumpInfo = DebrisHelper.GetResourceClumpInfo(clump);
+                        if (clumpInfo != null)
+                        {
+                            tooltip = BuildDebrisTooltip(clumpInfo);
+                            break;
+                        }
                     }
                 }
             }
@@ -559,6 +589,24 @@ namespace BetterQOL
                 }
             }
 
+            // Chops required to fell/chop tree
+            if (Config.EnableDebrisHover)
+            {
+                var (totalChops, trunkChops, stumpChops) = DebrisHelper.GetFruitTreeChopHits(fruitTree);
+                if (fruitTree.stump.Value)
+                {
+                    tooltip.Lines.Add(new TooltipLine(ModEntry.I18n.Get("hover.tree.stump-chops", new { chops = stumpChops }), new Color(20, 110, 220)));
+                }
+                else if (fruitTree.growthStage.Value >= 4)
+                {
+                    tooltip.Lines.Add(new TooltipLine(ModEntry.I18n.Get("hover.tree.chops-breakdown", new { total = totalChops, trunk = trunkChops, stump = stumpChops }), new Color(20, 110, 220)));
+                }
+                else
+                {
+                    tooltip.Lines.Add(new TooltipLine(ModEntry.I18n.Get("hover.tree.chops-simple", new { chops = totalChops }), new Color(20, 110, 220)));
+                }
+            }
+
             return tooltip;
         }
 
@@ -598,6 +646,45 @@ namespace BetterQOL
             if (info.IsTapped)
             {
                 tooltip.Lines.Add(new TooltipLine(ModEntry.I18n.Get("hover.tree.tapped"), new Color(20, 110, 220)));
+            }
+
+            // Chops required to fell/chop tree
+            if (Config.EnableDebrisHover)
+            {
+                var (totalChops, trunkChops, stumpChops) = DebrisHelper.GetTreeChopHits(tree);
+                if (tree.stump.Value)
+                {
+                    tooltip.Lines.Add(new TooltipLine(ModEntry.I18n.Get("hover.tree.stump-chops", new { chops = stumpChops }), new Color(20, 110, 220)));
+                }
+                else if (tree.growthStage.Value >= 5)
+                {
+                    tooltip.Lines.Add(new TooltipLine(ModEntry.I18n.Get("hover.tree.chops-breakdown", new { total = totalChops, trunk = trunkChops, stump = stumpChops }), new Color(20, 110, 220)));
+                }
+                else
+                {
+                    tooltip.Lines.Add(new TooltipLine(ModEntry.I18n.Get("hover.tree.chops-simple", new { chops = totalChops }), new Color(20, 110, 220)));
+                }
+            }
+
+            return tooltip;
+        }
+
+        /// <summary>
+        /// Composes the debris tooltip (stones, twigs, weeds, resource clumps): title and remaining tool hits.
+        /// </summary>
+        private static TooltipModel BuildDebrisTooltip(DebrisInfo info)
+        {
+            var tooltip = new TooltipModel
+            {
+                Title = info.Name,
+                Subtitle = info.Subtitle,
+                IconTexture = Config.ShowItemIconInTooltip ? info.IconTexture : null,
+                IconSourceRect = Config.ShowItemIconInTooltip ? info.IconSourceRect : null
+            };
+
+            if (!string.IsNullOrEmpty(info.ToolHitsText))
+            {
+                tooltip.Lines.Add(new TooltipLine(info.ToolHitsText, info.ToolHitsColor));
             }
 
             return tooltip;

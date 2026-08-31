@@ -1,9 +1,10 @@
-{
-  "furniture.princess_double_bed.name": "Princess Double Bed",
-  "furniture.princess_pastel_window.name": "Princess Pastel Window",
-  "furniture.princess_wall_sconce.name": "Princess Wall Sconce",
-  "furniture.princess_nightstand.name": "Princess Nightstand",
-  "furniture.princess_grand_rug.name": "Princess Grand Rug",
-  "furniture.princess_rococo_mirror.name": "Princess Rococo Mirror",
-  "furniture.princess_bed_canopy.name": "Princess Bed Canopy"
+﻿{
+    "furniture.princess_double_bed.name":  "Princess Double Bed",
+    "furniture.princess_pastel_window.name":  "Princess Pastel Window",
+    "furniture.princess_wall_sconce.name":  "Princess Wall Sconce",
+    "furniture.princess_nightstand.name":  "Princess Nightstand",
+    "furniture.princess_grand_rug.name":  "Princess Grand Rug",
+    "furniture.princess_rococo_mirror.name":  "Princess Rococo Mirror",
+    "furniture.princess_bed_canopy.name":  "Princess Bed Canopy",
+    "mod.description":  "Adds better and larger furniture to Stardew Valley, including a spacious 4x4 Princess King Bed with free placement and animated sconce flames."
 }

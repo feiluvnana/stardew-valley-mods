@@ -52,6 +52,9 @@ namespace BetterFishing
                 }
             );
 
+            // Mod description on Root Page
+            configMenu.AddParagraph(ModManifest, () => I18n.Get("mod.description"));
+
             // Sub-page Navigation Links on Root Page
             AddPageLink(configMenu, "price-scaling", "price-scaling");
             AddPageLink(configMenu, "movement-bonuses", "movement-bonuses");

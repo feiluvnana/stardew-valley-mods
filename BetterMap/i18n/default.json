@@ -1,10 +1,11 @@
-{
-  "gmcm.section.ginger_island.title": "Ginger Island Farm Customization",
-  "gmcm.section.ginger_island.description": "Configure map cleanup and obstacle removal for Ginger Island Farm.",
-  "gmcm.remove_farm_driftwood_barrier.name": "Remove Farm Driftwood Fence & Logs",
-  "gmcm.remove_farm_driftwood_barrier.tooltip": "Removes the long horizontal driftwood fence and bleached log piles separating the upper path and the farmable field on Ginger Island Farm (Island West).",
-  "gmcm.section.farmhouse.title": "Farmhouse Customization",
-  "gmcm.section.farmhouse.description": "Configure farmhouse entrance and doorway enhancements.",
-  "gmcm.widen_house_exit.name": "3x1 Farmhouse Exit Doorway",
-  "gmcm.widen_house_exit.tooltip": "Widens the farmhouse exit doorway to 3 tiles wide across all Farmhouse upgrade levels and the Ginger Island Farmhouse, allowing easy 3x1 exit without being funneled into a single tile."
+﻿{
+    "gmcm.section.ginger_island.title":  "Ginger Island Farm Customization",
+    "gmcm.section.ginger_island.description":  "Configure map cleanup and obstacle removal for Ginger Island Farm.",
+    "gmcm.remove_farm_driftwood_barrier.name":  "Remove Farm Driftwood Fence \u0026 Logs",
+    "gmcm.remove_farm_driftwood_barrier.tooltip":  "Removes the long horizontal driftwood fence and bleached log piles separating the upper path and the farmable field on Ginger Island Farm (Island West).",
+    "gmcm.section.farmhouse.title":  "Farmhouse Customization",
+    "gmcm.section.farmhouse.description":  "Configure farmhouse entrance and doorway enhancements.",
+    "gmcm.widen_house_exit.name":  "3x1 Farmhouse Exit Doorway",
+    "gmcm.widen_house_exit.tooltip":  "Widens the farmhouse exit doorway to 3 tiles wide across all Farmhouse upgrade levels and the Ginger Island Farmhouse, allowing easy 3x1 exit without being funneled into a single tile.",
+    "mod.description":  "Enhances Stardew Valley maps by widening Farmhouse exit doorways to 3x1 tiles and clearing Ginger Island Farm driftwood fences and log piles."
 }

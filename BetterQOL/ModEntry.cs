@@ -65,6 +65,7 @@ namespace BetterQOL
             StackablePatches.Apply(harmony, Monitor);
             MenuTooltipPatch.Apply(harmony, Monitor);
             SkillsPagePatch.Apply(harmony, Monitor);
+            DayTimeMoneyBoxPatch.Apply(harmony, Monitor);
             TransparencyPatches.Apply(harmony, Monitor, helper);
 
             // Features that don't need Harmony are initialized directly with SMAPI
@@ -232,6 +233,9 @@ namespace BetterQOL
                     TransparencyManager.ClearCache();
                 }
             );
+
+            // Mod description on Root Page
+            configMenu.AddParagraph(ModManifest, () => I18n.Get("mod.description"));
 
             // Sub-page Navigation Links on Root Page
             configMenu.AddPageLink(ModManifest, "blacksmith", () => I18n.Get("config.section.blacksmith"));
@@ -413,6 +417,14 @@ namespace BetterQOL
 
             configMenu.AddBoolOption(
                 mod: ModManifest,
+                name: () => I18n.Get("config.enable-debris-hover.name"),
+                tooltip: () => I18n.Get("config.enable-debris-hover.tooltip"),
+                getValue: () => Config.EnableDebrisHover,
+                setValue: value => Config.EnableDebrisHover = value
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
                 name: () => I18n.Get("config.enable-animal-hover.name"),
                 tooltip: () => I18n.Get("config.enable-animal-hover.tooltip"),
                 getValue: () => Config.EnableAnimalHover,
@@ -473,6 +485,14 @@ namespace BetterQOL
                 tooltip: () => I18n.Get("config.show-exact-experience-in-skills-page.tooltip"),
                 getValue: () => Config.ShowExactExperienceInSkillsPage,
                 setValue: value => Config.ShowExactExperienceInSkillsPage = value
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.enable-weather-season-hover.name"),
+                tooltip: () => I18n.Get("config.enable-weather-season-hover.tooltip"),
+                getValue: () => Config.EnableWeatherAndSeasonHover,
+                setValue: value => Config.EnableWeatherAndSeasonHover = value
             );
 
             // Keybind option: lets the player bind any keyboard/controller button.

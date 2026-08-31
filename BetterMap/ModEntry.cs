@@ -184,6 +184,12 @@ namespace BetterMap
                 }
             );
 
+            // Mod description on Root Page
+            configMenu.AddParagraph(
+                mod: ModManifest,
+                text: () => Helper.Translation.Get("mod.description")
+            );
+
             // Section: Ginger Island Farm
             // A bold heading grouping the options below it. The strings come
             // from i18n/*.json via the Translation helper (localization-ready);

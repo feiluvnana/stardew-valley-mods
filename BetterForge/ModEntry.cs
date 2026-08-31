@@ -151,6 +151,9 @@ namespace BetterForge
                 }
             );
 
+            // Mod description on Root Page
+            configMenu.AddParagraph(ModManifest, () => I18n.Get("mod.description"));
+
             // Sub-page Navigation Links on Root Page
             configMenu.AddPageLink(ModManifest, "enchanting", () => I18n.Get("config.section.enchanting"));
             configMenu.AddPageLink(ModManifest, "reforging", () => I18n.Get("config.section.reforging"));

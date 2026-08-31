@@ -66,6 +66,9 @@ namespace BetterQOL
         /// <summary>Whether to show fruit tree maturation/yield and wild tree stages when hovering.</summary>
         public bool EnableTreeHover { get; set; } = true;
 
+        /// <summary>Whether to show tool hits required to chop/break trees, stones, twigs, and resource clumps when hovering.</summary>
+        public bool EnableDebrisHover { get; set; } = true;
+
         /// <summary>Whether to show animal/pet friendship, daily petting, and produce info when hovering.</summary>
         public bool EnableAnimalHover { get; set; } = true;
 
@@ -89,6 +92,9 @@ namespace BetterQOL
 
         /// <summary>Whether to show exact XP, remaining XP, and progress percentage when hovering over skills in the Skills page.</summary>
         public bool ShowExactExperienceInSkillsPage { get; set; } = true;
+
+        /// <summary>Whether to show weather details, tomorrow forecast, and season info when hovering over top-right HUD icons.</summary>
+        public bool EnableWeatherAndSeasonHover { get; set; } = true;
 
         // SButton is SMAPI's cross-device enum: one type covers keyboard keys, mouse
         // buttons, and controller buttons (so a single setting can serve all inputs).

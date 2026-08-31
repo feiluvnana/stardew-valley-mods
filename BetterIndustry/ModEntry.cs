@@ -137,6 +137,9 @@ namespace BetterIndustry
                 }
             );
 
+            // Mod description on Root Page
+            configMenu.AddParagraph(ModManifest, () => I18n.Get("mod.description"));
+
             // Every option below follows the same GMCM recipe: a getter lambda feeding the
             // CURRENT value into the menu, a setter lambda writing the chosen value back
             // into Config, and (for numbers) min/max/interval slider bounds.

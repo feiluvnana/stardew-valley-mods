@@ -55,6 +55,9 @@ namespace BetterAnimal
                 }
             );
 
+            // Mod description on Root Page
+            configMenu.AddParagraph(ModManifest, () => I18n.Get("mod.description"));
+
             // Sub-page navigation links on root page
             configMenu.AddPageLink(ModManifest, "ducks", () => I18n.Get("config.section.ducks"));
             configMenu.AddPageLink(ModManifest, "rabbits", () => I18n.Get("config.section.rabbits"));
