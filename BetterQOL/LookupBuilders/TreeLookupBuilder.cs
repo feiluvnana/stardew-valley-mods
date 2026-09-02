@@ -49,7 +49,7 @@ namespace BetterQOL
                 // status (fertilizer improves the odds of each daily stage-up succeeding).
                 if (!treeInfo.IsMature)
                 {
-                    lookupSection.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.tree.growth-stage"), ModEntry.I18n.Get("hover.tree.stage", new { stage = treeInfo.GrowthStage, max = 5 }), new Color(180, 100, 0)));
+                    lookupSection.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.tree.growth-stage"), ModEntry.I18n.Get("hover.tree.stage", new { stage = treeInfo.GrowthStage + 1, total = 5 }), new Color(180, 100, 0)));
                     if (tree.fertilized.Value)
                     {
                         lookupSection.Fields.Add(new LookupField(ModEntry.I18n.Get("lookup.tree.fertilized"), ModEntry.I18n.Get("lookup.tree.fertilized-status").ToString(), new Color(0, 140, 0)));

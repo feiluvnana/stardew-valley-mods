@@ -101,20 +101,20 @@ namespace BetterQOL
 
             int hoveredSkillIndex = -1;
 
-            // 5 visual skill rows:
+            // 5 visual skill rows in vanilla SkillsPage:
             // Row 0: Farming (0)
-            // Row 1: Mining (3)
+            // Row 1: Fishing (1)
             // Row 2: Foraging (2)
-            // Row 3: Fishing (1)
+            // Row 3: Mining (3)
             // Row 4: Combat (4)
             for (int row = 0; row < 5; row++)
             {
                 int skillIndex = row switch
                 {
                     0 => Farmer.farmingSkill,
-                    1 => Farmer.miningSkill,
+                    1 => Farmer.fishingSkill,
                     2 => Farmer.foragingSkill,
-                    3 => Farmer.fishingSkill,
+                    3 => Farmer.miningSkill,
                     4 => Farmer.combatSkill,
                     _ => row
                 };

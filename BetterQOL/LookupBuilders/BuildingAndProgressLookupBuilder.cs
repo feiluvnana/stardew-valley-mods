@@ -989,7 +989,7 @@ namespace BetterQOL
 			{
 				name = (((Character)n).displayName ?? ((Character)n).Name)
 			})).ToString())) : ((object)ModEntry.I18n.Get("lookup.calendar.no-birthdays")).ToString());
-			bool flag = Game1.getLocationFromName("Town")?.characters?.Any(c => c.Name.Equals("Bookseller", StringComparison.OrdinalIgnoreCase)) ?? false;
+			bool isBooksellerToday = Utility.getDaysOfBooksellerThisSeason()?.Contains(Game1.dayOfMonth) ?? false;
 			// Weekday index: seasons are 28 days = exactly 4 weeks, so (day-1) % 7 gives
 			// 0=Monday..6=Sunday. Cart visits Friday (4), Sunday (6), and winter fair days.
 			int dayOfMonth = Game1.dayOfMonth;
@@ -1000,7 +1000,7 @@ namespace BetterQOL
 			{
 				list2.Add(item);
 			}
-			if (flag)
+			if (isBooksellerToday)
 			{
 				list2.Add(((object)ModEntry.I18n.Get("lookup.events.bookseller-in-town")).ToString());
 			}
@@ -1184,6 +1184,26 @@ namespace BetterQOL
 				break;
 			}
 		}
+		List<int>? booksellerDays = Utility.getDaysOfBooksellerThisSeason();
+		if (booksellerDays != null)
+		{
+			if (booksellerDays.Contains(Game1.dayOfMonth))
+			{
+				lookupSection.Fields.Add(new LookupField((ModEntry.I18n.Get("lookup.events.bookseller")), ((object)ModEntry.I18n.Get("lookup.events.bookseller-visiting")).ToString(), (Color?)new Color(180, 50, 180)));
+			}
+			foreach (int bDay in booksellerDays)
+			{
+				if (bDay > Game1.dayOfMonth && bDay <= Math.Min(28, Game1.dayOfMonth + 7))
+				{
+					int days = bDay - Game1.dayOfMonth;
+					string bText = (days == 1)
+						? ((object)ModEntry.I18n.Get("lookup.calendar.tomorrow")).ToString()
+						: ((object)ModEntry.I18n.Get("lookup.calendar.in-days-format", (object)new { days })).ToString();
+					string seasonName = ((object)ModEntry.I18n.Get("season." + Game1.currentSeason.ToLower())).ToString();
+					lookupSection.Fields.Add(new LookupField((ModEntry.I18n.Get("lookup.events.bookseller")), $"{ModEntry.I18n.Get("lookup.events.bookseller-in-town")} - {bText} ({seasonName} {bDay})", (Color?)new Color(180, 100, 0)));
+				}
+			}
+		}
 		return lookupSection;
 	}
 
@@ -1321,10 +1341,10 @@ namespace BetterQOL
 		string text = weatherForTomorrow switch
 		{
 			"Rain" => ((object)ModEntry.I18n.Get("lookup.weather.rainy-text")).ToString(), 
-			"Storm" => ((object)ModEntry.I18n.Get("lookup.weather.lightning-storm")).ToString(), 
+			"Storm" or "Lightning" => ((object)ModEntry.I18n.Get("lookup.weather.lightning-storm")).ToString(), 
 			"Snow" => ((object)ModEntry.I18n.Get("lookup.weather.snowing")).ToString(), 
 			"GreenRain" => ((object)ModEntry.I18n.Get("lookup.weather.green-rain-text")).ToString(), 
-			"Wind" => ((object)ModEntry.I18n.Get("lookup.weather.windy-debris")).ToString(), 
+			"Wind" or "Debris" => ((object)ModEntry.I18n.Get("lookup.weather.windy-debris")).ToString(), 
 			_ => ((object)ModEntry.I18n.Get("lookup.weather.sunny")).ToString(), 
 		};
 		if (1 == 0)
@@ -1375,8 +1395,29 @@ namespace BetterQOL
 		//IL_036d: Unknown result type (might be due to invalid IL or missing references)
 		//IL_03a1: Unknown result type (might be due to invalid IL or missing references)
 		LookupSection lookupSection = new LookupSection((ModEntry.I18n.Get("lookup.section.events-tv-quests")));
-		bool flag = Game1.getLocationFromName("Town")?.characters?.Any(c => c.Name.Equals("Bookseller", StringComparison.OrdinalIgnoreCase)) ?? false;
-		lookupSection.Fields.Add(new LookupField((ModEntry.I18n.Get("lookup.events.bookseller")), flag ? ((object)ModEntry.I18n.Get("lookup.events.bookseller-visiting")).ToString() : ((object)ModEntry.I18n.Get("lookup.events.bookseller-not-today")).ToString(), (Color)(flag ? new Color(180, 50, 180) : Color.DarkSlateGray)));
+		List<int>? booksellerDays = Utility.getDaysOfBooksellerThisSeason();
+		bool isBooksellerToday = booksellerDays != null && booksellerDays.Contains(Game1.dayOfMonth);
+		if (isBooksellerToday)
+		{
+			lookupSection.Fields.Add(new LookupField((ModEntry.I18n.Get("lookup.events.bookseller")), ((object)ModEntry.I18n.Get("lookup.events.bookseller-visiting")).ToString(), (Color)new Color(180, 50, 180)));
+		}
+		else
+		{
+			int nextBooksellerDay = booksellerDays != null ? booksellerDays.FirstOrDefault(d => d > Game1.dayOfMonth) : 0;
+			if (nextBooksellerDay > 0)
+			{
+				int daysUntil = nextBooksellerDay - Game1.dayOfMonth;
+				string daysText = (daysUntil == 1)
+					? ((object)ModEntry.I18n.Get("lookup.calendar.tomorrow")).ToString()
+					: ((object)ModEntry.I18n.Get("lookup.calendar.in-days-format", (object)new { days = daysUntil })).ToString();
+				string seasonName = ((object)ModEntry.I18n.Get("season." + Game1.currentSeason.ToLower())).ToString();
+				lookupSection.Fields.Add(new LookupField((ModEntry.I18n.Get("lookup.events.bookseller")), $"{daysText} ({seasonName} {nextBooksellerDay})", (Color?)new Color(180, 100, 0)));
+			}
+			else
+			{
+				lookupSection.Fields.Add(new LookupField((ModEntry.I18n.Get("lookup.events.bookseller")), ((object)ModEntry.I18n.Get("lookup.events.bookseller-not-today")).ToString(), Color.DarkSlateGray));
+			}
+		}
 		if (((NetFieldBase<int, NetInt>)(object)Game1.player.daysLeftForToolUpgrade).Value > 0)
 		{
 			int value = ((NetFieldBase<int, NetInt>)(object)Game1.player.daysLeftForToolUpgrade).Value;
@@ -1430,17 +1471,34 @@ namespace BetterQOL
 		}
 		else
 		{
-			// Days until Friday: (target - today + 7) % 7 wraps around the week; the
-			// result of 0 is bumped to 7 so "today" never claims a visit.
-			int num2 = (4 - num + 7) % 7;
-			if (num2 == 0)
+			int daysUntilFriday = (4 - num + 7) % 7;
+			if (daysUntilFriday == 0)
 			{
-				num2 = 7;
+				daysUntilFriday = 7;
 			}
+			int daysUntilSunday = (6 - num + 7) % 7;
+			if (daysUntilSunday == 0)
+			{
+				daysUntilSunday = 7;
+			}
+
+			int nextCartDays;
+			string nextCartDayName;
+			if (daysUntilFriday < daysUntilSunday)
+			{
+				nextCartDays = daysUntilFriday;
+				nextCartDayName = ((object)ModEntry.I18n.Get("day.friday")).ToString();
+			}
+			else
+			{
+				nextCartDays = daysUntilSunday;
+				nextCartDayName = ((object)ModEntry.I18n.Get("day.sunday")).ToString();
+			}
+
 			lookupSection.Fields.Add(new LookupField((ModEntry.I18n.Get("lookup.events.cart")), ((object)ModEntry.I18n.Get("lookup.events.cart-next", (object)new
 			{
-				days = num2,
-				dayOfWeek = ModEntry.I18n.Get("day.friday")
+				days = nextCartDays,
+				dayOfWeek = nextCartDayName
 			})).ToString(), Color.DarkSlateGray));
 		}
 		return lookupSection;
@@ -1481,10 +1539,11 @@ namespace BetterQOL
 				if (1 == 0)
 				{
 				}
-				// Absolute day since year 1: (year-1)*112 days + season offset (0/28/56/84)
-				// + day of month; dividing by 7 gives the "week number" used as the TV key.
+				// Absolute day in 2-year cycle: ((year-1)%2)*112 days + season offset (0/28/56/84)
+				// + day of month; dividing by 7 gives the "week number" (1-32) used as the TV key.
 				int num2 = num;
-				if (dictionary.TryGetValue((((Game1.year - 1) * 112 + Game1.dayOfMonth + num2) / 7).ToString(), out var value))
+				int weekKey = (((Game1.year - 1) % 2) * 112 + Game1.dayOfMonth + num2) / 7;
+				if (dictionary.TryGetValue(weekKey.ToString(), out var value))
 				{
 					string[] array = value.Split('/');
 					if (array.Length != 0)
@@ -1592,7 +1651,7 @@ namespace BetterQOL
 				}
 				foreach (SObject value5 in ((GameLocation)farm).objects.Values)
 				{
-					if (((NetFieldBase<bool, NetBool>)(object)value5.readyForHarvest).Value)
+					if (((NetFieldBase<bool, NetBool>)(object)value5.readyForHarvest).Value || (((NetFieldBase<SObject, NetRef<SObject>>)(object)value5.heldObject).Value != null && value5.MinutesUntilReady <= 0))
 					{
 						num6++;
 					}
@@ -1608,7 +1667,7 @@ namespace BetterQOL
 					}
 					foreach (SObject value6 in ((NetFieldBase<GameLocation, NetRef<GameLocation>>)(object)building.indoors).Value.objects.Values)
 					{
-						if (((NetFieldBase<bool, NetBool>)(object)value6.readyForHarvest).Value)
+						if (((NetFieldBase<bool, NetBool>)(object)value6.readyForHarvest).Value || (((NetFieldBase<SObject, NetRef<SObject>>)(object)value6.heldObject).Value != null && value6.MinutesUntilReady <= 0))
 						{
 							num6++;
 						}
@@ -2418,7 +2477,7 @@ namespace BetterQOL
 					string key = item49.Key;
 					ObjectData value = item49.Value;
 					ParsedItemData val = ItemRegistry.GetData(key) ?? ItemRegistry.GetData("(O)" + key);
-					if (val != null && !val.ObjectType.Equals("Arch", StringComparison.OrdinalIgnoreCase) && !val.ObjectType.Equals("Minerals", StringComparison.OrdinalIgnoreCase) && !val.ObjectType.Equals("Fish", StringComparison.OrdinalIgnoreCase) && val.Category != -75 && val.Category != -79 && val.Category != -80 && val.Category != -81 && val.Category != -999 && val.Category != 0 && (value.Type == "Basic" || val.Category == -75 || val.Category == -79 || val.Category == -80 || val.Category == -5 || val.Category == -6 || val.Category == -26 || val.Category == -14 || val.Category == -27 || val.Category == -81))
+					if (val != null && !value.ExcludeFromShippingCollection && val.Category != -999 && !val.ObjectType.Equals("Arch", StringComparison.OrdinalIgnoreCase) && !val.ObjectType.Equals("Minerals", StringComparison.OrdinalIgnoreCase) && !val.ObjectType.Equals("Fish", StringComparison.OrdinalIgnoreCase) && (value.Type == "Basic" || val.Category == -75 || val.Category == -79 || val.Category == -80 || val.Category == -5 || val.Category == -6 || val.Category == -26 || val.Category == -14 || val.Category == -27 || val.Category == -81))
 					{
 						num++;
 						if (((NetDictionary<string, int, NetInt, SerializableDictionary<string, int>, NetStringDictionary<int, NetInt>>)(object)Game1.player.basicShipped).ContainsKey(key) || ((NetDictionary<string, int, NetInt, SerializableDictionary<string, int>, NetStringDictionary<int, NetInt>>)(object)Game1.player.basicShipped).ContainsKey("(O)" + key))

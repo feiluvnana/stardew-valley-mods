@@ -118,17 +118,29 @@ namespace BetterQOL
 				lookupSection.Fields.Add(new LookupField((ModEntry.I18n.Get("lookup.item.buffs")), string.Join(", ", foodBuffs), (Color?)new Color(180, 50, 180)));
 			}
 		}
-		int num4 = item.sellToStorePrice(-1L);
-		// Quality price tiers: silver = x1.25, gold = x1.5, iridium = x2 of the base price.
-		if (num4 > 0)
+		int rawSellPrice = item.sellToStorePrice(-1L);
+		int normalPrice = rawSellPrice;
+		if (item is SObject qualityObj && qualityObj.Quality > 0)
 		{
-			int value3 = (int)((double)num4 * 1.25);
-			int value4 = (int)((double)num4 * 1.5);
-			int value5 = (int)((double)num4 * 2.0);
+			double mult = qualityObj.Quality switch
+			{
+				1 => 1.25,
+				2 => 1.5,
+				4 => 2.0,
+				_ => 1.0
+			};
+			normalPrice = (int)Math.Round((double)rawSellPrice / mult);
+		}
+		// Quality price tiers: silver = x1.25, gold = x1.5, iridium = x2 of the base price.
+		if (normalPrice > 0)
+		{
+			int value3 = (int)((double)normalPrice * 1.25);
+			int value4 = (int)((double)normalPrice * 1.5);
+			int value5 = (int)((double)normalPrice * 2.0);
 			string value6 = (ModEntry.I18n.Get("hover.quality.silver"));
 			string value7 = (ModEntry.I18n.Get("hover.quality.gold"));
 			string value8 = (ModEntry.I18n.Get("hover.quality.iridium"));
-			lookupSection.Fields.Add(new LookupField((ModEntry.I18n.Get("lookup.item.sell-price")), $"{num4}g ({value6}: {value3}g, {value7}: {value4}g, {value8}: {value5}g)", (Color?)new Color(180, 100, 0)));
+			lookupSection.Fields.Add(new LookupField((ModEntry.I18n.Get("lookup.item.sell-price")), $"{normalPrice}g ({value6}: {value3}g, {value7}: {value4}g, {value8}: {value5}g)", (Color?)new Color(180, 100, 0)));
 		}
 		(int InventoryCount, int StorageCount) itemOwnedCounts = GetItemOwnedCounts(item);
 		int item2 = itemOwnedCounts.InventoryCount;
@@ -166,7 +178,7 @@ namespace BetterQOL
 		AddGeodeAndMysteryBoxSection(lookupSubject, item);
 		AddFertilizerDetailsSection(lookupSubject, item);
 		AddRecyclingSection(lookupSubject, item);
-		AddArtisanProductsSection(lookupSubject, item, num4);
+		AddArtisanProductsSection(lookupSubject, item, normalPrice);
 		AddTailoringAndDyeSection(lookupSubject, item);
 		AddCollectionAndPerfectionSection(lookupSubject, item);
 		if (ModEntry.Config.ShowBundleAndMuseumInfo)
@@ -1410,7 +1422,7 @@ namespace BetterQOL
 										else
 										{
 											string text16 = text8;
-											if (text16.Contains("spook fish"))
+											if (text16.Contains("stonefish") || text16.Contains("spook fish"))
 											{
 												text6 = ((object)ModEntry.I18n.Get("lookup.pond.stonefish")).ToString();
 											}

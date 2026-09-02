@@ -82,12 +82,17 @@ namespace BetterQOL
             string title;
             string desc;
 
-            if (Game1.IsGreenRainingHere() || Game1.weatherIcon == 999)
+            if (Game1.IsGreenRainingHere() || Game1.isGreenRain || Game1.weatherIcon == 999)
             {
                 title = ModEntry.I18n.Get("lookup.weather.green-rain-text").ToString();
                 desc = ModEntry.I18n.Get("hover.weather.green-rain-desc").ToString();
             }
-            else if (Utility.isFestivalDay() || Game1.weatherIcon == 1)
+            else if (Game1.weddingToday || Game1.weatherIcon == 6)
+            {
+                title = ModEntry.I18n.Get("lookup.weather.wedding").ToString();
+                desc = ModEntry.I18n.Get("hover.weather.wedding-desc").ToString();
+            }
+            else if (Utility.isFestivalDay() || Game1.weatherIcon == 4)
             {
                 string? festivalName = null;
                 try
@@ -98,10 +103,7 @@ namespace BetterQOL
                         festivalName = festName;
                     }
                 }
-                catch
-                {
-                    // fallback to default key
-                }
+                catch { }
 
                 title = !string.IsNullOrEmpty(festivalName) ? festivalName : ModEntry.I18n.Get("lookup.weather.festival").ToString();
                 if (Game1.whereIsTodaysFest != null)
@@ -117,27 +119,22 @@ namespace BetterQOL
                     desc = ModEntry.I18n.Get("hover.weather.festival-desc").ToString();
                 }
             }
-            else if (Game1.weddingToday || Game1.weatherIcon == 0)
-            {
-                title = ModEntry.I18n.Get("lookup.weather.wedding").ToString();
-                desc = ModEntry.I18n.Get("hover.weather.wedding-desc").ToString();
-            }
-            else if (Game1.IsLightningHere() || Game1.weatherIcon == 5)
+            else if (Game1.IsLightningHere() || Game1.isLightning || Game1.weatherIcon == 3)
             {
                 title = ModEntry.I18n.Get("lookup.weather.lightning-storm").ToString();
                 desc = ModEntry.I18n.Get("hover.weather.storm-desc").ToString();
             }
-            else if (Game1.IsRainingHere() || Game1.weatherIcon == 4)
-            {
-                title = ModEntry.I18n.Get("lookup.weather.rainy-text").ToString();
-                desc = ModEntry.I18n.Get("hover.weather.rain-desc").ToString();
-            }
-            else if (Game1.IsSnowingHere() || Game1.weatherIcon == 7)
+            else if (Game1.IsSnowingHere() || Game1.isSnowing || Game1.weatherIcon == 5 || Game1.weatherIcon == 7)
             {
                 title = ModEntry.I18n.Get("lookup.weather.snowing").ToString();
                 desc = ModEntry.I18n.Get("hover.weather.snow-desc").ToString();
             }
-            else if (Game1.IsDebrisWeatherHere() || Game1.weatherIcon == 3 || Game1.weatherIcon == 6)
+            else if (Game1.IsRainingHere() || Game1.isRaining || Game1.weatherIcon == 1)
+            {
+                title = ModEntry.I18n.Get("lookup.weather.rainy-text").ToString();
+                desc = ModEntry.I18n.Get("hover.weather.rain-desc").ToString();
+            }
+            else if (Game1.IsDebrisWeatherHere() || Game1.isDebrisWeather || Game1.weatherIcon == 2)
             {
                 title = ModEntry.I18n.Get("lookup.weather.windy-debris").ToString();
                 desc = ModEntry.I18n.Get("hover.weather.debris-desc").ToString();
@@ -150,9 +147,9 @@ namespace BetterQOL
 
             string tomorrowWeather = GetLocalizedTomorrowWeather();
             string tomorrowLine = ModEntry.I18n.Get("hover.weather.tomorrow-forecast", new { weather = tomorrowWeather }).ToString();
-            string fullBody = $"{desc}\n\n{tomorrowLine}";
+            string body = $"{desc}\n\n{tomorrowLine}";
 
-            return (title, fullBody);
+            return (title, body);
         }
 
         /// <summary>
@@ -163,10 +160,10 @@ namespace BetterQOL
             return Game1.weatherForTomorrow switch
             {
                 "Rain" => ModEntry.I18n.Get("lookup.weather.rainy-text").ToString(),
-                "Storm" => ModEntry.I18n.Get("lookup.weather.lightning-storm").ToString(),
+                "Storm" or "Lightning" => ModEntry.I18n.Get("lookup.weather.lightning-storm").ToString(),
                 "Snow" => ModEntry.I18n.Get("lookup.weather.snowing").ToString(),
                 "GreenRain" => ModEntry.I18n.Get("lookup.weather.green-rain-text").ToString(),
-                "Wind" => ModEntry.I18n.Get("lookup.weather.windy-debris").ToString(),
+                "Wind" or "Debris" => ModEntry.I18n.Get("lookup.weather.windy-debris").ToString(),
                 "Festival" => ModEntry.I18n.Get("lookup.weather.festival").ToString(),
                 "Wedding" => ModEntry.I18n.Get("lookup.weather.wedding").ToString(),
                 _ => ModEntry.I18n.Get("lookup.weather.sunny").ToString()
