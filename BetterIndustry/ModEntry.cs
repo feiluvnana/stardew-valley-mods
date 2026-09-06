@@ -82,6 +82,7 @@ namespace BetterIndustry
             CookingPatches.Apply(harmony);
             MachineQualityPatches.Apply(harmony);
             MillPatches.Apply(harmony);
+            CaskPatches.Apply(harmony);
 
             // Game Loop Events
             // GameLaunched: fires once the game finished booting (right moment to query
@@ -301,6 +302,14 @@ namespace BetterIndustry
                 tooltip: () => I18n.Get("config.expanded-aging.tooltip"),
                 getValue: () => Config.EnableExpandedAging,
                 setValue: value => Config.EnableExpandedAging = value
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.casks-everywhere.name"),
+                tooltip: () => I18n.Get("config.casks-everywhere.tooltip"),
+                getValue: () => Config.EnableCasksEverywhere,
+                setValue: value => Config.EnableCasksEverywhere = value
             );
 
             // ---------------- Sub-Page 3: Fruit Tree Balancing & Automation ----------------

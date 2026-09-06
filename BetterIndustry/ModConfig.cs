@@ -76,6 +76,9 @@ namespace BetterIndustry
         /// <summary>Whether Casks can age additional artisan goods such as Vegetable Juice.</summary>
         public bool EnableExpandedAging { get; set; } = true;
 
+        /// <summary>Whether Casks can age artisan goods outside the cellar (e.g. anywhere in sheds, farmhouses, or outdoors).</summary>
+        public bool EnableCasksEverywhere { get; set; } = true;
+
         // ---------------- Fruit Tree Balancing & Automation ----------------
         /// <summary>Whether fruit automatically falls to the ground when a mature fruit tree reaches the configured fruit count.</summary>
         public bool EnableAutoFruitDrop { get; set; } = true;

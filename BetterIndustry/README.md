@@ -58,7 +58,8 @@
 
 ## 🥕 Module 5: Vegetable Juice Buff & Expanded Cask Aging
 * **Juice Multiplier:** Vegetable Juice brews at `JuiceMultiplier` (default **2.75x**).
-* **Cask Aging:** Vegetable Juice can age in Cellar Casks up to Iridium quality over 56 days.
+* **Cask Aging:** Vegetable Juice can age in Casks up to Iridium quality over 56 days.
+* **Casks Everywhere (Outside Cellar):** Casks function and age goods anywhere (sheds, barns, farmhouses, or outdoors on the farm), not just inside the cellar (`EnableCasksEverywhere`, default `true`). Fully compatible with manual placement and Automate.
 
 ---
 
@@ -120,6 +121,7 @@ Strict early-game protection: Bug Meat (8g), Slime (5g), and Bat Wing (15g) are 
 | `EnableCookingOilArtisanCategory` | `true` | Assigns Artisan category (-26) to Cooking Oil. |
 | `EnableJuiceBuff` | `true` | Buffs Vegetable Juice multiplier in Kegs (2.75x). |
 | `EnableExpandedAging` | `true` | Allows Vegetable Juice to age in Casks. |
+| `EnableCasksEverywhere` | `true` | Allows Casks to function and age goods outside the cellar. |
 | `EnableFruitTreeRebalance` | `true` | Rebalances orchard fruit prices for positive Year-1 ROI. |
 | `EnableAutoFruitDrop` | `true` | Drops ripe fruit overnight when tree reaches threshold. |
 | `EnableMineralPriceRebalance` | `true` | Rebalances 41 geode minerals with 2-digit profit bumps. |

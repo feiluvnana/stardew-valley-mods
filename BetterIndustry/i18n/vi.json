@@ -1,4 +1,4 @@
-﻿{
+{
     "config.section.cooking":  "Tùy Chọn Món Ăn \u0026 Sao Chất Lượng",
     "config.cooking-balancing.name":  "Cân Bằng Giá Nấu Nướng",
     "config.cooking-balancing.tooltip":  "Đảm bảo các món ăn luôn bán được với giá cao hơn tổng nguyên liệu thô theo tỷ lệ lợi nhuận đã định.",
@@ -36,6 +36,8 @@
     "config.juice-multiplier.tooltip":  "Hệ số nhân giá nước ép rau củ so với giá rau củ thô (mặc định 2.75x, gốc 2.25x).",
     "config.expanded-aging.name":  "Mở Rộng Thùng Ủ Hầm (Cask)",
     "config.expanded-aging.tooltip":  "Cho phép Thùng ủ hầm (Cask) ủ già thêm các mặt hàng thủ công như Nước ép rau củ.",
+    "config.casks-everywhere.name":  "Dùng Thùng Ủ Ngoài Hầm Rượu",
+    "config.casks-everywhere.tooltip":  "Cho phép Thùng ủ (Cask) hoạt động và ủ già sản phẩm ở bất kỳ đâu (nhà kho, nhà chính, ngoài trời,...), không chỉ giới hạn trong hầm rượu.",
     "config.section.fruittree":  "Tùy Chọn Cây Ăn Trái",
     "config.enable-fruit-tree-rebalance.name":  "Cân Bằng Giá Trái Cây",
     "config.enable-fruit-tree-rebalance.tooltip":  "Tái cân bằng giá bán trái cây (Đào/Lựu 180g, Cam/Táo 135g, Cherry 110g, Mơ 75g) để đảm bảo hoàn vốn và có lãi ngay trong năm 1.",

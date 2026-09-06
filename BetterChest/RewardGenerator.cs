@@ -132,7 +132,7 @@ namespace BetterChest
             new("(O)896", LootCategory.Legendary, 1, 2, 15.0, c => c.EnableLegendaryCategory && c.EnableGalaxySoul && (!c.GatekeepQiItems || ProgressionHelper.IsQiRoomUnlocked()), false),  // Galaxy Soul
             new("(O)StardropTea", LootCategory.Legendary, 1, 3, 15.0, c => c.EnableLegendaryCategory && c.EnableStardropTea, false),
             new("(O)PrizeTicket", LootCategory.Legendary, 2, 4, 15.0, c => c.EnableLegendaryCategory && c.EnablePrizeTicket, false),
-            new("(O)Book_Stars", LootCategory.Legendary, 1, 1, 10.0, c => c.EnableLegendaryCategory && (!c.GatekeepMasteryItems || ProgressionHelper.IsMasteryUnlocked()), false), // Book of Stars
+            new("(O)Book_Stars", LootCategory.Legendary, 1, 1, 1.3, c => c.EnableLegendaryCategory && (!c.GatekeepMasteryItems || ProgressionHelper.IsMasteryUnlocked()), false), // Book of Stars (~1% category share)
 
             // =========================================================================
             // === 2. AGRICULTURE CATEGORY (15% Category Weight)                     ===
@@ -148,25 +148,25 @@ namespace BetterChest
             new("(O)805", LootCategory.Agriculture, 10, 20, 15.0, c => c.EnableAgricultureCategory && c.EnableFertilizers),     // Tree Fertilizer
             new("(O)915", LootCategory.Agriculture, 1, 2, 12.0, c => c.EnableAgricultureCategory && c.EnableSprinklers && (!c.GatekeepQiItems || ProgressionHelper.IsQiRoomUnlocked())),        // Pressure Nozzle (Mult Allowed)
             new("(O)913", LootCategory.Agriculture, 1, 2, 12.0, c => c.EnableAgricultureCategory && c.EnableSprinklers && (!c.GatekeepQiItems || ProgressionHelper.IsQiRoomUnlocked())),        // Enricher (Mult Allowed)
-            new("(O)Book_Farming", LootCategory.Agriculture, 1, 1, 8.0, c => c.EnableAgricultureCategory, false), // Stardew Valley Almanac
-            new("(O)Book_Animal", LootCategory.Agriculture, 1, 1, 6.0, c => c.EnableAgricultureCategory, false),  // Animal Catalogue
+            new("(O)Book_Farming", LootCategory.Agriculture, 1, 1, 0.8, c => c.EnableAgricultureCategory, false), // Stardew Valley Almanac (~1% total book share)
+            new("(O)Book_Animal", LootCategory.Agriculture, 1, 1, 0.8, c => c.EnableAgricultureCategory, false),  // Animal Catalogue (~1% total book share)
 
             // =========================================================================
             // === 3. MINING CATEGORY (15% Category Weight)                          ===
             // =========================================================================
             new("(O)386", LootCategory.Mining, 10, 25, 25.0, c => c.EnableMiningCategory && c.EnableIridiumItems),       // Iridium Ore
             new("(O)288", LootCategory.Mining, 5, 15, 25.0, c => c.EnableMiningCategory && c.EnableBombs),               // Mega Bomb
-            new("(O)909", LootCategory.Mining, 5, 15, 22.0, c => c.EnableMiningCategory && c.EnableRadioactiveItems && (!c.GatekeepRadioactiveItems || ProgressionHelper.IsQiRoomUnlocked())),    // Radioactive Ore
+            new("(O)909", LootCategory.Mining, 8, 20, 22.0, c => c.EnableMiningCategory && c.EnableRadioactiveItems && (!c.GatekeepRadioactiveItems || ProgressionHelper.IsQiRoomUnlocked())),    // Radioactive Ore (Slightly Buffed Stack)
             new("(O)337", LootCategory.Mining, 2, 4, 22.0, c => c.EnableMiningCategory && c.EnableIridiumItems, false),        // Iridium Bar (Fixed Stack, No Multiplier)
             new("(O)910", LootCategory.Mining, 1, 3, 20.0, c => c.EnableMiningCategory && c.EnableRadioactiveItems && (!c.GatekeepRadioactiveItems || ProgressionHelper.IsQiRoomUnlocked()), false),     // Radioactive Bar (Fixed Stack, No Multiplier)
-            new("(O)382", LootCategory.Mining, 35, 90, 24.0, c => c.EnableMiningCategory && c.EnableCoal),               // Coal (New)
+            new("(O)382", LootCategory.Mining, 40, 100, 25.0, c => c.EnableMiningCategory && c.EnableCoal),               // Coal (Slightly Buffed Stack & Weight)
             new("(BC)21", LootCategory.Mining, 1, 1, 12.0, c => c.EnableMiningCategory && c.EnableMachines && (!c.GatekeepMasteryItems || ProgressionHelper.GetMiningLevel() >= 9), false),       // Crystalarium
             new("(O)848", LootCategory.Mining, 6, 16, 20.0, c => c.EnableMiningCategory && (!c.GatekeepIslandItems || ProgressionHelper.IsVolcanoShortcutUnlocked())),                                // Cinder Shard (Volcano Shortcut Gatekeep)
             new("(O)70", LootCategory.Mining, 3, 8, 20.0, c => c.EnableMiningCategory),                                  // Jade (Staircases)
             new("(O)72", LootCategory.Mining, 3, 8, 18.0, c => c.EnableMiningCategory),                                  // Diamond
-            new("(O)Book_Mining", LootCategory.Mining, 1, 1, 8.0, c => c.EnableMiningCategory, false),           // Mining Monthly
-            new("(O)Book_Bombs", LootCategory.Mining, 1, 1, 6.0, c => c.EnableMiningCategory, false),            // Dwarvish Safety Manual
-            new("(O)Book_Diamonds", LootCategory.Mining, 1, 1, 6.0, c => c.EnableMiningCategory, false),         // The Diamond Hunter
+            new("(O)Book_Mining", LootCategory.Mining, 1, 1, 0.7, c => c.EnableMiningCategory, false),           // Mining Monthly (~1% total book share)
+            new("(O)Book_Bombs", LootCategory.Mining, 1, 1, 0.7, c => c.EnableMiningCategory, false),            // Dwarvish Safety Manual (~1% total book share)
+            new("(O)Book_Diamonds", LootCategory.Mining, 1, 1, 0.7, c => c.EnableMiningCategory, false),         // The Diamond Hunter (~1% total book share)
 
             // =========================================================================
             // === 4. FISHING CATEGORY (15% Category Weight)                         ===
@@ -181,9 +181,9 @@ namespace BetterChest
             new("(O)CaveJelly", LootCategory.Fishing, 1, 3, 16.0, c => c.EnableFishingCategory),                     // Cave Jelly
             new("(O)265", LootCategory.Fishing, 2, 5, 15.0, c => c.EnableFishingCategory),                            // Seafoam Pudding
             new("(O)242", LootCategory.Fishing, 2, 6, 15.0, c => c.EnableFishingCategory),                            // Dish O' The Sea
-            new("(O)Book_Fishing", LootCategory.Fishing, 1, 1, 8.0, c => c.EnableFishingCategory, false),        // Bait And Bobber
-            new("(O)Book_Crabbing", LootCategory.Fishing, 1, 1, 6.0, c => c.EnableFishingCategory, false),       // The Art O' Crabbing
-            new("(O)Book_Roe", LootCategory.Fishing, 1, 1, 6.0, c => c.EnableFishingCategory, false),            // Jewels Of The Sea
+            new("(O)Book_Fishing", LootCategory.Fishing, 1, 1, 0.5, c => c.EnableFishingCategory, false),        // Bait And Bobber (~1% total book share)
+            new("(O)Book_Crabbing", LootCategory.Fishing, 1, 1, 0.5, c => c.EnableFishingCategory, false),       // The Art O' Crabbing (~1% total book share)
+            new("(O)Book_Roe", LootCategory.Fishing, 1, 1, 0.5, c => c.EnableFishingCategory, false),            // Jewels Of The Sea (~1% total book share)
 
             // =========================================================================
             // === 5. COMBAT CATEGORY (15% Category Weight)                          ===
@@ -195,21 +195,22 @@ namespace BetterChest
             new("(O)879", LootCategory.Combat, 2, 5, 18.0, c => c.EnableCombatCategory),                                // Monster Musk
             new("(O)857", LootCategory.Combat, 1, 2, 15.0, c => c.EnableCombatCategory && c.EnableSlimeEggs && (!c.GatekeepIslandItems || ProgressionHelper.IsIslandUnlocked()), false),    // Tiger Slime Egg
             new("(O)439", LootCategory.Combat, 1, 2, 15.0, c => c.EnableCombatCategory && c.EnableSlimeEggs, false),    // Purple Slime Egg
-            new("(O)Book_Combat", LootCategory.Combat, 1, 1, 8.0, c => c.EnableCombatCategory, false),           // Combat Quarterly
-            new("(O)Book_Void", LootCategory.Combat, 1, 1, 6.0, c => c.EnableCombatCategory, false),             // Monster Compendium
-            new("(O)Book_Defense", LootCategory.Combat, 1, 1, 6.0, c => c.EnableCombatCategory, false),          // Jack Be Nimble, Jack Be Thick
+            new("(O)Book_Combat", LootCategory.Combat, 1, 1, 0.45, c => c.EnableCombatCategory, false),          // Combat Quarterly (~1% total book share)
+            new("(O)Book_Void", LootCategory.Combat, 1, 1, 0.45, c => c.EnableCombatCategory, false),            // Monster Compendium (~1% total book share)
+            new("(O)Book_Defense", LootCategory.Combat, 1, 1, 0.45, c => c.EnableCombatCategory, false),         // Jack Be Nimble, Jack Be Thick (~1% total book share)
 
             // =========================================================================
             // === 6. FORAGING CATEGORY (15% Category Weight)                        ===
             // =========================================================================
-            new("(O)709", LootCategory.Foraging, 30, 80, 24.0, c => c.EnableForagingCategory && c.EnableHardwood),    // Hardwood (Buffed)
+            new("(O)709", LootCategory.Foraging, 30, 80, 24.0, c => c.EnableForagingCategory && c.EnableHardwood),    // Hardwood
+            new("(O)388", LootCategory.Foraging, 100, 250, 20.0, c => c.EnableForagingCategory && c.EnableWood),       // Wood (New)
             new("(O)MysticTreeSeed", LootCategory.Foraging, 2, 6, 22.0, c => c.EnableForagingCategory && (!c.GatekeepMasteryItems || ProgressionHelper.IsMasteryUnlocked("Foraging"))), // Mystic Tree Seed
             new("(O)791", LootCategory.Foraging, 2, 6, 22.0, c => c.EnableForagingCategory && (!c.GatekeepIslandItems || ProgressionHelper.IsIslandUnlocked())),                            // Golden Coconut
             new("(O)851", LootCategory.Foraging, 3, 8, 20.0, c => c.EnableForagingCategory && (!c.GatekeepIslandItems || ProgressionHelper.IsIslandUnlocked())),                            // Magma Cap
             new("(O)422", LootCategory.Foraging, 5, 12, 20.0, c => c.EnableForagingCategory),                           // Purple Mushroom
-            new("(O)Book_Foraging", LootCategory.Foraging, 1, 1, 8.0, c => c.EnableForagingCategory, false),     // Woodcutter's Weekly
-            new("(O)Book_Woodcutting", LootCategory.Foraging, 1, 1, 6.0, c => c.EnableForagingCategory, false),  // Woody's Secret
-            new("(O)Book_Grass", LootCategory.Foraging, 1, 1, 6.0, c => c.EnableForagingCategory, false),        // Ol' Slitherlegs
+            new("(O)Book_Foraging", LootCategory.Foraging, 1, 1, 0.38, c => c.EnableForagingCategory, false),    // Woodcutter's Weekly (~1% total book share)
+            new("(O)Book_Woodcutting", LootCategory.Foraging, 1, 1, 0.38, c => c.EnableForagingCategory, false), // Woody's Secret (~1% total book share)
+            new("(O)Book_Grass", LootCategory.Foraging, 1, 1, 0.38, c => c.EnableForagingCategory, false),       // Ol' Slitherlegs (~1% total book share)
 
             // =========================================================================
             // === 7. LOOTBOXES CATEGORY (15% Category Weight)                       ===
@@ -220,9 +221,9 @@ namespace BetterChest
             new("(O)GoldenMysteryBox", LootCategory.Lootboxes, 2, 5, 22.0, c => c.EnableLootboxCategory && c.EnableMysteryBoxes && (!c.GatekeepMasteryItems || ProgressionHelper.IsMasteryUnlocked("Foraging")) && (!c.GatekeepMysteryBoxes || ProgressionHelper.IsMysteryBoxUnlocked())),
             new("(O)CalicoEgg", LootCategory.Lootboxes, 15, 40, 22.0, c => c.EnableLootboxCategory && c.EnableCalicoEggs && (!c.GatekeepCalicoEggs || ProgressionHelper.IsDesertFestivalActive())),
             new("(O)TreasureTotem", LootCategory.Lootboxes, 2, 5, 18.0, c => c.EnableLootboxCategory && (!c.GatekeepMasteryItems || ProgressionHelper.IsMasteryUnlocked("Foraging")), false), // Treasure Totem (Buffed base stack, No Mult)
-            new("(O)Book_Mystery", LootCategory.Lootboxes, 1, 1, 6.0, c => c.EnableLootboxCategory && (!c.GatekeepMysteryBoxes || ProgressionHelper.IsMysteryBoxUnlocked()), false), // Book of Mysteries
-            new("(O)Book_Artifact", LootCategory.Lootboxes, 1, 1, 6.0, c => c.EnableLootboxCategory, false),    // Treasure Appraisal Guide
-            new("(O)Book_PriceCatalogue", LootCategory.Lootboxes, 1, 1, 6.0, c => c.EnableLootboxCategory, false), // Price Catalogue
+            new("(O)Book_Mystery", LootCategory.Lootboxes, 1, 1, 0.45, c => c.EnableLootboxCategory && (!c.GatekeepMysteryBoxes || ProgressionHelper.IsMysteryBoxUnlocked()), false), // Book of Mysteries (~1% total book share)
+            new("(O)Book_Artifact", LootCategory.Lootboxes, 1, 1, 0.45, c => c.EnableLootboxCategory, false),    // Treasure Appraisal Guide (~1% total book share)
+            new("(O)Book_PriceCatalogue", LootCategory.Lootboxes, 1, 1, 0.45, c => c.EnableLootboxCategory, false), // Price Catalogue (~1% total book share)
         };
 
         // "static" method — call it as RewardGenerator.GenerateRewards(...) with
@@ -241,9 +242,6 @@ namespace BetterChest
             var results = new List<Item>();
             // Special chests only get their buff when the user hasn't disabled it.
             bool applySpecialBuff = isSpecialChest && config.EnableFloor100Buff;
-            // "Relative depth": Skull Cavern floors count up from 1 above level 120.
-            int relativeDepth = Math.Max(1, mineLevel > 120 ? mineLevel - 120 : mineLevel);
-            bool isShallowFloor = config.EnableDepthScaling && !applySpecialBuff && relativeDepth < 50;
 
             // Organize eligible items into category buckets
             // Dictionary key = category; value = a TUPLE bundling the entry list with
@@ -341,22 +339,9 @@ namespace BetterChest
                     config.Floor100Roll12Chance
                 };
             }
-            else if (isShallowFloor)
-            {
-                // Shallow floor depth scaling (Floors 1-49: Min 1 guaranteed roll, max 4 rolls)
-                minRolls = 1;
-                maxRolls = Math.Min(config.MaxRolls, 4);
-                decayChances = new[]
-                {
-                    1.0f,
-                    0.60f,
-                    0.35f,
-                    0.20f
-                };
-            }
             else
             {
-                // Standard deep floors (Floors 50+: Min 2 guaranteed rolls, expected 3.0 items, max 6 rolls)
+                // Standard regular chests (Min 2 guaranteed rolls, expected 3.0 items, max 6 rolls)
                 minRolls = 2;
                 maxRolls = config.MaxRolls;
                 decayChances = new[]
@@ -400,14 +385,6 @@ namespace BetterChest
                 x4Chance = config.Floor100QuadrupleStackChance;
                 x3Chance = config.Floor100TripleStackChance;
                 x2Chance = config.Floor100DoubleStackChance;
-            }
-            else if (isShallowFloor)
-            {
-                // Shallow floors limit stack multiplier jackpot up to 2x
-                x5Chance = 0f;
-                x4Chance = 0f;
-                x3Chance = 0f;
-                x2Chance = config.DoubleStackChance;
             }
             else
             {

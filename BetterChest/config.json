@@ -1,7 +1,6 @@
 {
   "EnableCustomRewards": true,
   "ExcludeCosmetics": true,
-  "EnableDepthScaling": true,
   "MaxRolls": 6,
   "Roll2Chance": 1.0,
   "Roll3Chance": 0.5,
@@ -60,6 +59,7 @@
   "EnableRadioactiveItems": true,
   "EnableIridiumItems": true,
   "EnableCoal": true,
+  "EnableWood": true,
   "EnableHardwood": true,
   "EnableBombs": true,
   "EnableFishingTackle": true,

@@ -1,8 +1,11 @@
+using System;
+using System.Collections.Generic;
 using HarmonyLib;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Objects;
 using StardewValley.Objects.Trinkets;
+using StardewValley.Tools;
 
 namespace BetterQOL
 {
@@ -72,6 +75,12 @@ namespace BetterQOL
                 PatchGetOne(harmony, typeof(Furniture));
                 PatchGetOne(harmony, typeof(Trinket));
 
+                // Patch Tool.attach so fishing tackle never stacks inside rod attachment slots
+                PatchToolAttach(harmony);
+
+                // Patch FishingRod.doDoneFishing to protect against stack loss if stacked tackle breaks
+                PatchFishingRodDoneFishing(harmony);
+
                 monitor.Log("Harmony patches for BetterQOL stackable items applied successfully.", LogLevel.Trace);
             }
             catch (Exception ex)
@@ -131,6 +140,35 @@ namespace BetterQOL
                 harmony.Patch(
                     original: method,
                     postfix: new HarmonyMethod(typeof(StackablePatches), nameof(Item_getOne_Postfix))
+                );
+            }
+        }
+
+        /// <summary>Attaches Tool_attach_Prefix to Tool.attach(Object).</summary>
+        /// <param name="harmony">Shared patcher instance.</param>
+        private static void PatchToolAttach(Harmony harmony)
+        {
+            var method = AccessTools.DeclaredMethod(typeof(Tool), nameof(Tool.attach), new[] { typeof(StardewValley.Object) });
+            if (method != null && !method.IsAbstract)
+            {
+                harmony.Patch(
+                    original: method,
+                    prefix: new HarmonyMethod(typeof(StackablePatches), nameof(Tool_attach_Prefix))
+                );
+            }
+        }
+
+        /// <summary>Attaches prefix and postfix to FishingRod.doDoneFishing(bool).</summary>
+        /// <param name="harmony">Shared patcher instance.</param>
+        private static void PatchFishingRodDoneFishing(Harmony harmony)
+        {
+            var method = AccessTools.DeclaredMethod(typeof(FishingRod), "doDoneFishing", new[] { typeof(bool) });
+            if (method != null && !method.IsAbstract)
+            {
+                harmony.Patch(
+                    original: method,
+                    prefix: new HarmonyMethod(typeof(StackablePatches), nameof(FishingRod_doDoneFishing_Prefix)),
+                    postfix: new HarmonyMethod(typeof(StackablePatches), nameof(FishingRod_doDoneFishing_Postfix))
                 );
             }
         }
@@ -376,5 +414,159 @@ namespace BetterQOL
         /// <param name="clothing">The clothing item being compared.</param>
         /// <returns>Its QualifiedItemId.</returns>
         private static string mechanicalQualifiedId(Clothing clothing) => clothing.QualifiedItemId;
+
+        /// <summary>
+        /// Prefix for Tool.attach(Object o).
+        /// Intercepts fishing tackle (bobber) attachments on a FishingRod.
+        /// When attaching tackle from a stack, equips only 1 item into an empty tackle slot
+        /// (leaving the remaining stack in the player's cursor) and disallows stacking onto
+        /// an already-occupied tackle slot. If holding 1 tackle and slots are full, allows
+        /// normal swapping with slot 1.
+        /// </summary>
+        /// <param name="__instance">The tool being attached to.</param>
+        /// <param name="o">The item attempting to be attached.</param>
+        /// <param name="__result">Return value of attach (remaining cursor item or swapped item).</param>
+        /// <returns>False if custom-handled to skip vanilla Tool.attach, true otherwise.</returns>
+        public static bool Tool_attach_Prefix(Tool __instance, ref StardewValley.Object o, ref StardewValley.Object __result)
+        {
+            try
+            {
+                if (!Config.EnableTackleStacking)
+                    return true;
+
+                // Only intercept tackle attachments to a FishingRod
+                if (__instance is not FishingRod rod)
+                    return true;
+
+                if (o == null || o.Category != StardewValley.Object.tackleCategory)
+                    return true;
+
+                // If this rod cannot use tackle (e.g. Bamboo Pole, Fiberglass Rod), let vanilla reject it
+                if (!rod.CanUseTackle())
+                    return true;
+
+                // Tackle slots on a FishingRod are indices 1 through AttachmentSlotsCount - 1
+                int targetSlot = -1;
+                for (int i = 1; i < rod.AttachmentSlotsCount; i++)
+                {
+                    if (rod.attachments[i] == null)
+                    {
+                        targetSlot = i;
+                        break;
+                    }
+                }
+
+                if (targetSlot != -1)
+                {
+                    // Empty tackle slot found!
+                    if (o.Stack <= 1)
+                    {
+                        rod.attachments[targetSlot] = o;
+                        __result = null; // Whole cursor stack consumed
+                    }
+                    else
+                    {
+                        // Take only 1 tackle into the rod; retain remainder in cursor
+                        StardewValley.Object one = (StardewValley.Object)o.getOne();
+                        one.Stack = 1;
+                        rod.attachments[targetSlot] = one;
+                        o.Stack--;
+                        __result = o;
+                    }
+                    Game1.playSound("button1");
+                    return false; // Handled, skip vanilla Tool.attach
+                }
+
+                // All tackle slots are occupied.
+                // If holding a single tackle, allow standard vanilla swap with primary tackle slot (slot 1)
+                if (o.Stack <= 1)
+                {
+                    int swapSlot = 1;
+                    StardewValley.Object oldTackle = rod.attachments[swapSlot];
+                    rod.attachments[swapSlot] = o;
+                    Game1.playSound("button1");
+                    __result = oldTackle;
+                    return false;
+                }
+
+                // Holding a stack (> 1) when all tackle slots are already occupied:
+                // Disallow stacking into the slot, and disallow swapping a stack for a single item.
+                __result = o;
+                return false;
+            }
+            catch (Exception ex)
+            {
+                Monitor.Log($"Error in Tool_attach_Prefix: {ex}", LogLevel.Error);
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// Prefix for FishingRod.doDoneFishing(bool).
+        /// Records any tackle slots currently containing a stack (> 1) of tackle.
+        /// If vanilla's durability check sets attachments[slot] = null upon reaching maxTackleUses,
+        /// our postfix will intercept and decrement the stack by 1 while resetting durability to 0,
+        /// protecting the remaining bobbers from being destroyed all at once.
+        /// </summary>
+        /// <param name="__instance">The fishing rod in use.</param>
+        /// <param name="consumeBaitAndTackle">Whether bait and tackle are being consumed on this catch.</param>
+        /// <param name="__state">State passed to postfix containing stacked tackle items by slot index.</param>
+        public static void FishingRod_doDoneFishing_Prefix(FishingRod __instance, bool consumeBaitAndTackle, out Dictionary<int, StardewValley.Object>? __state)
+        {
+            __state = null;
+            try
+            {
+                if (!consumeBaitAndTackle || __instance.lastUser == null || !__instance.lastUser.IsLocalPlayer)
+                    return;
+
+                for (int i = 1; i < __instance.attachments.Length; i++)
+                {
+                    StardewValley.Object tackle = __instance.attachments[i];
+                    if (tackle != null && tackle.Category == StardewValley.Object.tackleCategory && tackle.Stack > 1)
+                    {
+                        __state ??= new Dictionary<int, StardewValley.Object>();
+                        __state[i] = tackle;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Monitor.Log($"Error in FishingRod_doDoneFishing_Prefix: {ex}", LogLevel.Error);
+            }
+        }
+
+        /// <summary>
+        /// Postfix for FishingRod.doDoneFishing(bool).
+        /// If a tackle slot was nulled out by vanilla when durability reached maxTackleUses,
+        /// but had a stack count > 1 recorded in prefix, decrement Stack by 1, reset durability
+        /// (uses.Value = 0), and restore the remaining stack to the attachment slot.
+        /// </summary>
+        /// <param name="__instance">The fishing rod in use.</param>
+        /// <param name="__state">State from prefix containing stacked tackle items by slot index.</param>
+        public static void FishingRod_doDoneFishing_Postfix(FishingRod __instance, Dictionary<int, StardewValley.Object>? __state)
+        {
+            try
+            {
+                if (__state == null)
+                    return;
+
+                foreach (var kvp in __state)
+                {
+                    int slot = kvp.Key;
+                    StardewValley.Object tackle = kvp.Value;
+
+                    if (__instance.attachments[slot] == null)
+                    {
+                        tackle.Stack--;
+                        tackle.uses.Value = 0;
+                        __instance.attachments[slot] = tackle;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Monitor.Log($"Error in FishingRod_doDoneFishing_Postfix: {ex}", LogLevel.Error);
+            }
+        }
     }
 }

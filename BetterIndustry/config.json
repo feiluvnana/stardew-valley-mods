@@ -14,6 +14,7 @@
   "EnableJuiceBuff": true,
   "JuiceMultiplier": 2.75,
   "EnableExpandedAging": true,
+  "EnableCasksEverywhere": true,
   "EnableAutoFruitDrop": true,
   "MaxFruitsBeforeDrop": 3,
   "EnableFruitTreeRebalance": true,

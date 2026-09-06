@@ -1,4 +1,4 @@
-﻿{
+{
     "config.section.cooking":  "Cooking \u0026 Food Quality Options",
     "config.cooking-balancing.name":  "Cooking Balance",
     "config.cooking-balancing.tooltip":  "Ensure cooking dishes always sell for at least the configured profit margin over raw ingredients.",
@@ -36,6 +36,8 @@
     "config.juice-multiplier.tooltip":  "Price multiplier for Vegetable Juice relative to raw vegetable price (default 2.75x, vanilla 2.25x).",
     "config.expanded-aging.name":  "Expanded Cask Aging",
     "config.expanded-aging.tooltip":  "Allows Casks to age additional artisan goods such as Vegetable Juice.",
+    "config.casks-everywhere.name":  "Allow Casks Outside Cellar",
+    "config.casks-everywhere.tooltip":  "Allows Casks to age goods anywhere (sheds, farmhouses, outdoors, etc.), not just inside the cellar.",
     "config.section.fruittree":  "Fruit Tree Options",
     "config.enable-fruit-tree-rebalance.name":  "Enable Fruit Tree Price Rebalance",
     "config.enable-fruit-tree-rebalance.tooltip":  "Rebalances orchard fruit prices (Peach/Pomegranate 180g, Orange/Apple 135g, Cherry 110g, Apricot 75g) to ensure positive Year-1 ROI.",

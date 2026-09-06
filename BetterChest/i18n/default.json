@@ -1,11 +1,9 @@
-﻿{
+{
     "config.section.general":  "General Settings",
     "config.enable-custom-rewards.name":  "Enable Custom Rewards",
     "config.enable-custom-rewards.tooltip":  "Replace Skull Cavern chest rewards with the enhanced 7-category loot system.",
     "config.exclude-cosmetics.name":  "Exclude Cosmetics",
     "config.exclude-cosmetics.tooltip":  "Exclude hats, clothing, and decorative items when custom rewards are disabled.",
-    "config.enable-depth-scaling.name":  "Enable Depth Scaling",
-    "config.enable-depth-scaling.tooltip":  "Scale Skull Cavern chest rolls and jackpots by depth (Floors 1-49: max 4 rolls, 2x stack limit; Floors 50-99: standard rolls; Floor 100+: supercharged rolls).",
     "config.section.progression-gatekeeping":  "Progression \u0026 Gatekeeping",
     "config.gatekeep-mastery-items.name":  "Gatekeep 1.6 Mastery Rewards",
     "config.gatekeep-mastery-items.tooltip":  "Only allow Golden Animal Crackers, Golden Mystery Boxes, Mystic Tree Seeds, Treasure Totems, and Challenge Bait to drop if their respective 1.6 Mastery is claimed.",
@@ -127,6 +125,8 @@
     "config.enable-iridium-items.tooltip":  "Allow Iridium Ore and Iridium Bars to appear.",
     "config.enable-coal.name":  "Enable Coal",
     "config.enable-coal.tooltip":  "Allow Coal stacks to appear in the Mining loot pool.",
+    "config.enable-wood.name":  "Enable Wood",
+    "config.enable-wood.tooltip":  "Allow Wood stacks to appear in the Foraging loot pool.",
     "config.enable-hardwood.name":  "Enable Hardwood",
     "config.enable-hardwood.tooltip":  "Allow Hardwood stacks to appear in the Foraging loot pool.",
     "config.enable-bombs.name":  "Enable Bombs \u0026 Mega Bombs",

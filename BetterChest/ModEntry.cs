@@ -252,7 +252,6 @@ namespace BetterChest
             AddSection(configMenu, "general");
             AddBool(configMenu, "enable-custom-rewards", () => Config.EnableCustomRewards, v => Config.EnableCustomRewards = v);
             AddBool(configMenu, "exclude-cosmetics", () => Config.ExcludeCosmetics, v => Config.ExcludeCosmetics = v);
-            AddBool(configMenu, "enable-depth-scaling", () => Config.EnableDepthScaling, v => Config.EnableDepthScaling = v);
 
             // Sub-page Navigation Links on Root Page
             AddPageLink(configMenu, "progression-gatekeeping", "progression-gatekeeping");
@@ -345,6 +344,7 @@ namespace BetterChest
             AddBool(configMenu, "enable-combat-consumables", () => Config.EnableCombatConsumables, v => Config.EnableCombatConsumables = v);
             AddBool(configMenu, "enable-rare-seeds", () => Config.EnableRareSeeds, v => Config.EnableRareSeeds = v);
             AddBool(configMenu, "enable-coal", () => Config.EnableCoal, v => Config.EnableCoal = v);
+            AddBool(configMenu, "enable-wood", () => Config.EnableWood, v => Config.EnableWood = v);
             AddBool(configMenu, "enable-hardwood", () => Config.EnableHardwood, v => Config.EnableHardwood = v);
             AddBool(configMenu, "enable-mystery-boxes", () => Config.EnableMysteryBoxes, v => Config.EnableMysteryBoxes = v);
             AddBool(configMenu, "enable-omni-geodes", () => Config.EnableOmniGeodes, v => Config.EnableOmniGeodes = v);

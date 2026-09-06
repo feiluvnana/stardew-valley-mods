@@ -30,8 +30,6 @@ namespace BetterChest
         public bool EnableCustomRewards { get; set; } = true;
         /// <summary>When custom rewards are off, strip clothing/hats/decor ("cosmetics") from vanilla chests instead.</summary>
         public bool ExcludeCosmetics { get; set; } = true;
-        /// <summary>Scale roll counts and stack multipliers by how deep in Skull Cavern the chest is.</summary>
-        public bool EnableDepthScaling { get; set; } = true;
 
         // Decaying Multi-Rolls (1st and 2nd roll guaranteed 100%, expected 3.0 items, max 6 rolls)
         /// <summary>Upper limit of loot rolls per standard deep-floor (50+) chest.</summary>
@@ -163,6 +161,8 @@ namespace BetterChest
         public bool EnableIridiumItems { get; set; } = true;
         /// <summary>Coal may drop from chests.</summary>
         public bool EnableCoal { get; set; } = true;
+        /// <summary>Wood may drop from chests.</summary>
+        public bool EnableWood { get; set; } = true;
         /// <summary>Hardwood may drop from chests.</summary>
         public bool EnableHardwood { get; set; } = true;
         /// <summary>Bombs (Mega Bomb) may drop from chests.</summary>
