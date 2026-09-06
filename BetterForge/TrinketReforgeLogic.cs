@@ -164,12 +164,10 @@ namespace BetterForge
                     eval.Score = Math.Clamp((dps - 10f) / 26f, 0f, 1f);
                     eval.Tier = style switch
                     {
-                        // Switch EXPRESSION (C# 8+): picks a value like a chain of
-                        // ternaries; `_` is the "catch-all" default arm.
                         "Perfect" => 5,
                         "Heavy" => 4,
                         "Rapid" => 4,
-                        _ => Math.Clamp(1 + (int)Math.Round(eval.Score * 3.0f), 1, 5)
+                        _ => Math.Clamp(1 + (int)Math.Floor(eval.Score * 2.99f), 1, 3)
                     };
                     eval.IsMaxRoll = (style == "Perfect");
                     eval.Summary = $"{style} | Cooldown: {delay / 1000f:0.00}s | Dmg: {minDmg}-{maxDmg}";
@@ -202,7 +200,7 @@ namespace BetterForge
                     float delayScore = 1.0f - ((delay - 3000f) / 2000f);
                     float freezeScore = (freeze - 2000) / 2000f;
                     eval.Score = isPerfect ? 1.0f : Math.Clamp(delayScore * 0.5f + freezeScore * 0.5f, 0f, 0.95f);
-                    eval.Tier = isPerfect ? 5 : Math.Clamp(1 + (int)Math.Round(eval.Score * 3.5f), 1, 5);
+                    eval.Tier = isPerfect ? 5 : Math.Clamp(1 + (int)Math.Floor(eval.Score * 3.99f), 1, 4);
                     eval.IsMaxRoll = isPerfect;
                     eval.Summary = $"Delay: {delay / 1000f:0.0}s | Freeze: {freeze / 1000f:0.0}s{(isPerfect ? " (Perfect)" : "")}";
                     break;
@@ -283,14 +281,44 @@ namespace BetterForge
         }
 
         /// <summary>
-        /// Performs one never-downgrade reforge: searches up to 1000 candidate seeds
-        /// for a roll that beats the trinket's current tier/score, applies the best
-        /// seed found, refreshes the tooltip, and shows a HUD message.
+        /// Calculates the success probability for upgrading a trinket from currentTier to currentTier + 1.
+        /// Uses a normalized (M - i) / M curve such that the total expected rolls from Tier 1 to MaxTier (M)
+        /// equals targetTotalRolls (default 15 rolls = 45 Iridium Bars at 3 bars/roll) across every trinket family.
+        /// </summary>
+        /// <param name="currentTier">Current tier (1-indexed).</param>
+        /// <param name="maxTier">Maximum tier for this trinket family (M).</param>
+        /// <param name="targetTotalRolls">Total expected rolls from Tier 1 to MaxTier (default 15.0 = 45 Iridium Bars).</param>
+        /// <returns>Success probability clamped between 0.05 and 0.95.</returns>
+        public static double CalculateUpgradeSuccessChance(int currentTier, int maxTier, double targetTotalRolls = 15.0)
+        {
+            if (currentTier >= maxTier || maxTier <= 1)
+                return 0.0;
+
+            // Harmonic number H_{M-1} = 1/1 + 1/2 + ... + 1/(M-1)
+            double harmonicSum = 0.0;
+            for (int j = 1; j < maxTier; j++)
+            {
+                harmonicSum += 1.0 / j;
+            }
+
+            // Normalization factor k_M = (M * H_{M-1}) / targetTotalRolls
+            // P(i, M) = ((M - i) / M) * k_M
+            double factor = (maxTier * harmonicSum) / targetTotalRolls;
+            double rawChance = ((double)(maxTier - currentTier) / maxTier) * factor;
+
+            return Math.Clamp(rawChance, 0.05, 0.95);
+        }
+
+        /// <summary>
+        /// Performs one Anvil reforge roll:
+        /// Success probability is governed by CalculateUpgradeSuccessChance.
+        /// On success: advances the trinket to the next tier and applies upgraded stats.
+        /// On failure: preserves the current tier and stats ("Never Downgrade" protection).
         /// </summary>
         /// <param name="trinket">The trinket being reforged.</param>
         /// <param name="who">The player doing the reforge (receives messages/sounds).</param>
         /// <param name="config">Current mod settings.</param>
-        /// <returns>The winning generation seed that was applied.</returns>
+        /// <returns>The generation seed that was applied.</returns>
         public static int ProcessReforge(Trinket trinket, Farmer who, ModConfig config)
         {
             // When PreventDowngrades is off, simply reroll once without any upgrade protection
@@ -307,7 +335,7 @@ namespace BetterForge
                     if (eval.IsMaxRoll)
                     {
                         Game1.addHUDMessage(new HUDMessage(ModEntry.I18n.Get("hud.reforge-perfect", new { item = trinket.DisplayName }), 1));
-                        who.currentLocation.playSound("yoba");
+                        who.currentLocation?.playSound("yoba");
                     }
                     else
                     {
@@ -317,47 +345,52 @@ namespace BetterForge
                 return randomSeed;
             }
 
-            // Grade what the trinket currently has, so we know the bar to beat.
+            // Grade what the trinket currently has
             int currentSeed = trinket.generationSeed.Value;
             var currentEval = Evaluate(trinket.ItemId, currentSeed);
 
-            Random rng = Game1.random;
+            // If already at max tier, cannot upgrade further
+            if (currentEval.IsMaxRoll || currentEval.Tier >= currentEval.MaxTier)
+            {
+                return currentSeed;
+            }
 
-            // Target next tier or higher
-            // Aim for exactly one tier above current (capped at the type's max);
-            // Math.Min keeps the target inside the valid range.
-            int targetTier = Math.Min(currentEval.MaxTier, currentEval.Tier + 1);
+            // Calculate normalized success chance so all trinkets average 45 Iridium Bars (45 / IridiumBarCost rolls)
+            double targetRolls = 45.0 / Math.Max(1, config.IridiumBarCost);
+            double chance = CalculateUpgradeSuccessChance(currentEval.Tier, currentEval.MaxTier, targetRolls);
+            bool isSuccess = Game1.random.NextDouble() < chance;
+
+            if (!isSuccess)
+            {
+                // Roll failed: Never Downgrade protection keeps current stats!
+                IncrementReforgeCount(trinket);
+                ResetCachedDescription(trinket, who);
+
+                if (config.ShowReforgeSuccessMessage)
+                {
+                    Game1.addHUDMessage(new HUDMessage(
+                        ModEntry.I18n.Get("hud.reforge-fail", new { item = trinket.DisplayName, tier = currentEval.Tier, maxTier = currentEval.MaxTier }),
+                        2
+                    ));
+                }
+                return currentSeed;
+            }
+
+            // Roll succeeded: search for a seed that produces tier i + 1
+            int targetTier = currentEval.Tier + 1;
             int bestSeed = currentSeed;
             float bestScore = -1f;
 
-            // Try up to 1000 random seeds offline. Nothing changes until we commit
-            // the winner, so this is just cheap simulation.
-            for (int attempt = 0; attempt < 1000; attempt++)
+            Random rng = Game1.random;
+
+            for (int attempt = 0; attempt < 1500; attempt++)
             {
                 int cand = rng.Next();
                 var candEval = Evaluate(trinket.ItemId, cand);
 
-                if (targetTier > currentEval.Tier)
+                if (candEval.Tier == targetTier)
                 {
-                    // Target at least next tier (or allow jackpot roll)
-                    // Only consider candidates that reached the target tier; among
-                    // those keep the highest score. A perfect roll ends the search early.
-                    if (candEval.Tier >= targetTier)
-                    {
-                        if (candEval.Score > bestScore)
-                        {
-                            bestScore = candEval.Score;
-                            bestSeed = cand;
-                            if (candEval.IsMaxRoll) break;
-                        }
-                    }
-                }
-                else
-                {
-                    // Already at max tier, improve score towards perfect roll
-                    // Can't gain a tier anymore — accept any candidate that simply
-                    // scores better than the current roll.
-                    if (candEval.Score > currentEval.Score && candEval.Score > bestScore)
+                    if (candEval.Score > bestScore)
                     {
                         bestScore = candEval.Score;
                         bestSeed = cand;
@@ -366,29 +399,41 @@ namespace BetterForge
                 }
             }
 
-            // Apply seed and update native stats & cache
-            // Commit the winning seed: RerollStats makes the game rebuild the
-            // trinket's real stats from it, then we clear stale tooltips.
+            // Safety fallback: if no exact match found, accept candEval.Tier >= targetTier
+            if (bestSeed == currentSeed)
+            {
+                for (int attempt = 0; attempt < 1000; attempt++)
+                {
+                    int cand = rng.Next();
+                    var candEval = Evaluate(trinket.ItemId, cand);
+                    if (candEval.Tier >= targetTier && candEval.Score > bestScore)
+                    {
+                        bestScore = candEval.Score;
+                        bestSeed = cand;
+                        break;
+                    }
+                }
+            }
+
+            // Commit winning seed
             trinket.RerollStats(bestSeed);
             IncrementReforgeCount(trinket);
             ResetCachedDescription(trinket, who);
 
             var finalEval = Evaluate(trinket.ItemId, bestSeed);
 
-            if (finalEval.IsMaxRoll)
+            if (finalEval.IsMaxRoll || finalEval.Tier >= finalEval.MaxTier)
             {
                 if (config.ShowReforgeSuccessMessage)
                 {
-                    // Perfect roll: celebratory HUD message + the "yoba" blessing sound.
                     Game1.addHUDMessage(new HUDMessage(ModEntry.I18n.Get("hud.reforge-perfect", new { item = trinket.DisplayName }), 1));
-                    who.currentLocation.playSound("yoba");
+                    who.currentLocation?.playSound("yoba");
                 }
             }
             else
             {
                 if (config.ShowReforgeSuccessMessage)
                 {
-                    // Normal upgrade message showing the new tier out of max tier.
                     Game1.addHUDMessage(new HUDMessage(ModEntry.I18n.Get("hud.reforge-upgrade", new { item = trinket.DisplayName, tier = finalEval.Tier, maxTier = finalEval.MaxTier }), 1));
                 }
             }

@@ -6,6 +6,7 @@ using StardewValley.Companions;
 using StardewValley.Monsters;
 using StardewValley.Objects.Trinkets;
 using StardewValley.Projectiles;
+using StardewValley.Menus;
 
 namespace BetterForge
 {
@@ -90,6 +91,10 @@ namespace BetterForge
                     typeof(int), typeof(float), typeof(float), typeof(bool), typeof(Farmer), typeof(bool)
                 },
                 prefixMethodName: nameof(GameLocation_damageMonster_Prefix), description: "Spur Crit Chance");
+
+            // 9. BuffsDisplay high-resolution icon support (allows crisp 64x64/128x128 icons without cropping)
+            PatchMethod(harmony, typeof(BuffsDisplay), nameof(BuffsDisplay.getClickableComponents),
+                new[] { typeof(Buff) }, postfixMethodName: nameof(BuffsDisplay_getClickableComponents_Postfix), description: "High-Res Buff Icons");
         }
 
         /// <summary>
@@ -239,7 +244,7 @@ namespace BetterForge
         private static bool PerformReforge(StardewValley.Object anvil, Trinket trinket, Farmer who, int totalIridiumRequired)
         {
             var eval = TrinketReforgeLogic.Evaluate(trinket.ItemId, trinket.generationSeed.Value);
-            if (eval.IsMaxRoll)
+            if (eval.IsMaxRoll || eval.Tier >= eval.MaxTier)
             {
                 who.currentLocation?.playSound("cancel");
                 Game1.showRedMessage(ModEntry.I18n.Get("message.already-max-tier"));
@@ -247,11 +252,20 @@ namespace BetterForge
             }
 
             who.Items.ReduceId("(O)337", totalIridiumRequired);
-            TrinketReforgeLogic.ProcessReforge(trinket, who, Config);
+            int oldSeed = trinket.generationSeed.Value;
+            int newSeed = TrinketReforgeLogic.ProcessReforge(trinket, who, Config);
 
             who.currentLocation?.playSound("furnace");
-            who.currentLocation?.playSound("hammer");
-            Game1.createRadialDebris(who.currentLocation, 12, (int)anvil.TileLocation.X * 64 + 32, (int)anvil.TileLocation.Y * 64 + 32, 6, false);
+            if (oldSeed != newSeed)
+            {
+                who.currentLocation?.playSound("hammer");
+                Game1.createRadialDebris(who.currentLocation, 12, (int)anvil.TileLocation.X * 64 + 32, (int)anvil.TileLocation.Y * 64 + 32, 8, false);
+            }
+            else
+            {
+                who.currentLocation?.playSound("clank");
+                Game1.createRadialDebris(who.currentLocation, 12, (int)anvil.TileLocation.X * 64 + 32, (int)anvil.TileLocation.Y * 64 + 32, 3, false);
+            }
             return true;
         }
 
@@ -265,10 +279,8 @@ namespace BetterForge
             }
 
             who.Items.ReduceId("(O)74", totalShardsRequired);
-            TrinketAscensionLogic.AscendTrinketDirect(trinket, who);
-
-            Game1.createRadialDebris(who.currentLocation, 12, (int)anvil.TileLocation.X * 64 + 32, (int)anvil.TileLocation.Y * 64 + 32, 8, false);
-            return true;
+            Vector2 visualPos = new Vector2((int)anvil.TileLocation.X * 64 + 32, (int)anvil.TileLocation.Y * 64 + 32);
+            return TrinketAscensionLogic.AttemptAscendTrinket(trinket, who, visualPos);
         }
 
         /// <summary>
@@ -407,6 +419,20 @@ namespace BetterForge
 
             try
             {
+                // Display current Tier badge or Maximum Tier badge
+                var eval = TrinketReforgeLogic.Evaluate(__instance.ItemId, __instance.generationSeed.Value);
+                if (eval.MaxTier > 1)
+                {
+                    string tierBadge = eval.IsMaxRoll
+                        ? ModEntry.I18n.Get("tooltip.perfect-roll")
+                        : ModEntry.I18n.Get("tooltip.tier-badge", new { tier = eval.Tier, maxTier = eval.MaxTier });
+
+                    if (!__result.Contains(tierBadge))
+                    {
+                        __result = $"{tierBadge}\n{__result}";
+                    }
+                }
+
                 // Only ascended trinkets get the extra tooltip block.
                 if (TrinketAscensionLogic.IsAscended(__instance))
                 {
@@ -474,15 +500,20 @@ namespace BetterForge
 
         /// <summary>
         /// Harmony prefix on GameLocation.damageMonster (every monster hit flows
-        /// through it). Boosts incoming critChance by +5% when the attacker wears an ascended Golden Spur.
+        /// through it). Boosts incoming critChance by +5% when the attacker wears an ascended Golden Spur,
+        /// and boosts critMultiplier by +25% during Spur Fury.
         /// </summary>
-        public static void GameLocation_damageMonster_Prefix(Farmer who, ref float critChance)
+        public static void GameLocation_damageMonster_Prefix(Farmer who, ref float critChance, ref float critMultiplier)
         {
             if (who == null) return;
 
             if (TrinketAscensionLogic.HasAscendedTrinket(who, "spur") || TrinketAscensionLogic.HasAscendedTrinket(who, "goldenspur") || TrinketAscensionLogic.HasAscendedTrinket(who, "iridiumspur") || TrinketAscensionLogic.HasAscendedTrinket(who, "iridium"))
             {
                 critChance += 0.05f; // +5% Critical Strike Chance
+                if (who.buffs.AppliedBuffs.ContainsKey("iridiumspur"))
+                {
+                    critMultiplier *= 1.25f; // +25% Critical Strike Damage during Spur Fury!
+                }
             }
         }
 
@@ -511,17 +542,18 @@ namespace BetterForge
                 TrinketAscensionLogic.TriggerIceShatterAndSlowNearby(monster, farmer);
             }
 
-            // 3. Basilisk Paw: 20% Lifesteal on Hit
+            // 3. Basilisk Paw: 12% Lifesteal on Hit with 0.6s cooldown
             if ((trinketId.Contains("basilisk") || trinketId.Contains("paw")) && TrinketAscensionLogic.IsAscended(__instance))
             {
                 TrinketAscensionLogic.TriggerBasiliskLifesteal(farmer, damageAmount);
             }
 
-            // 4. Parrot Egg: 2x Gold Coins & 35% Chance for Extra Loot Drop
+            // 4. Parrot Egg: Scaled Gold Coins & 28% Chance for Extra Loot Drop
             // "Health <= damageAmount" predicts the killing blow.
             if (monster.Health <= 0 && trinketId.Contains("parrot") && TrinketAscensionLogic.IsAscended(__instance))
             {
-                farmer.Money += 25 + Game1.random.Next(25); // bonus 25-49 g
+                int bonusGold = 25 + Math.Min(150, (int)(monster.MaxHealth * 0.15f));
+                farmer.Money += bonusGold;
                 Game1.playSound("money");
                 TrinketAscensionLogic.TriggerParrotBonusLoot(monster, farmer);
             }
@@ -614,22 +646,22 @@ namespace BetterForge
         {
             if (__instance == null || location == null) return;
 
-            // 1. Magic Quiver Arrow: Pierces up to 3 monsters with 25% arrow crit chance
+            // 1. Magic Quiver Arrow: Pierces up to 2 monsters with 15% arrow crit chance (1.5x dmg)
             if (__instance is BasicProjectile bp && bp.projectileID.Value == 14)
             {
                 Farmer? farmer = bp.theOneWhoFiredMe.Get(location) as Farmer;
                 if (farmer != null && (TrinketAscensionLogic.HasAscendedTrinket(farmer, "quiver") || TrinketAscensionLogic.HasAscendedTrinket(farmer, "magicquiver")))
                 {
                     bp.ignoreCharacterCollisions.Value = true;
-                    bp.piercesLeft.Value = 3;
+                    bp.piercesLeft.Value = 2;
 
                     Rectangle arrowBounds = bp.getBoundingBox();
                     var hitList = _arrowHitMonsters.GetOrCreateValue(bp); // per-arrow memory
 
-                    // Check overlap against monsters (up to 3 distinct hits)
+                    // Check overlap against monsters (up to 2 distinct hits)
                     for (int i = 0; i < location.characters.Count; i++)
                     {
-                        if (hitList.Count >= 3)
+                        if (hitList.Count >= 2)
                             break;
 
                         if (location.characters[i] is Monster monster && !monster.IsInvisible && arrowBounds.Intersects(monster.GetBoundingBox()))
@@ -638,8 +670,8 @@ namespace BetterForge
                             // is damaged at most ONCE per arrow pass.
                             if (hitList.Add(monster))
                             {
-                                bool isCrit = Game1.random.NextDouble() < 0.25;
-                                int dmg = Math.Max(1, bp.damageToFarmer.Value) * (isCrit ? 2 : 1);
+                                bool isCrit = Game1.random.NextDouble() < 0.15;
+                                int dmg = Math.Max(1, (int)(bp.damageToFarmer.Value * (isCrit ? 1.5f : 1.0f)));
                                 if (isCrit)
                                 {
                                     location.playSound("crit");
@@ -751,8 +783,8 @@ namespace BetterForge
             Farmer? owner = __instance.Owner;
             if (owner != null && (TrinketAscensionLogic.HasAscendedTrinket(owner, "frog") || TrinketAscensionLogic.HasAscendedTrinket(owner, "frogegg")))
             {
-                // 45% chance to immediately reset fullness cooldown
-                if (Game1.random.NextDouble() < 0.45)
+                // 40% chance to immediately reset fullness cooldown (calibrated from 45%)
+                if (Game1.random.NextDouble() < 0.40)
                 {
                     TrinketAscensionLogic.TriggerFrogCooldownReset(__instance, owner);
                 }
@@ -789,10 +821,42 @@ namespace BetterForge
 
             if (TrinketAscensionLogic.HasAscendedTrinket(farmer, "fairy") || TrinketAscensionLogic.HasAscendedTrinket(farmer, "fairybox"))
             {
-                // Bonus scales with max health (5% baseline) and the trinket's Power stat.
-                int healAmount = Math.Max(4, (int)(farmer.maxHealth * 0.05f * __instance.Power));
+                // Calibrated passive heal scaling: 2% max health * Power (min 2 HP)
+                int healAmount = Math.Max(2, (int)(farmer.maxHealth * 0.02f * __instance.Power));
                 TrinketAscensionLogic.TriggerFairyAllyHealAndBlessing(farmer, healAmount);
                 __instance.HealTimer = 0f; // restart the pulse cycle cleanly
+            }
+        }
+
+        /// <summary>
+        /// Postfix on BuffsDisplay.getClickableComponents:
+        /// When a buff has a texture larger than 16x16 (e.g. 64x64 or 128x128),
+        /// adjusts sourceRect to the full texture and sets scale so it renders
+        /// seamlessly in the standard 64x64 HUD slot instead of being cropped to (0,0,16,16).
+        /// </summary>
+        public static IEnumerable<ClickableTextureComponent> BuffsDisplay_getClickableComponents_Postfix(IEnumerable<ClickableTextureComponent> __result, Buff buff)
+        {
+            if (buff?.iconTexture != null && (buff.iconTexture.Width != 16 || buff.iconTexture.Height != 16))
+            {
+                int w = buff.iconTexture.Width;
+                int h = buff.iconTexture.Height;
+                float scale = 64f / Math.Max(w, h);
+                Rectangle sourceRect = new Rectangle(0, 0, w, h);
+
+                foreach (var comp in __result)
+                {
+                    comp.sourceRect = sourceRect;
+                    comp.baseScale = scale;
+                    comp.scale = scale;
+                    yield return comp;
+                }
+            }
+            else
+            {
+                foreach (var comp in __result)
+                {
+                    yield return comp;
+                }
             }
         }
     }

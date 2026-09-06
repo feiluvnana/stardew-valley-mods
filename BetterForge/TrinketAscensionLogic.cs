@@ -33,6 +33,9 @@ namespace BetterForge
         /// <summary>ID of the temporary +1 Defense buff granted by an ascended Fairy Box.</summary>
         public const string FairyDefenseBuffId = "feiluvnana.BetterForge/FairyDefense";
 
+        /// <summary>Success probability for Prismatic Ascension (20%).</summary>
+        public const double AscensionSuccessChance = 0.20;
+
         /// <summary>ID of the speed+attack buff shared with vanilla's Iridium Spur.</summary>
         public const string SpurAttackBuffId = "iridiumspur";
 
@@ -169,7 +172,7 @@ namespace BetterForge
         /// <summary>
         /// Attempts to ascend a trinket the "paid" way: validates preconditions
         /// (not already ascended, player owns a Prismatic Shard), consumes the shard,
-        /// then delegates to <see cref="AscendTrinketDirect"/> to do the real work.
+        /// then delegates to <see cref="AttemptAscendTrinket"/> to roll the 20% success chance.
         /// </summary>
         /// <returns>True if ascension succeeded.</returns>
         public static bool TryAscendTrinket(Trinket trinket, Farmer who)
@@ -187,7 +190,6 @@ namespace BetterForge
             }
 
             // Require 1 Prismatic Shard. "(O)74": "O" = object category, 74 = shard ID.
-            // ContainsId counts whether the inventory holds at least that many.
             if (!who.Items.ContainsId("(O)74", 1)) // Prismatic Shard
             {
                 Game1.addHUDMessage(new HUDMessage(ModEntry.I18n.Get("message.need-prismatic"), 2));
@@ -198,13 +200,81 @@ namespace BetterForge
             // Payment accepted — remove exactly one shard from the inventory.
             who.Items.ReduceId("(O)74", 1);
 
-            return AscendTrinketDirect(trinket, who);
+            return AttemptAscendTrinket(trinket, who);
         }
 
         /// <summary>
-        /// Performs the actual ascension with no cost checks (used by both the paid
-        /// path above and the Anvil's shard branch): flags the item, refreshes its
-        /// tooltip, plays celebratory feedback, and reapplies passive buffs.
+        /// Attempts Prismatic Ascension with a 20% success chance.
+        /// On success: flags modData, updates buffs, plays celebratory feedback, and displays success HUD toast.
+        /// On failure: plays failure sounds, spawns debris, and displays failure HUD toast.
+        /// </summary>
+        /// <param name="trinket">The trinket to ascend.</param>
+        /// <param name="who">The player performing the ascension.</param>
+        /// <param name="visualPos">Optional position for sound and debris (e.g. Anvil location).</param>
+        /// <returns>True if ascension succeeded (20% chance); false if failed.</returns>
+        public static bool AttemptAscendTrinket(Trinket trinket, Farmer who, Vector2? visualPos = null)
+        {
+            if (trinket == null || who == null)
+                return false;
+
+            if (IsAscended(trinket))
+                return false;
+
+            Vector2 centerPos = visualPos ?? who.Position;
+            var loc = who.currentLocation;
+
+            // 20% success chance
+            bool isSuccess = Game1.random.NextDouble() < AscensionSuccessChance;
+
+            if (isSuccess)
+            {
+                // THE core step: write the flag into modData. Permanent for this trinket.
+                trinket.modData[AscensionKey] = "true";
+
+                // Force tooltips to rebuild so the ascension lines appear immediately.
+                TrinketReforgeLogic.ResetCachedDescription(trinket, who);
+
+                // Feedback: two cheerful sounds + a green success HUD message ("1").
+                loc?.playSound("yoba");
+                loc?.playSound("reward");
+
+                if (loc != null)
+                {
+                    Game1.createRadialDebris(loc, 12, (int)centerPos.X, (int)centerPos.Y, 8, false);
+                }
+
+                Game1.addHUDMessage(new HUDMessage(
+                    ModEntry.I18n.Get("hud.ascension-success", new { item = trinket.DisplayName }),
+                    1
+                ));
+
+                // Recompute the passive luck buff now that one more slot is ascended.
+                UpdateAscensionLuckBuff(who);
+
+                return true;
+            }
+            else
+            {
+                // Roll failed (80% chance): Prismatic Shard consumed but ascension failed.
+                loc?.playSound("clank");
+                loc?.playSound("cancel");
+
+                if (loc != null)
+                {
+                    Game1.createRadialDebris(loc, 12, (int)centerPos.X, (int)centerPos.Y, 3, false);
+                }
+
+                Game1.addHUDMessage(new HUDMessage(
+                    ModEntry.I18n.Get("hud.ascension-fail", new { item = trinket.DisplayName }),
+                    3
+                ));
+
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Directly forces ascension with 100% success (used for testing or guaranteed unlocks).
         /// </summary>
         public static bool AscendTrinketDirect(Trinket trinket, Farmer who)
         {
@@ -217,14 +287,9 @@ namespace BetterForge
                 return false;
             }
 
-            // THE core step: write the flag into modData. This string dictionary is
-            // saved inside the save file, so ascension is permanent for this trinket.
             trinket.modData[AscensionKey] = "true";
-
-            // Force tooltips to rebuild so the ascension lines appear immediately.
             TrinketReforgeLogic.ResetCachedDescription(trinket, who);
 
-            // Feedback: two cheerful sounds + a green success HUD message ("1").
             who.currentLocation?.playSound("yoba");
             who.currentLocation?.playSound("reward");
 
@@ -233,9 +298,7 @@ namespace BetterForge
                 1
             ));
 
-            // Recompute the passive luck buff now that one more slot may be ascended.
             UpdateAscensionLuckBuff(who);
-
             return true;
         }
 
@@ -472,8 +535,8 @@ namespace BetterForge
         {
             if (monster == null || who?.currentLocation == null) return;
 
-            // NextDouble() returns 0.0-1.0, so "< 0.35" is a literal 35% chance.
-            if (Game1.random.NextDouble() < 0.35)
+            // NextDouble() returns 0.0-1.0, so "< 0.28" is a calibrated 28% chance.
+            if (Game1.random.NextDouble() < 0.28)
             {
                 var extraDrops = monster.getExtraDropItems();
                 if (extraDrops != null && extraDrops.Count > 0)
@@ -617,29 +680,32 @@ namespace BetterForge
                         nearbyMonster.takeDamage(explosionDamage, 0, 0, false, 1.0, "hitEnemy");
                         location.debris.Add(new Debris(explosionDamage, nearbyMonster.getStandingPosition(), Color.Cyan, 1f, nearbyMonster));
 
-                        // Frost slow: stun wave and splash visual
-                        nearbyMonster.stunTime.Value = Math.Max(nearbyMonster.stunTime.Value, 1500);
+                        // Frost slow: stun wave and splash visual (2.5s frost chill slow)
+                        nearbyMonster.stunTime.Value = Math.Max(nearbyMonster.stunTime.Value, 2500);
                         Game1.createRadialDebris(location, 10, (int)nearbyMonster.Position.X + 32, (int)nearbyMonster.Position.Y + 32, 4, false);
                     }
                 }
             }
         }
 
-        // 6. Basilisk Paw: Reflect 50% damage & 20% lifesteal on hit (heal 3-8 HP)
+        // 6. Basilisk Paw: Reflect 75% damage & 12% lifesteal with 0.6s cooldown (heal 3-5 HP)
 
         /// <summary>
         /// Ascended Basilisk Paw power, part 1: when the wearer takes damage, bounce
-        /// half of it back onto the attacker with knockback away from the player.
+        /// 75% of it back onto the attacker with flinch and knockback away from the player.
         /// </summary>
         public static void TriggerDamageReflect(Monster attacker, Farmer victim, int incomingDamage)
         {
             if (attacker == null || victim == null || incomingDamage <= 0 || victim.currentLocation == null) return;
 
             var location = victim.currentLocation;
-            // Always reflect at least 1 point, even for chip damage.
-            int reflectDamage = Math.Max(1, (int)(incomingDamage * 0.5f));
+            // Reflect 75% of incoming damage (minimum 2)
+            int reflectDamage = Math.Max(2, (int)(incomingDamage * 0.75f));
             Vector2 trajectory = Utility.getAwayFromPlayerTrajectory(attacker.GetBoundingBox(), victim);
             attacker.takeDamage(reflectDamage, (int)trajectory.X, (int)trajectory.Y, false, 1.0, "hitEnemy");
+
+            // Flinch attacker slightly
+            attacker.stunTime.Value = Math.Max(attacker.stunTime.Value, 400);
             
             // Display visible orange floating damage number on attacker
             location.debris.Add(new Debris(reflectDamage, attacker.getStandingPosition(), Color.Orange, 1f, attacker));
@@ -648,17 +714,23 @@ namespace BetterForge
             Game1.createRadialDebris(location, 12, (int)attacker.Position.X + 32, (int)attacker.Position.Y + 32, 6, false);
         }
 
+        private static double _lastLifestealMs = 0;
+
         /// <summary>
-        /// Ascended Basilisk Paw power, part 2: 20% chance per hit to steal life,
-        /// healing 3-8 HP scaled from the damage dealt (Math.Clamp bounds it).
+        /// Ascended Basilisk Paw power, part 2: 12% chance per hit to steal life,
+        /// healing 3-5 HP with a 0.6s internal cooldown to prevent rapid-swing cheese.
         /// </summary>
         public static void TriggerBasiliskLifesteal(Farmer who, int damageDealt)
         {
             if (who == null || damageDealt <= 0) return;
 
-            if (Game1.random.NextDouble() < 0.20)
+            double now = Game1.currentGameTime?.TotalGameTime.TotalMilliseconds ?? 0;
+            if (now - _lastLifestealMs < 600) return;
+
+            if (Game1.random.NextDouble() < 0.12)
             {
-                int healAmount = Math.Clamp((int)(damageDealt * 0.08f), 3, 8);
+                _lastLifestealMs = now;
+                int healAmount = Math.Clamp((int)(damageDealt * 0.06f), 3, 5);
                 if (who.health < who.maxHealth)
                 {
                     who.health = Math.Min(who.maxHealth, who.health + healAmount);

@@ -30,37 +30,38 @@ In vanilla Stardew Valley, weapon and tool enchantments at the Volcano Forge use
 
 The Anvil allows players to re-roll the stats and levels of 1.6 Trinkets using **3 Iridium Bars**.
 
-### "Never Downgrade" Stat Protection
-* Re-rolling at the Anvil will **never lower** your trinket's level, cooldown, or primary stats.
-* If a new roll produces lower or equal stats, your previous superior stats are automatically preserved.
+### Vanilla Stage Progression & Equal Expected Cost
+* **Preserves Vanilla Tiers:** Respects the authentic vanilla tier structures for each trinket (e.g. Parrot Egg = 4, Fairy Box = 5, Magic Quiver = 5, Ice Rod = 5, Golden Spur = 5, Frog Egg = 7, Basilisk Paw = 1).
+* **Equal Expected Iridium Cost:** Uses a normalized success probability curve such that the mathematical expected cost to reach Max Tier from Tier 1 is identical across all trinkets (~15 rolls = 45 Iridium Bars at 3 bars/roll).
+* **"Never Downgrade" Stat Protection:** Reforge rolls advance step-by-step ($i \to i + 1$). If an upgrade attempt fails, your current tier and stats are 100% protected—never lost or downgraded.
 * **Stack-Safe Reforging:** Reforging while holding a stack of trinkets processes safely without losing items.
 
 ### "Perfect" Tier Prefix & Maximum Badges
 When a trinket reaches its absolute maximum possible stat roll, BetterForge dynamically updates the item:
 * **Display Name:** Prepends the **"Perfect"** title (e.g. *Perfect Fairy Box*, *Perfect Magic Quiver*, *Perfect Ice Rod*).
-* **Tooltip Badge:** Adds the golden **"✦ MAXIMUM TIER REACHED ✦"** badge to the tooltip.
-* **HUD Notification:** Displays an on-screen toast banner announcing your perfect reforge.
+* **Tooltip Tier Badges:** Displays **"✦ TIER {tier}/{maxTier} ✦"** during progression and the golden **"✦ MAXIMUM TIER REACHED ✦"** badge at max rank.
+* **HUD Notification:** Displays an on-screen toast banner announcing your tier upgrade or stats-protected roll.
 
 ---
 
 ## 🌈 Module 3: Permanent Prismatic Ascension
 
-Bring any Trinket to the Anvil and forge it with **1 Prismatic Shard** to permanently unlock its **Prismatic Ascension**.
+Bring any Trinket to the Anvil and forge it with **1 Prismatic Shard** for a **20% chance** to permanently unlock its **Prismatic Ascension** (complete with dedicated visual debris, sound effects, and success/failure HUD toast banners).
 
 ### 🌟 Base Passive Luck Buff
 * Equipping any Ascended Trinket grants an endless **+0.5 Luck** buff per equipped ascended trinket (`Prismatic Ascension`).
 
-### Unique Ascended Trinket Powers
+### Balanced Ascended Trinket Powers
 
 | Trinket | Vanilla Stats / Effect | Prismatic Ascension Enhanced Power |
 | :--- | :--- | :--- |
-| **🐸 Frog Egg** | Follows player and eats nearby monsters. | Swallowing monsters drops all their loot, with a **45% chance** to immediately reset the swallow cooldown. |
-| **🧚 Fairy Box** | Spawns a healing fairy (Level 1–5). | Provides continuous passive healing every pulse (even out of combat), heals nearby multiplayer allies, and grants **+1 Defense** for 15s (*Fairy Blessing*). |
-| **🦜 Parrot Egg** | Spawns a parrot that finds gold coins (Level 1–4). | **Doubles gold coin value** and grants a **+35% chance** for defeated monsters to drop bonus monster loot. |
-| **✨ Golden Spur** | Critical strikes grant a short speed boost (5–10s). | Increases Critical Strike Chance by **+10%**, and the critical speed boost provides **+3 Attack** (*Spur Fury*). |
-| **🏹 Magic Quiver** | Fires spectral arrows every 0.9–1.6s. | Spectral arrows **pierce through all enemies** and grant **+15% Critical Strike Chance**. |
-| **❄️ Ice Rod** | Shoots ice orbs freezing enemies (3–5s cooldown). | Striking frozen enemies shatters the ice into an **ice blast**, dealing 30% Attack damage and slowing nearby foes. |
-| **🦎 Basilisk Paw** | Grants immunity to debuffs (Slimed, Jinxed, etc.). | **Reflects 50% incoming damage** back to attackers, and melee attacks have a **20% chance to lifesteal** (heals 3–8 HP). |
+| **🐸 Frog Egg** | Follows player and eats nearby monsters. | Swallowing monsters drops all their loot, with a **40% chance** to immediately reset the swallow cooldown. |
+| **🧚 Fairy Box** | Spawns a healing fairy (Level 1–5). | Restores **2% max HP per pulse out of combat** (scaled by Power, min 2 HP), provides combat healing pulses to player and nearby co-op allies, and grants **+1 Defense** for 15s (*Fairy Blessing*). |
+| **🦜 Parrot Egg** | Spawns a parrot that finds gold coins (Level 1–4). | Grants **scaled bonus gold** on monster kills based on monster max HP, and provides a **+28% chance** for defeated monsters to drop bonus monster loot. |
+| **✨ Golden Spur** | Critical strikes grant a short speed boost (5–10s). | Increases Critical Strike Chance by **+5%**; during *Spur Fury*, gain **+3 Attack** and **+25% Critical Strike Damage**. |
+| **🏹 Magic Quiver** | Fires spectral arrows every 0.9–1.6s. | Spectral arrows **pierce up to 2 monsters** and gain **+15% Critical Strike Chance** (1.5x damage). |
+| **❄️ Ice Rod** | Shoots ice orbs freezing enemies (3–5s cooldown). | Striking frozen enemies shatters the ice into an **ice blast** (deals 30% Attack damage and inflicts a **2.5s frost chill slow** on nearby foes). |
+| **🦎 Basilisk Paw** | Grants immunity to debuffs (Slimed, Jinxed, etc.). | **Reflects 75% incoming damage** back to attackers with recoil, and attacks have a **12% chance to lifesteal** (heals 3–5 HP, 0.6s cooldown). |
 
 ---
 
