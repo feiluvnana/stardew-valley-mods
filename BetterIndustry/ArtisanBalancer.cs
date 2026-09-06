@@ -255,6 +255,11 @@ namespace BetterIndustry
                         objData.Category = StardewValley.Object.artisanGoodsCategory; // -26
                     }
 
+                    // Milled staples (Flour, Sugar, Rice) are cooking ingredients excluded from the shipping collection in vanilla.
+                    // When assigned the Artisan Goods category (-26), explicitly preserve their exclusion so they do not
+                    // appear in the Collections shipping tab or affect Perfection tracking.
+                    objData.ExcludeFromShippingCollection = true;
+
                     if (Config.EnableMillBalancing)
                     {
                         objData.Price = price;
@@ -268,12 +273,15 @@ namespace BetterIndustry
         /// </summary>
         private static void ApplyCookingOilEdits(IDictionary<string, ObjectData> data)
         {
-            if (!Config.EnableCookingOilArtisanCategory)
-                return;
-
             if (data.TryGetValue("247", out var oilData) || data.TryGetValue("(O)247", out oilData))
             {
-                oilData.Category = StardewValley.Object.artisanGoodsCategory; // -26
+                if (Config.EnableCookingOilArtisanCategory)
+                {
+                    oilData.Category = StardewValley.Object.artisanGoodsCategory; // -26
+                }
+
+                // Preserve vanilla behavior where basic Cooking Oil is not part of the shipping collection.
+                oilData.ExcludeFromShippingCollection = true;
             }
         }
 
