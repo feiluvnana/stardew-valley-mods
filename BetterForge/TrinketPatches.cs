@@ -6,7 +6,6 @@ using StardewValley.Companions;
 using StardewValley.Monsters;
 using StardewValley.Objects.Trinkets;
 using StardewValley.Projectiles;
-using StardewValley.Menus;
 
 namespace BetterForge
 {
@@ -91,10 +90,6 @@ namespace BetterForge
                     typeof(int), typeof(float), typeof(float), typeof(bool), typeof(Farmer), typeof(bool)
                 },
                 prefixMethodName: nameof(GameLocation_damageMonster_Prefix), description: "Spur Crit Chance");
-
-            // 9. BuffsDisplay high-resolution icon support (allows crisp 64x64/128x128 icons without cropping)
-            PatchMethod(harmony, typeof(BuffsDisplay), nameof(BuffsDisplay.getClickableComponents),
-                new[] { typeof(Buff) }, postfixMethodName: nameof(BuffsDisplay_getClickableComponents_Postfix), description: "High-Res Buff Icons");
         }
 
         /// <summary>
@@ -825,38 +820,6 @@ namespace BetterForge
                 int healAmount = Math.Max(2, (int)(farmer.maxHealth * 0.02f * __instance.Power));
                 TrinketAscensionLogic.TriggerFairyAllyHealAndBlessing(farmer, healAmount);
                 __instance.HealTimer = 0f; // restart the pulse cycle cleanly
-            }
-        }
-
-        /// <summary>
-        /// Postfix on BuffsDisplay.getClickableComponents:
-        /// When a buff has a texture larger than 16x16 (e.g. 64x64 or 128x128),
-        /// adjusts sourceRect to the full texture and sets scale so it renders
-        /// seamlessly in the standard 64x64 HUD slot instead of being cropped to (0,0,16,16).
-        /// </summary>
-        public static IEnumerable<ClickableTextureComponent> BuffsDisplay_getClickableComponents_Postfix(IEnumerable<ClickableTextureComponent> __result, Buff buff)
-        {
-            if (buff?.iconTexture != null && (buff.iconTexture.Width != 16 || buff.iconTexture.Height != 16))
-            {
-                int w = buff.iconTexture.Width;
-                int h = buff.iconTexture.Height;
-                float scale = 64f / Math.Max(w, h);
-                Rectangle sourceRect = new Rectangle(0, 0, w, h);
-
-                foreach (var comp in __result)
-                {
-                    comp.sourceRect = sourceRect;
-                    comp.baseScale = scale;
-                    comp.scale = scale;
-                    yield return comp;
-                }
-            }
-            else
-            {
-                foreach (var comp in __result)
-                {
-                    yield return comp;
-                }
             }
         }
     }
