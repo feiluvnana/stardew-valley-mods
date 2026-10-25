@@ -29,6 +29,7 @@ namespace BetterFishing
             FishingExpPatches.Apply(harmony);
             CrabPotPatches.Apply(harmony);
             FishPondPatches.Apply(harmony);
+            FishingTrashPatches.Apply(harmony);
 
             // Asset hooks for fish price balancing
             helper.Events.Content.AssetRequested += FishPriceBalancer.OnAssetRequested;
@@ -64,6 +65,7 @@ namespace BetterFishing
             AddPageLink(configMenu, "fishing-exp", "fishing-exp");
             AddPageLink(configMenu, "crab-pots", "crab-pots");
             AddPageLink(configMenu, "fish-ponds", "fish-ponds");
+            AddPageLink(configMenu, "bait-settings", "bait-settings");
 
             // Sub-Page 1: Fish Price Scaling
             AddPage(configMenu, "price-scaling", "price-scaling");
@@ -120,6 +122,10 @@ namespace BetterFishing
             AddBool(configMenu, "enable-fish-pond-quality", () => Config.EnableFishPondQuality, v => Config.EnableFishPondQuality = v);
             AddBool(configMenu, "enable-caviar-rebalance", () => Config.EnableCaviarRebalance, v => Config.EnableCaviarRebalance = v);
             AddInt(configMenu, "caviar-base-price", () => Config.CaviarBasePrice, v => Config.CaviarBasePrice = v, 100, 3000, 25);
+
+            // Sub-Page 9: Bait & Rod Fishing Settings
+            AddPage(configMenu, "bait-settings", "bait-settings");
+            AddBool(configMenu, "enable-bait-prevents-trash", () => Config.EnableBaitPreventsTrash, v => Config.EnableBaitPreventsTrash = v);
         }
 
         private void AddPageLink(IGenericModConfigMenuApi menu, string pageId, string sectionKey)

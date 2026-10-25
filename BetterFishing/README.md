@@ -49,6 +49,11 @@ $$P_{\text{base}}(D) = F + c_1 \cdot D + c_2 \cdot \left(\frac{D}{50}\right)^2 +
 * **⭐ Star Quality Inheritance**: Fish Ponds dynamically award **Silver, Gold, or Iridium quality** to Roe based on pond population tier (up to 40% Gold / 25% Iridium at capacity 10) and Daily Luck.
 * **👑 Caviar Rebalance**: Sturgeon Caviar base price rebalanced from 500g to **800g base** (**1,120g Artisan / 2,240g Iridium Artisan**), turning Fish Ponds into genuine high-tier luxury estates.
 
+### 9. 🪱 Bait Eliminates Trash (0% Trash Rate)
+* **🗑️ 0% Trash Rate with Bait**: When any bait is attached to the fishing rod (Standard Bait, Deluxe Bait, Wild Bait, Magnet, Magic Bait, Specific Bait, Challenge Bait), the chance of hooking trash is completely eliminated (**0% trash chance**).
+* **🎯 Guaranteed Valid Catches**: Trash rolls are intercepted and automatically converted into valid local fish matching the location, season, weather, water depth, and time of day.
+* **🏞️ Edge-Case & Mine Protection**: Works universally across all waters—including floor 100 lava in Mineshafts (guaranteeing Lava Eel or Cave Jelly) and farm ponds without native fish data (falling back to surrounding forest/town river catches).
+
 ---
 
 ## ⚙️ Configuration (GMCM)
@@ -79,3 +84,4 @@ All options can be configured in-game via **Generic Mod Config Menu** or in `con
 | `EnableFishPondQuality` | `true` | Enables star quality for Fish Pond roe outputs based on population. |
 | `EnableCaviarRebalance` | `true` | Enables base price rebalancing for Sturgeon Caviar. |
 | `CaviarBasePrice` | `800` | Base sell price for Sturgeon Caviar (800g base / 1,120g Artisan). |
+| `EnableBaitPreventsTrash` | `true` | Eliminates trash catches (0% trash rate) whenever bait is attached to the fishing rod. |

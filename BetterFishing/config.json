@@ -44,5 +44,6 @@
   "Tier1CrabPotExp": 8,
   "EnableFishPondQuality": true,
   "EnableCaviarRebalance": true,
-  "CaviarBasePrice": 800
+  "CaviarBasePrice": 800,
+  "EnableBaitPreventsTrash": true
 }

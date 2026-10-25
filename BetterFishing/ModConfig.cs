@@ -141,5 +141,11 @@ namespace BetterFishing
 
         /// <summary>Base sell price for Caviar (default: 800g; 1,120g Artisan / 2,240g Iridium Artisan).</summary>
         public int CaviarBasePrice { get; set; } = 800;
+
+        // =====================================================================
+        // === 9. ROD FISHING & BAIT SETTINGS                                ===
+        // =====================================================================
+        /// <summary>When enabled, having bait equipped on the fishing rod completely eliminates trash catches (0% trash chance).</summary>
+        public bool EnableBaitPreventsTrash { get; set; } = true;
     }
 }
