@@ -96,6 +96,12 @@ namespace BetterQOL
         /// <summary>Whether to show weather details, tomorrow forecast, and season info when hovering over top-right HUD icons.</summary>
         public bool EnableWeatherAndSeasonHover { get; set; } = true;
 
+        /// <summary>Whether to show the Prismatic Butterfly location on the World Map when having the Blessing of the Butterfly.</summary>
+        public bool EnablePrismaticButterflyMapMarker { get; set; } = true;
+
+        /// <summary>Whether to show a directional HUD pointer and beacon towards the Prismatic Butterfly when in the same location.</summary>
+        public bool EnablePrismaticButterflyHudTracker { get; set; } = true;
+
         // SButton is SMAPI's cross-device enum: one type covers keyboard keys, mouse
         // buttons, and controller buttons (so a single setting can serve all inputs).
         /// <summary>Optional key to hold to show hover tooltips (default None: always shows on hover).</summary>

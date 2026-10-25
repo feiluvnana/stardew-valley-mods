@@ -35,6 +35,10 @@ Hover over any interactive tile, entity, or inventory item to inspect live data 
 * **🐄 Farm Animals & Pets:** Displays daily petting status (`Petted today ✓` / `Needs petting ✗`), friendship hearts (`5.0 / 5.0 ♥`), happiness, and ready produce.
 * **🎒 Inventory & Menu Items:** Displays individual and stack sell prices, clean wrapped/bulleted **Community Center bundle requirements**, and **Museum donation status**.
 * **🌤️ Weather & Season HUD Icons:** Hovering over the weather icon in the top-right clock widget displays the current weather condition, detailed description, and tomorrow's forecast. Hovering over the season icon displays the current season, year, day progress (`Day 15 of 28`), remaining days, and the upcoming season.
+* **🦋 Prismatic Butterfly Map Marker & HUD Tracking:** When having the **Blessing of the Butterfly** from the Statue of Blessings (Farming Mastery):
+  * **World Map / Minimap Marker:** Automatically displays the animated, fluttering, prismatic butterfly icon on the in-game World Map (`MapPage` / minimap) for that player. Revolves 4 rainbow sparkles and displays a hover tooltip with the exact location name (`Location: Cindersap Forest - Active today until 5:00 PM!`).
+  * **HUD Directional Edge Pointer & Beacon:** When entering the same map location as the butterfly, a subtle HUD pointer on the edge of the screen points toward the butterfly with distance in tiles/meters. When on-screen, an elevated glowing prismatic beacon marks the butterfly so it is never hidden behind trees or tall grass.
+  * **Blessing Buff Hint:** Hovering over the daily blessing buff icon in the top-right HUD explicitly specifies the exact map name where the butterfly is waiting today.
 
 ---
 
@@ -109,6 +113,8 @@ Customizable, smooth-fading transparency for obstruction-heavy entities whenever
   "ShowItemSellPriceOnHover": true,
   "ShowBundleNeedOnHover": true,
   "ShowMuseumNeedOnHover": true,
+  "EnablePrismaticButterflyMapMarker": true,
+  "EnablePrismaticButterflyHudTracker": true,
   "HoverHotkey": "None",
   "EnableLookupAnything": true,
   "LookupKey": "F1",
@@ -174,6 +180,8 @@ Customizable, smooth-fading transparency for obstruction-heavy entities whenever
 | **Hover Info** | `ShowItemSellPriceOnHover` | `true` | Display sell prices when hovering over items in menus. |
 | **Hover Info** | `ShowBundleNeedOnHover` | `true` | Display Community Center bundle needs on menu items. |
 | **Hover Info** | `ShowMuseumNeedOnHover` | `true` | Display Museum donation status on menu items. |
+| **Hover Info** | `EnablePrismaticButterflyMapMarker` | `true` | Display animated Prismatic Butterfly marker on World Map (`MapPage`). |
+| **Hover Info** | `EnablePrismaticButterflyHudTracker` | `true` | Display directional HUD edge pointer & beacon when in the same location. |
 | **Hover Info** | `HoverHotkey` | `None` | Key to hold to show hover tooltips (`None` = always). |
 | **Lookup** | `EnableLookupAnything` | `true` | Enable F1 lookup cards. |
 | **Lookup** | `LookupKey` | `F1` | Hotkey to trigger lookup card. |

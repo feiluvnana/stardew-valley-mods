@@ -66,12 +66,14 @@ namespace BetterQOL
             MenuTooltipPatch.Apply(harmony, Monitor);
             SkillsPagePatch.Apply(harmony, Monitor);
             DayTimeMoneyBoxPatch.Apply(harmony, Monitor);
+            ButterflyMapTracker.Apply(harmony, Monitor);
             TransparencyPatches.Apply(harmony, Monitor, helper);
 
             // Features that don't need Harmony are initialized directly with SMAPI
             // services instead (an event-driven overlay, custom menu button, and transparency manager).
             GeodeMenuHandler.Initialize(helper, Monitor);
             HoverInfoOverlay.Initialize(helper, Monitor);
+            ButterflyMapTracker.Initialize(helper, Monitor);
             TransparencyManager.Initialize(helper, Monitor);
 
             // EVENTS: in C#, "+=" SUBSCRIBES a method to an event - like plugging it
@@ -224,6 +226,7 @@ namespace BetterQOL
                     Helper.WriteConfig(Config);
                     InvalidateAssetCaches();
                     TransparencyManager.ClearCache();
+                    ButterflyMapTracker.ResetCache();
                 },
                 save: () =>
                 {
@@ -231,6 +234,7 @@ namespace BetterQOL
                     Helper.WriteConfig(Config);
                     InvalidateAssetCaches();
                     TransparencyManager.ClearCache();
+                    ButterflyMapTracker.ResetCache();
                 }
             );
 
@@ -493,6 +497,22 @@ namespace BetterQOL
                 tooltip: () => I18n.Get("config.enable-weather-season-hover.tooltip"),
                 getValue: () => Config.EnableWeatherAndSeasonHover,
                 setValue: value => Config.EnableWeatherAndSeasonHover = value
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.enable-prismatic-butterfly-map-marker.name"),
+                tooltip: () => I18n.Get("config.enable-prismatic-butterfly-map-marker.tooltip"),
+                getValue: () => Config.EnablePrismaticButterflyMapMarker,
+                setValue: value => Config.EnablePrismaticButterflyMapMarker = value
+            );
+
+            configMenu.AddBoolOption(
+                mod: ModManifest,
+                name: () => I18n.Get("config.enable-prismatic-butterfly-hud-tracker.name"),
+                tooltip: () => I18n.Get("config.enable-prismatic-butterfly-hud-tracker.tooltip"),
+                getValue: () => Config.EnablePrismaticButterflyHudTracker,
+                setValue: value => Config.EnablePrismaticButterflyHudTracker = value
             );
 
             // Keybind option: lets the player bind any keyboard/controller button.

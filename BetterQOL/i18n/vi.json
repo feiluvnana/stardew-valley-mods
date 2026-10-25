@@ -1,4 +1,4 @@
-﻿{
+{
     "button.crack-all":  "Đập Toàn Bộ",
     "tooltip.crack-all":  "Đập Nhanh Cả Chồng Hốc Tinh (Shift + Nhấp Chuột)",
     "menu.description.standard":  "Clint có thể đập những hốc tinh này cho bạn với giá 25g.\n(Giữ Shift hoặc bấm \u0027Đập Toàn Bộ\u0027 để mở cả chồng)",
@@ -59,6 +59,10 @@
     "config.show-exact-experience-in-skills-page.tooltip":  "Hiển thị điểm kinh nghiệm hiện tại, mục tiêu cấp kế tiếp, điểm còn thiếu và tỷ lệ tiến độ khi rê chuột vào thanh kỹ năng.",
     "config.enable-weather-season-hover.name":  "Xem Thời Tiết \u0026 Mùa Khi Di Chuột HUD",
     "config.enable-weather-season-hover.tooltip":  "Hiển thị chi tiết thời tiết, dự báo ngày mai và thông tin tiến độ mùa khi rê chuột vào biểu tượng thời tiết và mùa ở góc trên bên phải màn hình.",
+    "config.enable-prismatic-butterfly-map-marker.name":  "Hiện Vị Trí Bướm Ngũ Sắc Trên Bản Đồ",
+    "config.enable-prismatic-butterfly-map-marker.tooltip":  "Hiển thị vị trí chính xác của Bướm Ngũ Sắc trên Bản Đồ Thế Giới khi nhận được Lời Chúc Phúc của Bướm.",
+    "config.enable-prismatic-butterfly-hud-tracker.name":  "Hiện Hướng Bướm Ngũ Sắc Trên HUD",
+    "config.enable-prismatic-butterfly-hud-tracker.tooltip":  "Hiển thị mũi tên chỉ hướng và điểm sáng dẫn đường tới Bướm Ngũ Sắc khi bạn ở cùng khu vực bản đồ.",
     "config.hover-hotkey.name":  "Phím Tắt Kích Hoạt Rê Chuột",
     "config.hover-hotkey.tooltip":  "Phím cần giữ để hiện khung thông tin. Đặt là \u0027None\u0027 để luôn hiện khi rê chuột.",
     "config.section.lookup-anything":  "Tra Cứu Chi Tiết Mọi Thứ",
@@ -281,6 +285,9 @@
     "season.summer":  "Mùa Hạ",
     "season.fall":  "Mùa Thu",
     "season.winter":  "Mùa Đông",
+    "butterfly.map-title":  "Bướm Ngũ Sắc",
+    "butterfly.map-body":  "Vị trí: {{location}}\nĐang đợi bạn hôm nay trước 5:00 chiều!",
+    "butterfly.buff-desc":  "Một con bướm ngũ sắc đang đợi bạn ở {{location}} trước 5:00 chiều!",
     "lookup.common.yes":  "Có",
     "lookup.common.no":  "Không",
     "lookup.common.none":  "Không Có",

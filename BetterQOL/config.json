@@ -25,6 +25,8 @@
   "ShowMuseumNeedOnHover": true,
   "ShowExactExperienceInSkillsPage": true,
   "EnableWeatherAndSeasonHover": true,
+  "EnablePrismaticButterflyMapMarker": true,
+  "EnablePrismaticButterflyHudTracker": true,
   "HoverHotkey": "None",
   "EnableLookupAnything": true,
   "LookupKey": "F1",

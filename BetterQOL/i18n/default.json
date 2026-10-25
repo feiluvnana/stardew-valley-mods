@@ -1,4 +1,4 @@
-﻿{
+{
     "button.crack-all":  "Crack All",
     "tooltip.crack-all":  "Crack Entire Stack (Shift+Click)",
     "menu.description.standard":  "Clint can break these open for you for 25g.\n(Hold Shift or click \u0027Crack All\u0027 to open stack)",
@@ -59,6 +59,10 @@
     "config.show-exact-experience-in-skills-page.tooltip":  "Displays exact current XP, next level target, remaining XP, and progress percentage when hovering over skills.",
     "config.enable-weather-season-hover.name":  "Weather \u0026 Season HUD Hover",
     "config.enable-weather-season-hover.tooltip":  "Displays detailed weather, forecast, and season info when hovering over the weather and season icons in the top-right clock HUD.",
+    "config.enable-prismatic-butterfly-map-marker.name":  "Prismatic Butterfly Map Marker",
+    "config.enable-prismatic-butterfly-map-marker.tooltip":  "Displays the exact location of the Prismatic Butterfly on the World Map when having the Blessing of the Butterfly.",
+    "config.enable-prismatic-butterfly-hud-tracker.name":  "Prismatic Butterfly HUD Direction Pointer",
+    "config.enable-prismatic-butterfly-hud-tracker.tooltip":  "Displays a directional pointer and beacon pointing towards the Prismatic Butterfly when in the same map location.",
     "config.hover-hotkey.name":  "Hover Activation Hotkey",
     "config.hover-hotkey.tooltip":  "Key to hold down to show hover tooltips. Set to \u0027None\u0027 to always show on hover.",
     "config.section.lookup-anything":  "Lookup Anything",
@@ -281,6 +285,9 @@
     "season.summer":  "Summer",
     "season.fall":  "Fall",
     "season.winter":  "Winter",
+    "butterfly.map-title":  "Prismatic Butterfly",
+    "butterfly.map-body":  "Location: {{location}}\nActive today until 5:00 PM!",
+    "butterfly.buff-desc":  "A prismatic butterfly is waiting for you in {{location}} before 5:00 PM!",
     "lookup.common.yes":  "Yes",
     "lookup.common.no":  "No",
     "lookup.common.none":  "None",
