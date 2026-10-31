@@ -129,6 +129,14 @@ namespace BetterIndustry
                 if (machine != null && (machine.ItemId == "163" || machine.QualifiedItemId == "(BC)163"))
                     return;
 
+                // Machines/recipes that natively preserve 1:1 input star quality (Fish Smoker with DROP_IN_QUALITY, Ostrich Egg Mayonnaise with CopyQuality)
+                // must retain full native star quality (including Iridium 4⭐) without being stepped down.
+                if (IsNativeQualityPreserving(machine, outputData, __result))
+                {
+                    __result.Quality = inputItem.Quality;
+                    return;
+                }
+
                 // Restrict quality preservation strictly to Artisan Goods (Category -26) from eligible artisan machines
                 if (!IsEligibleArtisanProduct(__result, machine))
                     return;
@@ -198,6 +206,53 @@ namespace BetterIndustry
         }
 
         /// <summary>
+        /// Checks whether a machine or recipe natively preserves 1:1 star quality from the input item
+        /// (e.g. Fish Smoker smoking fish via DROP_IN_QUALITY, or Mayonnaise Machine processing Ostrich Eggs via CopyQuality).
+        /// </summary>
+        private static bool IsNativeQualityPreserving(StardewValley.Object machine, MachineItemOutput outputData, Item result)
+        {
+            if (outputData != null)
+            {
+                if (outputData.CopyQuality)
+                    return true;
+
+                if (!string.IsNullOrEmpty(outputData.ItemId) && outputData.ItemId.Contains("DROP_IN_QUALITY", StringComparison.OrdinalIgnoreCase))
+                    return true;
+            }
+
+            if (machine != null)
+            {
+                string mId = machine.ItemId;
+                string mQid = machine.QualifiedItemId;
+                string mName = machine.Name ?? string.Empty;
+
+                if (string.Equals(mId, "FishSmoker", StringComparison.OrdinalIgnoreCase)
+                    || string.Equals(mQid, "(BC)FishSmoker", StringComparison.OrdinalIgnoreCase)
+                    || mName.Contains("Fish Smoker", StringComparison.OrdinalIgnoreCase)
+                    || mName.Contains("Smoker", StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+
+            if (result != null)
+            {
+                string rId = result.ItemId;
+                string rQid = result.QualifiedItemId;
+                string rName = result.Name ?? string.Empty;
+
+                if (string.Equals(rId, "SmokedFish", StringComparison.OrdinalIgnoreCase)
+                    || string.Equals(rQid, "(O)SmokedFish", StringComparison.OrdinalIgnoreCase)
+                    || rName.Contains("Smoked Fish", StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Checks if an input item is a vanilla Large animal product (Large Milk, Large Egg) that guarantees Gold quality.
         /// </summary>
         private static bool IsLargeAnimalProduct(Item item)
@@ -242,6 +297,10 @@ namespace BetterIndustry
                 || string.Equals(mQid, "(BC)MushroomLog", StringComparison.OrdinalIgnoreCase)
                 || string.Equals(mId, "MiniForge", StringComparison.OrdinalIgnoreCase)
                 || string.Equals(mQid, "(BC)MiniForge", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(mId, "FishSmoker", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(mQid, "(BC)FishSmoker", StringComparison.OrdinalIgnoreCase)
+                || mName.Contains("Fish Smoker", StringComparison.OrdinalIgnoreCase)
+                || mName.Contains("Smoker", StringComparison.OrdinalIgnoreCase)
                 || mName.Contains("Furnace", StringComparison.OrdinalIgnoreCase)
                 || mName.Contains("Seed Maker", StringComparison.OrdinalIgnoreCase)
                 || mName.Contains("Recycling", StringComparison.OrdinalIgnoreCase)

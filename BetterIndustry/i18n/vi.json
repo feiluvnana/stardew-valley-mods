@@ -21,7 +21,7 @@
     "config.flower-mead-multiplier.name":  "Hệ Số Giá Rượu Mật Ong Hoa",
     "config.flower-mead-multiplier.tooltip":  "Hệ số nhân giá bán Rượu mật ong so với giá mật ong hoa cơ bản (mặc định: 1.35x).",
     "config.machine-quality.name":  "Ma Trận Sao Máy Thủ Công",
-    "config.machine-quality.tooltip":  "Bật ma trận chất lượng cân bằng (60/25/15 với 0% Iridium) cho các máy sản xuất thủ công (Thùng ủ Keg, Hũ mứt, Máy ép phô mai, Máy làm sốt mayonnaise, Khung cửi, Máy ép dầu, Máy sấy, Máy hun khói cá).",
+    "config.machine-quality.tooltip":  "Bật ma trận chất lượng cân bằng (60/25/15 với 0% Iridium) cho các máy sản xuất thủ công (Thùng ủ Keg, Hũ mứt, Máy ép phô mai, Máy làm sốt mayonnaise, Khung cửi, Máy ép dầu, Máy sấy; Máy hun khói cá giữ nguyên 100% sao cá).",
     "config.quality-preserving.name":  "Giữ Sao Chất Lượng Cho Máy",
     "config.quality-preserving.tooltip":  "Các máy thủ công giữ sao chất lượng nguyên liệu thông qua ma trận chất lượng cân bằng 60/25/15.",
     "config.truffle-oil-fix.name":  "Sửa Giá Dầu Nấm",

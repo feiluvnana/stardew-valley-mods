@@ -39,11 +39,12 @@
 ---
 
 ## ⭐ Module 3: Quality-Preserving Artisan Machines & Cooking Oil
-* **Strict Quality Step-Down Matrix:** Machines preserve and step down star quality (0% Iridium) across artisan machines (Kegs, Jars, Cheese Presses, Looms, Dehydrators, Fish Smokers):
+* **Strict Quality Step-Down Matrix:** Machines preserve and step down star quality (0% Iridium) across artisan machines (Kegs, Jars, Cheese Presses, Looms, Dehydrators):
   * **Normal (0⭐) Input**: 100% Normal output (0 free star upgrades).
   * **Silver (1⭐) Input**: 70% Normal, 30% Silver, 0% Gold.
   * **Gold (2⭐) Input**: 40% Normal, 45% Silver, 15% Gold.
   * **Iridium (4⭐) Input**: 20% Normal, 50% Silver, 30% Gold.
+  * *Note*: Native 1:1 quality-preserving equipment (Fish Smokers and Ostrich Egg processing) is exempted from degradation, preserving full 1:1 star levels including Iridium.
 * **🛢️ Cooking Oil Artisan Tag:** Assigns category **`-26` (`Artisan Goods`)** to Cooking Oil (`(O)247`) so it benefits from the **+40% Artisan profession**, scaling through star tiers (140g–280g Artisan).
 
 ---

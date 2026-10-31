@@ -21,7 +21,7 @@
     "config.flower-mead-multiplier.name":  "Flower Mead Multiplier",
     "config.flower-mead-multiplier.tooltip":  "Price multiplier for Flower Honey Mead relative to flower honey base value (default: 1.35x).",
     "config.machine-quality.name":  "Artisan Machine Star Matrix",
-    "config.machine-quality.tooltip":  "Enables the balanced 60/25/15 quality matrix (Normal, Silver, Gold, 0% Iridium) for artisan machines (Keg, Preserves Jar, Cheese Press, Mayo Machine, Loom, Oil Maker, Dehydrator, Smoker).",
+    "config.machine-quality.tooltip":  "Enables the balanced 60/25/15 quality matrix (Normal, Silver, Gold, 0% Iridium) for artisan machines (Keg, Preserves Jar, Cheese Press, Mayo Machine, Loom, Oil Maker, Dehydrator; Fish Smoker natively preserves exact fish stars).",
     "config.quality-preserving.name":  "Quality-Preserving Machines",
     "config.quality-preserving.tooltip":  "Artisan machines preserve the input item\u0027s star quality through the balanced 60/25/15 quality matrix.",
     "config.truffle-oil-fix.name":  "Truffle Oil Scaling Fix",
