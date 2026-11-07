@@ -16,7 +16,7 @@ A suite of high-performance, modular quality-of-life, progression enhancement, a
 | [**📦 BetterQOL**](./BetterQOL) | `1.6.8` | Comprehensive Quality-of-Life suite: Weather & Season HUD hover, Prismatic Butterfly map tracking, Exact XP skills panel, Lookup Anything (`F1`), UI hover overlays, dynamic transparency, item stacking, and geode cracking. | Weather & Season top-right clock hover overlays, Prismatic Butterfly live marker on World Map (MapPage / minimap) & HUD pointer for blessed player, Exact XP numbers & level progress on SkillsPage, UI Info Suite 2 style hover tooltips (crops, machines, trees, debris & resource clumps, animals), F1 Lookup Anything, dynamic transparency, unstackable item stack overrides, and instant geode cracking. |
 | [**👑 BetterFurniture**](./BetterFurniture) | `1.0.1` | Interior decorating and luxury furniture expansion. | 4x4 spacious Princess King Bed with free placement anywhere, animated sconce flames, light sources, canopy layering, and farmhouse tile restorations. |
 | [**🗺️ BetterMap**](./BetterMap) | `1.0.0` | Farmhouse doorway and Ginger Island farm clutter cleaner. | Widens all Farmhouse exit doorways to 3x1 tiles, removes Ginger Island Farm driftwood fence and bleached log piles. |
-| [**🌵 BetterEvent**](./BetterEvent) | `1.2.2` | Expands the Calico Desert Festival across all seasons. | Enables Desert Festival in Summer, Fall, and Winter (15th–17th), preserves Calico Eggs across seasons. |
+| [**🌵 BetterEvent**](./BetterEvent) | `1.2.3` | Expands the Calico Desert Festival across all seasons. | Enables Desert Festival in Summer, Fall, and Winter (15th–17th), preserves Calico Eggs across seasons. |
 
 ---
 

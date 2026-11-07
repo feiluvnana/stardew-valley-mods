@@ -59,6 +59,25 @@ namespace BetterEvent
         }
 
         /// <summary>
+        /// Gets the current season even during SaveGame loading before Context.IsWorldReady is true.
+        /// </summary>
+        public static Season GetEffectiveSeason()
+        {
+            if (SaveGame.loaded != null && !string.IsNullOrEmpty(SaveGame.loaded.currentSeason))
+            {
+                if (Enum.TryParse(SaveGame.loaded.currentSeason, ignoreCase: true, out Season parsedSeason))
+                {
+                    return parsedSeason;
+                }
+            }
+            if (!string.IsNullOrEmpty(Game1.currentSeason))
+            {
+                return Game1.season;
+            }
+            return Season.Spring;
+        }
+
+        /// <summary>
         /// Returns true when the Desert Festival should exist during the given
         /// season. Spring is ALWAYS enabled (vanilla behaviour); every other
         /// season honors its own config toggle.
@@ -107,11 +126,9 @@ namespace BetterEvent
                     // variable and fills it with the found entry in one step.
                     if (data.TryGetValue("DesertFestival", out var festival))
                     {
-                        // Use the CURRENT season if a world is loaded; otherwise
-                        // fall back to Spring. Context.IsWorldReady tells whether
-                        // an actual save/world exists right now, and Game1 is
-                        // the game's global-state hub class.
-                        Season currentSeason = Context.IsWorldReady ? Game1.season : Season.Spring;
+                        // Use the effective season even during save loading; otherwise
+                        // fall back to Spring.
+                        Season currentSeason = GetEffectiveSeason();
                         if (IsSeasonEnabled(currentSeason))
                         {
                             festival.Season = currentSeason;
@@ -128,6 +145,39 @@ namespace BetterEvent
         }
 
         /// <summary>
+        /// Ensures DesertFestival is added to active passive festivals and daily setup is executed
+        /// if today is a scheduled festival day and requirements are met.
+        /// </summary>
+        private void SyncFestivalStateIfNeeded()
+        {
+            if (!Context.IsWorldReady || !Game1.IsMasterGame)
+                return;
+
+            Season currentSeason = Game1.season;
+            int startDay = Math.Clamp(Config.FestivalStartDay, 1, 28);
+            int endDay = Math.Clamp(Config.FestivalEndDay, startDay, 28);
+
+            bool shouldBeActive = IsSeasonEnabled(currentSeason)
+                && Game1.dayOfMonth >= startDay
+                && Game1.dayOfMonth <= endDay
+                && GameStateQuery.CheckConditions("LOCATION_ACCESSIBLE Desert");
+
+            bool isCurrentlyActive = Game1.netWorldState.Value.ActivePassiveFestivals.Contains("DesertFestival");
+
+            if (shouldBeActive && !isCurrentlyActive)
+            {
+                Helper.GameContent.InvalidateCache("Data/PassiveFestivals");
+                Game1.UpdatePassiveFestivalStates();
+
+                if (Utility.IsPassiveFestivalDay("DesertFestival"))
+                {
+                    Game1.PerformPassiveFestivalSetup();
+                    Monitor.Log($"BetterEvent: Activated Desert Festival for {currentSeason} day {Game1.dayOfMonth}.", LogLevel.Info);
+                }
+            }
+        }
+
+        /// <summary>
         /// Runs right after a save loads: refreshes the festival asset so its
         /// dates match the season the player loaded INTO (handles mid-season
         /// loads where a stale copy might already be cached).
@@ -136,6 +186,7 @@ namespace BetterEvent
         {
             // Invalidate cache upon loading save to ensure correct season config for mid-season loads
             Helper.GameContent.InvalidateCache("Data/PassiveFestivals");
+            SyncFestivalStateIfNeeded();
         }
 
         /// <summary>
@@ -185,6 +236,8 @@ namespace BetterEvent
             {
                 Helper.GameContent.InvalidateCache("Data/PassiveFestivals");
             }
+
+            SyncFestivalStateIfNeeded();
 
             // Morning festival reminders for active seasons (Summer, Fall, Winter, Spring)
             int startDay = Math.Clamp(Config.FestivalStartDay, 1, 28);
@@ -267,12 +320,14 @@ namespace BetterEvent
                     Config = new ModConfig();
                     // ...applied immediately via cache invalidation.
                     Helper.GameContent.InvalidateCache("Data/PassiveFestivals");
+                    SyncFestivalStateIfNeeded();
                 },
                 save: () =>
                 {
                     // Persist toggles to disk, then apply them right away.
                     Helper.WriteConfig(Config);
                     Helper.GameContent.InvalidateCache("Data/PassiveFestivals");
+                    SyncFestivalStateIfNeeded();
                 }
             );
 
